@@ -1,0 +1,16 @@
+---
+name: SLSA Source
+on:
+  push:
+    branches: [ "main" ]
+    tags: ['**']
+permissions: {}
+
+jobs:
+  # Whenever new source is pushed recompute the slsa source information.
+  generate-provenance:
+    permissions:
+      contents: write # needed for storing the vsa in the repo.
+      id-token: write # meeded to mint yokens for signing
+    uses: slsa-framework/source-actions/.github/workflows/compute_slsa_source.yml@main
+

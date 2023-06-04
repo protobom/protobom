@@ -3,7 +3,7 @@
 `protobom` is a [protocol buffers](https://protobuf.dev/getting-started/)
 representation of SBOM data able to ingest documents in modern 
 [SPDX](https://spdx.dev/) and [CycloneDX](https://cyclonedx.org/) versions
-without loss. It has an accompanying go library generated from the protocol
+without loss. It has an accompaining go library generated from the protocol
 buffers that also implements ingesters for those formats.
 
 ## Supported Versions and Formats

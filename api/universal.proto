@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "universal/";
+package puerco.protobom;
+
+// Graph is a minimal SBOM graph that can capture any SBOM 
+// in the current formats, including SPDX 3.
+message Graph {
+    string id = 1;
+    repeated Property metadata = 2;
+    repeated Node nodes = 3;
+    repeated Edge graph = 4;
+}
+
+message Node {
+    string id = 1;
+    NodeType type = 2;
+    repeated Property metadata = 3;
+
+    enum NodeType {
+        PACKAGE = 0;
+        FILE = 1;
+    }
+}
+
+message Property {
+    string name = 1;
+    string value = 2;
+    google.protobuf.Timestamp time = 3;
+    repeated Property properties = 4;
+}
+
+message Edge {
+    string type = 1;
+    string from = 2;
+    repeated string to = 3;
+    repeated Property properties = 4;
+}

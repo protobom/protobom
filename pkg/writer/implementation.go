@@ -8,10 +8,12 @@ import (
 	"strconv"
 	"strings"
 
+	cdx14 "github.com/bom-squad/protobom/pkg/cdx14"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer/options"
 	"github.com/onesbom/onesbom/pkg/formats"
-	cdx14 "github.com/onesbom/onesbom/pkg/formats/cyclonedx/v14"
+
+	// cdx14_old "github.com/onesbom/onesbom/pkg/formats/cyclonedx/v14"
 	"github.com/sirupsen/logrus"
 )
 
@@ -40,18 +42,22 @@ func (di *defaultWriterImplementation) SerializeSBOM(opts options.Options, s Ser
 	if err != nil {
 		ver = 0
 	}
-	doc := cdx14.Document{
-		Version:      ver,
-		Format:       "CycloneDX",
-		SpecVersion:  "1.4",
-		SerialNumber: bom.Metadata.Id,
-		Metadata: cdx14.Metadata{
-			// Tools:     []cdx14.Tool{},
-			Component: cdx14.Component{},
-		},
-		Components:   []cdx14.Component{},
-		Dependencies: []cdx14.Dependency{},
+	ver_2 := int32(ver)
+
+	doc := cdx14.Bom{
+		SpecVersion:        "1.4",
+		Version:            &ver_2,
+		SerialNumber:       &bom.Metadata.Id,
+		Metadata:           &cdx14.Metadata{},
+		Components:         []*cdx14.Component{},
+		Services:           []*cdx14.Service{},
+		ExternalReferences: []*cdx14.ExternalReference{},
+		Dependencies:       []*cdx14.Dependency{},
+		Compositions:       []*cdx14.Composition{},
+		Vulnerabilities:    []*cdx14.Vulnerability{},
 	}
+
+	// cdx14_old.Dependency
 	/*
 		if bom.Metadata.Date != nil {
 			doc.Metadata.Timestamp = bom.Metadata.Date.AsTime()
@@ -68,10 +74,10 @@ func (di *defaultWriterImplementation) SerializeSBOM(opts options.Options, s Ser
 			continue
 		}
 
-		if comp.Ref == "" {
+		if comp.BomRef == nil {
 			refless = append(refless, comp)
 		} else {
-			components[comp.Ref] = comp
+			components[*comp.BomRef] = comp
 		}
 	}
 
@@ -86,7 +92,7 @@ func (di *defaultWriterImplementation) SerializeSBOM(opts options.Options, s Ser
 			for _, n := range bom.Nodes {
 				if n.Id == id {
 					rootComp := nodeToCDX14Component(n)
-					doc.Metadata.Component = *rootComp
+					doc.Metadata.Component = rootComp
 					addedDict[id] = struct{}{}
 				}
 			}
@@ -122,27 +128,34 @@ func (di *defaultWriterImplementation) SerializeSBOM(opts options.Options, s Ser
 				}
 
 				if components[e.From].Components == nil {
-					components[e.From].Components = []cdx14.Component{}
+					components[e.From].Components = []*cdx14.Component{}
 				}
-				components[e.From].Components = append(components[e.From].Components, *components[targetID])
+				components[e.From].Components = append(components[e.From].Components, components[targetID])
 			}
 
 		case sbom.Edge_dependsOn:
 			// Add to the dependency tree
+
+			if doc.Dependencies == nil {
+				doc.Dependencies = []*cdx14.Dependency{}
+			}
+
 			for _, targetID := range e.To {
 				addedDict[targetID] = struct{}{}
 				if _, ok := components[targetID]; !ok {
 					return fmt.Errorf("unable to locate node %s", targetID)
 				}
 
-				if doc.Dependencies == nil {
-					doc.Dependencies = []cdx14.Dependency{}
+				dep := cdx14.Dependency{
+					Ref: e.From,
+					Dependencies: []*cdx14.Dependency{
+						{
+							Ref: targetID,
+						},
+					},
 				}
 
-				doc.Dependencies = append(doc.Dependencies, cdx14.Dependency{
-					Ref:       e.From,
-					DependsOn: e.To,
-				})
+				doc.Dependencies = append(doc.Dependencies, &dep)
 			}
 
 		default:
@@ -155,15 +168,15 @@ func (di *defaultWriterImplementation) SerializeSBOM(opts options.Options, s Ser
 
 		// Now add al nodes we have not yet positioned
 		for _, c := range components {
-			if _, ok := addedDict[c.Ref]; ok {
+			if _, ok := addedDict[*c.BomRef]; ok {
 				continue
 			}
-			doc.Components = append(doc.Components, *c)
+			doc.Components = append(doc.Components, c)
 		}
 
 		// Add components without refs
 		for _, c := range refless {
-			doc.Components = append(doc.Components, *c)
+			doc.Components = append(doc.Components, c)
 		}
 	}
 	logrus.Info("Writing SBOM in CycloneDX to STDOUT")
@@ -191,35 +204,35 @@ func nodeToCDX14Component(n *sbom.Node) *cdx14.Component {
 		return nil
 	}
 	c := &cdx14.Component{
-		Ref:         n.Id,
-		Type:        strings.ToLower(n.PrimaryPurpose),
+		BomRef: &n.Id,
+		// Type:        strings.ToLower(n.PrimaryPurpose),
 		Name:        n.Name,
 		Version:     n.Version,
-		Description: n.Description,
+		Description: &n.Description,
 		// Components:  []cdx14.Component{},
 	}
 
 	if n.Type == sbom.Node_FILE {
-		c.Type = "file"
+		c.Type = cdx14.Classification_CLASSIFICATION_FILE
 	}
 
-	if n.Licenses != nil && len(n.Licenses) > 0 {
-		c.Licenses = []cdx14.License{}
-		for _, l := range n.Licenses {
-			c.Licenses = append(c.Licenses, cdx14.License{
-				License: struct {
-					ID string "json:\"id\"" // TODO optimize
-				}{l},
-			})
-		}
-	}
+	// if n.Licenses != nil && len(n.Licenses) > 0 {
+	// 	c.Licenses = []*cdx14.License{}
+	// 	for _, l := range n.Licenses {
+	// 		c.Licenses = append(c.Licenses, &cdx14.License{
+	// 			License: struct {
+	// 				ID string "json:\"id\"" // TODO optimize
+	// 			}{l},
+	// 		})
+	// 	}
+	// }
 
 	if n.Hashes != nil && len(n.Hashes) > 0 {
-		c.Hashes = []cdx14.Hash{}
-		for algo, hash := range n.Hashes {
-			c.Hashes = append(c.Hashes, cdx14.Hash{
-				Algorithm: algo, // Fix to make it valid
-				Content:   hash,
+		c.Hashes = []*cdx14.Hash{}
+		for _, hash := range n.Hashes {
+			c.Hashes = append(c.Hashes, &cdx14.Hash{
+				// Alg:    algo, // Fix to make it valid
+				Value: hash,
 			})
 		}
 	}
@@ -227,17 +240,18 @@ func nodeToCDX14Component(n *sbom.Node) *cdx14.Component {
 	if n.ExternalReferences != nil {
 		for _, er := range n.ExternalReferences {
 			if er.Type == "purl" {
-				c.Purl = er.Url
+				c.Purl = &er.Url
 				continue
 			}
 
 			if c.ExternalReferences == nil {
-				c.ExternalReferences = []cdx14.ExternalReference{}
+				c.ExternalReferences = []*cdx14.ExternalReference{}
 			}
 
-			c.ExternalReferences = append(c.ExternalReferences, cdx14.ExternalReference{
-				Type: er.Type,
-				URL:  er.Url,
+			typeEnum := cdx14.ExternalReferenceType_value[er.Type]
+			c.ExternalReferences = append(c.ExternalReferences, &cdx14.ExternalReference{
+				Type: cdx14.ExternalReferenceType(typeEnum),
+				Url:  er.Url,
 			})
 		}
 	}

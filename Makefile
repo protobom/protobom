@@ -20,18 +20,32 @@ define title
     @printf '$(TITLE)$(1)$(RESET)\n'
 endef
 
+ifeq "$(strip $(VERSION))" ""
+ override VERSION = $(shell git describe --always --tags --dirty)
+endif
+
+
+ifeq "$(strip $(BRANCH))" ""
+ override BRANCH = $(shell git rev-parse --abbrev-ref HEAD | sed 's/\//-/g; s/ /-/g')
+endif
+
+
 PROTOC_ZIP=protoc-$(PROTOC_VERSION)-$(OS_TYPE)-$(ARCH).zip
 PROTODIR = $(TEMPDIR)/proto
 # PROTOC = $(PROTODIR)/bin/protoc 
 PROTOC = $(shell which protoc) #  For protoc installed in path used
 PROTODIR = $(TEMPDIR)/proto
 CDX_SPECDIR =  $(TEMPDIR)/cdx_spec
+EXAMPLE_OUTPUT =  examples/output
 
 $(TEMPDIR):
 	mkdir -p $(TEMPDIR)
 
 $(PROTODIR):
 	mkdir -p $(PROTODIR)
+
+$(EXAMPLE_OUTPUT):
+	mkdir -p $(EXAMPLE_OUTPUT)
 
 .PHONY: help
 help:
@@ -43,6 +57,14 @@ go-gen: ## Generate go protobuf
 	$(PROTOC)  --go_out=pkg/ --experimental_allow_proto3_optional  api/cdx/bom-1.4.proto
 #	$(PROTOC) --go_out=pkg/ api/sbom.proto
 #	$(PROTOC) --go_out=pkg/ api/universal.proto
+
+.PHONY: go_gen
+go-examples: ## Generate go protobuf
+	 go run  cmd/demo-ingest/main.go examples/vt.spdx.json > $(EXAMPLE_OUTPUT)/vt.spdx_cdx14.$(BRANCH).$(VERSION).json
+
+#	$(PROTOC) --go_out=pkg/ api/sbom.proto
+#	$(PROTOC) --go_out=pkg/ api/universal.proto
+
 
 .PHONY: go_gen
 go-cdx: ## Generate go protobuf

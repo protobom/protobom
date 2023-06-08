@@ -162,3 +162,63 @@ func (s *SerializerCDX14) Render(opts options.Options, doc interface{}, wr io.Wr
 
 	return nil
 }
+
+// nodeTo14Component converta a node in protobuf to a CycloneDX 1.4 component
+func nodeToCDX14Component(n *sbom.Node) *cdx14.Component {
+	if n == nil {
+		return nil
+	}
+	c := &cdx14.Component{
+		Ref:         n.Id,
+		Type:        strings.ToLower(n.PrimaryPurpose),
+		Name:        n.Name,
+		Version:     n.Version,
+		Description: n.Description,
+		// Components:  []cdx14.Component{},
+	}
+
+	if n.Type == sbom.Node_FILE {
+		c.Type = "file"
+	}
+
+	if n.Licenses != nil && len(n.Licenses) > 0 {
+		c.Licenses = []cdx14.License{}
+		for _, l := range n.Licenses {
+			c.Licenses = append(c.Licenses, cdx14.License{
+				License: struct {
+					ID string "json:\"id\"" // TODO optimize
+				}{l},
+			})
+		}
+	}
+
+	if n.Hashes != nil && len(n.Hashes) > 0 {
+		c.Hashes = []cdx14.Hash{}
+		for algo, hash := range n.Hashes {
+			c.Hashes = append(c.Hashes, cdx14.Hash{
+				Algorithm: algo, // Fix to make it valid
+				Content:   hash,
+			})
+		}
+	}
+
+	if n.ExternalReferences != nil {
+		for _, er := range n.ExternalReferences {
+			if er.Type == "purl" {
+				c.Purl = er.Url
+				continue
+			}
+
+			if c.ExternalReferences == nil {
+				c.ExternalReferences = []cdx14.ExternalReference{}
+			}
+
+			c.ExternalReferences = append(c.ExternalReferences, cdx14.ExternalReference{
+				Type: er.Type,
+				URL:  er.Url,
+			})
+		}
+	}
+
+	return c
+}

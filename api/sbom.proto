@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "sbom/";
-package puerco.protobom;
+package bomsquad.protobom;
 
 message Document {
     Metadata metadata = 1;

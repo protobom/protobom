@@ -4,7 +4,14 @@
 representation of SBOM data able to ingest documents in modern 
 [SPDX](https://spdx.dev/) and [CycloneDX](https://cyclonedx.org/) versions
 without loss. It has an accompaining go library generated from the protocol
-buffers that also implements ingesters for those formats.
+buffers definiton that also implements ingesters for those formats.
+
+Standard SBOMs are read by a reader using [parsers](docs/parsers.md) that
+understand the common formats. Parsers create a neutral protobom from data
+read from CycloneDX or SPDX documents.
+
+A protobom can be rendered into standard SBOM formats by the writer using 
+[serializers](docs/serializers.md) that know how to generate those documents.
 
 ## Supported Versions and Formats
 

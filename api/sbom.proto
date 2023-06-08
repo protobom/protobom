@@ -151,4 +151,5 @@ message Identifier {
 message NodeList {
     repeated Node nodes = 1;
     repeated Edge edges = 2;
+    repeated string root_elements = 3;
 }

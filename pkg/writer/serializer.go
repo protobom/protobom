@@ -4,12 +4,10 @@ import (
 	"io"
 
 	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/bom-squad/protobom/pkg/writer/options"
 )
 
-// SerializerCDX14 is an object that writes a protobuf sbom to CycloneDX 1.4
-type SerializerCDX14 struct{}
-
-func (s *SerializerCDX14) Render(*sbom.Document, io.Writer) error {
-	return nil
-
+type Serializer interface {
+	Serialize(options.Options, *sbom.Document) (interface{}, error)
+	Render(options.Options, interface{}, io.Writer) error
 }

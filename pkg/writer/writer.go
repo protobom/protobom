@@ -9,10 +9,6 @@ import (
 	"github.com/bom-squad/protobom/pkg/writer/options"
 )
 
-type Serializer interface {
-	Render(*sbom.Document, io.Writer) error
-}
-
 type Option func(*Writer)
 
 func New() *Writer {
@@ -31,12 +27,15 @@ func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 	if bom == nil {
 		return errors.New("unable to write sbom to stream, SBOM is nil")
 	}
-	s, err := w.impl.GetFormatSerializer(w.Options.Format)
+
+	// The target format is in the options ATM. Here we get the
+	// serializer for the target we are writing to
+	serializer, err := w.impl.GetFormatSerializer(w.Options.Format)
 	if err != nil {
 		return fmt.Errorf("getting serializer: %w", err)
 	}
 
-	if err := w.impl.SerializeSBOM(w.Options, s, bom, wr); err != nil {
+	if err := w.impl.SerializeSBOM(w.Options, serializer, bom, wr); err != nil {
 		return fmt.Errorf("serializing sbom: %w", err)
 	}
 

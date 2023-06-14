@@ -1,7 +1,6 @@
 package writer
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -9,7 +8,9 @@ import (
 
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer/options"
-	cdx14 "github.com/onesbom/onesbom/pkg/formats/cyclonedx/v14"
+
+	// cdx14 "github.com/onesbom/onesbom/pkg/formats/cyclonedx/v14"
+	cdx14 "github.com/CycloneDX/cyclonedx-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,22 +20,21 @@ import (
 type SerializerCDX14 struct{}
 
 func (s *SerializerCDX14) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
+	doc := cdx14.NewBOM()
+	doc.SerialNumber = bom.Metadata.Id
 	ver, err := strconv.Atoi(bom.Metadata.Version)
-	if err != nil {
-		ver = 0
+	if err == nil {
+		doc.Version = ver
 	}
-	doc := &cdx14.Document{
-		Version:      ver,
-		Format:       "CycloneDX",
-		SpecVersion:  "1.4",
-		SerialNumber: bom.Metadata.Id,
-		Metadata: cdx14.Metadata{
-			// Tools:     []cdx14.Tool{},
-			Component: cdx14.Component{},
-		},
-		Components:   []cdx14.Component{},
-		Dependencies: []cdx14.Dependency{},
+
+	metadata := cdx14.Metadata{
+		// Tools:     []cdx14.Tool{},
+		Component: &cdx14.Component{},
 	}
+
+	doc.Metadata = &metadata
+	doc.Components = &[]cdx14.Component{}
+	doc.Dependencies = &[]cdx14.Dependency{}
 	/*
 		if bom.Metadata.Date != nil {
 			doc.Metadata.Timestamp = bom.Metadata.Date.AsTime()
@@ -51,10 +51,10 @@ func (s *SerializerCDX14) Serialize(opts options.Options, bom *sbom.Document) (i
 			continue
 		}
 
-		if comp.Ref == "" {
+		if comp.BOMRef == "" {
 			refless = append(refless, comp)
 		} else {
-			components[comp.Ref] = comp
+			components[comp.BOMRef] = comp
 		}
 	}
 
@@ -69,7 +69,7 @@ func (s *SerializerCDX14) Serialize(opts options.Options, bom *sbom.Document) (i
 			for _, n := range bom.Nodes {
 				if n.Id == id {
 					rootComp := nodeToCDX14Component(n)
-					doc.Metadata.Component = *rootComp
+					doc.Metadata.Component = rootComp
 					addedDict[id] = struct{}{}
 				}
 			}
@@ -105,9 +105,9 @@ func (s *SerializerCDX14) Serialize(opts options.Options, bom *sbom.Document) (i
 				}
 
 				if components[e.From].Components == nil {
-					components[e.From].Components = []cdx14.Component{}
+					components[e.From].Components = &[]cdx14.Component{}
 				}
-				components[e.From].Components = append(components[e.From].Components, *components[targetID])
+				*components[e.From].Components = append(*components[e.From].Components, *components[targetID])
 			}
 
 		case sbom.Edge_dependsOn:
@@ -119,12 +119,12 @@ func (s *SerializerCDX14) Serialize(opts options.Options, bom *sbom.Document) (i
 				}
 
 				if doc.Dependencies == nil {
-					doc.Dependencies = []cdx14.Dependency{}
+					doc.Dependencies = &[]cdx14.Dependency{}
 				}
 
-				doc.Dependencies = append(doc.Dependencies, cdx14.Dependency{
-					Ref:       e.From,
-					DependsOn: e.To,
+				*doc.Dependencies = append(*doc.Dependencies, cdx14.Dependency{
+					Ref:          e.From,
+					Dependencies: &e.To,
 				})
 			}
 
@@ -138,15 +138,15 @@ func (s *SerializerCDX14) Serialize(opts options.Options, bom *sbom.Document) (i
 
 		// Now add al nodes we have not yet positioned
 		for _, c := range components {
-			if _, ok := addedDict[c.Ref]; ok {
+			if _, ok := addedDict[c.BOMRef]; ok {
 				continue
 			}
-			doc.Components = append(doc.Components, *c)
+			*doc.Components = append(*doc.Components, *c)
 		}
 
 		// Add components without refs
 		for _, c := range refless {
-			doc.Components = append(doc.Components, *c)
+			*doc.Components = append(*doc.Components, *c)
 		}
 	}
 	return doc, nil
@@ -154,9 +154,27 @@ func (s *SerializerCDX14) Serialize(opts options.Options, bom *sbom.Document) (i
 
 func (s *SerializerCDX14) Render(opts options.Options, doc interface{}, wr io.Writer) error {
 	logrus.Debug("Writing SBOM in CycloneDX to STDOUT")
-	encoder := json.NewEncoder(wr)
-	encoder.SetIndent("", strings.Repeat(" ", opts.Indent))
-	if err := encoder.Encode(doc.(*cdx14.Document)); err != nil {
+	encoder := cdx14.NewBOMEncoder(wr, cdx14.BOMFileFormatJSON)
+	if doc == nil {
+		return fmt.Errorf("no doc found")
+	}
+
+	if opts.Format.Type() != options.CDXFROMAT {
+		return fmt.Errorf("unsupported options, %v", opts)
+	}
+
+	encoder.SetPretty(true)
+
+	cdxVersion := cdx14.SpecVersion1_4
+	// 2DO - not sure if we should implicit switch case the suppported version or simply transform
+	verMinor := opts.Format.Minor()
+	ver, err := strconv.Atoi(verMinor)
+	if err == nil {
+		cdxVersion = cdx14.SpecVersion(ver)
+	}
+
+	err = encoder.EncodeVersion(doc.(*cdx14.BOM), cdxVersion)
+	if err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
 
@@ -169,8 +187,8 @@ func nodeToCDX14Component(n *sbom.Node) *cdx14.Component {
 		return nil
 	}
 	c := &cdx14.Component{
-		Ref:         n.Id,
-		Type:        strings.ToLower(n.PrimaryPurpose),
+		BOMRef:      n.Id,
+		Type:        cdx14.ComponentType(strings.ToLower(n.PrimaryPurpose)), // Fix to make it valid
 		Name:        n.Name,
 		Version:     n.Version,
 		Description: n.Description,
@@ -182,22 +200,26 @@ func nodeToCDX14Component(n *sbom.Node) *cdx14.Component {
 	}
 
 	if n.Licenses != nil && len(n.Licenses) > 0 {
-		c.Licenses = []cdx14.License{}
+		var licenseChoices []cdx14.LicenseChoice
+		var licenses cdx14.Licenses
 		for _, l := range n.Licenses {
-			c.Licenses = append(c.Licenses, cdx14.License{
-				License: struct {
-					ID string "json:\"id\"" // TODO optimize
-				}{l},
+			licenseChoices = append(licenseChoices, cdx14.LicenseChoice{
+				License: &cdx14.License{
+					ID: l,
+				},
 			})
 		}
+
+		licenses = licenseChoices
+		c.Licenses = &licenses
 	}
 
 	if n.Hashes != nil && len(n.Hashes) > 0 {
-		c.Hashes = []cdx14.Hash{}
+		c.Hashes = &[]cdx14.Hash{}
 		for algo, hash := range n.Hashes {
-			c.Hashes = append(c.Hashes, cdx14.Hash{
-				Algorithm: algo, // Fix to make it valid
-				Content:   hash,
+			*c.Hashes = append(*c.Hashes, cdx14.Hash{
+				Algorithm: NormalizeAlgo(algo), // Fix to make it valid
+				Value:     hash,
 			})
 		}
 	}
@@ -205,20 +227,53 @@ func nodeToCDX14Component(n *sbom.Node) *cdx14.Component {
 	if n.ExternalReferences != nil {
 		for _, er := range n.ExternalReferences {
 			if er.Type == "purl" {
-				c.Purl = er.Url
+				c.PackageURL = er.Url
 				continue
 			}
 
 			if c.ExternalReferences == nil {
-				c.ExternalReferences = []cdx14.ExternalReference{}
+				c.ExternalReferences = &[]cdx14.ExternalReference{}
 			}
 
-			c.ExternalReferences = append(c.ExternalReferences, cdx14.ExternalReference{
-				Type: er.Type,
+			*c.ExternalReferences = append(*c.ExternalReferences, cdx14.ExternalReference{
+				Type: cdx14.ExternalReferenceType(er.Type), // Fix to make it valid
 				URL:  er.Url,
 			})
 		}
 	}
 
 	return c
+}
+
+func NormalizeAlgo(algo string) cdx14.HashAlgorithm {
+	normAlgo := strings.ReplaceAll(strings.ToLower(algo), "_", "-")
+	switch normAlgo {
+	case "md5", "md-5":
+		return cdx14.HashAlgoMD5
+	case "sha1", "sha-1":
+		return cdx14.HashAlgoSHA1
+	case "sha256", "sha-256":
+		return cdx14.HashAlgoSHA256
+	case "sha384", "sha-384":
+		return cdx14.HashAlgoSHA384
+	case "sha512", "sha-512", "sha_512":
+		return cdx14.HashAlgoSHA512
+	case "sha3-256":
+		return cdx14.HashAlgoSHA3_256
+	case "sha3-384":
+		return cdx14.HashAlgoSHA3_384
+	case "sha3-512":
+		return cdx14.HashAlgoSHA3_512
+	case "blake2b-256":
+		return cdx14.HashAlgoBlake2b_256
+	case "blake2b-384":
+		return cdx14.HashAlgoBlake2b_384
+	case "blake2b-512":
+		return cdx14.HashAlgoBlake2b_512
+	case "blake3":
+		return cdx14.HashAlgoBlake3
+	default:
+		// Handle the case when the algorithm is not recognized
+		return "Unknown"
+	}
 }

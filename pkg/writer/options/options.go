@@ -1,9 +1,7 @@
 package options
 
-import "github.com/onesbom/onesbom/pkg/formats"
-
 type Options struct {
-	Format formats.Format
+	Format Format
 	Indent int
 }
 

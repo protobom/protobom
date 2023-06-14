@@ -12,16 +12,16 @@ import (
 )
 
 type writerImplementation interface {
-	GetFormatSerializer(formats.Format) (Serializer, error)
+	GetFormatSerializer(options.Format) (Serializer, error)
 	SerializeSBOM(options.Options, Serializer, *sbom.Document, io.WriteCloser) error
 	OpenFile(string) (*os.File, error)
 }
 
 type defaultWriterImplementation struct{}
 
-func (di *defaultWriterImplementation) GetFormatSerializer(format formats.Format) (Serializer, error) {
+func (di *defaultWriterImplementation) GetFormatSerializer(format options.Format) (Serializer, error) {
 	switch format {
-	case formats.CDX14JSON:
+	case options.CDX14JSON:
 		logrus.Infof("Serializing to %s", formats.CDX14JSON)
 		return &SerializerCDX14{}, nil
 	default:

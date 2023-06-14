@@ -7,7 +7,6 @@ import (
 
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer/options"
-	"github.com/onesbom/onesbom/pkg/formats"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,7 +21,7 @@ type defaultWriterImplementation struct{}
 func (di *defaultWriterImplementation) GetFormatSerializer(format options.Format) (Serializer, error) {
 	switch format {
 	case options.CDX14JSON:
-		logrus.Infof("Serializing to %s", formats.CDX14JSON)
+		logrus.Infof("Serializing to %s", options.CDX14JSON)
 		return &SerializerCDX14{}, nil
 	default:
 		return nil, fmt.Errorf("no serializer supports rendering to %s", format)

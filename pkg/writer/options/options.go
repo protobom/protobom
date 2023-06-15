@@ -1,7 +1,9 @@
 package options
 
+import "github.com/bom-squad/protobom/pkg/format"
+
 type Options struct {
-	Format Format
+	Format format.Format
 	Indent int
 }
 

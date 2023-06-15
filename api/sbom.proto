@@ -153,3 +153,26 @@ message NodeList {
     repeated Edge edges = 2;
     repeated string root_elements = 3;
 }
+
+enum HashAlgorithm {
+    UNKNOWN = 0;
+    MD5 = 1;
+    SHA1 = 2;
+    SHA256 = 3;
+    SHA384 = 4;
+    SHA512 = 5;
+    SHA3_256 = 6;
+    SHA3_384 = 7;
+    SHA3_512 = 8;
+    BLAKE2B_256 = 9;
+    BLAKE2B_384 = 10;
+    BLAKE2B_512 = 11;
+    BLAKE3 = 12;
+
+    //2DO what should we do
+    MD2 = 13; // Only supported by SPDX
+    ADLER32 = 14; // Only supported by SPDX
+    MD4 = 15; // Only supported by SPDX
+    MD6 = 16; // Only supported by SPDX
+    SHA224 = 17; // Only supported by SPDX
+  }

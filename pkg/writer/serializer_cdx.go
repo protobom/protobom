@@ -43,7 +43,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	for _, n := range bom.Nodes {
 		comp := s.nodeToComponent(n)
 		if comp == nil {
-			// Erorr? Warrn?
+			// Error? Warn?
 			continue
 		}
 
@@ -148,7 +148,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	return doc, nil
 }
 
-// nodeTo14Component converta a node in protobuf to a CycloneDX 1.4 component
+// nodeToComponent converts a node in protobuf to a CycloneDX component
 func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n == nil {
 		return nil
@@ -189,6 +189,7 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				if cdxAlgo == "" {
 					// Data loss here.
 					// TODO how do we handle when data loss occurs?
+					continue
 				}
 				*c.Hashes = append(*c.Hashes, cdx.Hash{
 					Algorithm: cdxAlgo,

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	protospdx "github.com/bom-squad/protobom/pkg/formats/spdx"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer/options"
 	"github.com/spdx/tools-golang/spdx"
@@ -94,7 +95,7 @@ func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) {
 			rel := spdx.Relationship{
 				RefA:         common.MakeDocElementID("", e.From),
 				RefB:         common.MakeDocElementID("", dest),
-				Relationship: e.Type.String(), // TODO(puerco): Translate to real SPDX names
+				Relationship: e.Type.ToSPDX2(),
 				// RelationshipComment: "",
 			}
 			relationships = append(relationships, &rel)
@@ -111,24 +112,39 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) {
 		}
 
 		f := spdx.File{
-			FileName:           node.FileName,
+			FileName:           node.Name,
 			FileSPDXIdentifier: common.ElementID(node.Id),
 			FileTypes:          node.FileTypes,
 			Checksums:          []common.Checksum{},
 			LicenseConcluded:   node.LicenseConcluded,
 			// LicenseInfoInFiles:   []string{}, << bug in SPDX
 			LicenseComments:   node.LicenseComments,
-			FileCopyrightText: node.Copyright,
+			FileCopyrightText: strings.TrimSpace(node.Copyright),
 			FileComment:       node.Comment,
 			// FileNotice:           node.File, // Missing?
 			// FileContributors:     []string{},
 			FileAttributionTexts: node.Attribution,
-			// FileDependencies:     []string{},
-			// Snippets:    map[common.ElementID]*v2_3.Snippet{},
-			Annotations: []v2_3.Annotation{},
+			Annotations:          []v2_3.Annotation{},
 		}
 
-		// TODO(puerco): Checksums
+		if f.FileCopyrightText == "" {
+			f.FileCopyrightText = "NONE"
+		}
+
+		for algo, hash := range node.Hashes {
+			if algoVal, ok := sbom.HashAlgorithm_value[algo]; ok {
+				spdxAlgo := sbom.HashAlgorithm(algoVal).ToSPDX()
+				if spdxAlgo == "" {
+					// Data loss here.
+					// TODO how do we handle when data loss occurs?
+					continue
+				}
+				f.Checksums = append(f.Checksums, common.Checksum{
+					Algorithm: spdxAlgo,
+					Value:     hash,
+				})
+			}
+		}
 		files = append(files, &f)
 	}
 	return files, nil
@@ -160,23 +176,59 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) {
 			PackageLicenseInfoFromFiles: []string{},
 			// PackageLicenseDeclared:      node.Licenses[0],
 			PackageLicenseComments:    node.LicenseComments,
-			PackageCopyrightText:      node.Copyright,
+			PackageCopyrightText:      strings.TrimSpace(node.Copyright),
 			PackageSummary:            node.Summary,
 			PackageDescription:        node.Description,
 			PackageComment:            node.Comment,
 			PackageExternalReferences: []*v2_3.PackageExternalReference{},
 			PackageAttributionTexts:   node.Attribution,
 			PrimaryPackagePurpose:     node.PrimaryPurpose,
-			ReleaseDate:               node.ReleaseDate.String(),
-			BuiltDate:                 node.BuildDate.String(),
-			ValidUntilDate:            node.ValidUntilDate.String(),
+			Annotations:               []v2_3.Annotation{},
+
+			// The files field may never be used... Or should it?
+			// We are mirroring the probom graph in the SPDX relationship
+			// structure so they don't need to be added here and
+			// the resulting document is valid.
+			//
+			// There may be tools that rely on files added in the list so
+			// at some point we may need to think of supporting this as an
+			// option.
 			// Files:                       []*v2_3.File{},
-			Annotations: []v2_3.Annotation{},
+		}
+
+		if node.ReleaseDate != nil {
+			p.ReleaseDate = node.ReleaseDate.String()
+		}
+
+		if node.BuildDate != nil {
+			p.BuiltDate = node.BuildDate.String()
+		}
+
+		if node.ValidUntilDate != nil {
+			p.ValidUntilDate = node.ValidUntilDate.String()
+		}
+
+		if p.PackageDownloadLocation == "" {
+			p.PackageDownloadLocation = protospdx.NOASSERTION
+		}
+
+		for algo, hash := range node.Hashes {
+			if algoVal, ok := sbom.HashAlgorithm_value[algo]; ok {
+				spdxAlgo := sbom.HashAlgorithm(algoVal).ToSPDX()
+				if spdxAlgo == "" {
+					// Data loss here.
+					// TODO how do we handle when data loss occurs?
+					continue
+				}
+				p.PackageChecksums = append(p.PackageChecksums, common.Checksum{
+					Algorithm: spdxAlgo,
+					Value:     hash,
+				})
+			}
 		}
 
 		// TODO(puerco): Supplier
 		// TODO(puerco): Originator
-		// TODO(puerco): Checksums
 		packages = append(packages, &p)
 	}
 	return packages, nil

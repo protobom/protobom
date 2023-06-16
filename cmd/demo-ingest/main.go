@@ -8,6 +8,7 @@ import (
 	"github.com/bom-squad/protobom/pkg/reader"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer"
+	"github.com/onesbom/onesbom/pkg/formats"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 )
@@ -34,6 +35,8 @@ func main() {
 	// doc = readProto()
 
 	renderer := writer.New()
+
+	renderer.Options.Format = formats.SPDX23JSON
 
 	if err := renderer.WriteStream(doc, os.Stdout); err != nil {
 		logrus.Fatalf("writing sbom to stdout: %v", err)

@@ -9,5 +9,5 @@ type Options struct {
 
 var Default = Options{
 	Indent: 4,
-	Format: "application/vnd.cyclonedx+json;version=1.4",
+	Format: formats.CDX14JSON,
 }

@@ -24,6 +24,9 @@ func (di *defaultWriterImplementation) GetFormatSerializer(formatOpt format.Form
 	case format.CDX14JSON:
 		logrus.Infof("Serializing to %s", format.CDX14JSON)
 		return &SerializerCDX14{}, nil
+	case formats.SPDX23JSON:
+		logrus.Infof("Serializing to %s", formats.SPDX23JSON)
+		return &SerializerSPDX23{}, nil
 	default:
 		return nil, fmt.Errorf("no serializer supports rendering to %s", formatOpt)
 	}

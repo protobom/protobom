@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bom-squad/protobom/pkg/format"
+	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer/options"
 
@@ -159,7 +159,7 @@ func (s *SerializerCDX14) Render(opts options.Options, doc interface{}, wr io.Wr
 		return fmt.Errorf("no doc found")
 	}
 
-	if opts.Format.Type() != format.CDXFROMAT {
+	if opts.Format.Type() != formats.CDXFROMAT {
 		return fmt.Errorf("unsupported options, %v", opts)
 	}
 

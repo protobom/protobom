@@ -5,24 +5,24 @@ import (
 	"io"
 	"os"
 
-	"github.com/bom-squad/protobom/pkg/format"
+	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer/options"
 	"github.com/sirupsen/logrus"
 )
 
 type writerImplementation interface {
-	GetFormatSerializer(format.Format) (Serializer, error)
+	GetFormatSerializer(formats.Format) (Serializer, error)
 	SerializeSBOM(options.Options, Serializer, *sbom.Document, io.WriteCloser) error
 	OpenFile(string) (*os.File, error)
 }
 
 type defaultWriterImplementation struct{}
 
-func (di *defaultWriterImplementation) GetFormatSerializer(formatOpt format.Format) (Serializer, error) {
+func (di *defaultWriterImplementation) GetFormatSerializer(formatOpt formats.Format) (Serializer, error) {
 	switch formatOpt {
-	case format.CDX14JSON:
-		logrus.Infof("Serializing to %s", format.CDX14JSON)
+	case formats.CDX14JSON:
+		logrus.Infof("Serializing to %s", formats.CDX14JSON)
 		return &SerializerCDX14{}, nil
 	case formats.SPDX23JSON:
 		logrus.Infof("Serializing to %s", formats.SPDX23JSON)

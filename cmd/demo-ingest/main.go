@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/reader"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer"
-	"github.com/onesbom/onesbom/pkg/formats"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 )

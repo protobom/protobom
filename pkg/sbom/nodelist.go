@@ -57,7 +57,22 @@ func (nl *NodeList) Add(nl2 *NodeList) {
 }
 
 // RemoveNodes removes a list of nodes and its edges from the nodelist
-func (nl *NodeList) RemoveNodes(nodes ...*Node) {
+func (nl *NodeList) RemoveNodes(ids []string) {
+	// build an inverse dict of the IDs
+	idDict := map[string]struct{}{}
+	for _, i := range ids {
+		idDict[i] = struct{}{}
+	}
+
+	newNodeList := []*Node{}
+	for i := range nl.Nodes {
+		if _, ok := idDict[nl.Nodes[i].Id]; !ok {
+			newNodeList = append(newNodeList, nl.Nodes[i])
+		}
+	}
+
+	nl.Nodes = newNodeList
+	nl.cleanEdges()
 }
 
 // Intersect returns a new NodeList with nodes which are common in nl and nl2.

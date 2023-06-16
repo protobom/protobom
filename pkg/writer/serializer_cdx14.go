@@ -153,13 +153,12 @@ func (s *SerializerCDX14) Serialize(opts options.Options, bom *sbom.Document) (i
 }
 
 func (s *SerializerCDX14) Render(opts options.Options, doc interface{}, wr io.Writer) error {
-	logrus.Debug("Writing SBOM in CycloneDX to STDOUT")
 	encoder := cdx14.NewBOMEncoder(wr, cdx14.BOMFileFormatJSON)
 	if doc == nil {
 		return fmt.Errorf("no doc found")
 	}
 
-	if opts.Format.Type() != formats.CDXFROMAT {
+	if opts.Format.Type() != formats.CDXFORMAT {
 		return fmt.Errorf("unsupported options, %v", opts)
 	}
 

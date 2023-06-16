@@ -10,4 +10,9 @@ require (
 	github.com/sirupsen/logrus v1.9.2
 )
 
-require golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
+require github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
+
+require (
+	github.com/spdx/tools-golang v0.5.2
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
+)

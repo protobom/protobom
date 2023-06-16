@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2023 The OneSBOM Authors
 // SPDX-License-Identifier: Apache-2.0
 
-package format
+package formats
 
 import "strings"
 
@@ -17,8 +17,9 @@ const (
 	CDX13JSON  = Format("application/vnd.cyclonedx+json;version=1.3")
 	CDX14JSON  = Format("application/vnd.cyclonedx+json;version=1.4")
 	CDX15JSON  = Format("application/vnd.cyclonedx+json;version=1.5")
-	CDXFROMAT  = "cyclonedx"
-	SPDXFROMAT = "spdx"
+
+	CDXFORMAT  = "cyclonedx"
+	SPDXFORMAT = "spdx"
 )
 
 type Document interface{}
@@ -34,7 +35,7 @@ func (f *Format) Version() string {
 	return ""
 }
 
-func (f *Format) Mijor() string {
+func (f *Format) Major() string {
 	ver := f.Version()
 	parts := strings.Split(ver, ".")
 	if len(parts) != 2 {
@@ -69,10 +70,10 @@ func (f Format) Encoding() string {
 
 // Type returns the encoding used by the SBOM format
 func (f *Format) Type() string {
-	if strings.Contains(string(*f), SPDXFROMAT) {
-		return SPDXFROMAT
-	} else if strings.Contains(string(*f), CDXFROMAT) {
-		return CDXFROMAT
+	if strings.Contains(string(*f), SPDXFORMAT) {
+		return SPDXFORMAT
+	} else if strings.Contains(string(*f), CDXFORMAT) {
+		return CDXFORMAT
 	}
 	return ""
 }

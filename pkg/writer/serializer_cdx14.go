@@ -215,11 +215,18 @@ func nodeToCDX14Component(n *sbom.Node) *cdx14.Component {
 
 	if n.Hashes != nil && len(n.Hashes) > 0 {
 		c.Hashes = &[]cdx14.Hash{}
-		for algo, hash := range n.Hashes {
-			*c.Hashes = append(*c.Hashes, cdx14.Hash{
-				Algorithm: NormalizeAlgo(algo), // Fix to make it valid
-				Value:     hash,
-			})
+		for algoString, hash := range n.Hashes {
+			if algoVal, ok := sbom.HashAlgorithm_value[algoString]; ok {
+				cdxAlgo := sbom.HashAlgorithm(algoVal).ToCycloneDX()
+				if cdxAlgo == "" {
+					// Data loss here.
+					// TODO how do we handle when data loss occurs?
+				}
+				*c.Hashes = append(*c.Hashes, cdx14.Hash{
+					Algorithm: cdxAlgo,
+					Value:     hash,
+				})
+			}
 		}
 	}
 
@@ -242,48 +249,4 @@ func nodeToCDX14Component(n *sbom.Node) *cdx14.Component {
 	}
 
 	return c
-}
-
-func NormalizeAlgo(algo string) cdx14.HashAlgorithm {
-	agloNum := sbom.HashAlgorithm_value[algo]
-	switch sbom.HashAlgorithm(agloNum) {
-	case sbom.HashAlgorithm_MD5:
-		return cdx14.HashAlgoMD5
-	case sbom.HashAlgorithm_SHA1:
-		return cdx14.HashAlgoSHA1
-	case sbom.HashAlgorithm_SHA256:
-		return cdx14.HashAlgoSHA256
-	case sbom.HashAlgorithm_SHA384:
-		return cdx14.HashAlgoSHA384
-	case sbom.HashAlgorithm_SHA512:
-		return cdx14.HashAlgoSHA512
-	case sbom.HashAlgorithm_SHA3_256:
-		return cdx14.HashAlgoSHA3_256
-	case sbom.HashAlgorithm_SHA3_384:
-		return cdx14.HashAlgoSHA3_384
-	case sbom.HashAlgorithm_SHA3_512:
-		return cdx14.HashAlgoBlake2b_256
-	case sbom.HashAlgorithm_BLAKE2B_256:
-		return cdx14.HashAlgoBlake2b_256
-	case sbom.HashAlgorithm_BLAKE2B_384:
-		return cdx14.HashAlgoBlake2b_384
-	case sbom.HashAlgorithm_BLAKE2B_512:
-		return cdx14.HashAlgoBlake2b_512
-	case sbom.HashAlgorithm_BLAKE3:
-		return cdx14.HashAlgoBlake3
-	// case sbom.HashAlgorithm_MD2:
-	// 	return "", fmt.Errorf("unsupported algo %s", algo) // What should we do ?
-	// case sbom.HashAlgorithm_ADLER32:
-	// 	return "", fmt.Errorf("unsupported algo %s", algo) // What should we do ?
-	// case sbom.HashAlgorithm_MD4:
-	// 	return "", fmt.Errorf("unsupported algo %s", algo) // What should we do ?
-	// case sbom.HashAlgorithm_MD6:
-	// 	return "", fmt.Errorf("unsupported algo %s", algo) // What should we do ?
-	// case sbom.HashAlgorithm_SHA224:
-	// 	return "", fmt.Errorf("unsupported algo %s", algo) // What should we do ?
-	// case sbom.HashAlgorithm_UNKNOWN:
-	// 	return "", fmt.Errorf("unknown algo %s", algo) // What should we do ?
-	default:
-		return cdx14.HashAlgorithm(algo) // 2DO ?
-	}
 }

@@ -1,5 +1,10 @@
 package sbom
 
+import (
+	"github.com/CycloneDX/cyclonedx-go"
+	cdx "github.com/CycloneDX/cyclonedx-go"
+)
+
 func EdgeTypeFromSPDX(spdxName string) Edge_Type {
 	switch spdxName {
 	case "AMENDS":
@@ -88,5 +93,36 @@ func EdgeTypeFromSPDX(spdxName string) Edge_Type {
 		return Edge_variant
 	default:
 		return Edge_UNKNOWN
+	}
+}
+
+func HashAlgorithmFromCDX(cdxAlgorithm cyclonedx.HashAlgorithm) HashAlgorithm {
+	switch cdxAlgorithm {
+	case cdx.HashAlgoMD5:
+		return HashAlgorithm_MD5
+	case cdx.HashAlgoSHA1:
+		return HashAlgorithm_SHA1
+	case cdx.HashAlgoSHA256:
+		return HashAlgorithm_SHA256
+	case cdx.HashAlgoSHA384:
+		return HashAlgorithm_SHA384
+	case cdx.HashAlgoSHA512:
+		return HashAlgorithm_SHA512
+	case cdx.HashAlgoSHA3_256:
+		return HashAlgorithm_SHA3_256
+	case cdx.HashAlgoSHA3_384:
+		return HashAlgorithm_SHA3_384
+	case cdx.HashAlgoSHA3_512:
+		return HashAlgorithm_SHA3_512
+	case cdx.HashAlgoBlake2b_256:
+		return HashAlgorithm_BLAKE2B_256
+	case cdx.HashAlgoBlake2b_384:
+		return HashAlgorithm_BLAKE2B_384
+	case cdx.HashAlgoBlake2b_512:
+		return HashAlgorithm_BLAKE2B_512
+	case cdx.HashAlgoBlake3:
+		return HashAlgorithm_BLAKE3
+	default:
+		return HashAlgorithm_UNKNOWN
 	}
 }

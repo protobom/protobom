@@ -3,16 +3,48 @@ package sbom
 // This file adds a few methods to the NodeList type which
 // handles fragments of the SBOM graph.
 
-// nodeIdList is an iverse dictionary to hold node identifiers
-type nodeIdList map[string]struct{}
+// nodeIndex is a dictionary of node pointers keyed by ID
+type nodeIndex map[string]*Node
 
-// indexIdentifiers returns an inverse dictionary with the IDs of thenodes
-func (nl *NodeList) indexIdentifiers() nodeIdList {
-	ret := nodeIdList{}
-	for i := range nl.Nodes {
-		ret[nl.Nodes[i].Id] = struct{}{}
+// edgeIndex is an index of edge pointers keyed by From elements and type
+type edgeIndex map[string]map[Edge_Type][]*Edge
+
+// rootElementsIndex is an index of the top levele elements by ID
+type rootElementsIndex map[string]struct{}
+
+// indexNodes returns an inverse dictionary with the IDs of thenodes
+func (nl *NodeList) indexNodes() nodeIndex {
+	ret := nodeIndex{}
+	for _, n := range nl.Nodes {
+		ret[n.Id] = n
 	}
 	return ret
+}
+
+// indexEdges returns the edges of the nodeList indexed by from and type
+func (nl *NodeList) indexEdges() edgeIndex {
+	index := edgeIndex{}
+	for i := range nl.Edges {
+		if _, ok := index[nl.Edges[i].From]; !ok {
+			index[nl.Edges[i].From] = map[Edge_Type][]*Edge{}
+		}
+
+		if _, ok := index[nl.Edges[i].From][nl.Edges[i].Type]; !ok {
+			index[nl.Edges[i].From][nl.Edges[i].Type] = []*Edge{nl.Edges[i]}
+			continue
+		}
+		index[nl.Edges[i].From][nl.Edges[i].Type] = append(index[nl.Edges[i].From][nl.Edges[i].Type], nl.Edges[i])
+	}
+	return index
+}
+
+// indexRootElements returns an index of the NodeList's top level elements by ID
+func (nl *NodeList) indexRootElements() rootElementsIndex {
+	index := rootElementsIndex{}
+	for _, id := range nl.RootElements {
+		index[id] = struct{}{}
+	}
+	return index
 }
 
 // cleanEdges is a utility function that removes broken
@@ -22,20 +54,17 @@ func (nl *NodeList) cleanEdges() {
 	newEdges := []*Edge{}
 
 	// Build a catalog of the elements ids
-	idDict := map[string]struct{}{}
-	for i := range nl.Nodes {
-		idDict[nl.Nodes[i].Id] = struct{}{}
-	}
+	nodeIndex := nl.indexNodes()
 
 	// Now list all edges and rebuild the list
 	for _, edge := range nl.Edges {
 		newTos := []string{}
-		if _, ok := idDict[edge.From]; !ok {
+		if _, ok := nodeIndex[edge.From]; !ok {
 			continue
 		}
 
 		for _, s := range edge.To {
-			if _, ok := idDict[s]; ok {
+			if _, ok := nodeIndex[s]; ok {
 				newTos = append(newTos, s)
 			}
 		}
@@ -52,8 +81,41 @@ func (nl *NodeList) cleanEdges() {
 }
 
 // Add combines NodeList nl2 into nl. It is te equivalent to Union but
-// instead of retuirn a new NodeList modifies nl
+// instead of returning a new NodeList it modifies nl.
 func (nl *NodeList) Add(nl2 *NodeList) {
+	existingNodes := nl.indexNodes()
+	for i := range nl2.Nodes {
+		if n, ok := existingNodes[nl2.Nodes[i].Id]; ok {
+			existingNodes[nl2.Nodes[i].Id].Augment(n)
+		} else {
+			nl.Nodes = append(nl.Nodes, nl2.Nodes[i])
+		}
+	}
+
+	existingEdges := nl.indexEdges()
+	for i := range nl2.Edges {
+		if _, ok := existingEdges[nl2.Edges[i].From]; !ok {
+			nl.Edges = append(nl.Edges, nl2.Edges[i])
+			continue
+		}
+
+		if _, ok := existingEdges[nl2.Edges[i].From][nl2.Edges[i].Type]; !ok {
+			nl.Edges = append(nl.Edges, nl2.Edges[i])
+			continue
+		}
+
+		// Add it her to the existing edge
+		existingEdges[nl2.Edges[i].From][nl2.Edges[i].Type][0].To = append(existingEdges[nl2.Edges[i].From][nl2.Edges[i].Type][0].To, nl2.Edges[i].To...)
+	}
+
+	rootElements := nl.indexRootElements()
+	for _, id := range nl2.RootElements {
+		if _, ok := rootElements[id]; !ok {
+			nl.RootElements = append(nl.RootElements, id)
+		}
+	}
+
+	nl.cleanEdges()
 }
 
 // RemoveNodes removes a list of nodes and its edges from the nodelist

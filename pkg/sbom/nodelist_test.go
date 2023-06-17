@@ -116,3 +116,69 @@ func TestRemoveNodes(t *testing.T) {
 		require.Equal(t, tc.sut, tc.expected)
 	}
 }
+
+func TestAdd(t *testing.T) {
+	for _, tc := range []struct {
+		sut     *NodeList
+		prepare func(*NodeList)
+		expect  *NodeList
+	}{
+		// Adding an empty nodelist is effectively as noop
+		{
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "test1"},
+					{Id: "test2"},
+				},
+				Edges: []*Edge{
+					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+				},
+			},
+			prepare: func(n *NodeList) {
+				n.Add(&NodeList{})
+			},
+			expect: &NodeList{
+				Nodes: []*Node{
+					{Id: "test1"},
+					{Id: "test2"},
+				},
+				Edges: []*Edge{
+					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+				},
+			},
+		},
+		// Add one node, no relationship
+		{
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "test1"},
+					{Id: "test2"},
+				},
+				Edges: []*Edge{
+					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+				},
+			},
+			prepare: func(n *NodeList) {
+				n.Add(&NodeList{
+					Nodes: []*Node{
+						{Id: "test3"},
+					},
+					Edges: []*Edge{},
+				})
+			},
+			expect: &NodeList{
+				Nodes: []*Node{
+					{Id: "test1"},
+					{Id: "test2"},
+					{Id: "test3"},
+				},
+				Edges: []*Edge{
+					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+				},
+			},
+		},
+	} {
+		tc.prepare(tc.sut)
+		require.Equal(t, tc.sut, tc.expect)
+	}
+}

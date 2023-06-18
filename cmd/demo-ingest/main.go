@@ -23,7 +23,7 @@ var filename = filepath.Join(os.TempDir(), "sbom.proto")
 
 func main() {
 	if len(os.Args) != 2 {
-		logrus.Fatalf("usage: %s sbom.json", os.Args[0])
+		logrus.Fatalf("usage: %s sbom.json", filepath.Base(os.Args[0]))
 	}
 
 	var doc *sbom.Document

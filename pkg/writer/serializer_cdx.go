@@ -21,6 +21,11 @@ type SerializerCDX struct {
 }
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
+	s.rootDict = map[string]struct{}{}
+	s.addedDict = map[string]struct{}{}
+	s.componentsDict = map[string]*cdx.Component{}
+	s.reflessList = []*cdx.Component{}
+
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
 	ver, err := strconv.Atoi(bom.Metadata.Version)
@@ -38,9 +43,14 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	doc.Dependencies = &[]cdx.Dependency{}
 
 	root, err := s.root(bom)
+	// 2DO Just warning until resolve BUG - the root spdx node is not found in the node list (search by ID)
 	if err != nil {
-		return nil, err
+		logrus.Warnf("Root missing")
+		// return nil, err
+	} else {
+		doc.Metadata.Component = root
 	}
+
 	err = s.componentsMaps(bom)
 	if err != nil {
 		return nil, err
@@ -51,7 +61,6 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 		return nil, err
 	}
 
-	doc.Metadata.Component = root
 	doc.Dependencies = &deps
 	components := s.components()
 	doc.Components = &components
@@ -77,8 +86,6 @@ func (s *SerializerCDX) components() []cdx.Component {
 }
 
 func (s *SerializerCDX) componentsMaps(bom *sbom.Document) error {
-	componentsDict := map[string]*cdx.Component{}
-	reflessList := []*cdx.Component{}
 	for _, n := range bom.Nodes {
 		comp := s.nodeToComponent(n)
 		if comp == nil {
@@ -87,33 +94,28 @@ func (s *SerializerCDX) componentsMaps(bom *sbom.Document) error {
 		}
 
 		if comp.BOMRef == "" {
-			reflessList = append(reflessList, comp)
+			s.reflessList = append(s.reflessList, comp)
 		} else {
-			componentsDict[comp.BOMRef] = comp
+			s.componentsDict[comp.BOMRef] = comp
 		}
 	}
-
-	s.componentsDict = componentsDict
-	s.reflessList = reflessList
 	return nil
 }
 
 func (s *SerializerCDX) root(bom *sbom.Document) (*cdx.Component, error) {
 	var rootComp *cdx.Component
 	found := false
-	rootDict := map[string]struct{}{}
-	addedDict := map[string]struct{}{}
 
 	// First, assign the top level nodes
 	if bom.RootElements != nil && len(bom.RootElements) > 0 {
 		for _, id := range bom.RootElements {
-			rootDict[id] = struct{}{}
+			s.rootDict[id] = struct{}{}
 			// Search for the node and add it
 			for _, n := range bom.Nodes {
 				if n.Id == id {
 					rootComp = s.nodeToComponent(n)
 					found = true
-					addedDict[id] = struct{}{}
+					s.addedDict[id] = struct{}{}
 				}
 			}
 
@@ -127,8 +129,6 @@ func (s *SerializerCDX) root(bom *sbom.Document) (*cdx.Component, error) {
 		return nil, fmt.Errorf("no root component")
 	}
 
-	s.rootDict = rootDict
-	s.addedDict = addedDict
 	return rootComp, nil
 }
 

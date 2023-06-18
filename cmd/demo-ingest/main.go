@@ -51,7 +51,7 @@ func main() {
 
 	// The SBOM read will be rewritten to the following format:
 	// renderer.Options.Format = formats.CDX14JSON
-	renderer.Options.Format = formats.SPDX23JSON
+	renderer.Options.Format = formats.CDX14JSON
 
 	// Serialize and render the protobom to STDOUT:
 	if err := renderer.WriteStream(doc, os.Stdout); err != nil {

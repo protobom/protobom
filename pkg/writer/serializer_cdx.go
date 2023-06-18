@@ -17,6 +17,7 @@ type SerializerCDX struct {
 	rootDict       map[string]struct{}
 	addedDict      map[string]struct{}
 	componentsDict map[string]*cdx.Component
+	reflessList    []*cdx.Component
 }
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
@@ -40,139 +41,44 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	if err != nil {
 		return nil, err
 	}
-	components, refless, err := s.components(bom)
+	err = s.componentsMaps(bom)
 	if err != nil {
 		return nil, err
 	}
+
 	deps, err := s.dependencies(bom)
 	if err != nil {
 		return nil, err
 	}
 
-	
-
-	/*
-		if bom.Metadata.Date != nil {
-			doc.Metadata.Timestamp = bom.Metadata.Date.AsTime()
-		}
-	*/
-
-	// Generate all components
-	// components := map[string]*cdx.Component{}
-	// refless := []*cdx.Component{}
-	// for _, n := range bom.Nodes {
-	// 	comp := s.nodeToComponent(n)
-	// 	if comp == nil {
-	// 		// Error? Warn?
-	// 		continue
-	// 	}
-
-	// 	if comp.BOMRef == "" {
-	// 		refless = append(refless, comp)
-	// 	} else {
-	// 		components[comp.BOMRef] = comp
-	// 	}
-	// }
-
-	// rootDict := map[string]struct{}{}
-	// addedDict := map[string]struct{}{}
-
-	// First, assign the top level nodes
-	// if bom.RootElements != nil && len(bom.RootElements) > 0 {
-	// 	for _, id := range bom.RootElements {
-	// 		rootDict[id] = struct{}{}
-	// 		// Search for the node and add it
-	// 		for _, n := range bom.Nodes {
-	// 			if n.Id == id {
-	// 				rootComp := s.nodeToComponent(n)
-	// 				doc.Metadata.Component = rootComp
-	// 				addedDict[id] = struct{}{}
-	// 			}
-	// 		}
-
-	// 		// TODO(degradation): Here we would document other root level elements
-	// 		// are not added to to document
-	// 		break
-	// 	}
-	// }
-
 	doc.Metadata.Component = root
+	doc.Dependencies = &deps
+	components := s.components()
+	doc.Components = &components
 
-	// Next up. Let's navigate the SBOM graph and translate it to the CDX simpler
-	// tree or to the dependency graph
-	for _, e := range bom.Edges {
-		if _, ok := addedDict[e.From]; ok {
-			continue
-		}
-
-		if _, ok := components[e.From]; !ok {
-			logrus.Info("serialize")
-			return nil, fmt.Errorf("unable to find component %s", e.From)
-		}
-
-		// In this example, we tree-ify all components related with a
-		// "contains" relationship. This is just an opinion for the demo
-		// and it is somethign we can parameterize
-		switch e.Type {
-		case sbom.Edge_contains:
-			// Make sure we have the target component
-			for _, targetID := range e.To {
-				addedDict[targetID] = struct{}{}
-				if _, ok := components[targetID]; !ok {
-					return nil, fmt.Errorf("unable to locate node %s", targetID)
-				}
-
-				if components[e.From].Components == nil {
-					components[e.From].Components = &[]cdx.Component{}
-				}
-				*components[e.From].Components = append(*components[e.From].Components, *components[targetID])
-			}
-
-		case sbom.Edge_dependsOn:
-			// Add to the dependency tree
-			for _, targetID := range e.To {
-				addedDict[targetID] = struct{}{}
-				if _, ok := components[targetID]; !ok {
-					return nil, fmt.Errorf("unable to locate node %s", targetID)
-				}
-
-				if doc.Dependencies == nil {
-					doc.Dependencies = &[]cdx.Dependency{}
-				}
-
-				*doc.Dependencies = append(*doc.Dependencies, cdx.Dependency{
-					Ref:          e.From,
-					Dependencies: &e.To,
-				})
-			}
-
-		default:
-			// TODO(degradation) here, we would document how relationships are lost
-			logrus.Warnf(
-				"node %s is related with %s to %d other nodes, data will be lost",
-				e.From, e.Type, len(e.To),
-			)
-		}
-
-		// Now add al nodes we have not yet positioned
-		for _, c := range components {
-			if _, ok := addedDict[c.BOMRef]; ok {
-				continue
-			}
-			*doc.Components = append(*doc.Components, *c)
-		}
-
-		// Add components without refs
-		for _, c := range refless {
-			*doc.Components = append(*doc.Components, *c)
-		}
-	}
 	return doc, nil
 }
 
-func (s *SerializerCDX) components(bom *sbom.Document) (map[string]*cdx.Component, []*cdx.Component{}, error) {
+func (s *SerializerCDX) components() []cdx.Component {
+	var components []cdx.Component
+	for _, c := range s.componentsDict {
+		if _, ok := s.addedDict[c.BOMRef]; ok {
+			continue
+		}
+		components = append(components, *c)
+	}
+
+	// Add components without refs
+	for _, c := range s.reflessList {
+		components = append(components, *c)
+	}
+
+	return components
+}
+
+func (s *SerializerCDX) componentsMaps(bom *sbom.Document) error {
 	componentsDict := map[string]*cdx.Component{}
-	refless := []*cdx.Component{}
+	reflessList := []*cdx.Component{}
 	for _, n := range bom.Nodes {
 		comp := s.nodeToComponent(n)
 		if comp == nil {
@@ -181,14 +87,15 @@ func (s *SerializerCDX) components(bom *sbom.Document) (map[string]*cdx.Componen
 		}
 
 		if comp.BOMRef == "" {
-			refless = append(refless, comp)
+			reflessList = append(reflessList, comp)
 		} else {
 			componentsDict[comp.BOMRef] = comp
 		}
 	}
 
 	s.componentsDict = componentsDict
-	return componentsDict, refless, nil
+	s.reflessList = reflessList
+	return nil
 }
 
 func (s *SerializerCDX) root(bom *sbom.Document) (*cdx.Component, error) {
@@ -224,7 +131,6 @@ func (s *SerializerCDX) root(bom *sbom.Document) (*cdx.Component, error) {
 	s.addedDict = addedDict
 	return rootComp, nil
 }
-
 
 // NOTE dependencies function modifies the components dictionary
 func (s *SerializerCDX) dependencies(bom *sbom.Document) ([]cdx.Dependency, error) {

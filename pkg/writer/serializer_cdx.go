@@ -13,7 +13,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type SerializerCDX struct{}
+type SerializerCDX struct {
+	rootDict       map[string]struct{}
+	addedDict      map[string]struct{}
+	componentsDict map[string]*cdx.Component
+}
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
 	doc := cdx.NewBOM()
@@ -31,6 +35,22 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	doc.Metadata = &metadata
 	doc.Components = &[]cdx.Component{}
 	doc.Dependencies = &[]cdx.Dependency{}
+
+	root, err := s.root(bom)
+	if err != nil {
+		return nil, err
+	}
+	components, refless, err := s.components(bom)
+	if err != nil {
+		return nil, err
+	}
+	deps, err := s.dependencies(bom)
+	if err != nil {
+		return nil, err
+	}
+
+	
+
 	/*
 		if bom.Metadata.Date != nil {
 			doc.Metadata.Timestamp = bom.Metadata.Date.AsTime()
@@ -38,43 +58,45 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	*/
 
 	// Generate all components
-	components := map[string]*cdx.Component{}
-	refless := []*cdx.Component{}
-	for _, n := range bom.Nodes {
-		comp := s.nodeToComponent(n)
-		if comp == nil {
-			// Error? Warn?
-			continue
-		}
+	// components := map[string]*cdx.Component{}
+	// refless := []*cdx.Component{}
+	// for _, n := range bom.Nodes {
+	// 	comp := s.nodeToComponent(n)
+	// 	if comp == nil {
+	// 		// Error? Warn?
+	// 		continue
+	// 	}
 
-		if comp.BOMRef == "" {
-			refless = append(refless, comp)
-		} else {
-			components[comp.BOMRef] = comp
-		}
-	}
+	// 	if comp.BOMRef == "" {
+	// 		refless = append(refless, comp)
+	// 	} else {
+	// 		components[comp.BOMRef] = comp
+	// 	}
+	// }
 
-	rootDict := map[string]struct{}{}
-	addedDict := map[string]struct{}{}
+	// rootDict := map[string]struct{}{}
+	// addedDict := map[string]struct{}{}
 
 	// First, assign the top level nodes
-	if bom.RootElements != nil && len(bom.RootElements) > 0 {
-		for _, id := range bom.RootElements {
-			rootDict[id] = struct{}{}
-			// Search for the node and add it
-			for _, n := range bom.Nodes {
-				if n.Id == id {
-					rootComp := s.nodeToComponent(n)
-					doc.Metadata.Component = rootComp
-					addedDict[id] = struct{}{}
-				}
-			}
+	// if bom.RootElements != nil && len(bom.RootElements) > 0 {
+	// 	for _, id := range bom.RootElements {
+	// 		rootDict[id] = struct{}{}
+	// 		// Search for the node and add it
+	// 		for _, n := range bom.Nodes {
+	// 			if n.Id == id {
+	// 				rootComp := s.nodeToComponent(n)
+	// 				doc.Metadata.Component = rootComp
+	// 				addedDict[id] = struct{}{}
+	// 			}
+	// 		}
 
-			// TODO(degradation): Here we would document other root level elements
-			// are not added to to document
-			break
-		}
-	}
+	// 		// TODO(degradation): Here we would document other root level elements
+	// 		// are not added to to document
+	// 		break
+	// 	}
+	// }
+
+	doc.Metadata.Component = root
 
 	// Next up. Let's navigate the SBOM graph and translate it to the CDX simpler
 	// tree or to the dependency graph
@@ -146,6 +168,121 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 		}
 	}
 	return doc, nil
+}
+
+func (s *SerializerCDX) components(bom *sbom.Document) (map[string]*cdx.Component, []*cdx.Component{}, error) {
+	componentsDict := map[string]*cdx.Component{}
+	refless := []*cdx.Component{}
+	for _, n := range bom.Nodes {
+		comp := s.nodeToComponent(n)
+		if comp == nil {
+			// Error? Warn?
+			continue
+		}
+
+		if comp.BOMRef == "" {
+			refless = append(refless, comp)
+		} else {
+			componentsDict[comp.BOMRef] = comp
+		}
+	}
+
+	s.componentsDict = componentsDict
+	return componentsDict, refless, nil
+}
+
+func (s *SerializerCDX) root(bom *sbom.Document) (*cdx.Component, error) {
+	var rootComp *cdx.Component
+	found := false
+	rootDict := map[string]struct{}{}
+	addedDict := map[string]struct{}{}
+
+	// First, assign the top level nodes
+	if bom.RootElements != nil && len(bom.RootElements) > 0 {
+		for _, id := range bom.RootElements {
+			rootDict[id] = struct{}{}
+			// Search for the node and add it
+			for _, n := range bom.Nodes {
+				if n.Id == id {
+					rootComp = s.nodeToComponent(n)
+					found = true
+					addedDict[id] = struct{}{}
+				}
+			}
+
+			// TODO(degradation): Here we would document other root level elements
+			// are not added to to document
+			break
+		}
+	}
+
+	if !found {
+		return nil, fmt.Errorf("no root component")
+	}
+
+	s.rootDict = rootDict
+	s.addedDict = addedDict
+	return rootComp, nil
+}
+
+
+// NOTE dependencies function modifies the components dictionary
+func (s *SerializerCDX) dependencies(bom *sbom.Document) ([]cdx.Dependency, error) {
+
+	var dependencies []cdx.Dependency
+
+	for _, e := range bom.Edges {
+		if _, ok := s.addedDict[e.From]; ok {
+			continue
+		}
+
+		if _, ok := s.componentsDict[e.From]; !ok {
+			logrus.Info("serialize")
+			return nil, fmt.Errorf("unable to find component %s", e.From)
+		}
+
+		// In this example, we tree-ify all components related with a
+		// "contains" relationship. This is just an opinion for the demo
+		// and it is somethign we can parameterize
+		switch e.Type {
+		case sbom.Edge_contains:
+			// Make sure we have the target component
+			for _, targetID := range e.To {
+				s.addedDict[targetID] = struct{}{}
+				if _, ok := s.componentsDict[targetID]; !ok {
+					return nil, fmt.Errorf("unable to locate node %s", targetID)
+				}
+
+				if s.componentsDict[e.From].Components == nil {
+					s.componentsDict[e.From].Components = &[]cdx.Component{}
+				}
+				*s.componentsDict[e.From].Components = append(*s.componentsDict[e.From].Components, *s.componentsDict[targetID])
+			}
+
+		case sbom.Edge_dependsOn:
+			// Add to the dependency tree
+			for _, targetID := range e.To {
+				s.addedDict[targetID] = struct{}{}
+				if _, ok := s.componentsDict[targetID]; !ok {
+					return nil, fmt.Errorf("unable to locate node %s", targetID)
+				}
+
+				dependencies = append(dependencies, cdx.Dependency{
+					Ref:          e.From,
+					Dependencies: &e.To,
+				})
+			}
+
+		default:
+			// TODO(degradation) here, we would document how relationships are lost
+			logrus.Warnf(
+				"node %s is related with %s to %d other nodes, data will be lost",
+				e.From, e.Type, len(e.To),
+			)
+		}
+	}
+
+	return dependencies, nil
 }
 
 // nodeToComponent converts a node in protobuf to a CycloneDX component

@@ -8,9 +8,14 @@ require (
 	github.com/CycloneDX/cyclonedx-go v0.7.1
 	github.com/onesbom/onesbom v0.0.0-20230531045741-b772339fa7cf
 	github.com/sirupsen/logrus v1.9.2
+	github.com/spf13/cobra v1.7.0
 )
 
-require github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
+require (
+	github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+)
 
 require (
 	github.com/spdx/tools-golang v0.5.2

@@ -148,23 +148,30 @@ func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
 	return nil
 }
 
+// copyEdgeList is a utility function that deep copies a list of edges
+func copyEdgeList(original []*Edge) (copy []*Edge) {
+	copy = []*Edge{}
+	for _, e := range original {
+		copy = append(copy, e.Copy())
+	}
+	return copy
+}
+
 // Intersect returns a new NodeList with nodes which are common in nl and nl2.
 // All common nodes will be copied from nl and then `Update`d with data from nl2
 func (nl *NodeList) Intersect(nl2 *NodeList) *NodeList {
 	rootElements := nl.indexRootElements()
 	rootElements2 := nl2.indexRootElements()
+
 	ret := &NodeList{
 		Nodes:        []*Node{},
-		Edges:        []*Edge{},
+		Edges:        copyEdgeList(nl.Edges), // copied as they will be cleaned
 		RootElements: []string{},
 	}
 	var ni1, ni2 nodeIndex
 
 	ni1 = nl.indexNodes()
 	ni2 = nl2.indexNodes()
-
-	// Copy edges from nl
-	ret.Edges = append(ret.Edges, nl.Edges...)
 
 	for id, node := range ni1 {
 		if _, ok := ni2[id]; !ok {
@@ -187,7 +194,7 @@ func (nl *NodeList) Intersect(nl2 *NodeList) *NodeList {
 	for _, e := range nl2.Edges {
 		existingEdge := ret.GetEdgeByType(e.From, e.Type)
 		if existingEdge == nil {
-			ret.Edges = append(ret.Edges, e)
+			ret.Edges = append(ret.Edges, e.Copy())
 		} else {
 			// Apppend data to existing edge
 			invDict := map[string]struct{}{}
@@ -210,6 +217,53 @@ func (nl *NodeList) Intersect(nl2 *NodeList) *NodeList {
 }
 
 // Union returns a new NodeList with all nodes from nl and nl2 joined together
+// any nodes common in nl also found in nl2 will be `Update`d from data from the
+// former.
 func (nl *NodeList) Union(nl2 *NodeList) *NodeList {
-	return nil
+	ret := &NodeList{
+		Nodes:        []*Node{},
+		Edges:        copyEdgeList(nl.Edges),
+		RootElements: nl.RootElements,
+	}
+
+	// Copy all nodes from the original nodelist
+	for _, n := range nl.Nodes {
+		ret.Nodes = append(ret.Nodes, n.Copy())
+	}
+
+	// Now reindex to know which one to append or update
+	nodeindex := ret.indexNodes()
+	for _, n := range nl2.Nodes {
+		if _, ok := nodeindex[n.Id]; ok {
+			nodeindex[n.Id].Update(n)
+		} else {
+			ret.Nodes = append(ret.Nodes, n)
+		}
+	}
+
+	// Add or append all edges from nl2
+	for _, e := range nl2.Edges {
+		existingEdge := ret.GetEdgeByType(e.From, e.Type)
+		if existingEdge == nil {
+			ret.Edges = append(ret.Edges, e.Copy())
+		} else {
+			for _, to := range e.To {
+				if !existingEdge.PointsTo(to) {
+					existingEdge.To = append(existingEdge.To, to)
+				}
+			}
+		}
+	}
+
+	ret.cleanEdges()
+
+	// Copy all root nodes from nl2
+	rootNodes := ret.indexRootElements()
+	for _, rootEl := range nl2.RootElements {
+		if _, ok := rootNodes[rootEl]; !ok {
+			ret.RootElements = append(ret.RootElements, rootEl)
+		}
+	}
+
+	return ret
 }

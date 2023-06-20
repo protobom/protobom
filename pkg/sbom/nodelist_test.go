@@ -183,7 +183,7 @@ func TestAdd(t *testing.T) {
 	}
 }
 
-func TestIntersect(t *testing.T) {
+func TestNodeListIntersect(t *testing.T) {
 	testNodeList := &NodeList{
 		Nodes: []*Node{
 			{
@@ -280,5 +280,116 @@ func TestIntersect(t *testing.T) {
 		new := tc.sut.Intersect(tc.isec)
 		require.Equal(t, tc.expect, new, title)
 	}
+}
 
+func TestNodeListUnion(t *testing.T) {
+	testNodeList := &NodeList{
+		Nodes: []*Node{
+			{
+				Id:      "node1",
+				Type:    Node_PACKAGE,
+				Name:    "package1",
+				Version: "1.0.0",
+			},
+
+			{
+				Id:      "node2",
+				Type:    Node_PACKAGE,
+				Name:    "package1",
+				Version: "1.0.0",
+			},
+			{
+				Id:      "node3",
+				Type:    Node_PACKAGE,
+				Name:    "package1",
+				Version: "1.0.0",
+			},
+		},
+		Edges: []*Edge{
+			{
+				Type: Edge_contains,
+				From: "node1",
+				To:   []string{"node2"},
+			},
+			{
+				Type: Edge_contains,
+				From: "node1",
+				To:   []string{"node3"},
+			},
+		},
+		RootElements: []string{},
+	}
+
+	testNodeList2 := &NodeList{
+		Nodes: []*Node{
+			{
+				Id:      "node1",
+				Type:    Node_PACKAGE,
+				Name:    "package2",
+				Version: "2.0.0",
+			},
+			{
+				Id:      "node2",
+				Type:    Node_PACKAGE,
+				Name:    "package1",
+				Version: "1.0.0",
+			},
+		},
+		Edges:        []*Edge{},
+		RootElements: []string{},
+	}
+
+	for title, tc := range map[string]struct {
+		sut    *NodeList
+		isec   *NodeList
+		expect *NodeList
+	}{
+		"same nodelist unioned on itself, returns same nodelist": {
+			sut:    testNodeList,
+			isec:   testNodeList,
+			expect: testNodeList,
+		},
+		"combined nodes": {
+			sut:  testNodeList,
+			isec: testNodeList2,
+			expect: &NodeList{
+				Nodes: []*Node{
+					{
+						Id:      "node1",
+						Type:    Node_PACKAGE,
+						Name:    "package2",
+						Version: "2.0.0",
+					},
+					{
+						Id:      "node2",
+						Type:    Node_PACKAGE,
+						Name:    "package1",
+						Version: "1.0.0",
+					},
+					{
+						Id:      "node3",
+						Type:    Node_PACKAGE,
+						Name:    "package1",
+						Version: "1.0.0",
+					},
+				},
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "node1",
+						To:   []string{"node2"},
+					},
+					{
+						Type: Edge_contains,
+						From: "node1",
+						To:   []string{"node3"},
+					},
+				},
+				RootElements: []string{},
+			},
+		},
+	} {
+		new := tc.sut.Union(tc.isec)
+		require.Equal(t, tc.expect, new, title)
+	}
 }

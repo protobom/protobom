@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	PROTOBOM__LONG_DISCRIPTION = "Translate SBOM formats such as cyclonedx and spdx"
-	PROTOBOM_SHORT_DISCRIPTION = "Translate SBOM formats"
+	PROTOBOM_LONG_DESCRIPTION = "Translate SBOM formats such as cyclonedx and spdx"
+	PROTOBOM_SHORT_DESCRIPTION = "Translate SBOM formats"
 	ProtobomUserExample        = `  {{.appName}} [sbom-path] [flags]
 
 	{{.appName}} [sbom-path] -o cyclonedx output a cyclonedx sbom

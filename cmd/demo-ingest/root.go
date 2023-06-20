@@ -65,7 +65,7 @@ var RootCmd = &cobra.Command{
 func init() {
 	cobra.OnInitialize()
 
-	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.FormatType), "output-format", "o", string(options.Default.FormatOpt.FormatType), fmt.Sprintf("Select output format type, %s", formats.ListFormatType))
+	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.FormatType), "output-format", "f", string(options.Default.FormatOpt.FormatType), fmt.Sprintf("Select output format type, %s", formats.ListFormatType))
 	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.FormatVersion), "output-version", "v", string(options.Default.FormatOpt.FormatVersion), fmt.Sprintf("Select version, %s", formats.MapVersion))
 	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.MimeFormat), "output-mime-format", "m", string(options.Default.FormatOpt.MimeFormat), fmt.Sprintf("Select mime format, %s", formats.ListMimeFormat))
 

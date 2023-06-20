@@ -137,9 +137,76 @@ func (nl *NodeList) RemoveNodes(ids []string) {
 	nl.cleanEdges()
 }
 
-// Intersect returns a new NodeList with nodes which are common in nl and nl2.
-func (nl *NodeList) Intersect(nl2 *NodeList) *NodeList {
+// GetEdgeByType returns a pointer to the first edge found from fromElement
+// of type t.
+func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
+	for _, e := range nl.Edges {
+		if e.From == fromElement && e.Type == t {
+			return e
+		}
+	}
 	return nil
+}
+
+// Intersect returns a new NodeList with nodes which are common in nl and nl2.
+// All common nodes will be copied from nl and then `Update`d with data from nl2
+func (nl *NodeList) Intersect(nl2 *NodeList) *NodeList {
+	rootElements := nl.indexRootElements()
+	rootElements2 := nl2.indexRootElements()
+	ret := &NodeList{
+		Nodes:        []*Node{},
+		Edges:        []*Edge{},
+		RootElements: []string{},
+	}
+	var ni1, ni2 nodeIndex
+
+	ni1 = nl.indexNodes()
+	ni2 = nl2.indexNodes()
+
+	// Copy edges from nl
+	ret.Edges = append(ret.Edges, nl.Edges...)
+
+	for id, node := range ni1 {
+		if _, ok := ni2[id]; !ok {
+			continue
+		}
+		// Clone the node
+		newnode := node.Copy()
+		newnode.Update(ni2[id])
+		ret.Nodes = append(ret.Nodes, newnode)
+
+		_, ok := rootElements[id]
+		_, ok2 := rootElements2[id]
+
+		if ok || ok2 {
+			ret.RootElements = append(ret.RootElements, id)
+		}
+	}
+
+	// Copy root elements
+	for _, e := range nl2.Edges {
+		existingEdge := ret.GetEdgeByType(e.From, e.Type)
+		if existingEdge == nil {
+			ret.Edges = append(ret.Edges, e)
+		} else {
+			// Apppend data to existing edge
+			invDict := map[string]struct{}{}
+			for _, t := range existingEdge.To {
+				invDict[t] = struct{}{}
+			}
+
+			for _, to := range e.To {
+				if _, ok := invDict[to]; !ok {
+					existingEdge.To = append(existingEdge.To, to)
+				}
+			}
+		}
+	}
+
+	// Clean edges
+	ret.cleanEdges()
+
+	return ret
 }
 
 // Union returns a new NodeList with all nodes from nl and nl2 joined together

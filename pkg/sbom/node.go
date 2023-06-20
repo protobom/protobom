@@ -158,3 +158,35 @@ func (n *Node) Augment(n2 *Node) {
 		n.FileTypes = n2.FileTypes
 	}
 }
+
+// Copy returns a new node that is a copy of the node
+func (n *Node) Copy() *Node {
+	return &Node{
+		Id:                 n.Id,
+		Type:               n.Type,
+		Name:               n.Name,
+		Version:            n.Version,
+		FileName:           n.FileName,
+		UrlHome:            n.UrlHome,
+		UrlDownload:        n.UrlDownload,
+		Licenses:           n.Licenses,
+		LicenseConcluded:   n.LicenseConcluded,
+		LicenseComments:    n.LicenseComments,
+		Copyright:          n.Copyright,
+		Hashes:             n.Hashes,
+		SourceInfo:         n.SourceInfo,
+		PrimaryPurpose:     n.PrimaryPurpose,
+		Comment:            n.Comment,
+		Summary:            n.Summary,
+		Description:        n.Description,
+		Attribution:        n.Attribution,
+		Suppliers:          n.Suppliers,
+		Originators:        n.Originators,
+		ReleaseDate:        n.ReleaseDate,
+		BuildDate:          n.BuildDate,
+		ValidUntilDate:     n.ValidUntilDate,
+		ExternalReferences: n.ExternalReferences,
+		Identifiers:        n.Identifiers,
+		FileTypes:          n.FileTypes,
+	}
+}

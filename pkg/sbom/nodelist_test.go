@@ -73,6 +73,29 @@ func TestCleanEdges(t *testing.T) {
 				RootElements: []string{"node1"},
 			},
 		},
+		// Duplicated edges should be consolidated
+		{
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "node1"}, {Id: "node2"}, {Id: "node3"},
+				},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "node1", To: []string{"node2"}},
+					{Type: Edge_contains, From: "node1", To: []string{"node3"}},
+				},
+				RootElements: []string{"node1"},
+			},
+
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: "node1"}, {Id: "node2"}, {Id: "node3"},
+				},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "node1", To: []string{"node2", "node3"}},
+				},
+				RootElements: []string{"node1"},
+			},
+		},
 	} {
 		tc.sut.cleanEdges()
 		require.Equal(t, tc.sut, tc.expected)
@@ -210,12 +233,7 @@ func TestNodeListIntersect(t *testing.T) {
 			{
 				Type: Edge_contains,
 				From: "node1",
-				To:   []string{"node2"},
-			},
-			{
-				Type: Edge_contains,
-				From: "node1",
-				To:   []string{"node3"},
+				To:   []string{"node2", "node3"},
 			},
 		},
 		RootElements: []string{},
@@ -309,10 +327,10 @@ func TestNodeListUnion(t *testing.T) {
 			{
 				Type: Edge_contains,
 				From: "node1",
-				To:   []string{"node2"},
+				To:   []string{"node2", "node3"},
 			},
 			{
-				Type: Edge_contains,
+				Type: Edge_dependsOn,
 				From: "node1",
 				To:   []string{"node3"},
 			},
@@ -377,10 +395,10 @@ func TestNodeListUnion(t *testing.T) {
 					{
 						Type: Edge_contains,
 						From: "node1",
-						To:   []string{"node2"},
+						To:   []string{"node2", "node3"},
 					},
 					{
-						Type: Edge_contains,
+						Type: Edge_dependsOn,
 						From: "node1",
 						To:   []string{"node3"},
 					},

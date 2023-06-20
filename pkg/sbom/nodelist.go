@@ -12,7 +12,7 @@ type edgeIndex map[string]map[Edge_Type][]*Edge
 // rootElementsIndex is an index of the top levele elements by ID
 type rootElementsIndex map[string]struct{}
 
-// indexNodes returns an inverse dictionary with the IDs of thenodes
+// indexNodes returns an inverse dictionary with the IDs of the nodes
 func (nl *NodeList) indexNodes() nodeIndex {
 	ret := nodeIndex{}
 	for _, n := range nl.Nodes {
@@ -56,12 +56,32 @@ func (nl *NodeList) cleanEdges() {
 	// Build a catalog of the elements ids
 	nodeIndex := nl.indexNodes()
 
+	// Add a seen cache to dedupe edges when
+	// cleaning them up
+	seenCache := map[string]map[Edge_Type]*Edge{}
+	var seenEdge bool
 	// Now list all edges and rebuild the list
 	for _, edge := range nl.Edges {
 		newTos := []string{}
+		oldTos := []string{}
+
+		// If the from node is not in the index, skip it
 		if _, ok := nodeIndex[edge.From]; !ok {
 			continue
 		}
+
+		// If we already saw an equivalent edge, reuse it
+		seenEdge = false
+		if _, ok := seenCache[edge.From]; ok {
+			if _, ok2 := seenCache[edge.From][edge.Type]; ok2 {
+				oldTos = edge.To
+				edge = seenCache[edge.From][edge.Type]
+				seenEdge = true
+			}
+		} else {
+			seenCache[edge.From] = map[Edge_Type]*Edge{}
+		}
+		seenCache[edge.From][edge.Type] = edge
 
 		for _, s := range edge.To {
 			if _, ok := nodeIndex[s]; ok {
@@ -69,18 +89,22 @@ func (nl *NodeList) cleanEdges() {
 			}
 		}
 
+		newTos = append(newTos, oldTos...)
+
 		if len(newTos) == 0 {
 			continue
 		}
 
 		edge.To = newTos
-		newEdges = append(newEdges, edge)
+		if !seenEdge {
+			newEdges = append(newEdges, edge)
+		}
 	}
 
 	nl.Edges = newEdges
 }
 
-// Add combines NodeList nl2 into nl. It is te equivalent to Union but
+// Add combines NodeList nl2 into nl. It is the equivalent to Union but
 // instead of returning a new NodeList it modifies nl.
 func (nl *NodeList) Add(nl2 *NodeList) {
 	existingNodes := nl.indexNodes()
@@ -104,7 +128,7 @@ func (nl *NodeList) Add(nl2 *NodeList) {
 			continue
 		}
 
-		// Add it her to the existing edge
+		// Add it here to the existing edge
 		existingEdges[nl2.Edges[i].From][nl2.Edges[i].Type][0].To = append(existingEdges[nl2.Edges[i].From][nl2.Edges[i].Type][0].To, nl2.Edges[i].To...)
 	}
 

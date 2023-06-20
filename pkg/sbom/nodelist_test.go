@@ -411,3 +411,128 @@ func TestNodeListUnion(t *testing.T) {
 		require.Equal(t, tc.expect, new, title)
 	}
 }
+
+func TestGetNodesByName(t *testing.T) {
+	for _, tc := range []struct {
+		sut      *NodeList
+		name     string
+		expected []*Node
+	}{
+		{
+			&NodeList{
+				Nodes: []*Node{
+					{Id: "node1", Name: "apache-tomcat"}, {Id: "node2", Name: "apache"},
+				},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+			"apache",
+			[]*Node{
+				{Id: "node2", Name: "apache"},
+			},
+		},
+		{
+			&NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-arm64", Name: "nginx"}, {Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-libs", Name: "nginx-libs"}, {Id: "nginx-docs", Name: "nginx-docs"},
+				},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+			"nginx",
+			[]*Node{
+				{Id: "nginx-arm64", Name: "nginx"}, {Id: "nginx-arm64", Name: "nginx"},
+			},
+		},
+	} {
+		res := tc.sut.GetNodesByName(tc.name)
+		require.Equal(t, tc.expected, res)
+	}
+}
+
+func TestGetNodeByID(t *testing.T) {
+	for _, tc := range []struct {
+		sut      *NodeList
+		id       string
+		expected *Node
+	}{
+		{
+			&NodeList{
+				Nodes: []*Node{
+					{Id: "node1", Name: "apache-tomcat"}, {Id: "node2", Name: "apache"},
+				},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+			"node2",
+			&Node{Id: "node2", Name: "apache"},
+		},
+		{
+			&NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-arm64", Name: "nginx"}, {Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-libs", Name: "nginx-libs"}, {Id: "nginx-docs", Name: "nginx-docs"},
+				},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+			"nginx-libs",
+			&Node{Id: "nginx-libs", Name: "nginx-libs"},
+		},
+	} {
+		res := tc.sut.GetNodeByID(tc.id)
+		require.Equal(t, tc.expected, res)
+	}
+}
+
+func TestGetNodesByIdentifier(t *testing.T) {
+	for _, tc := range []struct {
+		sut        *NodeList
+		identifier *Identifier
+		expected   []*Node
+	}{
+		{
+			&NodeList{
+				Nodes: []*Node{
+					{Id: "node1", Name: "apache-tomcat", Identifiers: []*Identifier{
+						{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
+					}},
+					{Id: "node2", Name: "apache"},
+				},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+			&Identifier{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
+			[]*Node{{Id: "node1", Name: "apache-tomcat", Identifiers: []*Identifier{
+				{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
+			}}},
+		},
+		{
+			&NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
+						{Type: "purl", Value: "pkg:/apk/wolfi/nginx@1.21.1"},
+						{Type: "cpe", Value: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
+					}},
+					{Id: "bash-4", Name: "bash", Identifiers: []*Identifier{
+						{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
+						{Type: "cpe", Value: "cpe:2.3:a:bash:bash:5.0-4:*:*:*:*:*:*:*"},
+					}},
+					{Id: "nginx-docs", Name: "nginx-docs"},
+				},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+			&Identifier{Type: "cpe", Value: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
+			[]*Node{{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
+				{Type: "purl", Value: "pkg:/apk/wolfi/nginx@1.21.1"},
+				{Type: "cpe", Value: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
+			}}},
+		},
+	} {
+		res := tc.sut.GetNodesByIdentifier(tc.identifier.Type, tc.identifier.Value)
+		require.Equal(t, tc.expected, res)
+	}
+}

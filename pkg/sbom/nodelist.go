@@ -291,3 +291,45 @@ func (nl *NodeList) Union(nl2 *NodeList) *NodeList {
 
 	return ret
 }
+
+// GetNodesByName returns a list of node pointers whose name equals name
+func (nl *NodeList) GetNodesByName(name string) []*Node {
+	ret := []*Node{}
+	for i := range nl.Nodes {
+		if nl.Nodes[i].Name == name {
+			ret = append(ret, nl.Nodes[i])
+		}
+	}
+	return ret
+}
+
+// GetNodeByID returns a node with the specified ID
+func (nl *NodeList) GetNodeByID(id string) *Node {
+	for i := range nl.Nodes {
+		if nl.Nodes[i].Id == id {
+			return nl.Nodes[i]
+		}
+	}
+
+	return nil
+}
+
+// GetNodesByIdentifier returns nodes that match an identifier of type t and
+// value v, for example t = "purl" v = "pkg:deb/debian/libpam-modules@1.4.0-9+deb11u1?arch=i386"
+// Not that this only does "dumb" string matching no assumptions are made on the
+// identifer type.
+func (nl *NodeList) GetNodesByIdentifier(t, v string) []*Node {
+	ret := []*Node{}
+	for i := range nl.Nodes {
+		if nl.Nodes[i].Identifiers == nil {
+			continue
+		}
+
+		for j := range nl.Nodes[i].Identifiers {
+			if nl.Nodes[i].Identifiers[j].Type == t && nl.Nodes[i].Identifiers[j].Value == v {
+				ret = append(ret, nl.Nodes[i])
+			}
+		}
+	}
+	return ret
+}

@@ -7,14 +7,16 @@ import (
 	"html/template"
 	"os"
 
-	"github.com/bom-squad/protobom/pkg"
+	"github.com/bom-squad/protobom/internal"
+
 	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/bom-squad/protobom/pkg/writer/options"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 const (
-	PROTOBOM_LONG_DESCRIPTION = "Translate SBOM formats such as cyclonedx and spdx"
+	PROTOBOM_LONG_DESCRIPTION  = "Translate SBOM formats such as cyclonedx and spdx"
 	PROTOBOM_SHORT_DESCRIPTION = "Translate SBOM formats"
 	ProtobomUserExample        = `  {{.appName}} [sbom-path] [flags]
 
@@ -25,15 +27,14 @@ const (
 var (
 	version         = "0.0.0"
 	ApplicationName = "protobom"
-	Cfg             pkg.Application
-	DefaultFormat   = formats.CDX14JSON
+	Cfg             internal.Application
 )
 
 var RootCmd = &cobra.Command{
 	Version: version,
-	Long:    PROTOBOM_SHORT_DISCRIPTION,
+	Long:    PROTOBOM_LONG_DESCRIPTION,
 	Use:     fmt.Sprintf("%s [TARGET]", ApplicationName),
-	Short:   PROTOBOM__LONG_DISCRIPTION,
+	Short:   PROTOBOM_SHORT_DESCRIPTION,
 	Example: Tprintf(ProtobomUserExample, map[string]interface{}{
 		"appName": ApplicationName,
 	}),
@@ -56,7 +57,7 @@ var RootCmd = &cobra.Command{
 		}
 		logrus.WithField("config", string(v)).Debugf("Protobom config")
 
-		pkg.Translate(path, &Cfg)
+		internal.Translate(path, &Cfg)
 		return nil
 	},
 }
@@ -64,7 +65,10 @@ var RootCmd = &cobra.Command{
 func init() {
 	cobra.OnInitialize()
 
-	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.Format), "output-format", "o", string(DefaultFormat), fmt.Sprintf("Select output format, [%s]", formats.List))
+	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.FormatType), "output-format", "o", string(options.Default.FormatOpt.FormatType), fmt.Sprintf("Select output format type, %s", formats.ListFormatType))
+	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.FormatVersion), "output-version", "v", string(options.Default.FormatOpt.FormatVersion), fmt.Sprintf("Select version, %s", formats.MapVersion))
+	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.MimeFormat), "output-mime-format", "m", string(options.Default.FormatOpt.MimeFormat), fmt.Sprintf("Select mime format, %s", formats.ListMimeFormat))
+
 }
 
 func Execute() {

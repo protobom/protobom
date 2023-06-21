@@ -69,7 +69,7 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 		return nil, fmt.Errorf("building relationships: %w", err)
 	}
 
-	for _, id := range bom.RootElements {
+	for _, id := range bom.NodeList.RootElements {
 		rels = append(rels, &spdx.Relationship{
 			RefA:                common.MakeDocElementID("", bom.Metadata.Id),
 			RefB:                common.MakeDocElementID("", id),
@@ -90,7 +90,7 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 
 func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) {
 	relationships := []*spdx.Relationship{}
-	for _, e := range bom.Edges {
+	for _, e := range bom.NodeList.Edges {
 		for _, dest := range e.To {
 			rel := spdx.Relationship{
 				RefA:         common.MakeDocElementID("", e.From),
@@ -106,7 +106,7 @@ func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) {
 
 func buildFiles(bom *sbom.Document) ([]*spdx.File, error) {
 	files := []*spdx.File{}
-	for _, node := range bom.Nodes {
+	for _, node := range bom.NodeList.Nodes {
 		if node.Type == sbom.Node_PACKAGE {
 			continue
 		}
@@ -152,7 +152,7 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) {
 
 func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) {
 	packages := []*spdx.Package{}
-	for _, node := range bom.Nodes {
+	for _, node := range bom.NodeList.Nodes {
 		if node.Type == sbom.Node_FILE {
 			continue
 		}

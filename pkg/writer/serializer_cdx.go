@@ -40,7 +40,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	// Generate all components
 	components := map[string]*cdx.Component{}
 	refless := []*cdx.Component{}
-	for _, n := range bom.Nodes {
+	for _, n := range bom.NodeList.Nodes {
 		comp := s.nodeToComponent(n)
 		if comp == nil {
 			// Error? Warn?
@@ -58,11 +58,11 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	addedDict := map[string]struct{}{}
 
 	// First, assign the top level nodes
-	if bom.RootElements != nil && len(bom.RootElements) > 0 {
-		for _, id := range bom.RootElements {
+	if bom.NodeList.RootElements != nil && len(bom.NodeList.RootElements) > 0 {
+		for _, id := range bom.NodeList.RootElements {
 			rootDict[id] = struct{}{}
 			// Search for the node and add it
-			for _, n := range bom.Nodes {
+			for _, n := range bom.NodeList.Nodes {
 				if n.Id == id {
 					rootComp := s.nodeToComponent(n)
 					doc.Metadata.Component = rootComp
@@ -78,7 +78,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 
 	// Next up. Let's navigate the SBOM graph and translate it to the CDX simpler
 	// tree or to the dependency graph
-	for _, e := range bom.Edges {
+	for _, e := range bom.NodeList.Edges {
 		if _, ok := addedDict[e.From]; ok {
 			continue
 		}

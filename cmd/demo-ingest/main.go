@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/cmd/cli"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -19,7 +20,7 @@ var filename = filepath.Join(os.TempDir(), "sbom.proto")
 // some tricks based on the following lines. See comments below
 
 func main() {
-	Execute()
+	cli.Execute()
 }
 
 func writeProto(bom *sbom.Document) {

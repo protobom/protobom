@@ -151,3 +151,36 @@ func TestUpdate(t *testing.T) {
 		require.Equal(t, tc.sut, tc.expected)
 	}
 }
+
+func TestGetRootNodes(t *testing.T) {
+	for _, tc := range []struct {
+		sut      *NodeList
+		expected []*Node
+	}{
+		// ID and node type should never change
+		{
+			sut: &NodeList{
+				RootElements: []string{"node1", "node3"},
+				Nodes: []*Node{
+					{Id: "node1"}, {Id: "node2"}, {Id: "node3"},
+				},
+				Edges: []*Edge{},
+			},
+			expected: []*Node{{Id: "node1"}, {Id: "node3"}},
+		},
+		// Missing nodes are not returned
+		{
+			sut: &NodeList{
+				RootElements: []string{"node1", "node3"},
+				Nodes: []*Node{
+					{Id: "node1"}, {Id: "node2"},
+				},
+				Edges: []*Edge{},
+			},
+			expected: []*Node{{Id: "node1"}},
+		},
+	} {
+		nodes := tc.sut.GetRootNodes()
+		require.Equal(t, tc.expected, nodes)
+	}
+}

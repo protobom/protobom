@@ -333,3 +333,22 @@ func (nl *NodeList) GetNodesByIdentifier(t, v string) []*Node {
 	}
 	return ret
 }
+
+// GetRootNodes returns a list of pointers of the root nodes of the document
+func (nl *NodeList) GetRootNodes() []*Node {
+	ret := []*Node{}
+	index := rootElementsIndex{}
+	for _, id := range nl.RootElements {
+		index[id] = struct{}{}
+	}
+	for i := range nl.Nodes {
+		if _, ok := index[nl.Nodes[i].Id]; ok {
+			ret = append(ret, nl.Nodes[i])
+			if len(ret) == len(index) {
+				break
+			}
+		}
+	}
+	// TODO(ehandling): What if not all nodes were found?
+	return ret
+}

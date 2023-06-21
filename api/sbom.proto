@@ -7,9 +7,7 @@ package bomsquad.protobom;
 
 message Document {
     Metadata metadata = 1;
-    repeated string root_elements = 2;
-    repeated Node nodes = 3;
-    repeated Edge edges = 4;
+    NodeList node_list = 2;
 }
 
 message Node {

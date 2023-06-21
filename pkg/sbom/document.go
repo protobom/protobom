@@ -1,29 +1,24 @@
 package sbom
 
-// ToNodeList returns a nodelist containing the information in the document
-func (d *Document) ToNodeList() *NodeList {
-	return &NodeList{
-		Nodes:        d.Nodes,
-		Edges:        d.Edges,
-		RootElements: d.RootElements,
+func NewDocument() *Document {
+	return &Document{
+		Metadata: &Metadata{
+			Id:      "",
+			Version: "0",
+			Name:    "",
+			// Date:    &timestamppb.New(spdxDoc.CreationInfo.Created), // bug in onesbom
+			Tools:   []*Tool{},
+			Authors: []*Person{},
+		},
+		NodeList: &NodeList{
+			Nodes:        []*Node{},
+			Edges:        []*Edge{},
+			RootElements: []string{},
+		},
 	}
 }
 
-// GetRootNodes returns a list of pointers of the root nodes of the document
+// GetRootNodes returns the top level nodes of the document
 func (d *Document) GetRootNodes() []*Node {
-	ret := []*Node{}
-	index := rootElementsIndex{}
-	for _, id := range d.RootElements {
-		index[id] = struct{}{}
-	}
-	for i := range d.Nodes {
-		if _, ok := index[d.Nodes[i].Id]; ok {
-			ret = append(ret, d.Nodes[i])
-			if len(ret) == len(index) {
-				break
-			}
-		}
-	}
-	// TODO(ehandling): What if not all nodes were found?
-	return ret
+	return d.GetRootNodes()
 }

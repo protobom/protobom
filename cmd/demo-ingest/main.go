@@ -1,13 +1,13 @@
-package cli
+package main
 
 import (
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/bom-squad/protobom/cmd/cli"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/cmd/cli"
 	"google.golang.org/protobuf/proto"
 )
 

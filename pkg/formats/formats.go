@@ -42,7 +42,7 @@ var List = []Format{SPDX23TV, SPDX23JSON, SPDX22TV, SPDX22JSON, CDX14JSON, CDX15
 var ListFormatType = []string{CDXFORMAT, SPDXFORMAT}
 var ListCdxVersion = []string{CDX_VERSION_13, CDX_VERSION_14, CDX_VERSION_15}
 var ListSpdxVersion = []string{SPDX_VERSION_22, SPDX_VERSION_23}
-var ListMimeFormat = []string{JSON_MIME_FORMAT, XML_MIME_FORMAT}
+var ListEncoding = []string{JSON_MIME_FORMAT, XML_MIME_FORMAT}
 var MapVersion = map[string][]string{
 	CDXFORMAT:  ListCdxVersion,
 	SPDXFORMAT: ListSpdxVersion,

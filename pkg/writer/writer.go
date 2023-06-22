@@ -28,13 +28,9 @@ func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 		return errors.New("unable to write sbom to stream, SBOM is nil")
 	}
 
-	format, err := w.Options.FormatOpt.Select()
-	if err != nil {
-		return err
-	}
 	// The target format is in the options ATM. Here we get the
 	// serializer for the target we are writing to
-	serializer, err := w.impl.GetFormatSerializer(format)
+	serializer, err := w.impl.GetFormatSerializer(w.Options.Format)
 	if err != nil {
 		return fmt.Errorf("getting serializer: %w", err)
 	}

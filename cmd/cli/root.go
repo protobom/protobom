@@ -9,8 +9,9 @@ import (
 
 	"github.com/bom-squad/protobom/internal"
 
-	"github.com/bom-squad/protobom/pkg/formats"
+	writeroptions "github.com/bom-squad/protobom/internal/writer"
 	"github.com/bom-squad/protobom/pkg/writer/options"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -66,9 +67,9 @@ var RootCmd = &cobra.Command{
 func init() {
 	cobra.OnInitialize()
 
-	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.FormatType), "format", "f", string(options.Default.FormatOpt.FormatType), fmt.Sprintf("Select format, Options=%s", formats.ListFormatType))
-	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.FormatVersion), "version", "v", string(options.Default.FormatOpt.FormatVersion), fmt.Sprintf("Select version, Options=%s", formats.MapVersion))
-	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.WriterOpts.FormatOpt.MimeFormat), "encoding", "e", string(options.Default.FormatOpt.MimeFormat), fmt.Sprintf("Select encoding, Options=%s", formats.ListEncoding))
+	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.Writer.Type), "format", "f", string(options.Default.Format.Type()), fmt.Sprintf("Select format, Options=%s", writeroptions.Versions.Formats()))
+	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.Writer.Version), "version", "v", string(options.Default.Format.Version()), fmt.Sprintf("Select version, Options=%s", writeroptions.Versions.VersionMap()))
+	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.Writer.Encoding), "encoding", "e", string(options.Default.Format.Encoding()), fmt.Sprintf("Select encoding, Options=%s", writeroptions.Versions.EncodingMap()))
 
 }
 

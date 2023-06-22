@@ -3,15 +3,17 @@ package internal
 import (
 	"os"
 
+	writeroptions "github.com/bom-squad/protobom/internal/writer"
 	"github.com/bom-squad/protobom/pkg/reader"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer"
-	"github.com/bom-squad/protobom/pkg/writer/options"
+
 	"github.com/sirupsen/logrus"
 )
 
 type Application struct {
-	WriterOpts options.Options
+	Writer writeroptions.Options `yaml:"writer,omitempty" json:"writer,omitempty"`
+	// Reader readeroptions.Options `yaml:"reader,omitempty" json:"reader,omitempty"`
 }
 
 func Translate(path string, cfg *Application) error {
@@ -41,7 +43,7 @@ func Translate(path string, cfg *Application) error {
 
 	// The SBOM read will be rewritten to the following format:
 	// renderer.Options.Format = formats.CDX14JSON
-	renderer.Options = cfg.WriterOpts
+	renderer.Options = cfg.Writer.ToOptions()
 
 	// Serialize and render the protobom to STDOUT:
 	if err := renderer.WriteStream(doc, os.Stdout); err != nil {

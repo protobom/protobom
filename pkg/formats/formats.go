@@ -4,7 +4,6 @@
 package formats
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -20,33 +19,14 @@ const (
 	CDX13JSON  = Format("application/vnd.cyclonedx+json;version=1.3")
 	CDX14JSON  = Format("application/vnd.cyclonedx+json;version=1.4")
 	CDX15JSON  = Format("application/vnd.cyclonedx+json;version=1.5")
-
 	CDXFORMAT  = "cyclonedx"
 	SPDXFORMAT = "spdx"
-
-	CDX_MIME  = "application/vnd.cyclonedx"
-	SPDX_MIME = "text/spdx"
-
-	CDX_VERSION_13   = "1.3"
-	CDX_VERSION_14   = "1.4"
-	CDX_VERSION_15   = "1.5"
-	SPDX_VERSION_22  = "2.2"
-	SPDX_VERSION_23  = "2.3"
-	JSON_MIME_FORMAT = "json"
-	XML_MIME_FORMAT  = "xml"
 )
 
 type Document interface{}
 
+var ListFormats = []Format{CDXFORMAT, SPDXFORMAT}
 var List = []Format{SPDX23TV, SPDX23JSON, SPDX22TV, SPDX22JSON, CDX14JSON, CDX15JSON}
-var ListFormatType = []string{CDXFORMAT, SPDXFORMAT}
-var ListCdxVersion = []string{CDX_VERSION_13, CDX_VERSION_14, CDX_VERSION_15}
-var ListSpdxVersion = []string{SPDX_VERSION_22, SPDX_VERSION_23}
-var ListEncoding = []string{JSON_MIME_FORMAT, XML_MIME_FORMAT}
-var MapVersion = map[string][]string{
-	CDXFORMAT:  ListCdxVersion,
-	SPDXFORMAT: ListSpdxVersion,
-}
 
 // Version returns the version of the format
 func (f *Format) Version() string {
@@ -77,6 +57,14 @@ func (f *Format) Minor() string {
 	return parts[1]
 }
 
+func (f *Format) URI() string {
+	parts := strings.Split(string(*f), "+")
+	if len(parts) > 0 {
+		return parts[0]
+	}
+	return ""
+}
+
 // Encoding returns the encoding used by the SBOM format
 func (f Format) Encoding() string {
 	// Trim the version first
@@ -98,36 +86,4 @@ func (f *Format) Type() string {
 		return CDXFORMAT
 	}
 	return ""
-}
-
-type FormatOpt struct {
-	FormatType    string `yaml:"format-type,omitempty" json:"format-type,omitempty"`
-	FormatVersion string `yaml:"format-version,omitempty" json:"format-version,omitempty"`
-	MimeFormat    string `yaml:"mime-format,omitempty" json:"mime-format,omitempty"`
-}
-
-func (f *FormatOpt) Select() (Format, error) {
-	var mimeUri string
-	switch f.FormatType {
-	case CDXFORMAT:
-		mimeUri = CDX_MIME
-	case SPDXFORMAT:
-		mimeUri = SPDXFORMAT
-	default:
-		return Format(""), fmt.Errorf("unknown format type %s", f.FormatType)
-	}
-
-	formatSelect := Format(fmt.Sprintf("%s+%s;version=%s", mimeUri, f.MimeFormat, f.FormatVersion))
-	found := false
-	for _, known := range List {
-		if known == formatSelect {
-			found = true
-		}
-	}
-
-	if !found {
-		return Format(""), fmt.Errorf("unknown format selected %s", formatSelect)
-	}
-
-	return formatSelect, nil
 }

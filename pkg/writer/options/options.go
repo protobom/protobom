@@ -5,15 +5,11 @@ import (
 )
 
 type Options struct {
-	FormatOpt formats.FormatOpt `yaml:"format,omitempty" json:"format,omitempty"`
-	Indent    int               `yaml:"indent,omitempty" json:"indent,omitempty"`
+	Format formats.Format `yaml:"format,omitempty" json:"format,omitempty"`
+	Indent int            `yaml:"indent,omitempty" json:"indent,omitempty"`
 }
 
 var Default = Options{
 	Indent: 4,
-	FormatOpt: formats.FormatOpt{
-		FormatType:    formats.CDXFORMAT,
-		FormatVersion: formats.CDX_VERSION_14,
-		MimeFormat:    formats.JSON_MIME_FORMAT,
-	},
+	Format: formats.CDX14JSON,
 }

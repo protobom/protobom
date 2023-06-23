@@ -31,19 +31,12 @@ func (gfp *FormatParserSPDX23) Parse(opts *options.Options, r io.Reader) (*sbom.
 		return nil, fmt.Errorf("decoding SPDX 2.3 document: %w", err)
 	}
 
-	bom := &sbom.Document{
-		Metadata: &sbom.Metadata{
-			Id:      spdxDoc.ID,
-			Version: "0",
-			Name:    spdxDoc.Name,
-			// Date:    &timestamppb.New(spdxDoc.CreationInfo.Created), // bug in onesbom
-			Tools:   []*sbom.Tool{},
-			Authors: []*sbom.Person{},
-		},
-	}
+	bom := sbom.NewDocument()
+	bom.Metadata.Id = spdxDoc.ID
+	bom.Metadata.Name = spdxDoc.Name
 
 	// Add the top level components
-	bom.RootElements = spdxDoc.DocumentDescribes
+	bom.NodeList.RootElements = spdxDoc.DocumentDescribes
 
 	// Assign the document metadata
 
@@ -54,7 +47,7 @@ func (gfp *FormatParserSPDX23) Parse(opts *options.Options, r io.Reader) (*sbom.
 			return nil, fmt.Errorf("rendering node from spdx package: %w", err)
 		}
 
-		bom.Nodes = append(bom.Nodes, p)
+		bom.NodeList.Nodes = append(bom.NodeList.Nodes, p)
 	}
 
 	for i := range spdxDoc.Files {
@@ -63,7 +56,7 @@ func (gfp *FormatParserSPDX23) Parse(opts *options.Options, r io.Reader) (*sbom.
 			return nil, fmt.Errorf("creating node from spdx file: %w", nil)
 		}
 
-		bom.Nodes = append(bom.Nodes, f)
+		bom.NodeList.Nodes = append(bom.NodeList.Nodes, f)
 	}
 
 	for i := range spdxDoc.Relationships {
@@ -71,7 +64,7 @@ func (gfp *FormatParserSPDX23) Parse(opts *options.Options, r io.Reader) (*sbom.
 		if err != nil {
 			return nil, fmt.Errorf("")
 		}
-		bom.Edges = append(bom.Edges, e)
+		bom.NodeList.Edges = append(bom.NodeList.Edges, e)
 	}
 
 	return bom, nil

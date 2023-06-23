@@ -64,7 +64,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 func (s *SerializerCDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
 	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
 
-	for _, n := range bom.Nodes {
+	for _, n := range bom.NodeList.Nodes {
 		comp := s.nodeToComponent(n)
 		if comp == nil {
 			// Error? Warn?
@@ -91,10 +91,10 @@ func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) *cdx.Compo
 	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
 
 	// 2DO Use GetRootNodes() https://github.com/bom-squad/protobom/pull/20
-	if bom.RootElements != nil && len(bom.RootElements) > 0 {
-		for _, id := range bom.RootElements {
+	if bom.NodeList.RootElements != nil && len(bom.NodeList.RootElements) > 0 {
+		for _, id := range bom.NodeList.RootElements {
 			// Search for the node and add it
-			for _, n := range bom.Nodes {
+			for _, n := range bom.NodeList.Nodes {
 				if n.Id == id {
 					rootComp = s.nodeToComponent(n)
 					state.addedDict[id] = struct{}{}
@@ -116,7 +116,7 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 	var dependencies []cdx.Dependency
 	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
 
-	for _, e := range bom.Edges {
+	for _, e := range bom.NodeList.Edges {
 		if _, ok := state.addedDict[e.From]; ok {
 			continue
 		}

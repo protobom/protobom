@@ -5,8 +5,8 @@ import (
 )
 
 type Options struct {
-	Format formats.Format
-	Indent int
+	Format formats.Format `yaml:"format,omitempty" json:"format,omitempty"`
+	Indent int            `yaml:"indent,omitempty" json:"indent,omitempty"`
 }
 
 var Default = Options{

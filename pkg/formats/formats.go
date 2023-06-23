@@ -3,7 +3,9 @@
 
 package formats
 
-import "strings"
+import (
+	"strings"
+)
 
 type Format string
 
@@ -17,13 +19,13 @@ const (
 	CDX13JSON  = Format("application/vnd.cyclonedx+json;version=1.3")
 	CDX14JSON  = Format("application/vnd.cyclonedx+json;version=1.4")
 	CDX15JSON  = Format("application/vnd.cyclonedx+json;version=1.5")
-
 	CDXFORMAT  = "cyclonedx"
 	SPDXFORMAT = "spdx"
 )
 
 type Document interface{}
 
+var ListFormats = []Format{CDXFORMAT, SPDXFORMAT}
 var List = []Format{SPDX23TV, SPDX23JSON, SPDX22TV, SPDX22JSON, CDX14JSON, CDX15JSON}
 
 // Version returns the version of the format
@@ -53,6 +55,14 @@ func (f *Format) Minor() string {
 	}
 
 	return parts[1]
+}
+
+func (f *Format) URI() string {
+	parts := strings.Split(string(*f), "+")
+	if len(parts) > 0 {
+		return parts[0]
+	}
+	return ""
 }
 
 // Encoding returns the encoding used by the SBOM format

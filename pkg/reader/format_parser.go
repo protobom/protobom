@@ -16,15 +16,15 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type FormatParser interface {
-	Parse(*options.Options, io.Reader) (*sbom.Document, error)
+type Parser interface {
+	ParseStream(*options.Options, io.Reader) (*sbom.Document, error)
 }
 
-type FormatParserSPDX23 struct{}
+type ParserSPDX23 struct{}
 
-type FormatParserCDX14 struct{}
+type ParserCDX14 struct{}
 
-func (gfp *FormatParserSPDX23) Parse(opts *options.Options, r io.Reader) (*sbom.Document, error) {
+func (gfp *ParserSPDX23) ParseStream(opts *options.Options, r io.Reader) (*sbom.Document, error) {
 	spdxDoc := &spdx23.Document{}
 	dc := json.NewDecoder(r)
 	if err := dc.Decode(spdxDoc); err != nil {

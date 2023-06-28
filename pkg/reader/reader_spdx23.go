@@ -1,0 +1,197 @@
+package reader
+
+import (
+	"fmt"
+	"io"
+	"strings"
+	"time"
+
+	"github.com/bom-squad/protobom/pkg/reader/options"
+	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	spdxjson "github.com/spdx/tools-golang/json"
+	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
+)
+
+type ParserSPDX23 struct{}
+
+// ParseStream reads an io.Reader to aprse an SPDX 2.3 document from it
+func (fp *ParserSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom.Document, error) {
+	spdxDoc, err := spdxjson.Read(r)
+	if err != nil {
+		return nil, fmt.Errorf("parsing SPDX json: %w", err)
+	}
+
+	bom := sbom.NewDocument()
+	bom.Metadata.Id = string(spdxDoc.SPDXIdentifier)
+	bom.Metadata.Name = spdxDoc.DocumentName
+
+	// TODO(degradation): External document references
+
+	// TODO(puerco) Top level elements
+	if t := fp.spdxDateToTime(spdxDoc.CreationInfo.Created); t != nil {
+		bom.Metadata.Date = timestamppb.New(*t)
+	}
+	if spdxDoc.CreationInfo.Creators != nil {
+		for _, c := range spdxDoc.CreationInfo.Creators {
+			// TODO: We need to creaste a parser library in formats/dpsx
+			if c.CreatorType == "Tool" {
+				// TODO:
+				bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: c.Creator})
+				continue
+			}
+			a := &sbom.Person{Name: c.Creator}
+			a.IsOrg = (c.CreatorType == "Organization")
+			bom.Metadata.Authors = append(bom.Metadata.Authors, a)
+		}
+	}
+
+	// TODO(degradation): SPDX LicenseVersion
+
+	for _, p := range spdxDoc.Packages {
+		bom.NodeList.AddNode(fp.packageToNode(p))
+	}
+
+	for _, f := range spdxDoc.Files {
+		bom.NodeList.AddNode(fp.fileToNode(f))
+	}
+
+	for _, r := range spdxDoc.Relationships {
+		// The SPDX go library surfaces the JSON top-level elements as relationships:
+		if r.RefA.ElementRefID == "DOCUMENT" && strings.ToUpper(r.Relationship) == "DESCRIBES" {
+			bom.NodeList.RootElements = append(bom.NodeList.RootElements, string(r.RefB.ElementRefID))
+		} else {
+			bom.NodeList.AddEdge(fp.relationshipToEdge(r))
+		}
+	}
+
+	return bom, nil
+}
+
+// packageToNode assigns the data from an SPDX package into a
+func (fp *ParserSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
+	n := &sbom.Node{
+		Id:              string(p.PackageSPDXIdentifier),
+		Type:            sbom.Node_PACKAGE,
+		Name:            p.PackageName,
+		Version:         p.PackageVersion,
+		FileName:        p.PackageFileName,
+		UrlHome:         p.PackageHomePage,
+		UrlDownload:     p.PackageDownloadLocation,
+		LicenseComments: p.PackageLicenseComments,
+		Copyright:       p.PackageCopyrightText,
+		SourceInfo:      p.PackageSourceInfo,
+		PrimaryPurpose:  p.PrimaryPackagePurpose,
+		Comment:         p.PackageComment,
+		Summary:         p.PackageSummary,
+		Description:     p.PackageDescription,
+		Attribution:     p.PackageAttributionTexts,
+		Identifiers:     []*sbom.Identifier{},
+	}
+
+	// TODO(degradation) NOASSERTION
+	if p.PackageLicenseConcluded != "NOASSERTION" && p.PackageLicenseConcluded != "" {
+		n.LicenseConcluded = p.PackageLicenseConcluded
+	}
+
+	if len(p.PackageChecksums) > 0 {
+		n.Hashes = map[string]string{}
+		for _, h := range p.PackageChecksums {
+			n.Hashes[string(h.Algorithm)] = h.Value
+		}
+	}
+
+	if len(p.PackageExternalReferences) > 0 {
+		n.ExternalReferences = []*sbom.ExternalReference{}
+		for _, r := range p.PackageExternalReferences {
+			n.ExternalReferences = append(n.ExternalReferences, &sbom.ExternalReference{
+				Url:     r.Locator,
+				Type:    r.RefType,
+				Comment: r.ExternalRefComment,
+			})
+		}
+	}
+
+	if t := fp.spdxDateToTime(p.ValidUntilDate); t != nil {
+		n.ValidUntilDate = timestamppb.New(*t)
+	}
+	if t := fp.spdxDateToTime(p.ReleaseDate); t != nil {
+		n.ReleaseDate = timestamppb.New(*t)
+	}
+	if t := fp.spdxDateToTime(p.BuiltDate); t != nil {
+		n.BuildDate = timestamppb.New(*t)
+	}
+
+	// Mmh there is a limitation here on the SPDX libraries. They will not
+	// return the supplier and originator emails as a separate field. Perhaps
+	// we should upstream a fix for that.
+	if p.PackageSupplier != nil && p.PackageSupplier.Supplier != "NOASSERTION" {
+		n.Suppliers = []*sbom.Person{{Name: p.PackageSupplier.Supplier}}
+		if p.PackageSupplier.SupplierType == "Organization" {
+			n.Suppliers[0].IsOrg = true
+		}
+	}
+
+	if p.PackageOriginator != nil && p.PackageOriginator.Originator != "NOASSERTION" && p.PackageOriginator.Originator != "" {
+		n.Originators = []*sbom.Person{{Name: p.PackageOriginator.Originator}}
+		if p.PackageOriginator.OriginatorType == "Organization" {
+			n.Originators[0].IsOrg = true
+		}
+	}
+
+	return n
+}
+
+// spdxDateToTime is a utility function that turns a date into a go time.Time
+func (_ *ParserSPDX23) spdxDateToTime(date string) *time.Time {
+	if date == "" {
+		return nil
+	}
+	t, err := time.Parse(time.RFC3339Nano, date)
+	if err != nil {
+		logrus.Warnf("invalid time format in %s", date)
+		return nil
+	}
+	return &t
+}
+
+// fileToNode converts a file from SPDX into a protobom node
+func (fp *ParserSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
+	n := &sbom.Node{
+		Id:               string(f.FileSPDXIdentifier),
+		Type:             sbom.Node_FILE,
+		Name:             f.FileName,
+		Licenses:         f.LicenseInfoInFiles,
+		LicenseConcluded: f.LicenseConcluded,
+		LicenseComments:  f.LicenseComments,
+		Copyright:        f.FileCopyrightText,
+		Comment:          f.FileComment,
+		Attribution:      []string{},
+		Suppliers:        []*sbom.Person{},
+		Originators:      []*sbom.Person{},
+		FileTypes:        f.FileTypes,
+	}
+
+	if len(f.Checksums) > 0 {
+		n.Hashes = map[string]string{}
+		for _, h := range f.Checksums {
+			n.Hashes[string(h.Algorithm)] = h.Value
+		}
+	}
+
+	return n
+}
+
+// relationshipToEdge converts the SPDX relationship to a protobom Edge
+func (_ *ParserSPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
+	// TODO(degradation) How to handle external documents?
+	// TODO(degradation) How to handle NOASSERTION and NONE targets
+	e := &sbom.Edge{
+		Type: sbom.EdgeTypeFromSPDX2(r.Relationship),
+		From: string(r.RefA.ElementRefID),
+		To:   []string{string(r.RefB.ElementRefID)},
+	}
+	return e
+}

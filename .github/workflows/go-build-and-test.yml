@@ -21,7 +21,7 @@ jobs:
 
     - name: Test
       env:
-        GOPATH: /home/runner/work/woodpecker/go
+        GOPATH: /home/runner/work/bom-squad/protobom
       run: |
         go get -d ./...
         go test -v ./...

@@ -20,6 +20,8 @@ jobs:
         path: go/src/github.com/bom-squad/protobom
 
     - name: Test
+      env:
+        GOPATH: /home/runner/work/woodpecker/go
       run: |
         go get -d ./...
         go test -v ./...

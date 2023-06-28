@@ -18,6 +18,7 @@ type Reader struct {
 	Options options.Options
 }
 
+// New returns a new Reader with the default options
 func New() *Reader {
 	return &Reader{
 		Options: defaultOptions,

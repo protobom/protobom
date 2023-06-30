@@ -44,7 +44,7 @@ func (r *Reader) ParseStream(f io.ReadSeekCloser) (*sbom.Document, error) {
 		return nil, fmt.Errorf("detecting SBOM format: %w", err)
 	}
 
-	formatParser, err := r.impl.GetParser(&r.Options, format)
+	formatParser, err := r.impl.GetUnserializer(&r.Options, format)
 	if err != nil {
 		return nil, fmt.Errorf("getting format parser: %w", err)
 	}

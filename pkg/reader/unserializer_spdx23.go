@@ -15,10 +15,10 @@ import (
 	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 )
 
-type ParserSPDX23 struct{}
+type UnserializerSPDX23 struct{}
 
-// ParseStream reads an io.Reader to aprse an SPDX 2.3 document from it
-func (fp *ParserSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom.Document, error) {
+// ParseStream reads an io.Reader to parse an SPDX 2.3 document from it
+func (u *UnserializerSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom.Document, error) {
 	spdxDoc, err := spdxjson.Read(r)
 	if err != nil {
 		return nil, fmt.Errorf("parsing SPDX json: %w", err)
@@ -31,14 +31,14 @@ func (fp *ParserSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom.Docu
 	// TODO(degradation): External document references
 
 	// TODO(puerco) Top level elements
-	if t := fp.spdxDateToTime(spdxDoc.CreationInfo.Created); t != nil {
+	if t := u.spdxDateToTime(spdxDoc.CreationInfo.Created); t != nil {
 		bom.Metadata.Date = timestamppb.New(*t)
 	}
 	if spdxDoc.CreationInfo.Creators != nil {
 		for _, c := range spdxDoc.CreationInfo.Creators {
-			// TODO: We need to creaste a parser library in formats/dpsx
+			// TODO: We need to create a parser library in formats/spdx
 			if c.CreatorType == "Tool" {
-				// TODO:
+				// TODO: Split the version from the Tool string here.
 				bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: c.Creator})
 				continue
 			}
@@ -51,11 +51,11 @@ func (fp *ParserSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom.Docu
 	// TODO(degradation): SPDX LicenseVersion
 
 	for _, p := range spdxDoc.Packages {
-		bom.NodeList.AddNode(fp.packageToNode(p))
+		bom.NodeList.AddNode(u.packageToNode(p))
 	}
 
 	for _, f := range spdxDoc.Files {
-		bom.NodeList.AddNode(fp.fileToNode(f))
+		bom.NodeList.AddNode(u.fileToNode(f))
 	}
 
 	for _, r := range spdxDoc.Relationships {
@@ -63,15 +63,15 @@ func (fp *ParserSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom.Docu
 		if r.RefA.ElementRefID == "DOCUMENT" && strings.ToUpper(r.Relationship) == "DESCRIBES" {
 			bom.NodeList.RootElements = append(bom.NodeList.RootElements, string(r.RefB.ElementRefID))
 		} else {
-			bom.NodeList.AddEdge(fp.relationshipToEdge(r))
+			bom.NodeList.AddEdge(u.relationshipToEdge(r))
 		}
 	}
 
 	return bom, nil
 }
 
-// packageToNode assigns the data from an SPDX package into a
-func (fp *ParserSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
+// packageToNode assigns the data from an SPDX package into a new Node
+func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	n := &sbom.Node{
 		Id:              string(p.PackageSPDXIdentifier),
 		Type:            sbom.Node_PACKAGE,
@@ -114,13 +114,13 @@ func (fp *ParserSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 		}
 	}
 
-	if t := fp.spdxDateToTime(p.ValidUntilDate); t != nil {
+	if t := u.spdxDateToTime(p.ValidUntilDate); t != nil {
 		n.ValidUntilDate = timestamppb.New(*t)
 	}
-	if t := fp.spdxDateToTime(p.ReleaseDate); t != nil {
+	if t := u.spdxDateToTime(p.ReleaseDate); t != nil {
 		n.ReleaseDate = timestamppb.New(*t)
 	}
-	if t := fp.spdxDateToTime(p.BuiltDate); t != nil {
+	if t := u.spdxDateToTime(p.BuiltDate); t != nil {
 		n.BuildDate = timestamppb.New(*t)
 	}
 
@@ -145,7 +145,7 @@ func (fp *ParserSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 }
 
 // spdxDateToTime is a utility function that turns a date into a go time.Time
-func (_ *ParserSPDX23) spdxDateToTime(date string) *time.Time {
+func (_ *UnserializerSPDX23) spdxDateToTime(date string) *time.Time {
 	if date == "" {
 		return nil
 	}
@@ -158,7 +158,7 @@ func (_ *ParserSPDX23) spdxDateToTime(date string) *time.Time {
 }
 
 // fileToNode converts a file from SPDX into a protobom node
-func (fp *ParserSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
+func (fp *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 	n := &sbom.Node{
 		Id:               string(f.FileSPDXIdentifier),
 		Type:             sbom.Node_FILE,
@@ -185,7 +185,7 @@ func (fp *ParserSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 }
 
 // relationshipToEdge converts the SPDX relationship to a protobom Edge
-func (_ *ParserSPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
+func (_ *UnserializerSPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
 	// TODO(degradation) How to handle external documents?
 	// TODO(degradation) How to handle NOASSERTION and NONE targets
 	e := &sbom.Edge{

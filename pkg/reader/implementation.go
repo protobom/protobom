@@ -14,8 +14,8 @@ import (
 
 type parserImplementation interface {
 	OpenDocumentFile(string) (*os.File, error)
-	DetectFormat(*options.Options, io.ReadSeeker) (formats.Format, error) // Change string to format
-	GetParser(*options.Options, formats.Format) (Parser, error)           // Change string to format
+	DetectFormat(*options.Options, io.ReadSeeker) (formats.Format, error)   // Change string to format
+	GetUnserializer(*options.Options, formats.Format) (Unserializer, error) // Change string to format
 }
 
 type defaultParserImplementation struct{}
@@ -33,10 +33,10 @@ func (di *defaultParserImplementation) DetectFormat(opts *options.Options, r io.
 	return format, nil
 }
 
-func (dpi *defaultParserImplementation) GetParser(_ *options.Options, format formats.Format) (Parser, error) {
+func (dpi *defaultParserImplementation) GetUnserializer(_ *options.Options, format formats.Format) (Unserializer, error) {
 	switch string(format) {
 	case "text/spdx+json;version=2.3":
-		return &ParserSPDX23{}, nil
+		return &UnserializerSPDX23{}, nil
 	//case "application/vnd.cyclonedx+json;version=1.4":
 	//	return &FormatParserCDX14{}, nil
 	default:

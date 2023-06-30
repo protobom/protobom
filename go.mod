@@ -2,7 +2,7 @@ module github.com/bom-squad/protobom
 
 go 1.20
 
-require google.golang.org/protobuf v1.30.0
+require google.golang.org/protobuf v1.31.0
 
 require (
 	github.com/CycloneDX/cyclonedx-go v0.7.1

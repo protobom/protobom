@@ -8,6 +8,15 @@ import (
 	"strings"
 )
 
+var sniffFormats = []sniffFormat{
+	cdxSniff{},
+	spdxSniff{},
+}
+
+type sniffFormat interface {
+	sniff(data []byte) formatDetails
+}
+
 type Sniffer struct{}
 
 // SniffFile takes a path an return the format
@@ -25,72 +34,105 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	fileScanner := bufio.NewScanner(f)
 	fileScanner.Split(bufio.ScanLines)
 
-	formatType := ""
-	formatEncoding := ""
-	formatVersion := ""
+	var format formatDetails
 
 	for fileScanner.Scan() {
-		if strings.Contains(fileScanner.Text(), `"bomFormat"`) && strings.Contains(fileScanner.Text(), `"CycloneDX"`) {
-			formatType = "application/vnd.cyclonedx"
-			formatEncoding = JSON
-		}
-
-		if strings.Contains(fileScanner.Text(), `"specVersion"`) {
-			parts := strings.Split(fileScanner.Text(), ":")
-			if len(parts) == 2 {
-				ver := strings.TrimPrefix(strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(parts[1]), ","), "\""), "\"")
-				if ver != "" {
-					formatVersion = ver
-					formatEncoding = JSON
-				}
-			}
-		}
-
-		if strings.Contains(fileScanner.Text(), "SPDXVersion:") {
-			formatType = "text/spdx"
-			formatEncoding = "text"
-
-			for _, ver := range []string{"2.2", "2.3"} {
-				if strings.Contains(fileScanner.Text(), fmt.Sprintf("SPDX-%s", ver)) {
-					formatVersion = ver
-					break
-				}
-			}
-			break
-		}
-
-		// In JSON, the SPDX version field would be quoted
-		if strings.Contains(fileScanner.Text(), "\"spdxVersion\"") ||
-			strings.Contains(fileScanner.Text(), "'spdxVersion'") {
-			formatType = "text/spdx"
-			formatEncoding = JSON
-			if formatVersion != "" {
-				break
-			}
-		}
-
-		for _, ver := range []string{"2.2", "2.3"} {
-			if strings.Contains(fileScanner.Text(), fmt.Sprintf("'SPDX-%s'", ver)) ||
-				strings.Contains(fileScanner.Text(), fmt.Sprintf("\"SPDX-%s\"", ver)) {
-				formatVersion = ver
-			}
-		}
-		if formatVersion != "" && formatType != "" && formatEncoding != "" {
+		format = fs.sniff(fileScanner.Bytes())
+		if format.Version != "" && format.Type != "" && format.Encoding != "" {
 			break
 		}
 	}
 
 	fmt.Fprintf(
 		os.Stderr, "format: %s version: %s encoding: %s\n",
-		formatType, formatVersion, formatEncoding,
+		format.Type, format.Version, format.Encoding,
 	)
 
 	for _, f := range List {
-		if string(f) == fmt.Sprintf("%s+%s;version=%s", formatType, formatEncoding, formatVersion) {
+		if string(f) == fmt.Sprintf("%s+%s;version=%s", format.Type, format.Encoding, format.Version) {
 			return f, nil
 		}
 	}
 
 	// TODO(puerco): Implement a light parser in case the string hacks don't work
 	return "", fmt.Errorf("unknown SBOM format")
+}
+
+func (fs *Sniffer) sniff(data []byte) formatDetails {
+	for _, sig := range sniffFormats {
+		if format := sig.sniff(data); format.Type != "" {
+			return format
+		}
+	}
+
+	return formatDetails{}
+}
+
+type formatDetails struct {
+	Type     string
+	Version  string
+	Encoding string
+}
+
+type cdxSniff struct{}
+
+func (c cdxSniff) sniff(data []byte) formatDetails {
+	stringValue := string(data)
+	var format formatDetails
+	if strings.Contains(stringValue, `"bomFormat"`) && strings.Contains(stringValue, `"CycloneDX"`) {
+		format.Type = "application/vnd.cyclonedx"
+		format.Encoding = JSON
+	}
+
+	if strings.Contains(stringValue, `"specVersion"`) {
+		parts := strings.Split(stringValue, ":")
+		if len(parts) == 2 {
+			ver := strings.TrimPrefix(strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(parts[1]), ","), "\""), "\"")
+			if ver != "" {
+				format.Version = ver
+				format.Encoding = JSON
+			}
+		}
+	}
+
+	return format
+}
+
+type spdxSniff struct{}
+
+func (c spdxSniff) sniff(data []byte) formatDetails {
+	stringValue := string(data)
+	var format formatDetails
+
+	if strings.Contains(stringValue, "SPDXVersion:") {
+		format.Type = "text/spdx"
+		format.Encoding = "text"
+
+		for _, ver := range []string{"2.2", "2.3"} {
+			if strings.Contains(stringValue, fmt.Sprintf("SPDX-%s", ver)) {
+				format.Version = ver
+				return format
+			}
+		}
+	}
+
+	// In JSON, the SPDX version field would be quoted
+	if strings.Contains(stringValue, "\"spdxVersion\"") ||
+		strings.Contains(stringValue, "'spdxVersion'") {
+		format.Type = "text/spdx"
+		format.Encoding = JSON
+		if format.Version != "" {
+			return format
+		}
+	}
+
+	for _, ver := range []string{"2.2", "2.3"} {
+		if strings.Contains(stringValue, fmt.Sprintf("'SPDX-%s'", ver)) ||
+			strings.Contains(stringValue, fmt.Sprintf("\"SPDX-%s\"", ver)) {
+			format.Version = ver
+			return format
+		}
+	}
+
+	return format
 }

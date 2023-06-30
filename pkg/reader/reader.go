@@ -13,42 +13,43 @@ import (
 
 var defaultOptions = options.Options{}
 
-type Parser struct {
+type Reader struct {
 	impl    parserImplementation
 	Options options.Options
 }
 
-func New() *Parser {
-	return &Parser{
+// New returns a new Reader with the default options
+func New() *Reader {
+	return &Reader{
 		Options: defaultOptions,
 		impl:    &defaultParserImplementation{},
 	}
 }
 
-// Parser reads a file and returns an sbom.Document
-func (p *Parser) ParseFile(path string) (*sbom.Document, error) {
-	f, err := p.impl.OpenDocumentFile(path)
+// ParseFile reads a file and returns an sbom.Document
+func (r *Reader) ParseFile(path string) (*sbom.Document, error) {
+	f, err := r.impl.OpenDocumentFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("opening SBOM file: %w", err)
 	}
 	defer f.Close()
 
-	return p.ParseReader(f)
+	return r.ParseStream(f)
 }
 
-// Parser returns a document from a reader
-func (p *Parser) ParseReader(f io.ReadSeekCloser) (*sbom.Document, error) {
-	format, err := p.impl.DetectFormat(&p.Options, f)
+// ParseStream returns a document from a io reader
+func (r *Reader) ParseStream(f io.ReadSeekCloser) (*sbom.Document, error) {
+	format, err := r.impl.DetectFormat(&r.Options, f)
 	if err != nil {
 		return nil, fmt.Errorf("detecting SBOM format: %w", err)
 	}
 
-	formatParser, err := p.impl.GetFormatParser(&p.Options, format)
+	formatParser, err := r.impl.GetUnserializer(&r.Options, format)
 	if err != nil {
 		return nil, fmt.Errorf("getting format parser: %w", err)
 	}
 
-	doc, err := formatParser.Parse(&p.Options, f)
+	doc, err := formatParser.ParseStream(&r.Options, f)
 	if err != nil {
 		return nil, fmt.Errorf("parsing %s document: %w", format, err)
 	}

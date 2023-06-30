@@ -33,10 +33,9 @@ var (
 )
 
 var RootCmd = &cobra.Command{
-	Version: version,
-	Long:    PROTOBOM_LONG_DESCRIPTION,
-	Use:     fmt.Sprintf("%s [sbom]", ApplicationName),
-	Short:   PROTOBOM_SHORT_DESCRIPTION,
+	Long:  PROTOBOM_LONG_DESCRIPTION,
+	Use:   fmt.Sprintf("%s [sbom]", ApplicationName),
+	Short: PROTOBOM_SHORT_DESCRIPTION,
 	Example: Tprintf(ProtobomUserExample, map[string]interface{}{
 		"appName": ApplicationName,
 	}),
@@ -67,10 +66,9 @@ var RootCmd = &cobra.Command{
 func init() {
 	cobra.OnInitialize()
 
-	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.Writer.Type), "format", "f", string(options.Default.Format.Type()), fmt.Sprintf("Select format, Options=%s", writeroptions.Versions.Formats()))
-	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.Writer.Version), "version", "v", string(options.Default.Format.Version()), fmt.Sprintf("Select version, Options=%s", writeroptions.Versions.VersionMap()))
-	RootCmd.PersistentFlags().StringVarP((*string)(&Cfg.Writer.Encoding), "encoding", "e", string(options.Default.Format.Encoding()), fmt.Sprintf("Select encoding, Options=%s", writeroptions.Versions.EncodingMap()))
-
+	RootCmd.PersistentFlags().StringVarP(&Cfg.Writer.Type, "format", "f", string(options.Default.Format.Type()), fmt.Sprintf("Select format, Options=%s", writeroptions.Versions.Formats()))
+	RootCmd.PersistentFlags().StringVarP(&Cfg.Writer.Version, "version", "v", options.Default.Format.Version(), fmt.Sprintf("Select version, Options=%s", writeroptions.Versions.VersionMap()))
+	RootCmd.PersistentFlags().StringVarP(&Cfg.Writer.Encoding, "encoding", "e", string(options.Default.Format.Encoding()), fmt.Sprintf("Select encoding, Options=%s", writeroptions.Versions.EncodingMap()))
 }
 
 func Execute() {

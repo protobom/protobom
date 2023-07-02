@@ -104,6 +104,14 @@ func (nl *NodeList) cleanEdges() {
 	nl.Edges = newEdges
 }
 
+func (nl *NodeList) AddEdge(e *Edge) {
+	nl.Edges = append(nl.Edges, e)
+}
+
+func (nl *NodeList) AddNode(n *Node) {
+	nl.Nodes = append(nl.Nodes, n)
+}
+
 // Add combines NodeList nl2 into nl. It is the equivalent to Union but
 // instead of returning a new NodeList it modifies nl.
 func (nl *NodeList) Add(nl2 *NodeList) {

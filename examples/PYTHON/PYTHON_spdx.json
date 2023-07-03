@@ -1,0 +1,203 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "PYTHON/poetry.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/PYTHON/poetry.lock-fb8fd5f1-2120-4f8f-b816-833da1442b88",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.42.1"
+    ],
+    "created": "2023-06-20T16:55:06Z"
+  },
+  "packages": [
+    {
+      "name": "PYTHON/poetry.lock",
+      "SPDXID": "SPDXRef-Filesystem-90ddbc67c77c2528",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    },
+    {
+      "name": "numpy",
+      "SPDXID": "SPDXRef-Package-d8c29b65b58d1d41",
+      "versionInfo": "1.24.3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/numpy@1.24.3"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: numpy@1.24.3"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "pandas",
+      "SPDXID": "SPDXRef-Package-68338e272e10a104",
+      "versionInfo": "2.0.1",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/pandas@2.0.1"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: pandas@2.0.1"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "poetry",
+      "SPDXID": "SPDXRef-Application-f90740a52f15f741",
+      "downloadLocation": "NONE",
+      "sourceInfo": "poetry.lock",
+      "copyrightText": "",
+      "primaryPackagePurpose": "APPLICATION"
+    },
+    {
+      "name": "python-dateutil",
+      "SPDXID": "SPDXRef-Package-ab82488409a37955",
+      "versionInfo": "2.8.2",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/python-dateutil@2.8.2"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: python-dateutil@2.8.2"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "pytz",
+      "SPDXID": "SPDXRef-Package-18ce055ef03341dc",
+      "versionInfo": "2023.3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/pytz@2023.3"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: pytz@2023.3"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "six",
+      "SPDXID": "SPDXRef-Package-b48bdfbd46503244",
+      "versionInfo": "1.16.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/six@1.16.0"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: six@1.16.0"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "tzdata",
+      "SPDXID": "SPDXRef-Package-f69abdf1e4c77b86",
+      "versionInfo": "2023.3",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/tzdata@2023.3"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: tzdata@2023.3"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-90ddbc67c77c2528",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-Filesystem-90ddbc67c77c2528",
+      "relatedSpdxElement": "SPDXRef-Application-f90740a52f15f741",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-f90740a52f15f741",
+      "relatedSpdxElement": "SPDXRef-Package-d8c29b65b58d1d41",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-f90740a52f15f741",
+      "relatedSpdxElement": "SPDXRef-Package-68338e272e10a104",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-f90740a52f15f741",
+      "relatedSpdxElement": "SPDXRef-Package-ab82488409a37955",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-f90740a52f15f741",
+      "relatedSpdxElement": "SPDXRef-Package-18ce055ef03341dc",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-f90740a52f15f741",
+      "relatedSpdxElement": "SPDXRef-Package-b48bdfbd46503244",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-f90740a52f15f741",
+      "relatedSpdxElement": "SPDXRef-Package-f69abdf1e4c77b86",
+      "relationshipType": "CONTAINS"
+    }
+  ]
+}

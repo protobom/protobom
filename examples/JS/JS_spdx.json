@@ -1,0 +1,229 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "JS/yarn.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/JS/yarn.lock-6de4facb-6db5-4915-966e-cfb60b5e80b5",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.42.1"
+    ],
+    "created": "2023-06-20T16:17:10Z"
+  },
+  "packages": [
+    {
+      "name": "JS/yarn.lock",
+      "SPDXID": "SPDXRef-Filesystem-f191271de98f05bc",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    },
+    {
+      "name": "async",
+      "SPDXID": "SPDXRef-Package-a160206e3055df02",
+      "versionInfo": "3.2.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/async@3.2.0"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: async@3.2.0"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "axios",
+      "SPDXID": "SPDXRef-Package-9b1175c366371ce",
+      "versionInfo": "0.21.4",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/axios@0.21.4"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: axios@0.21.4"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "lodash",
+      "SPDXID": "SPDXRef-Package-68b3f21ebe143687",
+      "versionInfo": "4.17.21",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/lodash@4.17.21"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: lodash@4.17.21"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "react",
+      "SPDXID": "SPDXRef-Package-abc564e76ea6947c",
+      "versionInfo": "17.0.2",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/react@17.0.2"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: react@17.0.2"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "react-dom",
+      "SPDXID": "SPDXRef-Package-102f06c1319d2b8a",
+      "versionInfo": "17.0.2",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/react-dom@17.0.2"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: react-dom@17.0.2"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "webpack",
+      "SPDXID": "SPDXRef-Package-35eb354c85cee005",
+      "versionInfo": "5.51.1",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/webpack@5.51.1"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: webpack@5.51.1"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "yargs",
+      "SPDXID": "SPDXRef-Package-6c7903660c9ac976",
+      "versionInfo": "17.2.1",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NONE",
+      "licenseDeclared": "NONE",
+      "copyrightText": "",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/yargs@17.2.1"
+        }
+      ],
+      "attributionTexts": [
+        "PkgID: yargs@17.2.1"
+      ],
+      "primaryPackagePurpose": "LIBRARY"
+    },
+    {
+      "name": "yarn",
+      "SPDXID": "SPDXRef-Application-3b9c6ecc45aece45",
+      "downloadLocation": "NONE",
+      "sourceInfo": "yarn.lock",
+      "copyrightText": "",
+      "primaryPackagePurpose": "APPLICATION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f191271de98f05bc",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-Filesystem-f191271de98f05bc",
+      "relatedSpdxElement": "SPDXRef-Application-3b9c6ecc45aece45",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-3b9c6ecc45aece45",
+      "relatedSpdxElement": "SPDXRef-Package-a160206e3055df02",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-3b9c6ecc45aece45",
+      "relatedSpdxElement": "SPDXRef-Package-9b1175c366371ce",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-3b9c6ecc45aece45",
+      "relatedSpdxElement": "SPDXRef-Package-68b3f21ebe143687",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-3b9c6ecc45aece45",
+      "relatedSpdxElement": "SPDXRef-Package-abc564e76ea6947c",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-3b9c6ecc45aece45",
+      "relatedSpdxElement": "SPDXRef-Package-102f06c1319d2b8a",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-3b9c6ecc45aece45",
+      "relatedSpdxElement": "SPDXRef-Package-35eb354c85cee005",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Application-3b9c6ecc45aece45",
+      "relatedSpdxElement": "SPDXRef-Package-6c7903660c9ac976",
+      "relationshipType": "CONTAINS"
+    }
+  ]
+}

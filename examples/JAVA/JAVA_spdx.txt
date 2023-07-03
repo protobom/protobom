@@ -1,0 +1,256 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: JAVA/pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/JAVA/pom.xml-d39f3129-bdba-4b3a-a86e-9df2e233f3df
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.42.1
+Created: 2023-06-20T17:01:01Z
+
+##### Package: pom
+
+PackageName: pom
+SPDXID: SPDXRef-Application-8e6f52607eedd3c1
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: APPLICATION
+FilesAnalyzed: false
+PackageSourceInfo: pom.xml
+
+##### Package: JAVA/pom.xml
+
+PackageName: JAVA/pom.xml
+SPDXID: SPDXRef-Filesystem-60c263cac2575773
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Package: com.google.code.gson:gson
+
+PackageName: com.google.code.gson:gson
+SPDXID: SPDXRef-Package-173a703215a96cb8
+PackageVersion: 2.8.9
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/com.google.code.gson/gson@2.8.9
+
+##### Package: org.springframework:spring-aop
+
+PackageName: org.springframework:spring-aop
+SPDXID: SPDXRef-Package-1ff80fd158c99c9f
+PackageVersion: 5.3.10
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.springframework/spring-aop@5.3.10
+
+##### Package: org.springframework:spring-jcl
+
+PackageName: org.springframework:spring-jcl
+SPDXID: SPDXRef-Package-24ccb01a09246c14
+PackageVersion: 5.3.10
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.springframework/spring-jcl@5.3.10
+
+##### Package: org.springframework:spring-core
+
+PackageName: org.springframework:spring-core
+SPDXID: SPDXRef-Package-6e9d86c567d921db
+PackageVersion: 5.3.10
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.springframework/spring-core@5.3.10
+
+##### Package: javax.servlet:javax.servlet-api
+
+PackageName: javax.servlet:javax.servlet-api
+SPDXID: SPDXRef-Package-8603b7f86f0b086d
+PackageVersion: 4.0.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/javax.servlet/javax.servlet-api@4.0.1
+
+##### Package: org.springframework:spring-web
+
+PackageName: org.springframework:spring-web
+SPDXID: SPDXRef-Package-8cb1a8cb106739fd
+PackageVersion: 5.3.10
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.springframework/spring-web@5.3.10
+
+##### Package: ch.qos.logback:logback-classic
+
+PackageName: ch.qos.logback:logback-classic
+SPDXID: SPDXRef-Package-91bb7a12eb90aabf
+PackageVersion: 1.2.6
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/ch.qos.logback/logback-classic@1.2.6
+
+##### Package: org.springframework:spring-beans
+
+PackageName: org.springframework:spring-beans
+SPDXID: SPDXRef-Package-a202bd9f8d11932
+PackageVersion: 5.3.10
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.springframework/spring-beans@5.3.10
+
+##### Package: org.slf4j:slf4j-api
+
+PackageName: org.slf4j:slf4j-api
+SPDXID: SPDXRef-Package-a26be097494d111e
+PackageVersion: 1.7.32
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.slf4j/slf4j-api@1.7.32
+
+##### Package: com.google.protobuf:protobuf-java
+
+PackageName: com.google.protobuf:protobuf-java
+SPDXID: SPDXRef-Package-a89b5e332dea5330
+PackageVersion: 3.11.4
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/com.google.protobuf/protobuf-java@3.11.4
+
+##### Package: org.springframework:spring-expression
+
+PackageName: org.springframework:spring-expression
+SPDXID: SPDXRef-Package-b8baecb585d31e38
+PackageVersion: 5.3.10
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.springframework/spring-expression@5.3.10
+
+##### Package: org.springframework:spring-webmvc
+
+PackageName: org.springframework:spring-webmvc
+SPDXID: SPDXRef-Package-bc78f052e3811f1c
+PackageVersion: 5.3.10
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.springframework/spring-webmvc@5.3.10
+
+##### Package: mysql:mysql-connector-java
+
+PackageName: mysql:mysql-connector-java
+SPDXID: SPDXRef-Package-ce06ea4e70d423a6
+PackageVersion: 8.0.26
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/mysql/mysql-connector-java@8.0.26
+
+##### Package: com.example:my-project
+
+PackageName: com.example:my-project
+SPDXID: SPDXRef-Package-d39af4d47ff2efef
+PackageVersion: 1.0.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/com.example/my-project@1.0.0
+
+##### Package: org.springframework:spring-context
+
+PackageName: org.springframework:spring-context
+SPDXID: SPDXRef-Package-d8de233c44e7b807
+PackageVersion: 5.3.10
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/org.springframework/spring-context@5.3.10
+
+##### Package: ch.qos.logback:logback-core
+
+PackageName: ch.qos.logback:logback-core
+SPDXID: SPDXRef-Package-fdf5f802678b8b74
+PackageVersion: 1.2.6
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: LIBRARY
+FilesAnalyzed: false
+PackageLicenseConcluded: NONE
+PackageLicenseDeclared: NONE
+ExternalRef: PACKAGE-MANAGER purl pkg:maven/ch.qos.logback/logback-core@1.2.6
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-60c263cac2575773
+Relationship: SPDXRef-Filesystem-60c263cac2575773 CONTAINS SPDXRef-Application-8e6f52607eedd3c1
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-91bb7a12eb90aabf
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-fdf5f802678b8b74
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-d39af4d47ff2efef
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-173a703215a96cb8
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-a89b5e332dea5330
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-8603b7f86f0b086d
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-ce06ea4e70d423a6
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-a26be097494d111e
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-1ff80fd158c99c9f
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-a202bd9f8d11932
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-d8de233c44e7b807
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-6e9d86c567d921db
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-b8baecb585d31e38
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-24ccb01a09246c14
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-8cb1a8cb106739fd
+Relationship: SPDXRef-Application-8e6f52607eedd3c1 CONTAINS SPDXRef-Package-bc78f052e3811f1c
+

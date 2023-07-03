@@ -1,0 +1,346 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:56ef83c4-2d1a-41cc-b5f5-5755da6120e9",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-06-20T16:16:29+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.42.1"
+      }
+    ],
+    "component": {
+      "bom-ref": "4961fd66-1921-4a3d-affb-b8cae9ff02c2",
+      "type": "application",
+      "name": "JAVA/pom.xml",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "4aca9407-129d-4268-b0a0-50e669444add",
+      "type": "application",
+      "name": "pom.xml",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:Class",
+          "value": "lang-pkgs"
+        },
+        {
+          "name": "aquasecurity:trivy:Type",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/ch.qos.logback/logback-classic@1.2.6",
+      "type": "library",
+      "name": "ch.qos.logback:logback-classic",
+      "version": "1.2.6",
+      "purl": "pkg:maven/ch.qos.logback/logback-classic@1.2.6",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/ch.qos.logback/logback-core@1.2.6",
+      "type": "library",
+      "name": "ch.qos.logback:logback-core",
+      "version": "1.2.6",
+      "purl": "pkg:maven/ch.qos.logback/logback-core@1.2.6",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/com.example/my-project@1.0.0",
+      "type": "library",
+      "name": "com.example:my-project",
+      "version": "1.0.0",
+      "purl": "pkg:maven/com.example/my-project@1.0.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/com.google.code.gson/gson@2.8.9",
+      "type": "library",
+      "name": "com.google.code.gson:gson",
+      "version": "2.8.9",
+      "purl": "pkg:maven/com.google.code.gson/gson@2.8.9",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/com.google.protobuf/protobuf-java@3.11.4",
+      "type": "library",
+      "name": "com.google.protobuf:protobuf-java",
+      "version": "3.11.4",
+      "purl": "pkg:maven/com.google.protobuf/protobuf-java@3.11.4",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/javax.servlet/javax.servlet-api@4.0.1",
+      "type": "library",
+      "name": "javax.servlet:javax.servlet-api",
+      "version": "4.0.1",
+      "purl": "pkg:maven/javax.servlet/javax.servlet-api@4.0.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/mysql/mysql-connector-java@8.0.26",
+      "type": "library",
+      "name": "mysql:mysql-connector-java",
+      "version": "8.0.26",
+      "purl": "pkg:maven/mysql/mysql-connector-java@8.0.26",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.slf4j/slf4j-api@1.7.32",
+      "type": "library",
+      "name": "org.slf4j:slf4j-api",
+      "version": "1.7.32",
+      "purl": "pkg:maven/org.slf4j/slf4j-api@1.7.32",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.springframework/spring-aop@5.3.10",
+      "type": "library",
+      "name": "org.springframework:spring-aop",
+      "version": "5.3.10",
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.10",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.springframework/spring-beans@5.3.10",
+      "type": "library",
+      "name": "org.springframework:spring-beans",
+      "version": "5.3.10",
+      "purl": "pkg:maven/org.springframework/spring-beans@5.3.10",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.springframework/spring-context@5.3.10",
+      "type": "library",
+      "name": "org.springframework:spring-context",
+      "version": "5.3.10",
+      "purl": "pkg:maven/org.springframework/spring-context@5.3.10",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.springframework/spring-core@5.3.10",
+      "type": "library",
+      "name": "org.springframework:spring-core",
+      "version": "5.3.10",
+      "purl": "pkg:maven/org.springframework/spring-core@5.3.10",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.springframework/spring-expression@5.3.10",
+      "type": "library",
+      "name": "org.springframework:spring-expression",
+      "version": "5.3.10",
+      "purl": "pkg:maven/org.springframework/spring-expression@5.3.10",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.springframework/spring-jcl@5.3.10",
+      "type": "library",
+      "name": "org.springframework:spring-jcl",
+      "version": "5.3.10",
+      "purl": "pkg:maven/org.springframework/spring-jcl@5.3.10",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.springframework/spring-web@5.3.10",
+      "type": "library",
+      "name": "org.springframework:spring-web",
+      "version": "5.3.10",
+      "purl": "pkg:maven/org.springframework/spring-web@5.3.10",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/org.springframework/spring-webmvc@5.3.10",
+      "type": "library",
+      "name": "org.springframework:spring-webmvc",
+      "version": "5.3.10",
+      "purl": "pkg:maven/org.springframework/spring-webmvc@5.3.10",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pom"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "4961fd66-1921-4a3d-affb-b8cae9ff02c2",
+      "dependsOn": [
+        "4aca9407-129d-4268-b0a0-50e669444add"
+      ]
+    },
+    {
+      "ref": "4aca9407-129d-4268-b0a0-50e669444add",
+      "dependsOn": [
+        "pkg:maven/ch.qos.logback/logback-classic@1.2.6",
+        "pkg:maven/ch.qos.logback/logback-core@1.2.6",
+        "pkg:maven/com.example/my-project@1.0.0",
+        "pkg:maven/com.google.code.gson/gson@2.8.9",
+        "pkg:maven/com.google.protobuf/protobuf-java@3.11.4",
+        "pkg:maven/javax.servlet/javax.servlet-api@4.0.1",
+        "pkg:maven/mysql/mysql-connector-java@8.0.26",
+        "pkg:maven/org.slf4j/slf4j-api@1.7.32",
+        "pkg:maven/org.springframework/spring-aop@5.3.10",
+        "pkg:maven/org.springframework/spring-beans@5.3.10",
+        "pkg:maven/org.springframework/spring-context@5.3.10",
+        "pkg:maven/org.springframework/spring-core@5.3.10",
+        "pkg:maven/org.springframework/spring-expression@5.3.10",
+        "pkg:maven/org.springframework/spring-jcl@5.3.10",
+        "pkg:maven/org.springframework/spring-web@5.3.10",
+        "pkg:maven/org.springframework/spring-webmvc@5.3.10"
+      ]
+    },
+    {
+      "ref": "pkg:maven/ch.qos.logback/logback-classic@1.2.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/ch.qos.logback/logback-core@1.2.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/com.example/my-project@1.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/com.google.code.gson/gson@2.8.9",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/com.google.protobuf/protobuf-java@3.11.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/javax.servlet/javax.servlet-api@4.0.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/mysql/mysql-connector-java@8.0.26",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.slf4j/slf4j-api@1.7.32",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-aop@5.3.10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-beans@5.3.10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-context@5.3.10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-core@5.3.10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-expression@5.3.10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-jcl@5.3.10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-web@5.3.10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-webmvc@5.3.10",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

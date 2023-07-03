@@ -1,0 +1,196 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:6958a3a5-b547-4168-a09e-26d15a7a77cf",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-06-20T16:55:09+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.42.1"
+      }
+    ],
+    "component": {
+      "bom-ref": "2a13a611-386d-44f1-932e-dee1f9362e5e",
+      "type": "application",
+      "name": "PYTHON/poetry.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "9f32595b-5b43-4dfc-bb02-ad3a68337f69",
+      "type": "application",
+      "name": "poetry.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:Class",
+          "value": "lang-pkgs"
+        },
+        {
+          "name": "aquasecurity:trivy:Type",
+          "value": "poetry"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:pypi/numpy@1.24.3",
+      "type": "library",
+      "name": "numpy",
+      "version": "1.24.3",
+      "purl": "pkg:pypi/numpy@1.24.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "numpy@1.24.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "poetry"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:pypi/pandas@2.0.1",
+      "type": "library",
+      "name": "pandas",
+      "version": "2.0.1",
+      "purl": "pkg:pypi/pandas@2.0.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "pandas@2.0.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "poetry"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:pypi/python-dateutil@2.8.2",
+      "type": "library",
+      "name": "python-dateutil",
+      "version": "2.8.2",
+      "purl": "pkg:pypi/python-dateutil@2.8.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "python-dateutil@2.8.2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "poetry"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:pypi/pytz@2023.3",
+      "type": "library",
+      "name": "pytz",
+      "version": "2023.3",
+      "purl": "pkg:pypi/pytz@2023.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "pytz@2023.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "poetry"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:pypi/six@1.16.0",
+      "type": "library",
+      "name": "six",
+      "version": "1.16.0",
+      "purl": "pkg:pypi/six@1.16.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "six@1.16.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "poetry"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:pypi/tzdata@2023.3",
+      "type": "library",
+      "name": "tzdata",
+      "version": "2023.3",
+      "purl": "pkg:pypi/tzdata@2023.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "tzdata@2023.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "poetry"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "2a13a611-386d-44f1-932e-dee1f9362e5e",
+      "dependsOn": [
+        "9f32595b-5b43-4dfc-bb02-ad3a68337f69"
+      ]
+    },
+    {
+      "ref": "9f32595b-5b43-4dfc-bb02-ad3a68337f69",
+      "dependsOn": [
+        "pkg:pypi/numpy@1.24.3",
+        "pkg:pypi/pandas@2.0.1",
+        "pkg:pypi/python-dateutil@2.8.2",
+        "pkg:pypi/pytz@2023.3",
+        "pkg:pypi/six@1.16.0",
+        "pkg:pypi/tzdata@2023.3"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/numpy@1.24.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pandas@2.0.1",
+      "dependsOn": [
+        "pkg:pypi/python-dateutil@2.8.2",
+        "pkg:pypi/pytz@2023.3",
+        "pkg:pypi/tzdata@2023.3"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/python-dateutil@2.8.2",
+      "dependsOn": [
+        "pkg:pypi/six@1.16.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pytz@2023.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/six@1.16.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/tzdata@2023.3",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

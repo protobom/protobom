@@ -1,0 +1,278 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:dd777bab-d7bf-4bc2-a0d5-e63f19a44c2d",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-06-20T16:31:26+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.42.1"
+      }
+    ],
+    "component": {
+      "bom-ref": "62f8d9ae-cd47-4403-96b9-dbd8c752d97b",
+      "type": "application",
+      "name": "R/Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "899c4d13-81e4-47b0-8ca3-890c2f0b1867",
+      "type": "application",
+      "name": "Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:Class",
+          "value": "lang-pkgs"
+        },
+        {
+          "name": "aquasecurity:trivy:Type",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/actix-rt@2.5.0",
+      "type": "library",
+      "name": "actix-rt",
+      "version": "2.5.0",
+      "purl": "pkg:cargo/actix-rt@2.5.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "actix-rt@2.5.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/actix-web@3.3.2",
+      "type": "library",
+      "name": "actix-web",
+      "version": "3.3.2",
+      "purl": "pkg:cargo/actix-web@3.3.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "actix-web@3.3.2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/actix@0.12.0",
+      "type": "library",
+      "name": "actix",
+      "version": "0.12.0",
+      "purl": "pkg:cargo/actix@0.12.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "actix@0.12.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/diesel@1.4.7",
+      "type": "library",
+      "name": "diesel",
+      "version": "1.4.7",
+      "purl": "pkg:cargo/diesel@1.4.7",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "diesel@1.4.7"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/log@0.4.14",
+      "type": "library",
+      "name": "log",
+      "version": "0.4.14",
+      "purl": "pkg:cargo/log@0.4.14",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "log@0.4.14"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/rand@0.8.4",
+      "type": "library",
+      "name": "rand",
+      "version": "0.8.4",
+      "purl": "pkg:cargo/rand@0.8.4",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "rand@0.8.4"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/reqwest@0.11.4",
+      "type": "library",
+      "name": "reqwest",
+      "version": "0.11.4",
+      "purl": "pkg:cargo/reqwest@0.11.4",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "reqwest@0.11.4"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/serde@1.0.130",
+      "type": "library",
+      "name": "serde",
+      "version": "1.0.130",
+      "purl": "pkg:cargo/serde@1.0.130",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "serde@1.0.130"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/serde_json@1.0.68",
+      "type": "library",
+      "name": "serde_json",
+      "version": "1.0.68",
+      "purl": "pkg:cargo/serde_json@1.0.68",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "serde_json@1.0.68"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:cargo/tokio@1.10.0",
+      "type": "library",
+      "name": "tokio",
+      "version": "1.10.0",
+      "purl": "pkg:cargo/tokio@1.10.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "tokio@1.10.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "cargo"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "62f8d9ae-cd47-4403-96b9-dbd8c752d97b",
+      "dependsOn": [
+        "899c4d13-81e4-47b0-8ca3-890c2f0b1867"
+      ]
+    },
+    {
+      "ref": "899c4d13-81e4-47b0-8ca3-890c2f0b1867",
+      "dependsOn": [
+        "pkg:cargo/actix-rt@2.5.0",
+        "pkg:cargo/actix-web@3.3.2",
+        "pkg:cargo/actix@0.12.0",
+        "pkg:cargo/diesel@1.4.7",
+        "pkg:cargo/log@0.4.14",
+        "pkg:cargo/rand@0.8.4",
+        "pkg:cargo/reqwest@0.11.4",
+        "pkg:cargo/serde@1.0.130",
+        "pkg:cargo/serde_json@1.0.68",
+        "pkg:cargo/tokio@1.10.0"
+      ]
+    },
+    {
+      "ref": "pkg:cargo/actix-rt@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/actix-web@3.3.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/actix@0.12.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/diesel@1.4.7",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/log@0.4.14",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/rand@0.8.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/reqwest@0.11.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/serde@1.0.130",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/serde_json@1.0.68",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:cargo/tokio@1.10.0",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

@@ -1,0 +1,65 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "a0123456789abcdef0123456789abcdef",
+    "packages": [
+        {
+            "name": "php",
+            "version": "7.4.10",
+            "source": {
+                "type": "dist",
+                "url": "https://php.net/get/php-7.4.10.tar.gz",
+                "reference": "abcdef0123456789abcdef0123456789abcdef"
+            },
+            "dist": {
+                "type": "tar",
+                "url": "https://php.net/get/php-7.4.10.tar.gz",
+                "reference": "abcdef0123456789abcdef0123456789abcdef",
+                "shasum": "0123456789abcdef0123456789abcdef01234567"
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "ext-pdo": "*",
+                "ext-xml": "*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MyNamespace\\": "src/"
+                }
+            }
+        },
+        {
+            "name": "myvendor/mypackage",
+            "version": "1.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/myvendor/mypackage.git",
+                "reference": "0123456789abcdef0123456789abcdef01234567"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/myvendor/mypackage/archive/v1.2.3.zip",
+                "reference": "0123456789abcdef0123456789abcdef01234567",
+                "shasum": "abcdef0123456789abcdef0123456789abcdef01"
+            },
+            "require": {
+                "php": "^7.4",
+                "someotherlibrary/someotherpackage": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MyVendor\\MyPackage\\": "src/"
+                }
+            }
+        },
+        // Additional packages and dependencies...
+    ],
+

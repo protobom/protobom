@@ -1,6 +1,7 @@
 package writer
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -10,12 +11,21 @@ import (
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer/options"
+	uuid "github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	PROTOBOM_REF_PREFIX = "__protobom_auto_noref"
 )
 
 type SerializerCDX struct{}
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
+	state := NewSerializerCDXState()
+	ctx := context.Background() //2DO Should we include a context in the interface ?
+	ctx = WithCDXState(ctx, state)
+
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
 	ver, err := strconv.Atoi(bom.Metadata.Version)
@@ -31,15 +41,29 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	doc.Metadata = &metadata
 	doc.Components = &[]cdx.Component{}
 	doc.Dependencies = &[]cdx.Dependency{}
-	/*
-		if bom.Metadata.Date != nil {
-			doc.Metadata.Timestamp = bom.Metadata.Date.AsTime()
-		}
-	*/
 
-	// Generate all components
-	components := map[string]*cdx.Component{}
-	refless := []*cdx.Component{}
+	doc.Metadata.Component = s.root(ctx, bom)
+
+	err = s.componentsMaps(ctx, bom)
+	if err != nil {
+		return nil, err
+	}
+
+	deps, err := s.dependencies(ctx, bom)
+	if err != nil {
+		return nil, err
+	}
+	doc.Dependencies = &deps
+
+	components := state.components()
+	doc.Components = &components
+
+	return doc, nil
+}
+
+func (s *SerializerCDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
+	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
+
 	for _, n := range bom.NodeList.Nodes {
 		comp := s.nodeToComponent(n)
 		if comp == nil {
@@ -48,25 +72,32 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 		}
 
 		if comp.BOMRef == "" {
-			refless = append(refless, comp)
-		} else {
-			components[comp.BOMRef] = comp
+			comp.BOMRef = s.generateRef()
 		}
+
+		state.componentsDict[comp.BOMRef] = comp
 	}
+	return nil
+}
 
-	rootDict := map[string]struct{}{}
-	addedDict := map[string]struct{}{}
+// 2DO FIX ME https://github.com/bom-squad/protobom/issues/23
+func (s *SerializerCDX) generateRef() string {
+	return fmt.Sprintf("%s-%s", PROTOBOM_REF_PREFIX, uuid.New())
+}
 
+func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) *cdx.Component {
+	var rootComp *cdx.Component
 	// First, assign the top level nodes
+	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
+
+	// 2DO Use GetRootNodes() https://github.com/bom-squad/protobom/pull/20
 	if bom.NodeList.RootElements != nil && len(bom.NodeList.RootElements) > 0 {
 		for _, id := range bom.NodeList.RootElements {
-			rootDict[id] = struct{}{}
 			// Search for the node and add it
 			for _, n := range bom.NodeList.Nodes {
 				if n.Id == id {
-					rootComp := s.nodeToComponent(n)
-					doc.Metadata.Component = rootComp
-					addedDict[id] = struct{}{}
+					rootComp = s.nodeToComponent(n)
+					state.addedDict[id] = struct{}{}
 				}
 			}
 
@@ -76,14 +107,21 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 		}
 	}
 
-	// Next up. Let's navigate the SBOM graph and translate it to the CDX simpler
-	// tree or to the dependency graph
+	return rootComp
+}
+
+// NOTE dependencies function modifies the components dictionary
+func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
+
+	var dependencies []cdx.Dependency
+	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
+
 	for _, e := range bom.NodeList.Edges {
-		if _, ok := addedDict[e.From]; ok {
+		if _, ok := state.addedDict[e.From]; ok {
 			continue
 		}
 
-		if _, ok := components[e.From]; !ok {
+		if _, ok := state.componentsDict[e.From]; !ok {
 			logrus.Info("serialize")
 			return nil, fmt.Errorf("unable to find component %s", e.From)
 		}
@@ -95,30 +133,26 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 		case sbom.Edge_contains:
 			// Make sure we have the target component
 			for _, targetID := range e.To {
-				addedDict[targetID] = struct{}{}
-				if _, ok := components[targetID]; !ok {
+				state.addedDict[targetID] = struct{}{}
+				if _, ok := state.componentsDict[targetID]; !ok {
 					return nil, fmt.Errorf("unable to locate node %s", targetID)
 				}
 
-				if components[e.From].Components == nil {
-					components[e.From].Components = &[]cdx.Component{}
+				if state.componentsDict[e.From].Components == nil {
+					state.componentsDict[e.From].Components = &[]cdx.Component{}
 				}
-				*components[e.From].Components = append(*components[e.From].Components, *components[targetID])
+				*state.componentsDict[e.From].Components = append(*state.componentsDict[e.From].Components, *state.componentsDict[targetID])
 			}
 
 		case sbom.Edge_dependsOn:
 			// Add to the dependency tree
 			for _, targetID := range e.To {
-				addedDict[targetID] = struct{}{}
-				if _, ok := components[targetID]; !ok {
+				state.addedDict[targetID] = struct{}{}
+				if _, ok := state.componentsDict[targetID]; !ok {
 					return nil, fmt.Errorf("unable to locate node %s", targetID)
 				}
 
-				if doc.Dependencies == nil {
-					doc.Dependencies = &[]cdx.Dependency{}
-				}
-
-				*doc.Dependencies = append(*doc.Dependencies, cdx.Dependency{
+				dependencies = append(dependencies, cdx.Dependency{
 					Ref:          e.From,
 					Dependencies: &e.To,
 				})
@@ -131,21 +165,9 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 				e.From, e.Type, len(e.To),
 			)
 		}
-
-		// Now add al nodes we have not yet positioned
-		for _, c := range components {
-			if _, ok := addedDict[c.BOMRef]; ok {
-				continue
-			}
-			*doc.Components = append(*doc.Components, *c)
-		}
-
-		// Add components without refs
-		for _, c := range refless {
-			*doc.Components = append(*doc.Components, *c)
-		}
 	}
-	return doc, nil
+
+	return dependencies, nil
 }
 
 // nodeToComponent converts a node in protobuf to a CycloneDX component
@@ -235,4 +257,37 @@ func (s *SerializerCDX) renderVersion(cdxVersion cdx.SpecVersion, doc interface{
 	}
 
 	return nil
+}
+
+type SerializerCDXState struct {
+	addedDict      map[string]struct{}
+	componentsDict map[string]*cdx.Component
+}
+
+func NewSerializerCDXState() *SerializerCDXState {
+	return &SerializerCDXState{
+		addedDict:      map[string]struct{}{},
+		componentsDict: map[string]*cdx.Component{},
+	}
+}
+
+func (s *SerializerCDXState) components() []cdx.Component {
+	var components []cdx.Component
+	for _, c := range s.componentsDict {
+		if _, ok := s.addedDict[c.BOMRef]; ok {
+			continue
+		}
+		components = append(components, *c)
+	}
+
+	return components
+}
+
+func WithCDXState(ctx context.Context, state *SerializerCDXState) context.Context {
+	return context.WithValue(ctx, "state", state)
+}
+
+func GetCDXState(ctx context.Context) (*SerializerCDXState, bool) {
+	dm, ok := ctx.Value("state").(*SerializerCDXState)
+	return dm, ok
 }

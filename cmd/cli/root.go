@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	version         = "0.0.0"
+	version         = "0.0.0" //nolint:unused
 	ApplicationName = "protobom"
 	Cfg             internal.Application
 )

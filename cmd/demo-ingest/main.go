@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var filename = filepath.Join(os.TempDir(), "sbom.proto")
+var filename = filepath.Join(os.TempDir(), "sbom.proto") //nolint:unused
 
 // NOTICE:
 // This program is a demo to test the protobom functions while

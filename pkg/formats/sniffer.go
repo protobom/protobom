@@ -21,7 +21,12 @@ func (fs *Sniffer) SniffFile(path string) (Format, error) {
 
 // SniffReader reads a stream and return the SBOM format
 func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
-	defer f.Seek(0, 0)
+	defer func() {
+		_, err := f.Seek(0, 0)
+		if err != nil {
+			fmt.Printf("WARNING: could not seek to beginning of file: %v", err)
+		}
+	}()
 	fileScanner := bufio.NewScanner(f)
 	fileScanner.Split(bufio.ScanLines)
 

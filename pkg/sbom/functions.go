@@ -16,7 +16,7 @@ const NodeIdentifierPrefix = "protobom"
 var invalidIDCharsRe = regexp.MustCompile(`[^a-zA-Z0-9-.]+`)
 
 // NewNodeIdentifier returns an identifier string that can be used in a node
-// and that it is guaranteed to be compatible with CycloneDX and SPDX.
+// and that is guaranteed to be compatible with CycloneDX and SPDX.
 //
 // Without options, identifiers will be created using a new UUID and prefixed
 // with a prefix like "protobom-xx-yy--". This prefix allows serializers to read

@@ -228,7 +228,7 @@ func (e *Edge) Equal(e2 *Edge) bool {
 }
 
 // flatString returns the edge serialized into a string that can be used
-// to indes or compare the contents of Edge e
+// to index or compare the contents of Edge e
 func (e *Edge) flatString() string {
 	return e.From + ":" + e.Type.String() + ":" + strings.Join(e.To, ":")
 }

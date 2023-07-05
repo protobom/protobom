@@ -17,14 +17,17 @@ import (
 
 const (
 	PROTOBOM_REF_PREFIX = "__protobom_auto_noref"
+	stateKey            = "cyclonedx_serializer_state"
 )
 
 type SerializerCDX struct{}
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
-	state := NewSerializerCDXState()
-	ctx := context.Background() //2DO Should we include a context in the interface ?
-	ctx = WithCDXState(ctx, state)
+	// Load the context with the CDX value. We initialize a context here
+	// but we should get it as part of the method to capture cancelations
+	// from the CLI or REST API.
+	state := newSerializerCDXState()
+	ctx := context.WithValue(context.Background(), stateKey, state)
 
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
@@ -34,7 +37,6 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	}
 
 	metadata := cdx.Metadata{
-		// Tools:     []cdx14.Tool{},
 		Component: &cdx.Component{},
 	}
 
@@ -42,10 +44,13 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	doc.Components = &[]cdx.Component{}
 	doc.Dependencies = &[]cdx.Dependency{}
 
-	doc.Metadata.Component = s.root(ctx, bom)
-
-	err = s.componentsMaps(ctx, bom)
+	rootComponent, err := s.root(ctx, bom)
 	if err != nil {
+		return nil, fmt.Errorf("generating SBOM root component: %w", err)
+	}
+
+	doc.Metadata.Component = rootComponent
+	if err := s.componentsMaps(ctx, bom); err != nil {
 		return nil, err
 	}
 
@@ -62,7 +67,10 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 }
 
 func (s *SerializerCDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
-	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
+	state, err := getCDXState(ctx)
+	if err != nil {
+		return fmt.Errorf("reading state: %w", err)
+	}
 
 	for _, n := range bom.NodeList.Nodes {
 		comp := s.nodeToComponent(n)
@@ -85,10 +93,13 @@ func (s *SerializerCDX) generateRef() string {
 	return fmt.Sprintf("%s-%s", PROTOBOM_REF_PREFIX, uuid.New())
 }
 
-func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) *cdx.Component {
+func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, error) {
 	var rootComp *cdx.Component
 	// First, assign the top level nodes
-	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
+	state, err := getCDXState(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("reading state: %w", err)
+	}
 
 	// 2DO Use GetRootNodes() https://github.com/bom-squad/protobom/pull/20
 	if bom.NodeList.RootElements != nil && len(bom.NodeList.RootElements) > 0 {
@@ -107,14 +118,17 @@ func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) *cdx.Compo
 		}
 	}
 
-	return rootComp
+	return rootComp, nil
 }
 
 // NOTE dependencies function modifies the components dictionary
 func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
 
 	var dependencies []cdx.Dependency
-	state, _ := GetCDXState(ctx) // 2DO what should happen when no state is found?
+	state, err := getCDXState(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("reading state: %w", err)
+	}
 
 	for _, e := range bom.NodeList.Edges {
 		if _, ok := state.addedDict[e.From]; ok {
@@ -181,7 +195,6 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		Name:        n.Name,
 		Version:     n.Version,
 		Description: n.Description,
-		// Components:  []cdx14.Component{},
 	}
 
 	if n.Type == sbom.Node_FILE {
@@ -259,19 +272,19 @@ func (s *SerializerCDX) renderVersion(cdxVersion cdx.SpecVersion, doc interface{
 	return nil
 }
 
-type SerializerCDXState struct {
+type serializerCDXState struct {
 	addedDict      map[string]struct{}
 	componentsDict map[string]*cdx.Component
 }
 
-func NewSerializerCDXState() *SerializerCDXState {
-	return &SerializerCDXState{
+func newSerializerCDXState() *serializerCDXState {
+	return &serializerCDXState{
 		addedDict:      map[string]struct{}{},
 		componentsDict: map[string]*cdx.Component{},
 	}
 }
 
-func (s *SerializerCDXState) components() []cdx.Component {
+func (s *serializerCDXState) components() []cdx.Component {
 	var components []cdx.Component
 	for _, c := range s.componentsDict {
 		if _, ok := s.addedDict[c.BOMRef]; ok {
@@ -283,11 +296,10 @@ func (s *SerializerCDXState) components() []cdx.Component {
 	return components
 }
 
-func WithCDXState(ctx context.Context, state *SerializerCDXState) context.Context {
-	return context.WithValue(ctx, "state", state)
-}
-
-func GetCDXState(ctx context.Context) (*SerializerCDXState, bool) {
-	dm, ok := ctx.Value("state").(*SerializerCDXState)
-	return dm, ok
+func getCDXState(ctx context.Context) (*serializerCDXState, error) {
+	dm, ok := ctx.Value(stateKey).(*serializerCDXState)
+	if !ok {
+		return nil, errors.New("unable to cast serializer state from context")
+	}
+	return dm, nil
 }

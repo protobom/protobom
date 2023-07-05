@@ -219,6 +219,14 @@ func EdgeTypeFromSPDX2(spdx2Type string) Edge_Type {
 	}
 }
 
+// Equal compares Edge e to e2 and returns true if they are the same
+func (e *Edge) Equal(e2 *Edge) bool {
+	if e2 == nil {
+		return false
+	}
+	return e.flatString() == e2.flatString()
+}
+
 // flatString returns the edge serialized into a string that can be used
 // to indes or compare the contents of Edge e
 func (e *Edge) flatString() string {

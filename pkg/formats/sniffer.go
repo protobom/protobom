@@ -37,7 +37,18 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	var format formatDetails
 
 	for fileScanner.Scan() {
-		format = fs.sniff(fileScanner.Bytes())
+		sniffFormat := fs.sniff(fileScanner.Bytes())
+
+		if sniffFormat.Type != "" {
+			format.Type = sniffFormat.Type
+		}
+		if sniffFormat.Version != "" {
+			format.Version = sniffFormat.Version
+		}
+		if sniffFormat.Encoding != "" {
+			format.Encoding = sniffFormat.Encoding
+		}
+
 		if format.Version != "" && format.Type != "" && format.Encoding != "" {
 			break
 		}
@@ -60,7 +71,10 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 
 func (fs *Sniffer) sniff(data []byte) formatDetails {
 	for _, sig := range sniffFormats {
-		if format := sig.sniff(data); format.Type != "" {
+		format := sig.sniff(data)
+		if format.Type != "" ||
+			format.Version != "" ||
+			format.Encoding != "" {
 			return format
 		}
 	}

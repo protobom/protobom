@@ -1,5 +1,12 @@
 package sbom
 
+import (
+	"sort"
+	"strings"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+)
+
 // This file contains methods to work with the generated node type
 // updates to the node proto should also be reflected in most of these
 // functions as they operate on the Node's fields
@@ -189,4 +196,25 @@ func (n *Node) Copy() *Node {
 		Identifiers:        n.Identifiers,
 		FileTypes:          n.FileTypes,
 	}
+}
+
+// Equal compares Node n to n2 and returns true if they are the same
+func (n *Node) Equal(n2 *Node) bool {
+	if n2 == nil {
+		return false
+	}
+	return n.flatString() == n2.flatString()
+}
+
+// flatString returns a string representation of the node which can be used to
+// index the node or compare it against another
+func (n *Node) flatString() string {
+	pairs := []string{}
+	n.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+		pairs = append(pairs, string(fd.FullName())+":"+v.String())
+		return true
+	})
+
+	sort.Strings(pairs)
+	return strings.Join(pairs, ":")
 }

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/lucassscaravelli_ej_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/lucassscaravelli_ej_go.mod-c1e98bb8-53f9-4064-acca-575c7415601a",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:25Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/lucassscaravelli_ej_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-df0b3265efb0f13c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-df0b3265efb0f13c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/indvd00m_java-ascii-render_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/indvd00m_java-ascii-render_pom.xml-ce2a5724-9578-4af8-8a6c-c824d6f527ca",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:58Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/indvd00m_java-ascii-render_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-5c9f69ec7a8d0448",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-5c9f69ec7a8d0448",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/burnash_gspread_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/burnash_gspread_requirements.txt-7628a86a-9d58-4fb2-ae91-ca9785bd5b4d",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:07Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/burnash_gspread_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-1eb31709add1656f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-1eb31709add1656f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

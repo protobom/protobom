@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/ruby/osheroff_git-spelunk_Gemfile.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/osheroff_git-spelunk_Gemfile.lock-8f388da3-c81f-48e7-99d3-558eb011e85c
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:52Z
+
+##### Package: metadata/ruby/osheroff_git-spelunk_Gemfile.lock
+
+PackageName: metadata/ruby/osheroff_git-spelunk_Gemfile.lock
+SPDXID: SPDXRef-Filesystem-3e961fcd99072e3d
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-3e961fcd99072e3d
+

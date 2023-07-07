@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/tholman_elevator.js_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/tholman_elevator.js_package.json-00d1f8c3-4151-4829-aa41-a3b4d80186a7",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:20Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/tholman_elevator.js_package.json",
+      "SPDXID": "SPDXRef-Filesystem-e4816609b71b43b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e4816609b71b43b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

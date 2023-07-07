@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/gtk-rs_gtk4-rs_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/gtk-rs_gtk4-rs_Cargo.lock-6286122a-c13d-490a-8141-5b3ebe3a516c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:30Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/gtk-rs_gtk4-rs_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-b9f956c3140d374b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b9f956c3140d374b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

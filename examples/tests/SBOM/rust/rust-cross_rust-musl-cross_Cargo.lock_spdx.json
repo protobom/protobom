@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/rust-cross_rust-musl-cross_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/rust-cross_rust-musl-cross_Cargo.lock-bba970cf-57af-452b-b0c4-4cc90867d962",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:20Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/rust-cross_rust-musl-cross_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-7a947ca000426e2d",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7a947ca000426e2d",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

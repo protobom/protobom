@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/omab_python-social-auth_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/omab_python-social-auth_requirements.txt-8d56ecc2-24fe-4ed0-a487-19b7d03ea6de",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:17Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/omab_python-social-auth_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-4d0f03e3d9f481d4",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-4d0f03e3d9f481d4",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

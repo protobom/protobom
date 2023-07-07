@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:d8c0a9da-699f-4bfb-9717-f9138e5a2e8f",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:28:59+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "201055e4-e257-40c7-afe9-5d6ce52cf091",
+      "type": "application",
+      "name": "metadata/java/alibaba_Sentinel_pom.xml",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "201055e4-e257-40c7-afe9-5d6ce52cf091",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

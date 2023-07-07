@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:21f371a3-70c4-431b-b23f-e80fe61bb130",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:47+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "77cd066c-f346-4525-b9ac-7ed19c9d7ee1",
+      "type": "application",
+      "name": "metadata/rust/lemunozm_message-io_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "77cd066c-f346-4525-b9ac-7ed19c9d7ee1",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/jeremylong_DependencyCheck_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/jeremylong_DependencyCheck_pom.xml-585a0085-e89d-450c-80cd-201ef5e6d0b9
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:26:45Z
+
+##### Package: metadata/java/jeremylong_DependencyCheck_pom.xml
+
+PackageName: metadata/java/jeremylong_DependencyCheck_pom.xml
+SPDXID: SPDXRef-Filesystem-62e1462d38fb2bc4
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-62e1462d38fb2bc4
+

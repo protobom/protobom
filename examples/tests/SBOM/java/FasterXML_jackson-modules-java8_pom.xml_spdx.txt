@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/FasterXML_jackson-modules-java8_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/FasterXML_jackson-modules-java8_pom.xml-219bc2ea-8ccc-41cd-8ec6-72a154cfd63a
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:26:57Z
+
+##### Package: metadata/java/FasterXML_jackson-modules-java8_pom.xml
+
+PackageName: metadata/java/FasterXML_jackson-modules-java8_pom.xml
+SPDXID: SPDXRef-Filesystem-9b56200960c3c7d5
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-9b56200960c3c7d5
+

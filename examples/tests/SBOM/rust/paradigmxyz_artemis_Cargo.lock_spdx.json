@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/paradigmxyz_artemis_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/paradigmxyz_artemis_Cargo.lock-1552637c-a695-4486-93f0-afc784596fad",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:39Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/paradigmxyz_artemis_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-11d11e789266b3f2",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-11d11e789266b3f2",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

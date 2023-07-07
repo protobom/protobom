@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/flask-admin_flask-admin_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/flask-admin_flask-admin_requirements.txt-acd078b0-6655-489d-a10b-0a97a7b21b30
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:43Z
+
+##### Package: metadata/python/flask-admin_flask-admin_requirements.txt
+
+PackageName: metadata/python/flask-admin_flask-admin_requirements.txt
+SPDXID: SPDXRef-Filesystem-74030aabe9718184
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-74030aabe9718184
+

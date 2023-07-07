@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/python-rapidjson_python-rapidjson_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/python-rapidjson_python-rapidjson_requirements.txt-af448399-b41d-448d-8d9a-d9e7e1838fd1
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:22:12Z
+
+##### Package: metadata/python/python-rapidjson_python-rapidjson_requirements.txt
+
+PackageName: metadata/python/python-rapidjson_python-rapidjson_requirements.txt
+SPDXID: SPDXRef-Filesystem-c554453b6d27bfec
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-c554453b6d27bfec
+

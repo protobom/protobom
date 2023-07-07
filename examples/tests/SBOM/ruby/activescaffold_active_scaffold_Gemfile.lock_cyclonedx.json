@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:728da956-11dd-40ae-b830-e2cbdfa4c7c2",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:25:24+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "89bf0206-df20-4c2f-bbdb-886497118304",
+      "type": "application",
+      "name": "metadata/ruby/activescaffold_active_scaffold_Gemfile.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "89bf0206-df20-4c2f-bbdb-886497118304",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

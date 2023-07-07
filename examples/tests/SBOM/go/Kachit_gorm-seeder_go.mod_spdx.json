@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/Kachit_gorm-seeder_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/Kachit_gorm-seeder_go.mod-f9c59190-e14d-4dc6-9a31-983b9ddaf4d2",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:32:17Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/Kachit_gorm-seeder_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-7677ef3c977c581c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7677ef3c977c581c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

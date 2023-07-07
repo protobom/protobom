@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:457138b9-369d-4f42-989e-19f0352504a9",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:28:22+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "57c5bccb-3888-4b22-89b5-509400923c4f",
+      "type": "application",
+      "name": "metadata/java/mapstruct_mapstruct_pom.xml",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "57c5bccb-3888-4b22-89b5-509400923c4f",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

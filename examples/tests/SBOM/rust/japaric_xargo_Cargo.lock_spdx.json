@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/japaric_xargo_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/japaric_xargo_Cargo.lock-415adec4-6e73-416a-8425-0d3a394db302",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:22Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/japaric_xargo_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-94eb9b0f3395a354",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-94eb9b0f3395a354",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/jessepollak_card_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/jessepollak_card_package.json-4dcf04a8-8ed3-4d61-9a22-1e1a838adbe5",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:33Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/jessepollak_card_package.json",
+      "SPDXID": "SPDXRef-Filesystem-f8c21d73681da2a8",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f8c21d73681da2a8",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

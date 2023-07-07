@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/jmcarp_robobrowser_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/jmcarp_robobrowser_requirements.txt-330559aa-987a-428a-bcee-dfdecc8693c0",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:02Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/jmcarp_robobrowser_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-6e3d5e88fb78ff59",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-6e3d5e88fb78ff59",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

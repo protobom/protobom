@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/dauxio_daux.io_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/dauxio_daux.io_composer.lock-142ab9e5-8fc8-482a-8253-3777eb7701f9",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:56Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/dauxio_daux.io_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-e91d4ee645d6a23b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e91d4ee645d6a23b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "countdown.js",
+  "version": "1.1.0",
+  "main": "lib/countdown.js",
+  "scripts": {
+    "test": "jake test"
+  },
+  "devDependencies" : {
+      "jake" : "latest"
+    , "mocha" : "latest"
+    , "jquery" : "*"
+    , "sinon" : "*"
+  },
+  "author": "Sidharth Shanker",
+  "license": "MIT"
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/flycheck_flycheck_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/flycheck_flycheck_Cargo.lock-12be3fc6-3d3e-4b83-aaf1-d62e2f34c745",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:51Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/flycheck_flycheck_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-d1f49d7d4bbaa907",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d1f49d7d4bbaa907",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/sergree_matchering_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/sergree_matchering_requirements.txt-96297bc7-66b2-424e-85a6-78b9d4ca60d0
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:22:09Z
+
+##### Package: metadata/python/sergree_matchering_requirements.txt
+
+PackageName: metadata/python/sergree_matchering_requirements.txt
+SPDXID: SPDXRef-Filesystem-587385a7c0e8abf9
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-587385a7c0e8abf9
+

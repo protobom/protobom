@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/rakyll_hey_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/rakyll_hey_go.mod-7a273e23-666e-4b8b-b8a2-4a5987503244
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:31:04Z
+
+##### Package: metadata/go/rakyll_hey_go.mod
+
+PackageName: metadata/go/rakyll_hey_go.mod
+SPDXID: SPDXRef-Filesystem-315b28725c65b0f3
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-315b28725c65b0f3
+

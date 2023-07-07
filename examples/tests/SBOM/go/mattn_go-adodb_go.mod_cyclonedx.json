@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:e6bb5059-a4b3-4f90-bff5-576b713fc7fe",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:29:59+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "4dd9ba4e-f35b-4955-a090-a55f57b3a54b",
+      "type": "application",
+      "name": "metadata/go/mattn_go-adodb_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "4dd9ba4e-f35b-4955-a090-a55f57b3a54b",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

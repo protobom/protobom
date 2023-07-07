@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:8485fe04-9be8-49e2-b301-dcea047d3d70",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:20:17+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "c82e5cb1-5300-44e6-ae46-8a061a6cac61",
+      "type": "application",
+      "name": "metadata/python/omab_python-social-auth_requirements.txt",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "c82e5cb1-5300-44e6-ae46-8a061a6cac61",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

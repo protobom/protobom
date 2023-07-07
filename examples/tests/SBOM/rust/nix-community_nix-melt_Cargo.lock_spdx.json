@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/nix-community_nix-melt_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/nix-community_nix-melt_Cargo.lock-98d0a376-a943-4f01-8355-9a023a9fe84f",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:05Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/nix-community_nix-melt_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-de080f5ad17d23a2",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-de080f5ad17d23a2",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

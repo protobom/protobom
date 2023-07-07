@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/cassandre-tech_cassandre-trading-bot_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/cassandre-tech_cassandre-trading-bot_pom.xml-941c0e1e-8046-4dc6-adb0-6434bccaf23c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:59Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/cassandre-tech_cassandre-trading-bot_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-97f03c4d54e22864",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-97f03c4d54e22864",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

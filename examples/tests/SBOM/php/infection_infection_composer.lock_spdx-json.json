@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/infection_infection_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/infection_infection_composer.lock-645f6f5f-6fe1-4829-b176-c3750816ac4a",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T07:08:13Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/infection_infection_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-386de2cba8c2de55",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-386de2cba8c2de55",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

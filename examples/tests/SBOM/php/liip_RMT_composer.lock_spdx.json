@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/liip_RMT_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/liip_RMT_composer.lock-32dcd85a-fd8e-40da-bc64-4512db338347",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:11Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/liip_RMT_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-b123973e134c37a8",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b123973e134c37a8",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

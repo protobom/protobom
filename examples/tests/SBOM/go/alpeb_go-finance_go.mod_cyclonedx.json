@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:930bb908-b746-4b25-91fa-58f421a2dd2e",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:31:28+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "afede4e1-22fc-4f4d-b39e-cbc51f7d9e32",
+      "type": "application",
+      "name": "metadata/go/alpeb_go-finance_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "afede4e1-22fc-4f4d-b39e-cbc51f7d9e32",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

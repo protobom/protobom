@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/jtablesaw_tablesaw_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/jtablesaw_tablesaw_pom.xml-78b3d48f-6711-4889-a879-0220f22d2418",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:20Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/jtablesaw_tablesaw_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-9f216e8da14bdda1",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9f216e8da14bdda1",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

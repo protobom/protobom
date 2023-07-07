@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/linvon_cuckoo-filter_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/linvon_cuckoo-filter_go.mod-128da338-7091-4999-aadc-15cec5c22867
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:29:56Z
+
+##### Package: metadata/go/linvon_cuckoo-filter_go.mod
+
+PackageName: metadata/go/linvon_cuckoo-filter_go.mod
+SPDXID: SPDXRef-Filesystem-f6f1936f0082583f
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-f6f1936f0082583f
+

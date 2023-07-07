@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:4b6c3850-31b7-4a90-a3ac-a4b82b1c2a4d",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:23:28+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "1a1380c9-4897-4966-9a05-d4a500195236",
+      "type": "application",
+      "name": "metadata/rust/Twinklebear_tray_rust_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "1a1380c9-4897-4966-9a05-d4a500195236",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

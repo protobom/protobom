@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/w4_chartered_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/w4_chartered_Cargo.lock-d4c8f60d-ed1b-4c9d-8e38-43946993a045",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:36Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/w4_chartered_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-5fa1c012e6f70f3c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-5fa1c012e6f70f3c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

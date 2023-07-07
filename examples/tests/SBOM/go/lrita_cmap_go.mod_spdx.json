@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/lrita_cmap_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/lrita_cmap_go.mod-fe3aeec6-72fb-4c7b-b9dd-753364c8e977",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:49Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/lrita_cmap_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-c8f2ee0d140e9ab9",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-c8f2ee0d140e9ab9",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/Theano_Theano_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/Theano_Theano_requirements.txt-8e76bce9-8be7-457f-a06c-dfabacd0246b
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:22:05Z
+
+##### Package: metadata/python/Theano_Theano_requirements.txt
+
+PackageName: metadata/python/Theano_Theano_requirements.txt
+SPDXID: SPDXRef-Filesystem-6d75186d0671ba08
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-6d75186d0671ba08
+

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:b22af169-339e-46ef-b409-3e49bcd6e095",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:20:01+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "3ab810f5-9287-4962-bc09-51097c3b5edc",
+      "type": "application",
+      "name": "metadata/python/worldveil_dejavu_requirements.txt",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "3ab810f5-9287-4962-bc09-51097c3b5edc",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

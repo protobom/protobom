@@ -1,0 +1,6 @@
+packaging
+coverage
+psutil
+pytest
+pytest-cov
+sentry-sdk

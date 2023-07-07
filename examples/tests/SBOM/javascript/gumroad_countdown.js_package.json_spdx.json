@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/gumroad_countdown.js_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/gumroad_countdown.js_package.json-e016be63-7ee7-4aa5-b6f0-1441035ee557",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:02Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/gumroad_countdown.js_package.json",
+      "SPDXID": "SPDXRef-Filesystem-8434f480c2641834",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-8434f480c2641834",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

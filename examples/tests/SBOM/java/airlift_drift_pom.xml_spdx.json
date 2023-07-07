@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/airlift_drift_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/airlift_drift_pom.xml-b766b218-2bd9-4172-bc7b-5beb28275ad0",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:12Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/airlift_drift_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-ad819b314244dc95",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-ad819b314244dc95",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

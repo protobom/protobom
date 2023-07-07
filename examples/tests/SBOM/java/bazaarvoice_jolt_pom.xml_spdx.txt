@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/bazaarvoice_jolt_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/bazaarvoice_jolt_pom.xml-8236c601-8bc1-4fd5-b2db-787f5e1f4fe2
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:26:49Z
+
+##### Package: metadata/java/bazaarvoice_jolt_pom.xml
+
+PackageName: metadata/java/bazaarvoice_jolt_pom.xml
+SPDXID: SPDXRef-Filesystem-914b4150127e7a3b
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-914b4150127e7a3b
+

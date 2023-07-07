@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/mvdnes_rboy_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/mvdnes_rboy_Cargo.lock-ab52c67f-2934-4458-adaf-0ba4e1cfa51d",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:40Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/mvdnes_rboy_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-841e6a2029b7ba28",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-841e6a2029b7ba28",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/abadojack_whatlanggo_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/abadojack_whatlanggo_go.mod-19d3eaec-dd10-4b1c-a2d0-6b8eafcfbc6c
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:30:47Z
+
+##### Package: metadata/go/abadojack_whatlanggo_go.mod
+
+PackageName: metadata/go/abadojack_whatlanggo_go.mod
+SPDXID: SPDXRef-Filesystem-a1eff8141f7dad78
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-a1eff8141f7dad78
+

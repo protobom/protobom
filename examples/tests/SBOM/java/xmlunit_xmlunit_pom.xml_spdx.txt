@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/xmlunit_xmlunit_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/xmlunit_xmlunit_pom.xml-8d9f4d6c-7bba-4520-af66-ab142750e60d
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:28:19Z
+
+##### Package: metadata/java/xmlunit_xmlunit_pom.xml
+
+PackageName: metadata/java/xmlunit_xmlunit_pom.xml
+SPDXID: SPDXRef-Filesystem-be9368f6c4c1a723
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-be9368f6c4c1a723
+

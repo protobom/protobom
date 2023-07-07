@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/tensorflow_tensorflow_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/tensorflow_tensorflow_requirements.txt-fd7d96f6-4ad9-40f2-80bb-c7b439c88023
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:20:55Z
+
+##### Package: metadata/python/tensorflow_tensorflow_requirements.txt
+
+PackageName: metadata/python/tensorflow_tensorflow_requirements.txt
+SPDXID: SPDXRef-Filesystem-5547e0b7a9c557d4
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-5547e0b7a9c557d4
+

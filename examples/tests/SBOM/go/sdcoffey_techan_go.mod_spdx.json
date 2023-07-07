@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/sdcoffey_techan_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/sdcoffey_techan_go.mod-d953bc4e-26c6-403b-9e05-9612e51efc6c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:35Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/sdcoffey_techan_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-3fdc91e9c6e6b742",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-3fdc91e9c6e6b742",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

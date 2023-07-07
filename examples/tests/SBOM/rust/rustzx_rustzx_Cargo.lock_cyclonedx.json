@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:3c79ee05-f97a-4db7-8e9b-94ec3bf79e49",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:42+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "304c23f3-4021-47fd-af62-f2b2004095f5",
+      "type": "application",
+      "name": "metadata/rust/rustzx_rustzx_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "304c23f3-4021-47fd-af62-f2b2004095f5",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

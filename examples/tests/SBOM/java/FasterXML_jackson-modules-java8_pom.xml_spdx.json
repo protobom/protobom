@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/FasterXML_jackson-modules-java8_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/FasterXML_jackson-modules-java8_pom.xml-b6fb15a0-8600-49dc-bdfe-b1abfafbac51",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:56Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/FasterXML_jackson-modules-java8_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-9b56200960c3c7d5",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9b56200960c3c7d5",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

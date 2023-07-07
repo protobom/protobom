@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/coobird_thumbnailator_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/coobird_thumbnailator_pom.xml-1a9650e9-43ce-40f0-a510-c38180711056",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:01Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/coobird_thumbnailator_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-b100fc0a8af49ff7",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b100fc0a8af49ff7",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

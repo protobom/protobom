@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/TimothyYe_skm_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/TimothyYe_skm_go.mod-1bcb9111-1af7-43f6-89c7-783c0b9737c7",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:21Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/TimothyYe_skm_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-260c83a2700168d5",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-260c83a2700168d5",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

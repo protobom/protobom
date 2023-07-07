@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/sirfz_tesserocr_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/sirfz_tesserocr_requirements.txt-cf704bfd-b36f-4ded-8175-eccd52bd29e6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:22Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/sirfz_tesserocr_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-a345a46bc38181f8",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a345a46bc38181f8",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

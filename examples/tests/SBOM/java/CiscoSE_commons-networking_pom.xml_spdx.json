@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/CiscoSE_commons-networking_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/CiscoSE_commons-networking_pom.xml-2fc9865c-67a1-48c3-b924-117913e3fd2f",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:25Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/CiscoSE_commons-networking_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-2bb3ad63f312c6b3",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-2bb3ad63f312c6b3",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

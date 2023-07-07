@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/inspektor-dev_inspektor_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/inspektor-dev_inspektor_Cargo.lock-660c0a13-48c6-49be-a16b-5f72482f8cb1
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:24:10Z
+
+##### Package: metadata/rust/inspektor-dev_inspektor_Cargo.lock
+
+PackageName: metadata/rust/inspektor-dev_inspektor_Cargo.lock
+SPDXID: SPDXRef-Filesystem-82f4699e97f6fdf5
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-82f4699e97f6fdf5
+

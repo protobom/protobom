@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/Wing924_hostutils_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/Wing924_hostutils_go.mod-eca5e3ef-e957-4f4e-8a10-78629ab5e064
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:29:43Z
+
+##### Package: metadata/go/Wing924_hostutils_go.mod
+
+PackageName: metadata/go/Wing924_hostutils_go.mod
+SPDXID: SPDXRef-Filesystem-e60679f66d08e8eb
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-e60679f66d08e8eb
+

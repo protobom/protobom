@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/aws_aws-cli_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/aws_aws-cli_requirements.txt-b5ba126d-3560-4732-a112-91011d0404be
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:37Z
+
+##### Package: metadata/python/aws_aws-cli_requirements.txt
+
+PackageName: metadata/python/aws_aws-cli_requirements.txt
+SPDXID: SPDXRef-Filesystem-eda4b406b5bd5841
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-eda4b406b5bd5841
+

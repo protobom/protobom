@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/ColinEberhardt_wasm-rust-chip8_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/ColinEberhardt_wasm-rust-chip8_Cargo.lock-9d409c6d-8149-4285-bb3f-64f926a6efbb",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:34Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/ColinEberhardt_wasm-rust-chip8_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-caabec4cd1659631",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-caabec4cd1659631",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

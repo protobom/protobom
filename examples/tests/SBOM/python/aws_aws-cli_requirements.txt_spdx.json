@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/aws_aws-cli_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/aws_aws-cli_requirements.txt-567b520e-c711-4c59-b0f8-8038d08f03d1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:37Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/aws_aws-cli_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-eda4b406b5bd5841",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-eda4b406b5bd5841",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

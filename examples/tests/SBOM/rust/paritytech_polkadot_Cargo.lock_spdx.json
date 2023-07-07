@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/paritytech_polkadot_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/paritytech_polkadot_Cargo.lock-a4ee0469-4c19-41b5-ab60-01ba41f9ac06",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:07Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/paritytech_polkadot_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-32c30727353663b2",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-32c30727353663b2",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

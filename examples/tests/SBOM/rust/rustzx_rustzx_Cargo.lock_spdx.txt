@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/rustzx_rustzx_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/rustzx_rustzx_Cargo.lock-239356e1-2289-4dc3-b9c1-846d8a01cb96
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:24:42Z
+
+##### Package: metadata/rust/rustzx_rustzx_Cargo.lock
+
+PackageName: metadata/rust/rustzx_rustzx_Cargo.lock
+SPDXID: SPDXRef-Filesystem-ce11ba3757b2b26d
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-ce11ba3757b2b26d
+

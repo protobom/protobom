@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/django-cache-machine_django-cache-machine_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/django-cache-machine_django-cache-machine_requirements.txt-5f46736f-7c63-4d5b-9976-d3904bde445c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:25Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/django-cache-machine_django-cache-machine_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-f556d8df6c29c6b2",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f556d8df6c29c6b2",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

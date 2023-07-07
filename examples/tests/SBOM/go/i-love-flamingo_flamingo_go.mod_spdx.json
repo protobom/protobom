@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/i-love-flamingo_flamingo_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/i-love-flamingo_flamingo_go.mod-345fb52e-4584-4f8b-9489-c2e21042ea73",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:30Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/i-love-flamingo_flamingo_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-fa8c2a4c4a29920b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-fa8c2a4c4a29920b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

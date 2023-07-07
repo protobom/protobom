@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/agiliq_merchant_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/agiliq_merchant_requirements.txt-6330c8e4-b275-4928-91fc-303f00eda5aa",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:23Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/agiliq_merchant_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-5972b68652bf8771",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-5972b68652bf8771",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

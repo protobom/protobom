@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/fawick_speedtest-resize_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/fawick_speedtest-resize_go.mod-d10315a5-a5e1-43f6-9646-4c5ef8731429",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:07Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/fawick_speedtest-resize_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-8268f9746309cb09",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-8268f9746309cb09",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/arkworks-rs_circom-compat_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/arkworks-rs_circom-compat_Cargo.lock-021c33b3-83f8-40f3-bb7f-9f95f1cb04cd",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:55Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/arkworks-rs_circom-compat_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-b691493eea761cd",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b691493eea761cd",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

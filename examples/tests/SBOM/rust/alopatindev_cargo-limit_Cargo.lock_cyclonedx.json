@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:554f6339-dc5c-4561-b903-ab79fc2e44ef",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:26+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "daa7e2df-28c4-469d-a8d7-2483afea5a91",
+      "type": "application",
+      "name": "metadata/rust/alopatindev_cargo-limit_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "daa7e2df-28c4-469d-a8d7-2483afea5a91",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

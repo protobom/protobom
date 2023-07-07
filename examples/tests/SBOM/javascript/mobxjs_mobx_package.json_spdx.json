@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/mobxjs_mobx_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/mobxjs_mobx_package.json-e45333b6-33da-44ff-86e2-c87e413f3ffe",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:24Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/mobxjs_mobx_package.json",
+      "SPDXID": "SPDXRef-Filesystem-e09d0226aabd4f8",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e09d0226aabd4f8",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

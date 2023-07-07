@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/gephi_gephi_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/gephi_gephi_pom.xml-a20575d4-4100-47e8-a2d6-52ea1534e9c6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:49Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/gephi_gephi_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-6c49b1aaa75ea85b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-6c49b1aaa75ea85b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

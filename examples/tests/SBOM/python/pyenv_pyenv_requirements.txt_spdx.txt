@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/pyenv_pyenv_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/pyenv_pyenv_requirements.txt-79e80f9a-11b8-4154-aff5-7521018e06be
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:20:39Z
+
+##### Package: metadata/python/pyenv_pyenv_requirements.txt
+
+PackageName: metadata/python/pyenv_pyenv_requirements.txt
+SPDXID: SPDXRef-Filesystem-abe14e83df826e6c
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-abe14e83df826e6c
+

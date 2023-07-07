@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/logic-ng_LogicNG_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/logic-ng_LogicNG_pom.xml-6d9f037d-8ff8-48b5-86c3-8b38210769fa",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:02Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/logic-ng_LogicNG_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-ef61f76d060554a4",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-ef61f76d060554a4",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

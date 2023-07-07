@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/ruby/fatkodima_online_migrations_Gemfile.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/fatkodima_online_migrations_Gemfile.lock-69c37ada-3256-41ad-850d-054cfd9913bd",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:59Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/ruby/fatkodima_online_migrations_Gemfile.lock",
+      "SPDXID": "SPDXRef-Filesystem-b661a7492d3434dd",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b661a7492d3434dd",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/PrefectHQ_prefect_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/PrefectHQ_prefect_requirements.txt-1a927794-e032-4fe4-a756-0309364acb8e
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T06:38:56Z
+
+##### Package: metadata/python/PrefectHQ_prefect_requirements.txt
+
+PackageName: metadata/python/PrefectHQ_prefect_requirements.txt
+SPDXID: SPDXRef-Filesystem-d584e1cfd646c339
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-d584e1cfd646c339
+

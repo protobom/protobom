@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/Kachit_dusupay-sdk-go_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/Kachit_dusupay-sdk-go_go.mod-44ab958e-80e7-4e45-86e1-7a0145e2a6ef",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:07Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/Kachit_dusupay-sdk-go_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-9f4ad153186f0d0b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9f4ad153186f0d0b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

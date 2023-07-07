@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:d151890e-ee51-403f-b460-51eee3d62500",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:23:55+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "2f88f582-0df0-40a5-a76d-d8c48371335d",
+      "type": "application",
+      "name": "metadata/rust/daniel5151_clicky_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "2f88f582-0df0-40a5-a76d-d8c48371335d",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

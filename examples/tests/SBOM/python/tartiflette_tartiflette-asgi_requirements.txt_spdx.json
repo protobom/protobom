@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/tartiflette_tartiflette-asgi_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/tartiflette_tartiflette-asgi_requirements.txt-50be919a-0124-4ea4-b046-868a613a2af5",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:28Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/tartiflette_tartiflette-asgi_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-9bb128ae50324e87",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9bb128ae50324e87",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

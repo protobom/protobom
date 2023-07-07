@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/django-haystack_pysolr_Pipfile.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/django-haystack_pysolr_Pipfile.lock-4341565c-fd6e-49fc-8446-12bf0f46eb0c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:59Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/django-haystack_pysolr_Pipfile.lock",
+      "SPDXID": "SPDXRef-Filesystem-a0096875d2249c6d",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a0096875d2249c6d",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

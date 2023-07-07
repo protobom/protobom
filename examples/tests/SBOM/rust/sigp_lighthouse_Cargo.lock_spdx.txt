@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/sigp_lighthouse_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/sigp_lighthouse_Cargo.lock-07c0f6d8-bb4c-46e6-85fe-28add97b4818
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:08Z
+
+##### Package: metadata/rust/sigp_lighthouse_Cargo.lock
+
+PackageName: metadata/rust/sigp_lighthouse_Cargo.lock
+SPDXID: SPDXRef-Filesystem-62ed2e8f1a4e3d6
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-62ed2e8f1a4e3d6
+

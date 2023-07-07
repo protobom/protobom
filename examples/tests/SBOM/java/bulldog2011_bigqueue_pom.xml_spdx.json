@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/bulldog2011_bigqueue_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/bulldog2011_bigqueue_pom.xml-a8af4068-647e-4f20-b0f7-fe4ff2b558c2",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:55Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/bulldog2011_bigqueue_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-56a6ec1b16e98b6f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-56a6ec1b16e98b6f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:35f9da81-88bd-472f-af9f-3233d2144f1a",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:31:58+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "ac2ea8a3-48d8-4683-9b3a-8a5f74cb93ef",
+      "type": "application",
+      "name": "metadata/go/revel_revel_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "ac2ea8a3-48d8-4683-9b3a-8a5f74cb93ef",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

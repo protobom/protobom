@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/dwin_goArgonPass_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/dwin_goArgonPass_go.mod-d9058a61-ac43-4c9e-85db-6143e4b349e1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:01Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/dwin_goArgonPass_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-26875e2e3f50dece",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-26875e2e3f50dece",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:cc55ce0c-830e-4b0f-a107-e5a634253072",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:25:10+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "59372a10-8626-4d8a-b2ce-7a31da2217f8",
+      "type": "application",
+      "name": "metadata/rust/jacobdeichert_mask_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "59372a10-8626-4d8a-b2ce-7a31da2217f8",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

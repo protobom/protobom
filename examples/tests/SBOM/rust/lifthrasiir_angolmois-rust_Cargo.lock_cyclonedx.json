@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:5160bd2a-ebb1-4c5a-88f9-09480fd39e44",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:05+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "3ceff427-70d7-484e-bbc4-36d702d2c8da",
+      "type": "application",
+      "name": "metadata/rust/lifthrasiir_angolmois-rust_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "3ceff427-70d7-484e-bbc4-36d702d2c8da",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

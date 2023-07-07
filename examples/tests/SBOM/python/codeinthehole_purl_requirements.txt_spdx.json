@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/codeinthehole_purl_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/codeinthehole_purl_requirements.txt-c0c7de72-4c54-4f98-9eec-e382628e95bf",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:46Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/codeinthehole_purl_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-f18dc4cc9c7c5e02",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f18dc4cc9c7c5e02",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

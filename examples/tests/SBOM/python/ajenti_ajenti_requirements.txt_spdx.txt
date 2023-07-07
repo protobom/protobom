@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/ajenti_ajenti_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/ajenti_ajenti_requirements.txt-ba81b06f-250f-4572-8db4-4c46fa9b9151
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:01Z
+
+##### Package: metadata/python/ajenti_ajenti_requirements.txt
+
+PackageName: metadata/python/ajenti_ajenti_requirements.txt
+SPDXID: SPDXRef-Filesystem-d0c73fdeb6add85c
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-d0c73fdeb6add85c
+

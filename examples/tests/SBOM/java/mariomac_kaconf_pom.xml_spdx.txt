@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/mariomac_kaconf_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/mariomac_kaconf_pom.xml-5d448b85-abfc-45c8-9459-d731a10ec300
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:27:15Z
+
+##### Package: metadata/java/mariomac_kaconf_pom.xml
+
+PackageName: metadata/java/mariomac_kaconf_pom.xml
+SPDXID: SPDXRef-Filesystem-6eaf118437d1ecd6
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-6eaf118437d1ecd6
+

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/nathan-osman_go-sunrise_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/nathan-osman_go-sunrise_go.mod-cda6703e-0a0d-410e-bb6d-ba72a58da628
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:31:23Z
+
+##### Package: metadata/go/nathan-osman_go-sunrise_go.mod
+
+PackageName: metadata/go/nathan-osman_go-sunrise_go.mod
+SPDXID: SPDXRef-Filesystem-31e464158e46d48d
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-31e464158e46d48d
+

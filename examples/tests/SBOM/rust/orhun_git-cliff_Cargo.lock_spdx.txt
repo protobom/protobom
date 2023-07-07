@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/orhun_git-cliff_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/orhun_git-cliff_Cargo.lock-7ef36369-a0c2-4fd2-89be-e269eca580af
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:24:50Z
+
+##### Package: metadata/rust/orhun_git-cliff_Cargo.lock
+
+PackageName: metadata/rust/orhun_git-cliff_Cargo.lock
+SPDXID: SPDXRef-Filesystem-251e6698c657648e
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-251e6698c657648e
+

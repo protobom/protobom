@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/gomoob_php-pushwoosh_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/gomoob_php-pushwoosh_composer.lock-daf4bbf1-ad3b-4300-bc8b-57cbc66a4c09",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:09Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/gomoob_php-pushwoosh_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-84d198169a418a23",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-84d198169a418a23",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

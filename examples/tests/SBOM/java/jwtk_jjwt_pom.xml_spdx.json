@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/jwtk_jjwt_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/jwtk_jjwt_pom.xml-8f65e22c-f82b-4674-a4e5-5cdc27e0bf8c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:08Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/jwtk_jjwt_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-40956437f665899c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-40956437f665899c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

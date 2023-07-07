@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/oxidecomputer_propolis_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/oxidecomputer_propolis_Cargo.lock-e9f465e9-f2d0-48b4-aa18-8b0cc429ea2e
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:23:19Z
+
+##### Package: metadata/rust/oxidecomputer_propolis_Cargo.lock
+
+PackageName: metadata/rust/oxidecomputer_propolis_Cargo.lock
+SPDXID: SPDXRef-Filesystem-1e34f9f7e34fa533
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-1e34f9f7e34fa533
+

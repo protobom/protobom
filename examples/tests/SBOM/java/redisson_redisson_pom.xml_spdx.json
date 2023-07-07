@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/redisson_redisson_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/redisson_redisson_pom.xml-99f4aa05-69fd-4598-8d62-3237955732c8",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:23Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/redisson_redisson_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-d4a53caca42d53c3",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d4a53caca42d53c3",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

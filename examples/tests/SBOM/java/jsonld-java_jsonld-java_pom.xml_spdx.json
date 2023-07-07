@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/jsonld-java_jsonld-java_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/jsonld-java_jsonld-java_pom.xml-4e19bd35-a95a-4ba2-80be-ef3004d235a3",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:40Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/jsonld-java_jsonld-java_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-502ee2d70ad31dfb",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-502ee2d70ad31dfb",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

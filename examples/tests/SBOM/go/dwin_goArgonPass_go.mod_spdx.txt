@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/dwin_goArgonPass_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/dwin_goArgonPass_go.mod-a9c217e5-1af7-4297-9a49-0250500273cb
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:31:02Z
+
+##### Package: metadata/go/dwin_goArgonPass_go.mod
+
+PackageName: metadata/go/dwin_goArgonPass_go.mod
+SPDXID: SPDXRef-Filesystem-26875e2e3f50dece
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-26875e2e3f50dece
+

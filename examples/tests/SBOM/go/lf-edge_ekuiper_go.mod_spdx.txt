@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/lf-edge_ekuiper_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/lf-edge_ekuiper_go.mod-d013ebc5-127f-49fb-866a-e78f12f60d8c
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:31:19Z
+
+##### Package: metadata/go/lf-edge_ekuiper_go.mod
+
+PackageName: metadata/go/lf-edge_ekuiper_go.mod
+SPDXID: SPDXRef-Filesystem-8307addf05c83471
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-8307addf05c83471
+

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/mocktools_go-smtp-mock_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/mocktools_go-smtp-mock_go.mod-1ea3541d-4fed-4cb2-9366-ba0e74b4b026",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:59Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/mocktools_go-smtp-mock_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-ea8629d7bc076dd3",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-ea8629d7bc076dd3",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

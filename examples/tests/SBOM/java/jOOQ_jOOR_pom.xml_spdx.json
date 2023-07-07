@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/jOOQ_jOOR_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/jOOQ_jOOR_pom.xml-5cdb5349-b665-420b-b88d-c6a61db08525",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:00Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/jOOQ_jOOR_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-8fe2e0a0f450c66a",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-8fe2e0a0f450c66a",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/FuGangqiang_mdblog.rs_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/FuGangqiang_mdblog.rs_Cargo.lock-8d012bfe-f495-4aa2-a9d8-6f088c4263ed",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T07:07:35Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/FuGangqiang_mdblog.rs_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-113cd54ff0122b85",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-113cd54ff0122b85",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

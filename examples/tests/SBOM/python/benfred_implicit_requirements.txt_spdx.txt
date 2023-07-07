@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/benfred_implicit_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/benfred_implicit_requirements.txt-84c44b18-563c-4cf5-9181-2a62c9e51a5d
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:20:00Z
+
+##### Package: metadata/python/benfred_implicit_requirements.txt
+
+PackageName: metadata/python/benfred_implicit_requirements.txt
+SPDXID: SPDXRef-Filesystem-4158d8e007f9bc7b
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-4158d8e007f9bc7b
+

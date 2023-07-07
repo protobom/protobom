@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:772b0830-f7d4-47f5-aca9-30488d738475",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:34+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "9d2d4509-4839-4b27-93ed-7986b7cd0fd7",
+      "type": "application",
+      "name": "metadata/rust/harlanc_xiu_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "9d2d4509-4839-4b27-93ed-7986b7cd0fd7",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

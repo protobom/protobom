@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/chrispassas_silk_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/chrispassas_silk_go.mod-223ff1ee-69dc-4c8e-a5c9-8105af00f9d2",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:16Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/chrispassas_silk_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-6cfafb7487bc8c71",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-6cfafb7487bc8c71",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

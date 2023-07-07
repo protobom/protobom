@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/ruby/boazsegev_iodine_Gemfile.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/boazsegev_iodine_Gemfile.lock-00dd865e-5ef6-46c4-a5cd-a1590852b63b",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:48Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/ruby/boazsegev_iodine_Gemfile.lock",
+      "SPDXID": "SPDXRef-Filesystem-7498572a178d6d18",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7498572a178d6d18",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

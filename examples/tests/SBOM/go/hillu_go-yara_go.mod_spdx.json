@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/hillu_go-yara_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/hillu_go-yara_go.mod-cf6deb3f-c96d-4101-ae08-72884c837136",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:33Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/hillu_go-yara_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-5ddfa5b9bb402dc2",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-5ddfa5b9bb402dc2",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

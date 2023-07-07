@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/PaddiM8_kalker_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/PaddiM8_kalker_Cargo.lock-bb1169b5-6416-4927-85ae-085d19200d74",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:01Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/PaddiM8_kalker_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-6aed643fdc96628",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-6aed643fdc96628",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

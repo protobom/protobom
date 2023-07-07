@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/Konloch_bytecode-viewer_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/Konloch_bytecode-viewer_pom.xml-9f7c6051-a841-43d5-a027-0cdd24ac4498",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:50Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/Konloch_bytecode-viewer_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-e59658bacb854581",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e59658bacb854581",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/umpirsky_country-list_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/umpirsky_country-list_composer.lock-aedb568b-18e6-428b-8fbb-94d5c7456931",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:33Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/umpirsky_country-list_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-666efa876e783870",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-666efa876e783870",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

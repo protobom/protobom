@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/nsqio_go-nsq_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/nsqio_go-nsq_go.mod-bbf2e370-fc93-448c-a805-191e43729516
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:31:11Z
+
+##### Package: metadata/go/nsqio_go-nsq_go.mod
+
+PackageName: metadata/go/nsqio_go-nsq_go.mod
+SPDXID: SPDXRef-Filesystem-3c927d5ae23b1ef5
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-3c927d5ae23b1ef5
+

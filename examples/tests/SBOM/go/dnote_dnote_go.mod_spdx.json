@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/dnote_dnote_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/dnote_dnote_go.mod-73e1b799-2d8f-438b-9bec-d6f228bcf099",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T06:39:47Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/dnote_dnote_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-d6892ab1fc3a88d2",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d6892ab1fc3a88d2",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

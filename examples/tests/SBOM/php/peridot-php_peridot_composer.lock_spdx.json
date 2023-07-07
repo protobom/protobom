@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/peridot-php_peridot_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/peridot-php_peridot_composer.lock-df942063-20c8-43a8-92d1-e9f7c412009e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:30Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/peridot-php_peridot_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-b7130c2b7eda958c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b7130c2b7eda958c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

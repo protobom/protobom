@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/bluealloy_revm_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/bluealloy_revm_Cargo.lock-a1f212bc-2491-45a9-8838-e6a05933d249",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:24Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/bluealloy_revm_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-3c1ae1b2ac17ab92",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-3c1ae1b2ac17ab92",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/benfred_implicit_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/benfred_implicit_requirements.txt-ab2e0da3-80a2-46f9-a5b3-d2afeb5732f0",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:19:59Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/benfred_implicit_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-4158d8e007f9bc7b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-4158d8e007f9bc7b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

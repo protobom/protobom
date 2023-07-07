@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/bovigo_vfsStream_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/bovigo_vfsStream_composer.lock-1fcdccc8-523d-42a9-b9d9-69411d05410d",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:01Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/bovigo_vfsStream_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-ce5fed2f69b650a4",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-ce5fed2f69b650a4",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

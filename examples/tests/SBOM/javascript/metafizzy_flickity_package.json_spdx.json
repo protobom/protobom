@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/metafizzy_flickity_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/metafizzy_flickity_package.json-19f28d3f-d380-4100-b68e-f63cc398e7a7",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:39Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/metafizzy_flickity_package.json",
+      "SPDXID": "SPDXRef-Filesystem-d961e5007af1a649",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d961e5007af1a649",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

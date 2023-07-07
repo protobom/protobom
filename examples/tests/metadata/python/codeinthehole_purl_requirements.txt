@@ -1,0 +1,8 @@
+# Packaging
+pip==19.0.3
+setuptools==40.8.0
+wheel==0.33.1
+
+# Testing
+pytest
+tox==3.7.0

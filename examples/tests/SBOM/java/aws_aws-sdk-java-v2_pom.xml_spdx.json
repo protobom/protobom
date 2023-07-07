@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/aws_aws-sdk-java-v2_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/aws_aws-sdk-java-v2_pom.xml-b8b1f1f7-94dc-4674-bc18-991ad4ca3531",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:35Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/aws_aws-sdk-java-v2_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-2a33cc021cf0e8ec",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-2a33cc021cf0e8ec",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

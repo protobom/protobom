@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/veandco_go-sdl2_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/veandco_go-sdl2_go.mod-0deb4724-8f50-4041-9aa7-3516d46e505c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:06Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/veandco_go-sdl2_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-a8eaf881388e1762",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a8eaf881388e1762",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

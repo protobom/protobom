@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/yegor256_takes_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/yegor256_takes_pom.xml-b18c4576-4430-4b56-a215-0cf3492e9da3",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:53Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/yegor256_takes_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-fc7cd6e548c0a308",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-fc7cd6e548c0a308",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

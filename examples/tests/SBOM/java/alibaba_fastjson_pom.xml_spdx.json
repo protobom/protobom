@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/alibaba_fastjson_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/alibaba_fastjson_pom.xml-ac493498-680b-4966-8c40-e88bd5791e3c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:44Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/alibaba_fastjson_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-7b826cfcab17749",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7b826cfcab17749",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

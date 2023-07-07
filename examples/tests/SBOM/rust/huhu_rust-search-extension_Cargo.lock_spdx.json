@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/huhu_rust-search-extension_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/huhu_rust-search-extension_Cargo.lock-f63b8097-3933-4a80-aef7-06e6283410a1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:16Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/huhu_rust-search-extension_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-ee02c57387f14be4",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-ee02c57387f14be4",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

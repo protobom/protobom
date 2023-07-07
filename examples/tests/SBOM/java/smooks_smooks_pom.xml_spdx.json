@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/smooks_smooks_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/smooks_smooks_pom.xml-606520b8-ce1c-427d-b21a-99f81a765c83",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:24Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/smooks_smooks_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-247db2e27fe5eeed",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-247db2e27fe5eeed",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

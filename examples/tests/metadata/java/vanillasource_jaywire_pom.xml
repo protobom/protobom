@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>jaywire-android</artifactId>
+  <packaging>jar</packaging>
+  <name>JayWire Android Integration</name>
+  <description>JayWire Integration with Android</description>
+
+  <parent>
+     <groupId>com.vanillasource.jaywire</groupId>
+     <artifactId>jaywire-parent</artifactId>
+     <version>1.1.1-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+     <dependency>
+        <groupId>com.vanillasource.jaywire</groupId>
+        <artifactId>jaywire</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+       <groupId>com.google.android</groupId>
+       <artifactId>android</artifactId>
+       <version>4.1.1.4</version>
+       <scope>provided</scope>
+    </dependency>
+ </dependencies>
+</project>

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/randomizedtesting_randomizedtesting_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/randomizedtesting_randomizedtesting_pom.xml-d696b36d-a679-4175-b7fe-248914205b5c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:43Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/randomizedtesting_randomizedtesting_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-b275fd5c2f528d8b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b275fd5c2f528d8b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/PicnicSupermarket_error-prone-support_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/PicnicSupermarket_error-prone-support_pom.xml-26c5f13d-5a2c-4ecf-b052-10e09a013e60
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:27:01Z
+
+##### Package: metadata/java/PicnicSupermarket_error-prone-support_pom.xml
+
+PackageName: metadata/java/PicnicSupermarket_error-prone-support_pom.xml
+SPDXID: SPDXRef-Filesystem-83ec4947ac5249cd
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-83ec4947ac5249cd
+

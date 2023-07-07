@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/yegor256_cactoos_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/yegor256_cactoos_pom.xml-8368998f-8c06-4986-be21-c8949bc5338e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:05Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/yegor256_cactoos_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-4bbbaae1e6bf1252",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-4bbbaae1e6bf1252",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

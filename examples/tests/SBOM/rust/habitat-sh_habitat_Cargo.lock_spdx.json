@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/habitat-sh_habitat_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/habitat-sh_habitat_Cargo.lock-854f8e6c-499d-4e7b-be5b-e58d417cd2d6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:23Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/habitat-sh_habitat_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-1a0216dd46eed689",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-1a0216dd46eed689",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

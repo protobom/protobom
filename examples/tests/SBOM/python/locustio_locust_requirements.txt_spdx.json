@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/locustio_locust_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/locustio_locust_requirements.txt-3f4d32aa-2475-4195-9a16-b9243787325d",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:02Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/locustio_locust_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-858d761b0b7d5e5a",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-858d761b0b7d5e5a",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

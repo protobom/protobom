@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/OpenGMK_OpenGMK_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/OpenGMK_OpenGMK_Cargo.lock-3623fc18-0cad-4307-a02c-28b39dc2f5d7",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:14Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/OpenGMK_OpenGMK_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-56db13c59b0268cf",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-56db13c59b0268cf",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

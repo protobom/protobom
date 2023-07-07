@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/ruby/datastax_ruby-driver_Gemfile.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/datastax_ruby-driver_Gemfile.lock-7be7a9af-a95d-4c55-b5ce-d3685a3231ff
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:19Z
+
+##### Package: metadata/ruby/datastax_ruby-driver_Gemfile.lock
+
+PackageName: metadata/ruby/datastax_ruby-driver_Gemfile.lock
+SPDXID: SPDXRef-Filesystem-5e8449e94891668b
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-5e8449e94891668b
+

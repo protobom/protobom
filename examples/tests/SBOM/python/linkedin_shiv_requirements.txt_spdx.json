@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/linkedin_shiv_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/linkedin_shiv_requirements.txt-cd6ae6d1-3af1-47af-81b8-81949b947b8e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:58Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/linkedin_shiv_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-39f0af883e90a10c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-39f0af883e90a10c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

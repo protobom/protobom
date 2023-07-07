@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/sigp_lighthouse_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/sigp_lighthouse_Cargo.lock-603844d4-2482-40f6-9507-a4322adab2a6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:08Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/sigp_lighthouse_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-62ed2e8f1a4e3d6",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-62ed2e8f1a4e3d6",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

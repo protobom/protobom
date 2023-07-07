@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:181ff974-ed4b-4d01-871c-f1b7ffb92ee8",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:30:02+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "2aa0be32-efd5-4152-9774-c9556a266eb9",
+      "type": "application",
+      "name": "metadata/go/mehanizm_airtable_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "2aa0be32-efd5-4152-9774-c9556a266eb9",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

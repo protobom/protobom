@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/ruby/jaimeiniesta_metainspector_Gemfile.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/jaimeiniesta_metainspector_Gemfile.lock-01bda5a5-23e4-4fc7-9139-4a9f46b7195a
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:33Z
+
+##### Package: metadata/ruby/jaimeiniesta_metainspector_Gemfile.lock
+
+PackageName: metadata/ruby/jaimeiniesta_metainspector_Gemfile.lock
+SPDXID: SPDXRef-Filesystem-78e00c4a85afb699
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-78e00c4a85afb699
+

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/quickwit-oss_quickwit_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/quickwit-oss_quickwit_Cargo.lock-8c529f24-6242-4a3d-ad1d-7ab3cd356b4a
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:23:29Z
+
+##### Package: metadata/rust/quickwit-oss_quickwit_Cargo.lock
+
+PackageName: metadata/rust/quickwit-oss_quickwit_Cargo.lock
+SPDXID: SPDXRef-Filesystem-f028544ebecc1001
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-f028544ebecc1001
+

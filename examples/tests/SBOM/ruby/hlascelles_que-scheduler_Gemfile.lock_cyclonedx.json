@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:f8ebec1e-def1-4d40-98c2-00ee5893a1f9",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:25:48+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "8f6dc2d7-01bd-4917-bd43-13c9b84bec59",
+      "type": "application",
+      "name": "metadata/ruby/hlascelles_que-scheduler_Gemfile.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "8f6dc2d7-01bd-4917-bd43-13c9b84bec59",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

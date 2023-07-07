@@ -1,0 +1,3 @@
+-r requirements/dev.txt
+-r requirements/lint.txt
+-r requirements/testing.txt

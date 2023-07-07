@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/andrewstuart_goq_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/andrewstuart_goq_go.mod-8ebe5c5c-fe59-449a-91c2-3b01eb8d04ac
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:29:17Z
+
+##### Package: metadata/go/andrewstuart_goq_go.mod
+
+PackageName: metadata/go/andrewstuart_goq_go.mod
+SPDXID: SPDXRef-Filesystem-b7c7726a200e674f
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-b7c7726a200e674f
+

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:0f061a1c-fa6a-4775-878f-5c0fd85cdef6",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:36+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "52eff530-168e-41e4-a4ea-53afd2707f73",
+      "type": "application",
+      "name": "metadata/rust/rsaarelm_magog_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "52eff530-168e-41e4-a4ea-53afd2707f73",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/romshark_jscan_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/romshark_jscan_go.mod-1caacbb2-bffe-4781-8f63-1d2189a8498a",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:37Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/romshark_jscan_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-bb52b27df8c0082",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-bb52b27df8c0082",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

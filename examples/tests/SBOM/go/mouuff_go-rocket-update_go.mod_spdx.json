@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/mouuff_go-rocket-update_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/mouuff_go-rocket-update_go.mod-8e498ac7-09cc-4e67-b01e-c9497ff028ab",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:52Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/mouuff_go-rocket-update_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-5cb1d5e76adaf855",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-5cb1d5e76adaf855",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

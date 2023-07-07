@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/instancio_instancio_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/instancio_instancio_pom.xml-207a12ab-2230-46f9-816a-c4d35ba7fddf
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:28:45Z
+
+##### Package: metadata/java/instancio_instancio_pom.xml
+
+PackageName: metadata/java/instancio_instancio_pom.xml
+SPDXID: SPDXRef-Filesystem-a6055ba2dc7a3f2f
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-a6055ba2dc7a3f2f
+

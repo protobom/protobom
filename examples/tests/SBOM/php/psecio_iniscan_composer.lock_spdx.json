@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/psecio_iniscan_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/psecio_iniscan_composer.lock-276e8b07-b90a-4ab8-a49d-86dab0d68871",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:41Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/psecio_iniscan_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-42649bfca9939dcb",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-42649bfca9939dcb",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

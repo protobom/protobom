@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/PrefectHQ_prefect_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/PrefectHQ_prefect_requirements.txt-c29d4dff-ee0a-47c5-94cf-2b95f11d7e7e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T06:38:55Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/PrefectHQ_prefect_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-d584e1cfd646c339",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d584e1cfd646c339",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

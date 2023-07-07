@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/mozilla_unicode-slugify_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/mozilla_unicode-slugify_requirements.txt-f706c20b-54a5-4f69-a4f9-fbdae723b400
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:20:20Z
+
+##### Package: metadata/python/mozilla_unicode-slugify_requirements.txt
+
+PackageName: metadata/python/mozilla_unicode-slugify_requirements.txt
+SPDXID: SPDXRef-Filesystem-c43a3d3ea27531b3
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-c43a3d3ea27531b3
+

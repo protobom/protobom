@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/lifthrasiir_angolmois-rust_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/lifthrasiir_angolmois-rust_Cargo.lock-73e19694-c122-4502-be68-0ed4dd58b7e6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:04Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/lifthrasiir_angolmois-rust_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-abe3e1a10b2b17f8",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-abe3e1a10b2b17f8",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/php/peridot-php_peridot_composer.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/php/peridot-php_peridot_composer.lock-b543d708-2535-4078-8355-eea906578245
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:22:30Z
+
+##### Package: metadata/php/peridot-php_peridot_composer.lock
+
+PackageName: metadata/php/peridot-php_peridot_composer.lock
+SPDXID: SPDXRef-Filesystem-b7130c2b7eda958c
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-b7130c2b7eda958c
+

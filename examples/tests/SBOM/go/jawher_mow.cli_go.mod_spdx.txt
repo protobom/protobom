@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/jawher_mow.cli_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/jawher_mow.cli_go.mod-eb294faf-a7fc-4d8c-b853-ad171a60bc12
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:32:18Z
+
+##### Package: metadata/go/jawher_mow.cli_go.mod
+
+PackageName: metadata/go/jawher_mow.cli_go.mod
+SPDXID: SPDXRef-Filesystem-d639dd2edc240e1e
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-d639dd2edc240e1e
+

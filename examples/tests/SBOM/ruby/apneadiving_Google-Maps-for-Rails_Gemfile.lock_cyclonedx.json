@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:1394aa40-0c78-450c-9f53-98e06f8f67cb",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:25:21+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "4bb04aab-358d-4d56-8f89-c77f407c88a7",
+      "type": "application",
+      "name": "metadata/ruby/apneadiving_Google-Maps-for-Rails_Gemfile.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "4bb04aab-358d-4d56-8f89-c77f407c88a7",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

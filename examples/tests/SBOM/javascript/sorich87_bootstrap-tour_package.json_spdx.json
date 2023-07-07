@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/sorich87_bootstrap-tour_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/sorich87_bootstrap-tour_package.json-192b0d90-53d2-4eb4-9090-ce81bd3da7a1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:34Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/sorich87_bootstrap-tour_package.json",
+      "SPDXID": "SPDXRef-Filesystem-4a17f34b6827e95b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-4a17f34b6827e95b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

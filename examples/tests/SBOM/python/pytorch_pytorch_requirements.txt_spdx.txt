@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/pytorch_pytorch_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/pytorch_pytorch_requirements.txt-a1ca02e1-73ae-4341-ab7c-69facf7fb966
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:59Z
+
+##### Package: metadata/python/pytorch_pytorch_requirements.txt
+
+PackageName: metadata/python/pytorch_pytorch_requirements.txt
+SPDXID: SPDXRef-Filesystem-5513cd3b5f2aa25c
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-5513cd3b5f2aa25c
+

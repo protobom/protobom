@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/xhit_go-simple-mail_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/xhit_go-simple-mail_go.mod-78db6a37-27ed-451c-881f-109a7d9c3b15",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T06:46:45Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/xhit_go-simple-mail_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-1ebf7e8ced2f836e",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-1ebf7e8ced2f836e",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

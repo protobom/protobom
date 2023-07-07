@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/sergree_matchering_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/sergree_matchering_requirements.txt-d5de6754-d3b8-428a-862f-825ea3e4e06f",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:08Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/sergree_matchering_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-587385a7c0e8abf9",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-587385a7c0e8abf9",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

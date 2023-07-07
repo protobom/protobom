@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/neuland_jade4j_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/neuland_jade4j_pom.xml-bb20abbe-65d2-4649-bf91-af97d800a572
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:27:26Z
+
+##### Package: metadata/java/neuland_jade4j_pom.xml
+
+PackageName: metadata/java/neuland_jade4j_pom.xml
+SPDXID: SPDXRef-Filesystem-2853a1273d4eadb6
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-2853a1273d4eadb6
+

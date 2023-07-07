@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/adamwdraper_Numeral-js_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/adamwdraper_Numeral-js_package.json-85954203-f391-48fd-b3c2-649a9e390508",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:04Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/adamwdraper_Numeral-js_package.json",
+      "SPDXID": "SPDXRef-Filesystem-a0913f1292e8b2f3",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a0913f1292e8b2f3",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/mindsdb_mindsdb_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/mindsdb_mindsdb_requirements.txt-3c2fb521-7d30-4b6c-a805-a6b0f11f2966",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:56Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/mindsdb_mindsdb_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-35c8f0c0aae0ad7c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-35c8f0c0aae0ad7c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

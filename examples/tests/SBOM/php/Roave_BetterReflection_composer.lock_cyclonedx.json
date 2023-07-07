@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:64919767-657d-4d2c-951c-d64d023e8c90",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:22:40+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "dd9e6165-7bf2-4375-9579-100c52a54dfc",
+      "type": "application",
+      "name": "metadata/php/Roave_BetterReflection_composer.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "dd9e6165-7bf2-4375-9579-100c52a54dfc",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

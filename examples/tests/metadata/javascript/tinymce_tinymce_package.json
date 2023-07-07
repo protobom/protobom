@@ -1,0 +1,30 @@
+{
+  "name": "tinymce",
+  "version": "6.6.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinymce/tinymce"
+  },
+  "description": "TinyMCE rich text editor",
+  "author": "Ephox Corporation DBA Tiny Technologies, Inc",
+  "bugs": {
+    "url": "https://github.com/tinymce/tinymce/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10.26"
+  },
+  "main": "tinymce.js",
+  "scripts": {
+    "test": "grunt test",
+    "lint": "grunt eslint",
+    "silver-test": "grunt bedrock-auto:silver",
+    "silver-test-manual": "grunt bedrock-manual:silver"
+  },
+  "dependencies": {
+    "dompurify": "2.3.8",
+    "prismjs": "^1.27.0",
+    "tslib": "^2.0.0"
+  }
+}

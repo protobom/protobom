@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/mohanson_gameboy_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/mohanson_gameboy_Cargo.lock-7e9cc0e2-65fe-422a-82fb-3542219b9533",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:08Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/mohanson_gameboy_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-406a515a20563a44",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-406a515a20563a44",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

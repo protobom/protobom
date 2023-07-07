@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/gleitz_howdoi_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/gleitz_howdoi_requirements.txt-96f8ee17-bc7c-4d2c-b024-8674e9116d11",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:48Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/gleitz_howdoi_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-a2f0ee086d4d975f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a2f0ee086d4d975f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

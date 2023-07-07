@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/shyiko_dotenv_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/shyiko_dotenv_pom.xml-e8b7b2f9-ac72-4b28-8e2b-62bcf388dfe4",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:24Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/shyiko_dotenv_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-1e0589eded70b592",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-1e0589eded70b592",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/javascript/Bogdan-Lyashenko_codecrumbs_package.json
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/Bogdan-Lyashenko_codecrumbs_package.json-a76a0513-3e2c-4faf-a71f-13a4e6ab6dfe
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:26:24Z
+
+##### Package: metadata/javascript/Bogdan-Lyashenko_codecrumbs_package.json
+
+PackageName: metadata/javascript/Bogdan-Lyashenko_codecrumbs_package.json
+SPDXID: SPDXRef-Filesystem-fddf89e25a2ad582
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-fddf89e25a2ad582
+

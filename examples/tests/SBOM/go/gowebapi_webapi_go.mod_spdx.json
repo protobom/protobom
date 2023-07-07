@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/gowebapi_webapi_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/gowebapi_webapi_go.mod-da0a1faf-0141-4810-bdec-6dc3b7014c8a",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:33Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/gowebapi_webapi_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-9dbb41937352e1d2",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9dbb41937352e1d2",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/pyinvoke_invoke_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/pyinvoke_invoke_requirements.txt-98415b19-a783-4289-a7ab-f559a458099c
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:28Z
+
+##### Package: metadata/python/pyinvoke_invoke_requirements.txt
+
+PackageName: metadata/python/pyinvoke_invoke_requirements.txt
+SPDXID: SPDXRef-Filesystem-491c9aae403ac361
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-491c9aae403ac361
+

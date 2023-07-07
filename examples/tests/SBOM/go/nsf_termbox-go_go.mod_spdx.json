@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/nsf_termbox-go_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/nsf_termbox-go_go.mod-1a964942-56c3-45c6-b7a6-15e4ac6cf7f4",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:15Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/nsf_termbox-go_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-5e5d2c15e12413df",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-5e5d2c15e12413df",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

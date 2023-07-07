@@ -1,0 +1,66 @@
+{
+  "name": "card",
+  "version": "2.5.4",
+  "author": "Jesse Pollak <jpollak92@gmail.com>",
+  "description": "Card lets you add an interactive, CSS3 credit card animation to your credit card form to help your users through the process.",
+  "main": "lib/card.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jessepollak/card"
+  },
+  "contributors": [
+    {
+      "name": "Jesse Pollak",
+      "email": "jpollak92@gmail.com"
+    },
+    {
+      "name": "Melloware",
+      "email": "mellowaredev@gmail.com"
+    },
+    {
+      "name": "Daniel Juhl",
+      "email": "danieljuhl@gmail.com"
+    }
+  ],
+  "scripts": {
+    "clean": "rimraf ./lib/ && rimraf ./dist/",
+    "compile": "npm run clean && npm run compile:lib && npm run compile:dist && npm run compile:styles",
+    "compile:lib": "coffee --compile -o ./lib/ ./src/coffee/card.coffee && node-sass ./src/scss/card.scss -o lib/ && replace '../scss/card.scss' './card.css' lib/card.js",
+    "compile:dist": "npm run env NODE_ENV=production && webpack",
+    "compile:styles": "node-sass ./src/scss/card.scss -o ./dist/ --output-style compressed",
+    "development": "webpack-dev-server --hot",
+    "preversion": "npm run compile",
+    "prepublish": "npm run env NODE_ENV=production && npm run compile",
+    "postpublish": "git push origin master && git push --tags",
+    "test": "karma start --single-run --browsers PhantomJS"
+  },
+  "devDependencies": {
+    "bower": "^1.8.12",
+    "coffee-loader": "^4.0.0",
+    "coffee-script": "~1.12.7",
+    "css-loader": "^6.7.2",
+    "event-stream": "^4.0.1",
+    "glob": "^8.0.3",
+    "jquery": "^3.6.0",
+    "node-sass": "^8.0.0",
+    "nodemon": "^2.0.7",
+    "replace": "^1.2.1",
+    "rimraf": "^4.0.4",
+    "run-sequence": "~2.2.1",
+    "sass-loader": "^13.2.0",
+    "style-loader": "^3.3.1",
+    "underscore": "^1.12.1",
+    "vinyl-source-stream": "^2.0.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0",
+    "webpack-dev-server": "^4.11.1"
+  },
+  "dependencies": {
+    "node.extend": "~2.0.2",
+    "payment": "^2.4.6",
+    "qj": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

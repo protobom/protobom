@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/slack-go_slack_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/slack-go_slack_go.mod-b9f0e598-d514-4959-92e4-b5aeb392a60c
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:31:43Z
+
+##### Package: metadata/go/slack-go_slack_go.mod
+
+PackageName: metadata/go/slack-go_slack_go.mod
+SPDXID: SPDXRef-Filesystem-5c2cc95d09f6c4c5
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-5c2cc95d09f6c4c5
+

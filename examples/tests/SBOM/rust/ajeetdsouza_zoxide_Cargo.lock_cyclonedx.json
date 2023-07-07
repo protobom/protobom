@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:832ebda9-8db0-4ab1-aecc-e3820099cbf2",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:23:27+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "56aded59-9341-43af-9957-7a8384a19d8b",
+      "type": "application",
+      "name": "metadata/rust/ajeetdsouza_zoxide_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "56aded59-9341-43af-9957-7a8384a19d8b",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

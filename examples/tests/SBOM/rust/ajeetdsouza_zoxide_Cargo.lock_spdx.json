@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/ajeetdsouza_zoxide_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/ajeetdsouza_zoxide_Cargo.lock-76f914fd-9ccd-478a-a3b6-2eefc018c6d2",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:27Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/ajeetdsouza_zoxide_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-e9957972cc4bdd9f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e9957972cc4bdd9f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

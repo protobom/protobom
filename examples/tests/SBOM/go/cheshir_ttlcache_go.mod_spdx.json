@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/cheshir_ttlcache_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/cheshir_ttlcache_go.mod-f8852c6b-ee1f-4e8a-8fc4-f59f88e498b1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:18Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/cheshir_ttlcache_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-19436f3de1fc5a8",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-19436f3de1fc5a8",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

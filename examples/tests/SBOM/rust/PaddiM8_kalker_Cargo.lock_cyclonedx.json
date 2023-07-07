@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:55f8f27a-e366-4144-99d0-675464ad9b5a",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:01+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "59be9c06-1c18-439e-8510-ff5c84121dfe",
+      "type": "application",
+      "name": "metadata/rust/PaddiM8_kalker_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "59be9c06-1c18-439e-8510-ff5c84121dfe",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

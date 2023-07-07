@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/EngoEngine_engo_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/EngoEngine_engo_go.mod-783cecb8-7227-42f3-b043-6f4b69def342
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:30:13Z
+
+##### Package: metadata/go/EngoEngine_engo_go.mod
+
+PackageName: metadata/go/EngoEngine_engo_go.mod
+SPDXID: SPDXRef-Filesystem-4dc9a43d6e123630
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-4dc9a43d6e123630
+

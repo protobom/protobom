@@ -1,0 +1,7 @@
+Pygments
+curtsies >=0.4.0
+cwcwidth
+greenlet
+pyxdg
+requests
+setuptools

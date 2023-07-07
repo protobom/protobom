@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/foundry-rs_foundry_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/foundry-rs_foundry_Cargo.lock-8cc77bb9-d2df-4447-a950-3911f3b3dd2c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:03Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/foundry-rs_foundry_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-7468dbd35eba35d",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7468dbd35eba35d",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

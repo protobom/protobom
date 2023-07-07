@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:59b2bbf0-6ec6-4bdb-8850-8d2cc34f0786",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:23+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "bd0124b4-dfc9-4cd1-ace2-ccb34073f2c2",
+      "type": "application",
+      "name": "metadata/rust/japaric_xargo_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "bd0124b4-dfc9-4cd1-ace2-ccb34073f2c2",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/jonashaag_bjoern_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/jonashaag_bjoern_requirements.txt-6392d106-9b8b-4498-a11e-14846d1f5254",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:24Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/jonashaag_bjoern_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-78f6fb58c4f5acaa",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-78f6fb58c4f5acaa",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

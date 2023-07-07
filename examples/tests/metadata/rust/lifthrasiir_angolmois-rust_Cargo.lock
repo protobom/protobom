@@ -1,0 +1,30 @@
+[root]
+name = "angolmois"
+version = "2.0.0-alpha2"
+dependencies = [
+ "sdl 0.3.6 (git+https://github.com/lifthrasiir/rust-sdl.git)",
+ "sdl_image 0.3.6 (git+https://github.com/lifthrasiir/rust-sdl.git)",
+ "sdl_mixer 0.3.6 (git+https://github.com/lifthrasiir/rust-sdl.git)",
+]
+
+[[package]]
+name = "sdl"
+version = "0.3.6"
+source = "git+https://github.com/lifthrasiir/rust-sdl.git#fcf08194101ea31574e9b4a25d7c8c0a54c84e67"
+
+[[package]]
+name = "sdl_image"
+version = "0.3.6"
+source = "git+https://github.com/lifthrasiir/rust-sdl.git#fcf08194101ea31574e9b4a25d7c8c0a54c84e67"
+dependencies = [
+ "sdl 0.3.6 (git+https://github.com/lifthrasiir/rust-sdl.git)",
+]
+
+[[package]]
+name = "sdl_mixer"
+version = "0.3.6"
+source = "git+https://github.com/lifthrasiir/rust-sdl.git#fcf08194101ea31574e9b4a25d7c8c0a54c84e67"
+dependencies = [
+ "sdl 0.3.6 (git+https://github.com/lifthrasiir/rust-sdl.git)",
+]
+

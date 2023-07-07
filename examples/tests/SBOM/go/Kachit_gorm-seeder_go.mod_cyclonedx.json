@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:26489913-4146-45d6-9206-46eff6aa119f",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:32:17+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "74fb39d6-9d7a-490c-b2fa-35f1e493ca67",
+      "type": "application",
+      "name": "metadata/go/Kachit_gorm-seeder_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "74fb39d6-9d7a-490c-b2fa-35f1e493ca67",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

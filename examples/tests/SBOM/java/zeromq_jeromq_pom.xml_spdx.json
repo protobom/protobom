@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/zeromq_jeromq_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/zeromq_jeromq_pom.xml-f08345bf-6594-471b-9bb8-70a1dd75dbaa",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:13Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/zeromq_jeromq_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-f4d3802759074dc1",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f4d3802759074dc1",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

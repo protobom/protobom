@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:a378baec-a043-480f-bb40-4604f1a476ac",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:32:30+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "8a933ffd-31e6-4160-97da-bea8f6e2b93a",
+      "type": "application",
+      "name": "metadata/go/flike_kingshard_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "8a933ffd-31e6-4160-97da-bea8f6e2b93a",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

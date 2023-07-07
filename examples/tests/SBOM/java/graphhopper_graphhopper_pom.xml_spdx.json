@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/graphhopper_graphhopper_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/graphhopper_graphhopper_pom.xml-7f87049c-9067-455a-8e84-129e6fe4b868",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:55Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/graphhopper_graphhopper_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-b0bffb43329bcd3b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b0bffb43329bcd3b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

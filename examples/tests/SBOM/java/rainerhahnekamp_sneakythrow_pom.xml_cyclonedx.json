@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:b1530508-19ee-4c48-957c-d6039e21f905",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:27:47+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "09f65319-7cc9-4dcd-b5f2-7cc77cc0892f",
+      "type": "application",
+      "name": "metadata/java/rainerhahnekamp_sneakythrow_pom.xml",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "09f65319-7cc9-4dcd-b5f2-7cc77cc0892f",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/bobthecow_psysh_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/bobthecow_psysh_composer.lock-f714d2b7-9dd6-4d17-bd9a-674e71d6d289",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:28Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/bobthecow_psysh_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-5535defdfef97c8b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-5535defdfef97c8b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

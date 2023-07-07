@@ -1,0 +1,47 @@
+{
+  "name": "babelfish",
+  "version": "2.0.0",
+  "description": "i18n with human friendly syntax",
+  "keywords": [
+    "i18n",
+    "l10n"
+  ],
+  "contributors": [
+    "Aleksey V Zapparov <ixti@member.fsf.org> (http://www.ixti.net/)",
+    "Vitaly Puzrin (https://github.com/puzrin)"
+  ],
+  "license": "MIT",
+  "repository": "nodeca/babelfish",
+  "files": [
+    "index.js",
+    "lib/",
+    "dist/"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "test": "npm run lint && nyc mocha",
+    "covreport": "nyc report --reporter html && nyc report --reporter lcov",
+    "doc": "node support/build_doc.js",
+    "gh-pages": "npm run doc && gh-pages -d doc -f",
+    "browserify": "browserify -r ./ -s Babelfish -p [ browserify-header --file support/header.js ] > dist/babelfish.js",
+    "minify": "terser dist/babelfish.js -c -m > dist/babelfish.min.js",
+    "build": "npm run browserify && npm run minify",
+    "parser": "pegjs -o speed support/parser.pegjs lib/parser.js",
+    "prepublishOnly": "npm run gh-pages"
+  },
+  "dependencies": {
+    "plurals-cldr": "^2.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "browserify-header": "^1.0.1",
+    "eslint": "^8.3.0",
+    "gh-pages": "^3.2.3",
+    "mocha": "^9.1.3",
+    "ndoc": "^6.0.0",
+    "nyc": "^15.0.1",
+    "pegjs": "~0.8.0",
+    "shelljs": "^0.8.4",
+    "terser": "^5.10.0"
+  }
+}

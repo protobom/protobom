@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/cantino_mcfly_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/cantino_mcfly_Cargo.lock-c9b26d0f-cb1d-484c-b5f9-8a0fd7579abf
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:02Z
+
+##### Package: metadata/rust/cantino_mcfly_Cargo.lock
+
+PackageName: metadata/rust/cantino_mcfly_Cargo.lock
+SPDXID: SPDXRef-Filesystem-8ebeb147061b7de2
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-8ebeb147061b7de2
+

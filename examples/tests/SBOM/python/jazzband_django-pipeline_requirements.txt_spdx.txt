@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/jazzband_django-pipeline_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/jazzband_django-pipeline_requirements.txt-57f0db6a-27d3-489d-bb46-f69625ba357f
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T06:38:58Z
+
+##### Package: metadata/python/jazzband_django-pipeline_requirements.txt
+
+PackageName: metadata/python/jazzband_django-pipeline_requirements.txt
+SPDXID: SPDXRef-Filesystem-624245876d086c06
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-624245876d086c06
+

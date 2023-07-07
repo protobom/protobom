@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/php/thecodingmachine_safe_composer.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/php/thecodingmachine_safe_composer.lock-f7423266-4bce-44df-b0d4-3c3da540718d
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:22:50Z
+
+##### Package: metadata/php/thecodingmachine_safe_composer.lock
+
+PackageName: metadata/php/thecodingmachine_safe_composer.lock
+SPDXID: SPDXRef-Filesystem-8d449cefe0808bec
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-8d449cefe0808bec
+

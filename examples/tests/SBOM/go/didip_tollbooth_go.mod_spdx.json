@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/didip_tollbooth_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/didip_tollbooth_go.mod-0724c871-6a13-4042-a26e-d314475dd6bc",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:26Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/didip_tollbooth_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-bb3e0a6809c5a44b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-bb3e0a6809c5a44b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

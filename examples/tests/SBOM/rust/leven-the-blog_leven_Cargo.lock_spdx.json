@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/leven-the-blog_leven_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/leven-the-blog_leven_Cargo.lock-bed9bae3-a773-431e-a6f8-a4e66e5f8954",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:58Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/leven-the-blog_leven_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-d16a0d2251653e1c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d16a0d2251653e1c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

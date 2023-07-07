@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/stchris_untangle_poetry.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/stchris_untangle_poetry.lock-035f07b6-b5c6-4796-87e3-c9fa7745eb1e
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:20:56Z
+
+##### Package: metadata/python/stchris_untangle_poetry.lock
+
+PackageName: metadata/python/stchris_untangle_poetry.lock
+SPDXID: SPDXRef-Filesystem-810688c1bbd9696c
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-810688c1bbd9696c
+

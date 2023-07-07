@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/dtolnay_cargo-expand_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/dtolnay_cargo-expand_Cargo.lock-220ccd27-c781-40a2-8e9e-dcb751541fec",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:57Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/dtolnay_cargo-expand_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-1646ede6249b66fd",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-1646ede6249b66fd",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/php/appserver-io_appserver_composer.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/php/appserver-io_appserver_composer.lock-9d317919-080b-4d35-a867-8f7e0f0e41c1
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:22:53Z
+
+##### Package: metadata/php/appserver-io_appserver_composer.lock
+
+PackageName: metadata/php/appserver-io_appserver_composer.lock
+SPDXID: SPDXRef-Filesystem-34d773939bae3d7a
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-34d773939bae3d7a
+

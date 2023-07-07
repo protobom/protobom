@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/immunant_c2rust_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/immunant_c2rust_Cargo.lock-3c0bd938-2b99-4d7e-b5d9-ee9b17d8d17f",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:54Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/immunant_c2rust_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-7b5ea52734475d67",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7b5ea52734475d67",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/tictail_bounce.js_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/tictail_bounce.js_package.json-0ae40665-fad5-4d53-b2fe-e17228fb4b9e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:31Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/tictail_bounce.js_package.json",
+      "SPDXID": "SPDXRef-Filesystem-695a78bd7286196c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-695a78bd7286196c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

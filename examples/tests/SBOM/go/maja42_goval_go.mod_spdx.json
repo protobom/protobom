@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/maja42_goval_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/maja42_goval_go.mod-428def99-6ad5-426b-bef1-cea61e7f81a8",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:32:32Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/maja42_goval_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-4f167d09a620ca7a",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-4f167d09a620ca7a",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

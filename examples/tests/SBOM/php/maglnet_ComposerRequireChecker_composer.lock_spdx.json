@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/maglnet_ComposerRequireChecker_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/maglnet_ComposerRequireChecker_composer.lock-d5a64a7c-dfde-471f-88a1-e8a0e5cf5a2a",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:44Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/maglnet_ComposerRequireChecker_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-e364f207c52bc02b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e364f207c52bc02b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/php/bobthecow_psysh_composer.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/php/bobthecow_psysh_composer.lock-9e9fca77-3184-4333-a061-7d6a66a6a65d
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:22:28Z
+
+##### Package: metadata/php/bobthecow_psysh_composer.lock
+
+PackageName: metadata/php/bobthecow_psysh_composer.lock
+SPDXID: SPDXRef-Filesystem-5535defdfef97c8b
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-5535defdfef97c8b
+

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/justquick_django-activity-stream_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/justquick_django-activity-stream_requirements.txt-dbd3465c-6d0e-40ae-add8-5d9d6810ac75",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:29Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/justquick_django-activity-stream_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-6fa466bed2bb6379",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-6fa466bed2bb6379",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

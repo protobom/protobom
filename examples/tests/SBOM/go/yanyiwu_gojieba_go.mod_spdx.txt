@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/yanyiwu_gojieba_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/yanyiwu_gojieba_go.mod-b6534716-92bf-411c-9efb-868ab63bfed5
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:31:05Z
+
+##### Package: metadata/go/yanyiwu_gojieba_go.mod
+
+PackageName: metadata/go/yanyiwu_gojieba_go.mod
+SPDXID: SPDXRef-Filesystem-acd91bddd4644ce1
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-acd91bddd4644ce1
+

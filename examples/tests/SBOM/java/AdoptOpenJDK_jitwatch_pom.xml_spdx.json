@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/AdoptOpenJDK_jitwatch_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/AdoptOpenJDK_jitwatch_pom.xml-ecd685b5-496c-4d06-8b8e-c1befde481dd",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:46Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/AdoptOpenJDK_jitwatch_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-757ca939a82556d4",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-757ca939a82556d4",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

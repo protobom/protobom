@@ -1,0 +1,93 @@
+PATH
+  remote: .
+  specs:
+    notion-ruby-client (1.2.1)
+      dotenv
+      faraday (>= 2.0)
+      faraday-mashify (>= 0.1.1)
+      faraday-multipart (>= 1.0.4)
+      hashie (~> 5)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
+    ast (2.4.2)
+    crack (0.4.5)
+      rexml
+    diff-lcs (1.4.4)
+    dotenv (2.8.1)
+    faraday (2.7.4)
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-mashify (0.1.1)
+      faraday (~> 2.0)
+      hashie
+    faraday-multipart (1.0.4)
+      multipart-post (~> 2)
+    faraday-net_http (3.0.2)
+    hashdiff (1.0.1)
+    hashie (5.0.0)
+    jaro_winkler (1.5.4)
+    multipart-post (2.3.0)
+    parallel (1.20.1)
+    parser (3.0.1.1)
+      ast (~> 2.4.1)
+    public_suffix (4.0.6)
+    rainbow (3.0.0)
+    rake (13.0.6)
+    rexml (3.2.5)
+    rspec (3.10.0)
+      rspec-core (~> 3.10.0)
+      rspec-expectations (~> 3.10.0)
+      rspec-mocks (~> 3.10.0)
+    rspec-core (3.10.1)
+      rspec-support (~> 3.10.0)
+    rspec-expectations (3.10.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-mocks (3.10.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-support (3.10.2)
+    rubocop (0.82.0)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.7.0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      rexml
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 2.0)
+    rubocop-performance (1.5.2)
+      rubocop (>= 0.71.0)
+    rubocop-rspec (1.39.0)
+      rubocop (>= 0.68.1)
+    ruby-progressbar (1.11.0)
+    ruby2_keywords (0.0.5)
+    timecop (0.9.4)
+    unicode-display_width (1.7.0)
+    vcr (6.0.0)
+    webmock (3.13.0)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+
+PLATFORMS
+  arm64-darwin-20
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  notion-ruby-client!
+  rake (~> 13)
+  rspec
+  rubocop (~> 0.82.0)
+  rubocop-performance (~> 1.5.2)
+  rubocop-rspec (~> 1.39.0)
+  timecop
+  vcr
+  webmock
+
+BUNDLED WITH
+   2.2.16

@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/php/PHPOffice_PhpSpreadsheet_composer.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/php/PHPOffice_PhpSpreadsheet_composer.lock-96656a09-2047-4323-a58b-ffbb6ed31a26
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:23:16Z
+
+##### Package: metadata/php/PHPOffice_PhpSpreadsheet_composer.lock
+
+PackageName: metadata/php/PHPOffice_PhpSpreadsheet_composer.lock
+SPDXID: SPDXRef-Filesystem-512d392d47f7f45d
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-512d392d47f7f45d
+

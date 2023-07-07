@@ -1,0 +1,11 @@
+flake8
+pytest
+mock
+pytest-mock
+wheel
+setuptools>=17.1
+pexpect
+pypandoc
+pytest-benchmark
+pytest-docker-pexpect
+twine

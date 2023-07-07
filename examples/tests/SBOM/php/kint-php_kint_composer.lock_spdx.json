@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/kint-php_kint_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/kint-php_kint_composer.lock-74603a2d-eba6-451c-ab4f-6c067f4f3d4f",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:47Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/kint-php_kint_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-f51c7683bd95fef0",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f51c7683bd95fef0",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

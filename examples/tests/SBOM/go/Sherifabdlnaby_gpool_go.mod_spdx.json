@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/Sherifabdlnaby_gpool_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/Sherifabdlnaby_gpool_go.mod-498390be-e051-44cc-ac94-0192b182d97c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:32:22Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/Sherifabdlnaby_gpool_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-20bbb77f0ea47933",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-20bbb77f0ea47933",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

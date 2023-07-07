@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/getgrav_grav_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/getgrav_grav_composer.lock-47d8ca17-6c39-437b-990c-003c51d835ab",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:00Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/getgrav_grav_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-e0e07ec35ec76417",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e0e07ec35ec76417",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

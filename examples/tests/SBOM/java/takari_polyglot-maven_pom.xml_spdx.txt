@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/takari_polyglot-maven_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/takari_polyglot-maven_pom.xml-73475bca-ba6f-41f0-8a9d-9f7121e04905
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:28:34Z
+
+##### Package: metadata/java/takari_polyglot-maven_pom.xml
+
+PackageName: metadata/java/takari_polyglot-maven_pom.xml
+SPDXID: SPDXRef-Filesystem-85708734f073a713
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-85708734f073a713
+

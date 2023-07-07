@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/amitt001_delegator.py_Pipfile.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/amitt001_delegator.py_Pipfile.lock-686c62f3-792d-41a2-a0ae-6bcfce45064f
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:41Z
+
+##### Package: metadata/python/amitt001_delegator.py_Pipfile.lock
+
+PackageName: metadata/python/amitt001_delegator.py_Pipfile.lock
+SPDXID: SPDXRef-Filesystem-1bd33f92a7c84e7e
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-1bd33f92a7c84e7e
+

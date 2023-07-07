@@ -1,0 +1,388 @@
+<!--                   __                _      _   ________               -->
+<!--                  / /   ____  ____ _(_)____/ | / / ____/               -->
+<!--                 / /   / __ \/ __ `/ / ___/  |/ / / __                 -->
+<!--                / /___/ /_/ / /_/ / / /__/ /|  / /_/ /                 -->
+<!--               /_____/\____/\__, /_/\___/_/ |_/\____/                  -->
+<!--                           /____/                                      -->
+<!--                                                                       -->
+<!--               The Next Generation Logic Library                       -->
+<!--                                                                       -->
+<!--  Copyright 2015-20xx Christoph Zengler                                -->
+<!--                                                                       -->
+<!--  Licensed under the Apache License, Version 2.0 (the "License");      -->
+<!--  you may not use this file except in compliance with the License.     -->
+<!--  You may obtain a copy of the License at                              -->
+<!--                                                                       -->
+<!--  http://www.apache.org/licenses/LICENSE-2.0                           -->
+<!--                                                                       -->
+<!--  Unless required by applicable law or agreed to in writing, software  -->
+<!--  distributed under the License is distributed on an "AS IS" BASIS,    -->
+<!--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or      -->
+<!--  implied.  See the License for the specific language governing        -->
+<!--  permissions and limitations under the License.                       -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.logicng</groupId>
+  <artifactId>logicng</artifactId>
+  <version>2.4.1</version>
+  <packaging>bundle</packaging>
+
+  <name>LogicNG</name>
+  <description>The Next Generation Logic Library</description>
+  <url>http://www.logicng.org</url>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Christoph Zengler</name>
+      <email>christoph.zengler@booleworks.com</email>
+    </developer>
+    <developer>
+      <name>Steffen Hildebrandt</name>
+      <email>steffen.hildebrandt@booleworks.com</email>
+    </developer>
+    <developer>
+      <name>Rouven Walter</name>
+      <email>rouven.walter@booleworks.com</email>
+    </developer>
+    <developer>
+      <name>Elena Natterer</name>
+      <email>elena.natterer@booleworks.com</email>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com:logic-ng/LogicNG.git</connection>
+    <developerConnection>scm:git:ssh://github.com:logic-ng/LogicNG.git</developerConnection>
+    <url>https://github.com/logic-ng/LogicNG</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+
+    <sonar.language>java</sonar.language>
+    <sonar.exclusions>**/LogicNGPropositional*.java,**/LogicNGPseudoBoolean*.java</sonar.exclusions>
+
+    <!-- Dependency Versions -->
+    <version.antlr>4.9.3</version.antlr>
+    <version.junit>5.9.0</version.junit>
+    <version.assertj>3.23.1</version.assertj>
+    <version.mockito>4.7.0</version.mockito>
+
+    <!-- Plugin Versions -->
+    <version.antlr-plugin>4.9.3</version.antlr-plugin>
+    <version.jacoco>0.8.8</version.jacoco>
+    <version.coveralls>4.3.0</version.coveralls>
+    <version.surefire>3.0.0-M7</version.surefire>
+    <version.nexus-staging>1.6.8</version.nexus-staging>
+    <version.maven-gpg>1.6</version.maven-gpg>
+    <version.osgi-plugin>5.1.8</version.osgi-plugin>
+    <version.maven-source>3.2.1</version.maven-source>
+    <version.maven-javadoc>3.2.0</version.maven-javadoc>
+    <version.maven-jar>3.2.0</version.maven-jar>
+
+  </properties>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>org/logicng/version.txt</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <plugins>
+      <!-- ANTLR4 (Parser Generation)  -->
+      <plugin>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>${version.antlr-plugin}</version>
+        <configuration>
+          <sourceDirectory>src/main/antlr</sourceDirectory>
+          <outputDirectory>target/generated-sources/antlr/org/logicng/io/parsers</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Store POM version in application manifest and set Jigsaw module name-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${version.maven-jar}</version>
+        <configuration>
+          <skipIfEmpty>true</skipIfEmpty>
+          <archive>
+            <manifest>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Built-By>BooleWorks GmbH</Built-By>
+              <Automatic-Module-Name>logicng</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Compile jar with sources -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${version.maven-source}</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Compile jar with javadocs -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${version.maven-javadoc}</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- JaCoCo (Test Coverage)  -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${version.jacoco}</version>
+        <configuration>
+          <excludes>
+            <exclude>**/LogicNGPropositional*</exclude>
+            <exclude>**/LogicNGPseudoBoolean*</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Support for OSGi -->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${version.osgi-plugin}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-RequiredExecutionEnvironment>JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <!-- Coveralls.io test coverage -->
+      <plugin>
+        <groupId>org.eluder.coveralls</groupId>
+        <artifactId>coveralls-maven-plugin</artifactId>
+        <version>${version.coveralls}</version>
+        <configuration>
+          <sourceDirectories>
+            <sourceDirectory>target/generated-sources/antlr</sourceDirectory>
+          </sourceDirectories>
+        </configuration>
+      </plugin>
+
+      <!-- Necessary for Wercker toolchain -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${version.surefire}</version>
+        <configuration>
+          <useSystemClassLoader>false</useSystemClassLoader>
+          <trimStackTrace>false</trimStackTrace>
+          <argLine>-Xmx2g</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <!-- Parser -->
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+      <version>${version.antlr}</version>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${version.assertj}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${version.mockito}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${version.mockito}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-inline</artifactId>
+      <version>${version.mockito}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>sonatype-nexus-snapshot</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <!-- Deploy to Maven Central -->
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>${version.nexus-staging}</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+
+          <!-- Sign components -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${version.maven-gpg}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>all-tests</id>
+    </profile>
+
+    <profile>
+      <id>regular-tests</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <excludedGroups>random,longRunning</excludedGroups>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>long-running-tests</id>
+      <properties>
+        <groups>longRunning</groups>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>random-tests</id>
+      <properties>
+        <groups>random</groups>
+      </properties>
+    </profile>
+  </profiles>
+</project>
+

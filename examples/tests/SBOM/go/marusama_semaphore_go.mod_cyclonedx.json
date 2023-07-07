@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:3f4dea6a-6d39-4a38-8bea-14013d65cc23",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:30:44+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "a72cf2fc-1b5f-4e4b-bdd1-4dd09e840488",
+      "type": "application",
+      "name": "metadata/go/marusama_semaphore_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "a72cf2fc-1b5f-4e4b-bdd1-4dd09e840488",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

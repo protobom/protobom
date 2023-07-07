@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/shafreeck_retry_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/shafreeck_retry_go.mod-1c75e0c4-2af5-4bf9-866b-eabb0aaddb6b
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:31:31Z
+
+##### Package: metadata/go/shafreeck_retry_go.mod
+
+PackageName: metadata/go/shafreeck_retry_go.mod
+SPDXID: SPDXRef-Filesystem-d444f963b06def9a
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-d444f963b06def9a
+

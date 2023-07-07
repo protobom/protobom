@@ -1,0 +1,44 @@
+{
+  "name": "navaid",
+  "version": "1.2.0",
+  "repository": "lukeed/navaid",
+  "description": "A navigation aid (aka, router) for the browser in 865 bytes~!",
+  "unpkg": "dist/navaid.min.js",
+  "module": "dist/navaid.mjs",
+  "main": "dist/navaid.js",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com"
+  },
+  "engines": {
+    "node": ">= 6"
+  },
+  "scripts": {
+    "build": "node builder",
+    "pretest": "npm run build",
+    "test": "uvu -r esm test"
+  },
+  "files": [
+    "*.d.ts",
+    "dist"
+  ],
+  "keywords": [
+    "browser",
+    "client-side",
+    "router"
+  ],
+  "dependencies": {
+    "regexparam": "^1.0.2"
+  },
+  "devDependencies": {
+    "esm": "3.2.25",
+    "gzip-size": "5.1.1",
+    "mk-dirs": "2.1.0",
+    "pretty-bytes": "5.3.0",
+    "terser": "4.8.0",
+    "uvu": "0.3.3"
+  }
+}

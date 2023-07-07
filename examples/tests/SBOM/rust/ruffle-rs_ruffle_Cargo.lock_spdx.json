@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/ruffle-rs_ruffle_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/ruffle-rs_ruffle_Cargo.lock-b6af0777-e24b-4ee2-8c22-57dd341ba62d",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:47Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/ruffle-rs_ruffle_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-7a745454b8d4bc01",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7a745454b8d4bc01",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/pola-rs_polars_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/pola-rs_polars_Cargo.lock-a35ec7bb-75b2-42d1-ba2e-86d24800eef4",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:21Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/pola-rs_polars_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-a3b832f7bdceb390",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a3b832f7bdceb390",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

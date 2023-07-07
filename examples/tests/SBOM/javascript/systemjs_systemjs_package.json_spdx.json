@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/javascript/systemjs_systemjs_package.json",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/systemjs_systemjs_package.json-8d9ef72c-fd37-43e6-8256-1b079b6f07b5",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:22Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/javascript/systemjs_systemjs_package.json",
+      "SPDXID": "SPDXRef-Filesystem-8434fe9b3f175b9b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-8434fe9b3f175b9b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

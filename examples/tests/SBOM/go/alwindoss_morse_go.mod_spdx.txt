@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/alwindoss_morse_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/alwindoss_morse_go.mod-3dd32a9a-2db0-4560-b151-0f901837b094
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:30:56Z
+
+##### Package: metadata/go/alwindoss_morse_go.mod
+
+PackageName: metadata/go/alwindoss_morse_go.mod
+SPDXID: SPDXRef-Filesystem-5c27532c66b72de2
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-5c27532c66b72de2
+

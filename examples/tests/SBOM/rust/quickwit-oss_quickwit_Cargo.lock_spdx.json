@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/quickwit-oss_quickwit_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/quickwit-oss_quickwit_Cargo.lock-416237df-6550-4485-8c41-656e5e318c7c",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:29Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/quickwit-oss_quickwit_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-f028544ebecc1001",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f028544ebecc1001",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

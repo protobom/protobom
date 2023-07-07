@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/python_cpython_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/python_cpython_requirements.txt-aae12452-6d6a-4e66-b01e-66f50c5a5ab8
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:20:19Z
+
+##### Package: metadata/python/python_cpython_requirements.txt
+
+PackageName: metadata/python/python_cpython_requirements.txt
+SPDXID: SPDXRef-Filesystem-59ab3bd0fd70e773
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-59ab3bd0fd70e773
+

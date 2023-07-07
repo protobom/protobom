@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/schematics_schematics_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/schematics_schematics_requirements.txt-2ae8a465-08fa-4802-8c30-ea63509c8c52
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:20:10Z
+
+##### Package: metadata/python/schematics_schematics_requirements.txt
+
+PackageName: metadata/python/schematics_schematics_requirements.txt
+SPDXID: SPDXRef-Filesystem-7d7e284976d3a42
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-7d7e284976d3a42
+

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/ctco_cukes_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/ctco_cukes_pom.xml-a061a531-7cd7-40a2-867e-ab8034ba80fc",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:33Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/ctco_cukes_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-261c2d2c6e3ba25f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-261c2d2c6e3ba25f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

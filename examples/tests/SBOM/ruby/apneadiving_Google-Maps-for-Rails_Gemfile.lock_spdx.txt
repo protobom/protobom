@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/ruby/apneadiving_Google-Maps-for-Rails_Gemfile.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/apneadiving_Google-Maps-for-Rails_Gemfile.lock-34ed71a9-5363-486a-ba7a-240701eb25a4
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:20Z
+
+##### Package: metadata/ruby/apneadiving_Google-Maps-for-Rails_Gemfile.lock
+
+PackageName: metadata/ruby/apneadiving_Google-Maps-for-Rails_Gemfile.lock
+SPDXID: SPDXRef-Filesystem-2cbe99cd111b8805
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-2cbe99cd111b8805
+

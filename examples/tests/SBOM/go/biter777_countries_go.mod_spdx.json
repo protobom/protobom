@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/biter777_countries_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/biter777_countries_go.mod-ddd73187-68ca-4e38-a2af-3fe23cf73544",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:20Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/biter777_countries_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-a446a274ea7aaa1d",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a446a274ea7aaa1d",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

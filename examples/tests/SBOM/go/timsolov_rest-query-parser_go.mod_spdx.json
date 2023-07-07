@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/timsolov_rest-query-parser_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/timsolov_rest-query-parser_go.mod-e604d83a-07f9-49b1-b938-d45d7b98c657",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:19Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/timsolov_rest-query-parser_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-9df25d04f3f3c666",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9df25d04f3f3c666",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

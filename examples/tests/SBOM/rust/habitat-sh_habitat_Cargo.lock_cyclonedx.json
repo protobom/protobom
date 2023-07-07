@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:40d8d903-bc95-4072-a4cb-ce8a5c008af6",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:23:24+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "16f7dfab-36b2-4773-a6f8-80758ee29c5a",
+      "type": "application",
+      "name": "metadata/rust/habitat-sh_habitat_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "16f7dfab-36b2-4773-a6f8-80758ee29c5a",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

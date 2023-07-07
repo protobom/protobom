@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/awaitility_awaitility_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/awaitility_awaitility_pom.xml-011d9ff0-1d71-45db-baf0-15df5f4c3e7e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:20Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/awaitility_awaitility_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-607bce82790e4feb",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-607bce82790e4feb",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

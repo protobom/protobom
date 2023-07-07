@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/fabric8io_kubernetes-client_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/fabric8io_kubernetes-client_pom.xml-5bde0fd4-e411-4463-ae17-e3e5383beda8",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:21Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/fabric8io_kubernetes-client_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-fb25bb9d44910198",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-fb25bb9d44910198",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

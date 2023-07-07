@@ -1,0 +1,4 @@
+torch
+torchnlp
+numpy
+torchqrnn

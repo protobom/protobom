@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/cyruzin_golang-tmdb_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/cyruzin_golang-tmdb_go.mod-85249415-c6b5-4580-8e35-836f3a8ee820",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:42Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/cyruzin_golang-tmdb_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-9182ba0c8f6df384",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9182ba0c8f6df384",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

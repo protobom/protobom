@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/Crisu83_php-conversion_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/Crisu83_php-conversion_composer.lock-cb68c9fd-08c2-472d-93a1-9e8f83ea87ce",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:46Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/Crisu83_php-conversion_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-59996ff3a8760d1f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-59996ff3a8760d1f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

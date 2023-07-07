@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/FriendsOfPHP_pickle_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/FriendsOfPHP_pickle_composer.lock-066111b3-1051-4135-bed9-9a9cbc90353e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:27Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/FriendsOfPHP_pickle_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-a4bb467cd6a76521",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a4bb467cd6a76521",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

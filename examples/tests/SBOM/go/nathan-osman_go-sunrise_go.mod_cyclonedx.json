@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:a90800b5-12ec-4c46-9381-5a5ead613af5",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:31:24+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "57f9fe72-25a0-4a96-85ff-727c1fb00aaa",
+      "type": "application",
+      "name": "metadata/go/nathan-osman_go-sunrise_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "57f9fe72-25a0-4a96-85ff-727c1fb00aaa",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

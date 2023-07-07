@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/php/liip_RMT_composer.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/php/liip_RMT_composer.lock-d2a89958-de92-401d-888c-697e0ecb5418
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:23:11Z
+
+##### Package: metadata/php/liip_RMT_composer.lock
+
+PackageName: metadata/php/liip_RMT_composer.lock
+SPDXID: SPDXRef-Filesystem-b123973e134c37a8
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-b123973e134c37a8
+

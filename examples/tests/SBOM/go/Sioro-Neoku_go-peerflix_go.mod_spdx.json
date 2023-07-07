@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/Sioro-Neoku_go-peerflix_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/Sioro-Neoku_go-peerflix_go.mod-ec2525b5-d91a-4fed-b72a-755fe5d25a88",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:49Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/Sioro-Neoku_go-peerflix_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-8c28853d6d3c6f63",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-8c28853d6d3c6f63",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

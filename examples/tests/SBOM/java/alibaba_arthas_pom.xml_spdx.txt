@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/alibaba_arthas_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/alibaba_arthas_pom.xml-df68fd39-b244-4ddd-92d5-f0188f802316
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:28:47Z
+
+##### Package: metadata/java/alibaba_arthas_pom.xml
+
+PackageName: metadata/java/alibaba_arthas_pom.xml
+SPDXID: SPDXRef-Filesystem-a429c464121d09ba
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-a429c464121d09ba
+

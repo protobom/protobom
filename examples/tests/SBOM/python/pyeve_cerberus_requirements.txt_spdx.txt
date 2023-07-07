@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/pyeve_cerberus_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/pyeve_cerberus_requirements.txt-94211e36-1ec5-4a23-9428-9843932a5e01
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:45Z
+
+##### Package: metadata/python/pyeve_cerberus_requirements.txt
+
+PackageName: metadata/python/pyeve_cerberus_requirements.txt
+SPDXID: SPDXRef-Filesystem-39c036ea20c52c0c
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-39c036ea20c52c0c
+

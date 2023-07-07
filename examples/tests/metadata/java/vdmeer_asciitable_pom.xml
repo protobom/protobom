@@ -1,0 +1,454 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      This file is automatically created
+      -->
+
+    <!--
+      Basic POM definitions
+      -->
+    <groupId>de.vandermeer</groupId>
+    <artifactId>asciitable</artifactId>
+    <version>0.3.2</version>
+    <packaging>jar</packaging>
+
+    <!--
+      More project information
+      -->
+    <name>ASCII Table</name>
+    <description>An ASCII table with various render options and UTF-8 support</description>
+    <url>https://github.com/vdmeer/asciitable</url>
+    <inceptionYear>2014</inceptionYear>
+
+    <!--
+      Pre-requisites
+      -->
+    <prerequisites>
+        <maven>3.0.0</maven>
+    </prerequisites>
+
+    <!--
+      Licenses
+      -->
+    <licenses>
+        <license>
+        	<name>Apache 2</name>
+        	<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        	<distribution>repo</distribution>
+        	<comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <!--
+      Properties
+      -->
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
+        <encoding>UTF-8</encoding>
+        <file.encoding>UTF-8</file.encoding>
+		<pm.version.maven-jar-plugin>3.0.2</pm.version.maven-jar-plugin>
+		<pm.version.maven-site-plugin>3.5</pm.version.maven-site-plugin>
+		<pm.version.asciidoctor.asciidoclet>1.5.4</pm.version.asciidoctor.asciidoclet>
+		<pm.version.maven-source-plugin>3.0.1</pm.version.maven-source-plugin>
+		<pm.version.maven-assembly-plugin>3.0.0</pm.version.maven-assembly-plugin>
+		<pm.version.maven-compiler-plugin>3.6.1</pm.version.maven-compiler-plugin>
+		<pm.version.asciidoctor-maven-plugin>1.5.5</pm.version.asciidoctor-maven-plugin>
+		<pm.version.maven-javadoc-plugin>2.10.4</pm.version.maven-javadoc-plugin>
+		<pm.version.doxia-site-renderer>1.7</pm.version.doxia-site-renderer>
+		<pm.version.maven-resources-plugin>3.0.2</pm.version.maven-resources-plugin>
+		<pm.version.maven-antrun-plugin>1.8</pm.version.maven-antrun-plugin>
+		<mp.project.url>https://github.com/vdmeer/asciitable</mp.project.url>
+    </properties>
+
+    <!--
+      Developers
+      -->
+    <developers>
+        <developer>
+        	<id>vdmeer.sven</id>
+        	<name>Sven van der Meer</name>
+        	<email>vdmeer.sven@mykolab.com</email>
+        		<url>http://www.vandermeer.de</url>
+        <!--
+        		<organization>ACME</organization>
+        		<organizationUrl>http://www.example.com</organizationUrl>
+        -->
+        		<roles>
+        			<role>creator</role>
+        			<role>developer</role>
+        		</roles>
+        		<timezone>Europe/Dublin</timezone>
+        <!--
+        		<properties>
+        			<picUrl>http://www.example.com/jdoe/pic</picUrl>
+        		</properties>
+        -->
+        </developer>
+    </developers>
+
+    <!--
+      Contributors
+      -->
+    <contributors>
+        <contributor>
+        	<name>Sebastian Thomschke</name>
+        	<email>sebthom@sourceforge.net</email>
+        	<url>https://github.com/sebthom</url>
+        	<timezone>Europe/Berlin</timezone>
+        </contributor>
+    </contributors>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.vandermeer</groupId>
+            <artifactId>ascii-utf-themes</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.vandermeer</groupId>
+            <artifactId>char-translation</artifactId>
+            <version>0.0.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>ST4</artifactId>
+            <version>4.0.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.vandermeer</groupId>
+            <artifactId>asciilist</artifactId>
+            <version>0.0.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.sven-jacobs</groupId>
+            <artifactId>loremipsum</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+<!--
+<dependencyManagement>...</dependencyManagement>
+-->
+
+    <!--
+      Build and Plugins
+      -->
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${pm.version.maven-jar-plugin}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/doc-files/</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-site-plugin</artifactId>
+            	<version>${pm.version.maven-site-plugin}</version>
+
+            	<configuration>
+            		<asciidoc>
+            <!--
+            			<templateDirs>
+            				<dir>src/site/asciidoc/templates</dir>
+            			</templateDirs>
+            			<requires>
+            				<require>asciidoctor-diagram</require>
+            			</requires>
+            -->
+            			<attributes>
+            				<source-highlighter>coderay</source-highlighter>
+            				<coderay-css>style</coderay-css>
+            				<release-version>${project.version}</release-version>
+            				<basedir>${project.basedir}/src</basedir>
+            			</attributes>
+            		</asciidoc>
+            		<moduleExcludes>
+            			<asciidoc>**/_*.adoc</asciidoc>
+            		</moduleExcludes>
+            	</configuration>
+
+            	<dependencies>
+            		<dependency>
+            			<groupId>org.apache.maven.doxia</groupId>
+            			<artifactId>doxia-site-renderer</artifactId>
+            			<version>${pm.version.doxia-site-renderer}</version>
+            		</dependency>
+            		<dependency>
+            			<groupId>org.asciidoctor</groupId>
+            			<artifactId>asciidoctor-maven-plugin</artifactId>
+            			<version>${pm.version.asciidoctor-maven-plugin}</version>
+            		</dependency>
+            	</dependencies>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${pm.version.maven-compiler-plugin}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <optimize>true</optimize>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <!--
+      Profiles
+      -->
+    <profiles>
+        <profile>
+        	<id>env-bdoc</id>
+        	<build>
+        		<plugins>
+        			<!-- Create HTML versions of Changelog/Readme -->
+        			<plugin>
+        				<groupId>org.asciidoctor</groupId>
+        				<artifactId>asciidoctor-maven-plugin</artifactId>
+        				<version>${pm.version.asciidoctor-maven-plugin}</version>
+        				<executions>
+        					<execution>
+        						<id>bundle-asciidoc</id>
+        						<phase>process-resources</phase>
+        						<configuration>
+        							<sourceDirectory>${project.basedir}/target/bundle/doc</sourceDirectory>
+        							<outputDirectory>${project.basedir}</outputDirectory>
+        							<sourceHighlighter>coderay</sourceHighlighter>
+        							<backend>html</backend>
+        							<attributes>
+        								<toc>true</toc>
+        								<baseDir>${project.basedir}/target/bundle/doc</baseDir>
+        							</attributes>
+        						</configuration>
+        						<goals>
+        							<goal>process-asciidoc</goal>
+        						</goals>
+        					</execution>
+        				</executions>
+        			</plugin>
+
+        			<!-- Copy Changelog/Readme and then include in jar with License -->
+        			<plugin>
+        				<artifactId>maven-resources-plugin</artifactId>
+        				<version>${pm.version.maven-resources-plugin}</version>
+        				<executions>
+        					<execution>
+        						<id>copy-bundle-docs</id>
+        						<phase>generate-resources</phase>
+        						<goals><goal>copy-resources</goal></goals>
+        						<configuration>
+        							<outputDirectory>${project.basedir}/target/bundle/doc</outputDirectory>
+        							<resources>
+        								<resource>
+        									<directory>${project.basedir}</directory>
+        									<filtering>true</filtering>
+        									<includes>
+        										<include>*.adoc</include>
+        										<include>*.asciidoc</include>
+        									</includes>
+        								</resource>
+        							</resources>
+        						</configuration>
+        					</execution>
+        <!--
+        					<execution>
+        						<id>copy-to-jar</id>
+        						<phase>prepare-package</phase>
+        						<goals><goal>copy-resources</goal></goals>
+        						<configuration>
+        							<outputDirectory>${basedir}/target/classes</outputDirectory>
+        							<resources>
+        								<resource>
+        									<directory>${basedir}</directory>
+        									<includes>
+        										<include>LICENSE</include>
+        										<include>CHANGELOG.*</include>
+        										<include>README.*</include>
+        									</includes>
+        								</resource>
+        							</resources>
+        						</configuration>
+        					</execution>
+        -->
+        				</executions>
+        			</plugin>
+        		</plugins>
+        	</build>
+        </profile>
+
+        <profile>
+        	<id>env-srcjar</id>
+        	<build>
+        		<plugins>
+        			<plugin>
+        				<groupId>org.apache.maven.plugins</groupId>
+        				<artifactId>maven-source-plugin</artifactId>
+        				<version>${pm.version.maven-source-plugin}</version>
+        				<executions>
+        					<execution>
+        						<id>attach-sources</id>
+        						<goals>
+        							<goal>jar</goal>
+        						</goals>
+        					</execution>
+        				</executions>
+        			</plugin>
+        		</plugins>
+        	</build>
+        </profile>
+
+        <profile>
+        	<id>env-jdjar</id>
+        	<build>
+        		<plugins>
+        			<plugin>
+        				<groupId>org.apache.maven.plugins</groupId>
+        				<artifactId>maven-javadoc-plugin</artifactId>
+        				<version>${pm.version.maven-javadoc-plugin}</version>
+        				<executions>
+        					<execution>
+        						<id>attach-javadocs</id>
+        						<goals>
+        							<goal>jar</goal>
+        						</goals>
+        						<configuration>
+        							<source>${maven.compiler.target}</source>
+        							<doclet>org.asciidoctor.Asciidoclet</doclet>
+        							<docletArtifact>
+        								<groupId>org.asciidoctor</groupId>
+        								<artifactId>asciidoclet</artifactId>
+        								<version>${pm.version.asciidoctor.asciidoclet}</version>
+        							</docletArtifact>
+        							<overview>src/main/asciidoc/overview.adoc</overview>
+        							<additionalparam>
+        								--base-dir ${project.basedir}/src
+        								--attribute "name=${project.name}"
+        								--attribute "release-version=${project.version}"
+        								--attribute "title-link=${mp.project.url}/[${project.name} ${project.version}]"
+        							</additionalparam>
+        							<encoding>${project.resources.sourceEncoding}</encoding>
+        							<docencoding>${project.resources.sourceEncoding}</docencoding>
+        							<charset>${project.resources.sourceEncoding}</charset>
+        							<aggregate>true</aggregate>
+        							<nohelp>true</nohelp>
+        							<header>${project.name}: ${project.version}</header>
+        							<footer>${project.name}: ${project.version}</footer>
+        							<doctitle>${project.name}: ${project.version}</doctitle>
+        							<noqualifier>all</noqualifier>
+        							<detectLinks>true</detectLinks>
+        							<detectJavaApiLink>true</detectJavaApiLink>
+        							<javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+        							<docfilessubdirs>true</docfilessubdirs>
+        						</configuration>
+        					</execution>
+        				</executions>
+        			</plugin>
+        		</plugins>
+        	</build>
+        </profile>
+    </profiles>
+
+    <reporting>
+        <plugins>
+        	<plugin>
+        		<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-javadoc-plugin</artifactId>
+        		<version>${pm.version.maven-javadoc-plugin}</version>
+        		<reportSets>
+        			<reportSet>
+        				<id>default</id>
+        				<reports>
+        					<report>javadoc</report>
+        				</reports>
+        			</reportSet>
+        		</reportSets>
+        		<configuration>
+        			<source>${maven.compiler.target}</source>
+        			<doclet>org.asciidoctor.Asciidoclet</doclet>
+        			<docletArtifact>
+        				<groupId>org.asciidoctor</groupId>
+        				<artifactId>asciidoclet</artifactId>
+        				<version>${pm.version.asciidoctor.asciidoclet}</version>
+        			</docletArtifact>
+        			<overview>src/main/asciidoc/overview.adoc</overview>
+        			<additionalparam>
+        				--base-dir ${project.basedir}/src
+        				--attribute "name=${project.name}"
+        				--attribute "release-version=${project.version}"
+        				--attribute "title-link=${mp.project.url}/[${project.name} ${project.version}]"
+        			</additionalparam>
+        			<encoding>${project.resources.sourceEncoding}</encoding>
+        			<docencoding>${project.resources.sourceEncoding}</docencoding>
+        			<charset>${project.resources.sourceEncoding}</charset>
+        			<aggregate>true</aggregate>
+        			<nohelp>true</nohelp>
+        			<header>${project.name}: ${project.version}</header>
+        			<footer>${project.name}: ${project.version}</footer>
+        			<doctitle>${project.name}: ${project.version}</doctitle>
+        			<noqualifier>all</noqualifier>
+        			<detectLinks>true</detectLinks>
+        			<detectJavaApiLink>true</detectJavaApiLink>
+        			<javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+        			<docfilessubdirs>true</docfilessubdirs>
+        		</configuration>
+        	</plugin>
+        </plugins>
+
+    </reporting>
+
+    <!-- Environment Settings -->
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/vdmeer/asciitable/issues</url>
+    </issueManagement>
+
+<!--
+<ciManagement>...</ciManagement>
+<mailingLists>...</mailingLists>
+-->
+
+    <!--
+      SCM
+      -->
+    <scm>
+        <connection>scm:git:git://github.com/vdmeer/asciitable.git</connection>
+        <developerConnection>scm:git:git@github.com:vdmeer/asciitable.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/vdmeer/asciitable</url>
+    </scm>
+
+<!--
+<repositories>...</repositories>
+<pluginRepositories>...</pluginRepositories>
+<distributionManagement>...</distributionManagement>
+-->
+
+</project>

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/elapouya_python-docx-template_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/elapouya_python-docx-template_requirements.txt-0adba6cb-9b0c-4838-8548-16f15542b192",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:57Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/elapouya_python-docx-template_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-bb613a67c11ee40c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-bb613a67c11ee40c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

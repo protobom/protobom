@@ -1,0 +1,44 @@
+{@import https://raw.githubusercontent.com/central7/pom/main/pom.jim}
+{@import version.jim}
+{@sep [ ]}
+[project genpom]
+    [GAV :com.javax0.jamal:pom.xml_files:1.0.0]
+    [build]
+        <defaultGoal>clean</defaultGoal>
+        [plugins]
+            [plugin]
+                [GAV :com.javax0.jamal:jamal-maven-plugin:[JAMAL_VERSION]]
+                [executions]
+                    [execution]
+                        [id execution]
+                        [phase clean]
+                        [goals [goal jamal]]
+                        [configuration]
+                            <transformFrom>\.jam$</transformFrom>
+                            <transformTo></transformTo>
+                            <filePattern>(.*pom\.xml\.jam|.*\.yml\.jam)$</filePattern>
+                            <exclude>target|\.iml$|\.java$|\.xml$</exclude>
+                            <sourceDirectory>.</sourceDirectory>
+                            <targetDirectory>.</targetDirectory>
+                            <macroOpen>{</macroOpen>
+                            <macroClose>}</macroClose>
+                            <formatOutput>true</formatOutput>
+                        [end configuration]
+                    [end execution]
+                [end executions]
+                 <dependencies>
+                    <dependency>
+                        <groupId>com.javax0.jamal</groupId>
+                        <artifactId>jamal-yaml</artifactId>
+                        <version>1.10.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.javax0.jamal</groupId>
+                        <artifactId>jamal-snippet</artifactId>
+                        <version>1.10.4</version>
+                    </dependency>
+                </dependencies>
+            [end plugin]
+        [end plugins]
+    [end build]
+[end project]

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/spotify_dh-virtualenv_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/spotify_dh-virtualenv_requirements.txt-4a9c2ad4-44e1-4aba-91f6-55acc68161d6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:01Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/spotify_dh-virtualenv_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-e3223b0f5711f969",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e3223b0f5711f969",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

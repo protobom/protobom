@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/gaul_modernizer-maven-plugin_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/gaul_modernizer-maven-plugin_pom.xml-89d99f71-0fe6-414b-be91-335d54522ce2
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:29:02Z
+
+##### Package: metadata/java/gaul_modernizer-maven-plugin_pom.xml
+
+PackageName: metadata/java/gaul_modernizer-maven-plugin_pom.xml
+SPDXID: SPDXRef-Filesystem-411ebb45cdc6c39
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-411ebb45cdc6c39
+

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/Bogdanp_dramatiq_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/Bogdanp_dramatiq_requirements.txt-b3e4551a-53e7-4918-9edd-136f550cb767",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:20Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/Bogdanp_dramatiq_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-af085a4e8ff16562",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-af085a4e8ff16562",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:a266dea1-ac38-494c-9225-6b2fdc0bd4cd",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:21:50+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "24da11e3-3640-48e5-9f57-95d80bb22093",
+      "type": "application",
+      "name": "metadata/python/spulec_freezegun_requirements.txt",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "24da11e3-3640-48e5-9f57-95d80bb22093",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

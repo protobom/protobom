@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/guptarohit_asciigraph_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/guptarohit_asciigraph_go.mod-e52b334e-82be-4590-8603-37c74c71ab92",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:32:23Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/guptarohit_asciigraph_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-7cab02dc20620a1a",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7cab02dc20620a1a",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

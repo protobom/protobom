@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/bencherdev_bencher_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/bencherdev_bencher_Cargo.lock-3a0108f9-b207-4f8a-b1ef-9df42af32917
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:24:32Z
+
+##### Package: metadata/rust/bencherdev_bencher_Cargo.lock
+
+PackageName: metadata/rust/bencherdev_bencher_Cargo.lock
+SPDXID: SPDXRef-Filesystem-c1aef221be82c168
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-c1aef221be82c168
+

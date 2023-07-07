@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/bamzi_jobrunner_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/bamzi_jobrunner_go.mod-d2b2bc69-f9a4-4dbb-a902-4a53960be0a1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:31Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/bamzi_jobrunner_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-77b77fd746fd3f3a",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-77b77fd746fd3f3a",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

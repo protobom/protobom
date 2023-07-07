@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/gaul_modernizer-maven-plugin_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/gaul_modernizer-maven-plugin_pom.xml-03a693f5-667d-4687-8482-0c71e7363b02",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:02Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/gaul_modernizer-maven-plugin_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-411ebb45cdc6c39",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-411ebb45cdc6c39",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

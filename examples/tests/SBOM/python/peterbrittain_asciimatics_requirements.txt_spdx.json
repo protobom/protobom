@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/peterbrittain_asciimatics_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/peterbrittain_asciimatics_requirements.txt-b3bf4b4f-c231-4667-a333-c02dfd06916e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:38Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/peterbrittain_asciimatics_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-d649eac88ea4b7f1",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d649eac88ea4b7f1",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

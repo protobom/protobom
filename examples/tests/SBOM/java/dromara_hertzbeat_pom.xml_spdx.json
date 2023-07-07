@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/dromara_hertzbeat_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/dromara_hertzbeat_pom.xml-81670302-6b1f-4413-86c0-0dfe839cdac2",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:13Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/dromara_hertzbeat_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-890dbd826b81ba52",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-890dbd826b81ba52",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

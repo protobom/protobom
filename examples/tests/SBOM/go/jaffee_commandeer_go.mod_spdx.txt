@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/jaffee_commandeer_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/jaffee_commandeer_go.mod-b46aeeef-5405-4050-a8e3-1e48c444e199
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:29:56Z
+
+##### Package: metadata/go/jaffee_commandeer_go.mod
+
+PackageName: metadata/go/jaffee_commandeer_go.mod
+SPDXID: SPDXRef-Filesystem-a033ea96404fe5ce
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-a033ea96404fe5ce
+

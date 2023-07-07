@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/ybbus_jsonrpc_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/ybbus_jsonrpc_go.mod-0e61ce16-bc45-4e2c-84d0-bcb9dab89079",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T07:04:44Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/ybbus_jsonrpc_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-e51f261fb53d8c94",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e51f261fb53d8c94",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

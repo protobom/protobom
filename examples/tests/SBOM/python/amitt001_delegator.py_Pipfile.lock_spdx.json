@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/amitt001_delegator.py_Pipfile.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/amitt001_delegator.py_Pipfile.lock-1afa3346-f688-4286-9254-f9b17b503d62",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:41Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/amitt001_delegator.py_Pipfile.lock",
+      "SPDXID": "SPDXRef-Filesystem-1bd33f92a7c84e7e",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-1bd33f92a7c84e7e",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/LukeMathWalker_cargo-chef_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/LukeMathWalker_cargo-chef_Cargo.lock-a806945e-a7e8-4cea-af3c-eb222d89297e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:26Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/LukeMathWalker_cargo-chef_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-ec0af3a534ddc2cf",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-ec0af3a534ddc2cf",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

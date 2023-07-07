@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/pypa_bandersnatch_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/pypa_bandersnatch_requirements.txt-8b801f27-cf13-4ec7-aca9-2c2a224cb4c2",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:15Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/pypa_bandersnatch_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-a81038ac8419d133",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a81038ac8419d133",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

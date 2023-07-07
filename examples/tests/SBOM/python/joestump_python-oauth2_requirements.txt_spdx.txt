@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/joestump_python-oauth2_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/joestump_python-oauth2_requirements.txt-3a3e10d5-30c0-4077-ad32-485651c3c2d1
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:06Z
+
+##### Package: metadata/python/joestump_python-oauth2_requirements.txt
+
+PackageName: metadata/python/joestump_python-oauth2_requirements.txt
+SPDXID: SPDXRef-Filesystem-75530b007a4de5b9
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-75530b007a4de5b9
+

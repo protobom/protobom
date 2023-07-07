@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/sharkdp_hyperfine_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/sharkdp_hyperfine_Cargo.lock-0c622d00-5d1e-4582-8d37-8176ef2fb7b6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:04Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/sharkdp_hyperfine_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-d52104b0799d68e",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d52104b0799d68e",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

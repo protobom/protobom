@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/cweagans_composer-patches_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/cweagans_composer-patches_composer.lock-aa25f51f-433a-4894-ace3-4998c05faa6e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:32Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/cweagans_composer-patches_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-22b5cd30a514aaef",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-22b5cd30a514aaef",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

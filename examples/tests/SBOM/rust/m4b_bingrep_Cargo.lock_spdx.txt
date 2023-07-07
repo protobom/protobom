@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/m4b_bingrep_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/m4b_bingrep_Cargo.lock-f2028121-acd2-4ba8-92fc-80904f015b11
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:11Z
+
+##### Package: metadata/rust/m4b_bingrep_Cargo.lock
+
+PackageName: metadata/rust/m4b_bingrep_Cargo.lock
+SPDXID: SPDXRef-Filesystem-f2f85006df9a6ddf
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-f2f85006df9a6ddf
+

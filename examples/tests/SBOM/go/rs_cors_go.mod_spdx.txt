@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/rs_cors_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/rs_cors_go.mod-b3207f8b-bcd9-4366-ba0a-96f91894554d
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:30:34Z
+
+##### Package: metadata/go/rs_cors_go.mod
+
+PackageName: metadata/go/rs_cors_go.mod
+SPDXID: SPDXRef-Filesystem-17a59f776edbd2b4
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-17a59f776edbd2b4
+

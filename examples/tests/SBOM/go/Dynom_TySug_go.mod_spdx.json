@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/Dynom_TySug_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/Dynom_TySug_go.mod-9df71228-28f1-43af-bdbd-933369705f04",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:52Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/Dynom_TySug_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-6ccf0bab8ecc99e7",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-6ccf0bab8ecc99e7",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

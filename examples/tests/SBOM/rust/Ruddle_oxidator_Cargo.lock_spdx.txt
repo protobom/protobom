@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/Ruddle_oxidator_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/Ruddle_oxidator_Cargo.lock-69a01abd-f739-4d6d-8995-d61bf9744445
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:04Z
+
+##### Package: metadata/rust/Ruddle_oxidator_Cargo.lock
+
+PackageName: metadata/rust/Ruddle_oxidator_Cargo.lock
+SPDXID: SPDXRef-Filesystem-e41375803527e91d
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-e41375803527e91d
+

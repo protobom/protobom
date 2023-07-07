@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/ouch-org_ouch_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/ouch-org_ouch_Cargo.lock-76ee4a94-f896-432f-b290-ab9ab2577b97
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:24:18Z
+
+##### Package: metadata/rust/ouch-org_ouch_Cargo.lock
+
+PackageName: metadata/rust/ouch-org_ouch_Cargo.lock
+SPDXID: SPDXRef-Filesystem-ec5dd5f8c0a6d59c
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-ec5dd5f8c0a6d59c
+

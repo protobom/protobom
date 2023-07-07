@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/uber-go_fx_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/uber-go_fx_go.mod-9db2ff91-9a0c-4826-9506-361f51cb0537
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:32:26Z
+
+##### Package: metadata/go/uber-go_fx_go.mod
+
+PackageName: metadata/go/uber-go_fx_go.mod
+SPDXID: SPDXRef-Filesystem-d51e11f01c0b69a3
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-d51e11f01c0b69a3
+

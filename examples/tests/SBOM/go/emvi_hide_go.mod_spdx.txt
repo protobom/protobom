@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/emvi_hide_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/emvi_hide_go.mod-a5f8f39c-96f3-4509-9cbd-f45957cb9549
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:30:07Z
+
+##### Package: metadata/go/emvi_hide_go.mod
+
+PackageName: metadata/go/emvi_hide_go.mod
+SPDXID: SPDXRef-Filesystem-70ca1c3f833938a7
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-70ca1c3f833938a7
+

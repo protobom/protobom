@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/ilai-deutel_kibi_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/ilai-deutel_kibi_Cargo.lock-0d16f6db-337a-4cf0-bc60-74455a2a9011",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:30Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/ilai-deutel_kibi_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-1fc14e72cb94ae5b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-1fc14e72cb94ae5b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

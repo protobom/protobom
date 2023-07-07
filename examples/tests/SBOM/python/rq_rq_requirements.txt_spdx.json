@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/rq_rq_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/rq_rq_requirements.txt-0f87810d-accc-4f09-8b83-2fec75a4ebf2",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:20:11Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/rq_rq_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-42fe9d2ccf1a13bc",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-42fe9d2ccf1a13bc",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

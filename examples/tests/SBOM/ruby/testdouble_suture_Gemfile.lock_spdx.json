@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/ruby/testdouble_suture_Gemfile.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/testdouble_suture_Gemfile.lock-115cf190-989f-42a0-aca7-0cf43ef9ca11",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:38Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/ruby/testdouble_suture_Gemfile.lock",
+      "SPDXID": "SPDXRef-Filesystem-53d63bde06f2267",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-53d63bde06f2267",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

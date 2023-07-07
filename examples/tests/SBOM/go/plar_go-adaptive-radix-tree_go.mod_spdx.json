@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/plar_go-adaptive-radix-tree_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/plar_go-adaptive-radix-tree_go.mod-162892fb-eb8a-4c6e-866b-bda65b733e46",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:41Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/plar_go-adaptive-radix-tree_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-da049dd5023811ca",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-da049dd5023811ca",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

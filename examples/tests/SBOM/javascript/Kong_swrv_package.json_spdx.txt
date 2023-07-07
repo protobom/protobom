@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/javascript/Kong_swrv_package.json
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/javascript/Kong_swrv_package.json-20e12930-2283-47b1-bd30-86d5e1673b44
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:26:37Z
+
+##### Package: metadata/javascript/Kong_swrv_package.json
+
+PackageName: metadata/javascript/Kong_swrv_package.json
+SPDXID: SPDXRef-Filesystem-379db4a054bcf34
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-379db4a054bcf34
+

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/jacobdeichert_mask_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/jacobdeichert_mask_Cargo.lock-18ddd782-016c-4cc0-bc26-9971690ccbf2",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:10Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/jacobdeichert_mask_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-b8eda9fd42b4caa8",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b8eda9fd42b4caa8",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

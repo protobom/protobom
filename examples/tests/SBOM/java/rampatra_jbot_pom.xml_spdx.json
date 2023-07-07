@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/rampatra_jbot_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/rampatra_jbot_pom.xml-b51d53e6-0813-45a4-b435-31957bafb7e8",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:40Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/rampatra_jbot_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-fba7a02ef2512a9a",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-fba7a02ef2512a9a",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

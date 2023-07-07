@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/neondatabase_neon_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/neondatabase_neon_Cargo.lock-99952362-4cf4-4ad7-81e9-92e80832df5f",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:22Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/neondatabase_neon_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-9b0137792d72d6b8",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9b0137792d72d6b8",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

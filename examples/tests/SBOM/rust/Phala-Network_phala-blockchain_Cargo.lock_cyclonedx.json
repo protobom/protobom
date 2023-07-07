@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:9eccdeac-fccd-4a9f-85c2-1ffb6318fb5c",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:24:43+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "fe925741-2268-4c1b-b4c7-f56205ada33d",
+      "type": "application",
+      "name": "metadata/rust/Phala-Network_phala-blockchain_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "fe925741-2268-4c1b-b4c7-f56205ada33d",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

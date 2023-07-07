@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:8a9e86ce-3305-499b-9a64-10220af7b222",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:30:58+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "aa61af7b-7e9f-42b5-805f-09b6e13bc027",
+      "type": "application",
+      "name": "metadata/go/immortal_immortal_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "aa61af7b-7e9f-42b5-805f-09b6e13bc027",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

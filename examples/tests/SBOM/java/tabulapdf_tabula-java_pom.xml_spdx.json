@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/tabulapdf_tabula-java_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/tabulapdf_tabula-java_pom.xml-46b597a7-b20a-4866-9ba5-cc78d0b8af41",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:34Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/tabulapdf_tabula-java_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-920440909e21bea6",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-920440909e21bea6",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

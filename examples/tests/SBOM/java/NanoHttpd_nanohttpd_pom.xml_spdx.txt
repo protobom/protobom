@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/NanoHttpd_nanohttpd_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/NanoHttpd_nanohttpd_pom.xml-a2c97eac-3354-4e95-bc75-d3cfc57f4f7f
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:27:38Z
+
+##### Package: metadata/java/NanoHttpd_nanohttpd_pom.xml
+
+PackageName: metadata/java/NanoHttpd_nanohttpd_pom.xml
+SPDXID: SPDXRef-Filesystem-4e7762f27a80f16b
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-4e7762f27a80f16b
+

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/RustScan_RustScan_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/RustScan_RustScan_Cargo.lock-3e139a0f-6a56-4c19-8d63-110464c3add4",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:35Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/RustScan_RustScan_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-27030c14f4970757",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-27030c14f4970757",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

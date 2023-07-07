@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/spulec_freezegun_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/spulec_freezegun_requirements.txt-a61bfa30-3526-4154-91eb-cfddc45a9a04",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:50Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/spulec_freezegun_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-a263901aca42ef8f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a263901aca42ef8f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

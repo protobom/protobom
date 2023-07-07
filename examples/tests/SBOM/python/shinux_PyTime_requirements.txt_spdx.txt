@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/shinux_PyTime_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/shinux_PyTime_requirements.txt-4b44db1d-383f-4881-b341-f2b4b4b0ab95
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:51Z
+
+##### Package: metadata/python/shinux_PyTime_requirements.txt
+
+PackageName: metadata/python/shinux_PyTime_requirements.txt
+SPDXID: SPDXRef-Filesystem-250840a4898c1a45
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-250840a4898c1a45
+

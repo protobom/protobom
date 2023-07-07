@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/modelmapper_modelmapper_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/modelmapper_modelmapper_pom.xml-6051f8c8-83a5-401d-94a5-e92217d7ca3b",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:43Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/modelmapper_modelmapper_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-947ebbaabfb8109f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-947ebbaabfb8109f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

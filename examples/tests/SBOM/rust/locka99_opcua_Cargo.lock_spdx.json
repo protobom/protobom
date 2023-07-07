@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/locka99_opcua_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/locka99_opcua_Cargo.lock-e548a2ae-d3ee-4a61-a9d1-52fd2f00d230",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:15Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/locka99_opcua_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-33ba1056de5aa4e9",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-33ba1056de5aa4e9",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

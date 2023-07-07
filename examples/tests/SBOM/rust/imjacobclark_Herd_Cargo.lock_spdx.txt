@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/imjacobclark_Herd_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/imjacobclark_Herd_Cargo.lock-7b8c3721-a734-4a90-9744-d52ee6e553c1
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:23:44Z
+
+##### Package: metadata/rust/imjacobclark_Herd_Cargo.lock
+
+PackageName: metadata/rust/imjacobclark_Herd_Cargo.lock
+SPDXID: SPDXRef-Filesystem-cacb968bab35e208
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-cacb968bab35e208
+

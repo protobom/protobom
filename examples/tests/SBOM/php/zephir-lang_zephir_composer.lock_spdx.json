@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/zephir-lang_zephir_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/zephir-lang_zephir_composer.lock-957a6f91-d664-4f19-a4ed-8361bdf626da",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:45Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/zephir-lang_zephir_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-6d109e71a270f4e",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-6d109e71a270f4e",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

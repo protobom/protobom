@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:61c5a44e-8d17-433f-b2d2-1f5249cf9c71",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:23:42+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "251e4fd4-941f-445c-b89b-5c702f195cfb",
+      "type": "application",
+      "name": "metadata/rust/gfx-rs_wgpu_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "251e4fd4-941f-445c-b89b-5c702f195cfb",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

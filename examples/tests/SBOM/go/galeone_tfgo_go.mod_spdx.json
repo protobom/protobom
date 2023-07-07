@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/galeone_tfgo_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/galeone_tfgo_go.mod-20a364ff-4123-4c41-943c-5b894d64af33",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:44Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/galeone_tfgo_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-b4bb24a6cf0bbb1d",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b4bb24a6cf0bbb1d",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

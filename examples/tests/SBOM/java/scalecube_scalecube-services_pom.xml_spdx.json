@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/scalecube_scalecube-services_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/scalecube_scalecube-services_pom.xml-6560aabc-8293-4985-905b-6972c7633d4e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:26:46Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/scalecube_scalecube-services_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-b7d1374268bd3742",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b7d1374268bd3742",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

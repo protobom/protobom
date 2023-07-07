@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/DasEtwas_enginesound_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/DasEtwas_enginesound_Cargo.lock-9735f1a2-99be-4b77-8240-bd61c50d6b51",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:07Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/DasEtwas_enginesound_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-d007f9549814af02",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d007f9549814af02",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/slack-go_slack_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/slack-go_slack_go.mod-9f5413b6-eb22-40ae-8b13-bdb0e794c5dc",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:43Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/slack-go_slack_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-5c2cc95d09f6c4c5",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-5c2cc95d09f6c4c5",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

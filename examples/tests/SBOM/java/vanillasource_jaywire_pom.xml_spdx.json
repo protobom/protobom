@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/vanillasource_jaywire_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/vanillasource_jaywire_pom.xml-9e202a73-a4f2-4628-905a-1f32eb7140ad",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:11Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/vanillasource_jaywire_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-86f20edb33e68d4",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-86f20edb33e68d4",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

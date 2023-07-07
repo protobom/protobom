@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/ryanmcgrath_twython_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/ryanmcgrath_twython_requirements.txt-c0427893-667d-4df0-b610-fb21680cf1ad
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:53Z
+
+##### Package: metadata/python/ryanmcgrath_twython_requirements.txt
+
+PackageName: metadata/python/ryanmcgrath_twython_requirements.txt
+SPDXID: SPDXRef-Filesystem-c0254d1f9f7fe6cd
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-c0254d1f9f7fe6cd
+

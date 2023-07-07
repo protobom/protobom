@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/awaitility_awaitility_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/awaitility_awaitility_pom.xml-5e0eb904-937b-47ed-aac4-b45a5706ed5d
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:27:20Z
+
+##### Package: metadata/java/awaitility_awaitility_pom.xml
+
+PackageName: metadata/java/awaitility_awaitility_pom.xml
+SPDXID: SPDXRef-Filesystem-607bce82790e4feb
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-607bce82790e4feb
+

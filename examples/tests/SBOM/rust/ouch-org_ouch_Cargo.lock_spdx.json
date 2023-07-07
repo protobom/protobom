@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/ouch-org_ouch_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/ouch-org_ouch_Cargo.lock-5c216a0e-aeb2-4c20-8ca5-dd3ef3f910bb",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:18Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/ouch-org_ouch_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-ec5dd5f8c0a6d59c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-ec5dd5f8c0a6d59c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

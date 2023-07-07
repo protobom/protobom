@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/pudo_dataset_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/pudo_dataset_requirements.txt-ea3a3939-8bdc-42b2-b274-9e09e0fac73a",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:19:57Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/pudo_dataset_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-e1b59133f0eeddbe",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e1b59133f0eeddbe",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

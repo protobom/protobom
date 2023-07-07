@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/groovili_gogtrends_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/groovili_gogtrends_go.mod-9427b023-b8f3-417a-bf96-6d9c2dd869e4",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:20Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/groovili_gogtrends_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-f4dd566f1771154c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f4dd566f1771154c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

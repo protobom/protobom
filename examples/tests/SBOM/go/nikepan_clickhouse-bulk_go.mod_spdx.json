@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/nikepan_clickhouse-bulk_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/nikepan_clickhouse-bulk_go.mod-00e2e29c-50b5-40b9-aa67-3894b3f7ddd6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:15Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/nikepan_clickhouse-bulk_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-782e94780d354667",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-782e94780d354667",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

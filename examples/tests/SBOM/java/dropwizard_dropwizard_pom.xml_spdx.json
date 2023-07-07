@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/dropwizard_dropwizard_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/dropwizard_dropwizard_pom.xml-925ddd34-58d9-44e1-884f-a44e2087be5e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:02Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/dropwizard_dropwizard_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-bf57bf1f06ac42ed",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-bf57bf1f06ac42ed",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

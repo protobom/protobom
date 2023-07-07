@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/cassandre-tech_cassandre-trading-bot_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/cassandre-tech_cassandre-trading-bot_pom.xml-f04a2b5d-94de-48d6-9ace-c40bf7ae0fac
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:28:00Z
+
+##### Package: metadata/java/cassandre-tech_cassandre-trading-bot_pom.xml
+
+PackageName: metadata/java/cassandre-tech_cassandre-trading-bot_pom.xml
+SPDXID: SPDXRef-Filesystem-97f03c4d54e22864
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-97f03c4d54e22864
+

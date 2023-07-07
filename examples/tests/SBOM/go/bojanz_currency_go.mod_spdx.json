@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/bojanz_currency_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/bojanz_currency_go.mod-6350e967-aa0b-4c48-b90d-42f8bf2c9b8e",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:57Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/bojanz_currency_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-a6292ab8aa4b5b5f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a6292ab8aa4b5b5f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

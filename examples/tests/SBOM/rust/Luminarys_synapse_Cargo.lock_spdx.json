@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/Luminarys_synapse_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/Luminarys_synapse_Cargo.lock-b28f8f63-c0b4-426e-b711-a61d79e3294b",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:22Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/Luminarys_synapse_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-92f5969bd1cd090c",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-92f5969bd1cd090c",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

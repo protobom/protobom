@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/stalwartlabs_mail-parser_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/stalwartlabs_mail-parser_Cargo.lock-0232680f-2cdd-4aa3-890e-91c9bc18609e
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:23:49Z
+
+##### Package: metadata/rust/stalwartlabs_mail-parser_Cargo.lock
+
+PackageName: metadata/rust/stalwartlabs_mail-parser_Cargo.lock
+SPDXID: SPDXRef-Filesystem-f5294a0a735d5650
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-f5294a0a735d5650
+

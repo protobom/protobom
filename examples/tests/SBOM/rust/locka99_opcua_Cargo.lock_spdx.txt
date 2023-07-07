@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/rust/locka99_opcua_Cargo.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/rust/locka99_opcua_Cargo.lock-e27ec764-e7db-49d1-be36-e4bfec055bc2
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:24:15Z
+
+##### Package: metadata/rust/locka99_opcua_Cargo.lock
+
+PackageName: metadata/rust/locka99_opcua_Cargo.lock
+SPDXID: SPDXRef-Filesystem-33ba1056de5aa4e9
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-33ba1056de5aa4e9
+

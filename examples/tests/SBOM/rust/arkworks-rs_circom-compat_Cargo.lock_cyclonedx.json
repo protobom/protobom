@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:b1dee48d-5e46-4e40-a632-c4a90dd6f0bd",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:23:56+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "05ad36e6-1204-427d-acd5-b4e6652e9584",
+      "type": "application",
+      "name": "metadata/rust/arkworks-rs_circom-compat_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "05ad36e6-1204-427d-acd5-b4e6652e9584",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

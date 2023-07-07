@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/imjacobclark_Herd_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/imjacobclark_Herd_Cargo.lock-2e7894a1-06ef-423e-a689-720de4d77cc1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:44Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/imjacobclark_Herd_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-cacb968bab35e208",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-cacb968bab35e208",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/TeaEntityLab_fpGo_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/TeaEntityLab_fpGo_go.mod-b69274db-544e-4763-b6b5-7c82a9149476",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:25Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/TeaEntityLab_fpGo_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-20023d6afa24c034",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-20023d6afa24c034",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

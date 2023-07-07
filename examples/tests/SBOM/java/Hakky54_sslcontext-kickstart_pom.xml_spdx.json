@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/Hakky54_sslcontext-kickstart_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/Hakky54_sslcontext-kickstart_pom.xml-597bad65-c5a0-428a-9750-9c2a85a3e387",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:04Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/Hakky54_sslcontext-kickstart_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-fbef7b0de4633fc4",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-fbef7b0de4633fc4",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

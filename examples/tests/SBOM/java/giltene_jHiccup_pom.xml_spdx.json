@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/giltene_jHiccup_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/giltene_jHiccup_pom.xml-27f0efdf-f1b5-44e1-a4b2-fb9e4b8df6d1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:17Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/giltene_jHiccup_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-a37b5bdeb68f288f",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-a37b5bdeb68f288f",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

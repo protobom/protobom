@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:d3628a22-fc3e-4da7-ad63-27b47af59b52",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:30:27+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "a73d9591-8e58-468a-9029-9ed232e8b468",
+      "type": "application",
+      "name": "metadata/go/didip_tollbooth_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "a73d9591-8e58-468a-9029-9ed232e8b468",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

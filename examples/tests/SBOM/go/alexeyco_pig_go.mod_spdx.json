@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/alexeyco_pig_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/alexeyco_pig_go.mod-54c854c1-4985-4186-a559-e3e58ed735fc",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:57Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/alexeyco_pig_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-855a17d0ab7ecb4a",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-855a17d0ab7ecb4a",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

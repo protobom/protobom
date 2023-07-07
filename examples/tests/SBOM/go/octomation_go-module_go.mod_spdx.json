@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/octomation_go-module_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/octomation_go-module_go.mod-86091c5c-956f-4130-92fb-277c09986c6b",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:32:00Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/octomation_go-module_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-c3bdbb4ff7a1cf78",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-c3bdbb4ff7a1cf78",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

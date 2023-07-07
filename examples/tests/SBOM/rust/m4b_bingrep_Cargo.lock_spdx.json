@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/m4b_bingrep_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/m4b_bingrep_Cargo.lock-f51bcbff-55fa-4164-9eec-6eb7b87da135",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:11Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/m4b_bingrep_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-f2f85006df9a6ddf",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f2f85006df9a6ddf",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

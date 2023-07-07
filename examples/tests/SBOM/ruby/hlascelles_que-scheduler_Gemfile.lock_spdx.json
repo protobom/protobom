@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/ruby/hlascelles_que-scheduler_Gemfile.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/hlascelles_que-scheduler_Gemfile.lock-ddcca710-2e1a-4391-8aa4-08ffb067d80a",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:47Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/ruby/hlascelles_que-scheduler_Gemfile.lock",
+      "SPDXID": "SPDXRef-Filesystem-2fb822d5e6c6c4c9",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-2fb822d5e6c6c4c9",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

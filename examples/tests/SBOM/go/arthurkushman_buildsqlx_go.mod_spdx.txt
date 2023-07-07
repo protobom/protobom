@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/arthurkushman_buildsqlx_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/arthurkushman_buildsqlx_go.mod-a112d1d6-a7b0-421a-ba71-1031a5926702
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:29:46Z
+
+##### Package: metadata/go/arthurkushman_buildsqlx_go.mod
+
+PackageName: metadata/go/arthurkushman_buildsqlx_go.mod
+SPDXID: SPDXRef-Filesystem-21d7cecde73d549d
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-21d7cecde73d549d
+

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/jqnatividad_qsv_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/jqnatividad_qsv_Cargo.lock-544fc659-5d42-420d-8d83-4bf3eba7c3f1",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:03Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/jqnatividad_qsv_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-e5a055cf7008498",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e5a055cf7008498",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

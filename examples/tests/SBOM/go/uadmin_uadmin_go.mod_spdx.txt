@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/uadmin_uadmin_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/uadmin_uadmin_go.mod-87a99af8-ef67-4a39-8215-4cca8dea473a
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:30:36Z
+
+##### Package: metadata/go/uadmin_uadmin_go.mod
+
+PackageName: metadata/go/uadmin_uadmin_go.mod
+SPDXID: SPDXRef-Filesystem-c167ae5503ecdd3c
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-c167ae5503ecdd3c
+

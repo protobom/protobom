@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/pyparsing_pyparsing_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/pyparsing_pyparsing_requirements.txt-95025b68-9440-4957-8f2c-a860fd5aed4b",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:05Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/pyparsing_pyparsing_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-dbb4e751e3ae6154",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-dbb4e751e3ae6154",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

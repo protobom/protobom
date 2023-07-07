@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/moov-io_ach_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/moov-io_ach_go.mod-7bc29861-c4bb-490c-a572-cc3ba335e7a9",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:13Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/moov-io_ach_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-9fd39d8de8d220fa",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-9fd39d8de8d220fa",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

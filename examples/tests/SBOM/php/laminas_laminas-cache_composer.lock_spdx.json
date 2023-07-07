@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/php/laminas_laminas-cache_composer.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/php/laminas_laminas-cache_composer.lock-77e6d2a4-1485-43eb-8e43-90f5a3458df6",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:22:48Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/php/laminas_laminas-cache_composer.lock",
+      "SPDXID": "SPDXRef-Filesystem-b42cedcf2acbb2be",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b42cedcf2acbb2be",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

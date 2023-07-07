@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:fdfa9046-014d-4481-981c-d8e882771db0",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:31:18+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "72670a1f-c4ec-434b-a0b6-c61faf4a833e",
+      "type": "application",
+      "name": "metadata/go/prashantgupta24_mac-sleep-notifier_go.mod",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "72670a1f-c4ec-434b-a0b6-c61faf4a833e",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

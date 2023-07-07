@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/PicnicSupermarket_error-prone-support_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/PicnicSupermarket_error-prone-support_pom.xml-1e2fde34-e7e6-42ac-bd7c-764f6df9d0f4",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:01Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/PicnicSupermarket_error-prone-support_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-83ec4947ac5249cd",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-83ec4947ac5249cd",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

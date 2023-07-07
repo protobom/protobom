@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/networknt_light-4j_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/networknt_light-4j_pom.xml-8460f69c-71e7-49d9-9262-954cafc27c7d",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:28Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/networknt_light-4j_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-e6efb39d134a2660",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e6efb39d134a2660",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

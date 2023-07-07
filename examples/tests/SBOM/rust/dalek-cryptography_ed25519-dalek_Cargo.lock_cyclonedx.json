@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:e7c4f06a-22d1-48c2-aea7-d9a19737f24e",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:23:59+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "f1064072-ef45-4fd0-a953-a39a77e98a2c",
+      "type": "application",
+      "name": "metadata/rust/dalek-cryptography_ed25519-dalek_Cargo.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "f1064072-ef45-4fd0-a953-a39a77e98a2c",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

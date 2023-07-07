@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/python/Kotti_Kotti_requirements.txt
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/python/Kotti_Kotti_requirements.txt-68040337-bced-4fb3-b430-b0d01b49bea3
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:21:46Z
+
+##### Package: metadata/python/Kotti_Kotti_requirements.txt
+
+PackageName: metadata/python/Kotti_Kotti_requirements.txt
+SPDXID: SPDXRef-Filesystem-4b2177ea37cc6a4
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-4b2177ea37cc6a4
+

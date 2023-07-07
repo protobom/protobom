@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/go/golang_vscode-go_go.mod
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/go/golang_vscode-go_go.mod-b1b41336-bbfc-43b6-bb83-d85498631fd0
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:32:10Z
+
+##### Package: metadata/go/golang_vscode-go_go.mod
+
+PackageName: metadata/go/golang_vscode-go_go.mod
+SPDXID: SPDXRef-Filesystem-1291e2206d5f6f5d
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-1291e2206d5f6f5d
+

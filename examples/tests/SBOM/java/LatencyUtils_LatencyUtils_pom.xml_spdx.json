@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/LatencyUtils_LatencyUtils_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/LatencyUtils_LatencyUtils_pom.xml-2c35a42a-06af-432f-9060-607dc2921933",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:28:14Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/LatencyUtils_LatencyUtils_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-f4ba4373be96107b",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-f4ba4373be96107b",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

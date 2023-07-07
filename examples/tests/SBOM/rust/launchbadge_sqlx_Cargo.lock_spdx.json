@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/launchbadge_sqlx_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/launchbadge_sqlx_Cargo.lock-c5c2c875-5138-421c-91ed-1c33d8346fa0",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:14Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/launchbadge_sqlx_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-126696f3e9f1b53",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-126696f3e9f1b53",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

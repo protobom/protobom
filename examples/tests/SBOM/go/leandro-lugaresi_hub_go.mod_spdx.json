@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/leandro-lugaresi_hub_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/leandro-lugaresi_hub_go.mod-da69bbf3-bde0-487c-8726-69e0fb746df0",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:31:50Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/leandro-lugaresi_hub_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-efc3dfb156baab17",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-efc3dfb156baab17",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/dpc_rhex_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/dpc_rhex_Cargo.lock-cabc93e6-7bee-4ded-8105-8cc337d1d478",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:25:12Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/dpc_rhex_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-b3c7a8b358ffa459",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-b3c7a8b358ffa459",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

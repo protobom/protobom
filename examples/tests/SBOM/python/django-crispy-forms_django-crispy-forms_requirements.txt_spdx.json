@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/python/django-crispy-forms_django-crispy-forms_requirements.txt",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/python/django-crispy-forms_django-crispy-forms_requirements.txt-26675eb6-4927-4950-b420-71123cb28baf",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:21:04Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/python/django-crispy-forms_django-crispy-forms_requirements.txt",
+      "SPDXID": "SPDXRef-Filesystem-490b53addb148004",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-490b53addb148004",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

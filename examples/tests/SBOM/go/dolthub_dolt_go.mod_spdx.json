@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/dolthub_dolt_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/dolthub_dolt_go.mod-735a6445-aad3-4237-93b8-9dfdb597aa5f",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:32Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/dolthub_dolt_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-d7a2d010e2ee05a3",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-d7a2d010e2ee05a3",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:ad473299-1198-4e5b-a50b-f1892de5f9a4",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-07-07T04:23:04+00:00",
+    "tools": [
+      {
+        "vendor": "aquasecurity",
+        "name": "trivy",
+        "version": "0.43.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "b74588ce-9fc7-47f1-86b9-eeefb5db6c01",
+      "type": "application",
+      "name": "metadata/php/Ph3nol_NotificationPusher_composer.lock",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "b74588ce-9fc7-47f1-86b9-eeefb5db6c01",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

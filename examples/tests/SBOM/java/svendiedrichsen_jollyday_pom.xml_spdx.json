@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/svendiedrichsen_jollyday_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/svendiedrichsen_jollyday_pom.xml-59ae42ac-1730-4b4e-92a3-31aadea19942",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:29:12Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/svendiedrichsen_jollyday_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-2c29f9a69885fb51",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-2c29f9a69885fb51",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

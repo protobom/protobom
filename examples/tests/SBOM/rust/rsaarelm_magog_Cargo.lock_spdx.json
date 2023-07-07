@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/rsaarelm_magog_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/rsaarelm_magog_Cargo.lock-df8e8c0d-5d94-4063-a5a1-8ab8b0dba8cf",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:24:36Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/rsaarelm_magog_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-e8c99e8457553e5",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e8c99e8457553e5",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

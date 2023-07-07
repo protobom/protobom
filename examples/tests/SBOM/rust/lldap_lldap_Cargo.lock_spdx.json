@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/rust/lldap_lldap_Cargo.lock",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/rust/lldap_lldap_Cargo.lock-24dd6d52-c5a6-496e-91b5-7ea49f2b7a57",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:23:51Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/rust/lldap_lldap_Cargo.lock",
+      "SPDXID": "SPDXRef-Filesystem-7eac787410365b77",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-7eac787410365b77",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

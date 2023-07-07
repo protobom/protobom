@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/ruby/kanwei_algorithms_Gemfile.lock
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/ruby/kanwei_algorithms_Gemfile.lock-39ee7c0b-70ec-46f5-8cfc-5c7461bc0a00
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:25:17Z
+
+##### Package: metadata/ruby/kanwei_algorithms_Gemfile.lock
+
+PackageName: metadata/ruby/kanwei_algorithms_Gemfile.lock
+SPDXID: SPDXRef-Filesystem-1e6dc5a8f6ee50e7
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-1e6dc5a8f6ee50e7
+

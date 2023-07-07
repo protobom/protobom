@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/go/dropbox_godropbox_go.mod",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/go/dropbox_godropbox_go.mod-ebf79dc2-3f86-48f7-880a-68e644685467",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:30:58Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/go/dropbox_godropbox_go.mod",
+      "SPDXID": "SPDXRef-Filesystem-e88f252c864f50a0",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-e88f252c864f50a0",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

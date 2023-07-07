@@ -1,0 +1,22 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: metadata/java/dromara_hertzbeat_pom.xml
+DocumentNamespace: http://aquasecurity.github.io/trivy/filesystem/metadata/java/dromara_hertzbeat_pom.xml-d560f5cf-ace4-459e-b5da-e9c1fd80d736
+Creator: Organization: aquasecurity
+Creator: Tool: trivy-0.43.0
+Created: 2023-07-07T04:29:13Z
+
+##### Package: metadata/java/dromara_hertzbeat_pom.xml
+
+PackageName: metadata/java/dromara_hertzbeat_pom.xml
+SPDXID: SPDXRef-Filesystem-890dbd826b81ba52
+PackageDownloadLocation: NONE
+PrimaryPackagePurpose: SOURCE
+FilesAnalyzed: false
+PackageAttributionText: SchemaVersion: 2
+
+##### Relationships
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Filesystem-890dbd826b81ba52
+

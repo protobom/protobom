@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "metadata/java/serenity-bdd_serenity-core_pom.xml",
+  "documentNamespace": "http://aquasecurity.github.io/trivy/filesystem/metadata/java/serenity-bdd_serenity-core_pom.xml-e020e95d-a348-4bc4-9d72-f778368f9a0a",
+  "creationInfo": {
+    "licenseListVersion": "",
+    "creators": [
+      "Organization: aquasecurity",
+      "Tool: trivy-0.43.0"
+    ],
+    "created": "2023-07-07T04:27:53Z"
+  },
+  "packages": [
+    {
+      "name": "metadata/java/serenity-bdd_serenity-core_pom.xml",
+      "SPDXID": "SPDXRef-Filesystem-cc10092ae817edda",
+      "downloadLocation": "NONE",
+      "copyrightText": "",
+      "attributionTexts": [
+        "SchemaVersion: 2"
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Filesystem-cc10092ae817edda",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

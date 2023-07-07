@@ -1,3 +1,0 @@
-dateparser>=0.7
-pytz>=2018.9
-times>=0.7

@@ -1,8 +1,0 @@
-coverage
-coveralls
-docutils
-flake8
-mock
-nose
-sphinx
-tox

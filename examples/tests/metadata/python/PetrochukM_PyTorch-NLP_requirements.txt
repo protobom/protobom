@@ -1,4 +1,0 @@
-torch
-torchnlp
-numpy
-torchqrnn

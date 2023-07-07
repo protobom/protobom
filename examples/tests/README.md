@@ -35,10 +35,10 @@ python download_metadata.py
 The repository has the following structure:
 
 ```
-├── fetch_metadata.js     # Main script file
-├── metadata/             # Folder to store downloaded metadata files
-├── SBOM/                 # Folder to store generated SBOMs
-└── README.md             # Project README file
+├── download_metadata.py     # Main script file
+├── metadata.zip             # ZIP file containing partial results of the ./metadata folder
+├── SBOM.zip                 # ZIP file containing partial results of the ./SBOM folder
+└── README.md                # Project README file
 ```
 
 ## Contributing

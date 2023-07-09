@@ -1,5 +1,12 @@
 package sbom
 
+import (
+	reflect "reflect"
+	"sort"
+
+	"github.com/sirupsen/logrus"
+)
+
 // This file adds a few methods to the NodeList type which
 // handles fragments of the SBOM graph.
 
@@ -359,4 +366,62 @@ func (nl *NodeList) GetRootNodes() []*Node {
 	}
 	// TODO(ehandling): What if not all nodes were found?
 	return ret
+}
+
+// Equal returns true if the NodeList nl is equal to nl2
+func (nl *NodeList) Equal(nl2 *NodeList) bool {
+	if nl2 == nil {
+		return false
+	}
+
+	// First, quick one: Compare the lengths of the internals:
+	if len(nl.Edges) != len(nl2.Edges) ||
+		len(nl.Nodes) != len(nl2.Nodes) ||
+		len(nl.RootElements) != len(nl2.RootElements) {
+		return false
+	}
+
+	// Compare the flattened rootElements list
+	r1 := nl.RootElements
+	r2 := nl2.RootElements
+	sort.Strings(r1)
+	sort.Strings(r2)
+	if !reflect.DeepEqual(r1, r2) {
+		return false
+	}
+
+	// Compare the flattenned edges
+	nlEdges := []string{}
+	for _, e := range nl.Edges {
+		nlEdges = append(nlEdges, e.flatString())
+	}
+	sort.Strings(nlEdges)
+
+	nl2Edges := []string{}
+	for _, e := range nl2.Edges {
+		nl2Edges = append(nl2Edges, e.flatString())
+	}
+	sort.Strings(nl2Edges)
+
+	if !reflect.DeepEqual(nlEdges, nl2Edges) {
+		return false
+	}
+
+	// Compare the nodes
+	nlNodes := map[string]string{}
+	nl2Nodes := map[string]string{}
+	for _, n := range nl.Nodes {
+		nlNodes[n.Id] = n.flatString()
+	}
+
+	for _, n := range nl2.Nodes {
+		nl2Nodes[n.Id] = n.flatString()
+	}
+
+	if !reflect.DeepEqual(nlNodes, nl2Nodes) {
+		logrus.Infof("NodeList 1: %+v\nNodeList 2: %+v", nlNodes, nl2Nodes)
+		return false
+	}
+
+	return true
 }

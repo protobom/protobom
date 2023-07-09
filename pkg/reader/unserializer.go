@@ -10,8 +10,6 @@ import (
 	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
-type Parser interface {
+type Unserializer interface {
 	ParseStream(*options.Options, io.Reader) (*sbom.Document, error)
 }
-
-type ParserCDX14 struct{}

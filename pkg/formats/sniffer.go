@@ -2,10 +2,17 @@ package formats
 
 import (
 	"bufio"
+	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+)
+
+const (
+	stateKeySuffix = "sniffer_state"
+	EmptyFormat    = Format("")
 )
 
 var sniffFormats = []sniffFormat{
@@ -14,7 +21,8 @@ var sniffFormats = []sniffFormat{
 }
 
 type sniffFormat interface {
-	sniff(data []byte) formatDetails
+	sniff(ctx context.Context, data []byte) Format
+	Type() string
 }
 
 type Sniffer struct{}
@@ -34,68 +42,76 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	fileScanner := bufio.NewScanner(f)
 	fileScanner.Split(bufio.ScanLines)
 
-	var format formatDetails
+	var format Format
 
+	ctx := fs.setSniffState(context.Background())
 	for fileScanner.Scan() {
-		sniffFormat := fs.sniff(fileScanner.Bytes())
+		format = fs.sniff(ctx, fileScanner.Bytes())
 
-		if sniffFormat.Type != "" {
-			format.Type = sniffFormat.Type
-		}
-		if sniffFormat.Version != "" {
-			format.Version = sniffFormat.Version
-		}
-		if sniffFormat.Encoding != "" {
-			format.Encoding = sniffFormat.Encoding
-		}
-
-		if format.Version != "" && format.Type != "" && format.Encoding != "" {
+		if format != EmptyFormat {
 			break
 		}
 	}
 
-	fmt.Fprintf(
-		os.Stderr, "format: %s version: %s encoding: %s\n",
-		format.Type, format.Version, format.Encoding,
-	)
-
-	for _, f := range List {
-		if string(f) == fmt.Sprintf("%s+%s;version=%s", format.Type, format.Encoding, format.Version) {
-			return f, nil
-		}
+	if format != EmptyFormat {
+		return format, nil
 	}
+
+	fmt.Fprintf(
+		os.Stderr, "format: %s version: %s encodingq: %s\n",
+		format.Type(), format.Version(), format.Encoding(),
+	)
 
 	// TODO(puerco): Implement a light parser in case the string hacks don't work
 	return "", fmt.Errorf("unknown SBOM format")
 }
 
-func (fs *Sniffer) sniff(data []byte) formatDetails {
-	for _, sig := range sniffFormats {
-		format := sig.sniff(data)
-		if format.Type != "" ||
-			format.Version != "" ||
-			format.Encoding != "" {
+func (fs *Sniffer) setSniffState(ctx context.Context) context.Context {
+	state := make(map[string]sniffState, len(sniffFormats))
+	return setSniffState(ctx, state)
+}
+
+func (fs *Sniffer) sniff(ctx context.Context, data []byte) Format {
+
+	for _, sniffer := range sniffFormats {
+		format := sniffer.sniff(ctx, data)
+		if format != EmptyFormat {
 			return format
 		}
 	}
-
-	return formatDetails{}
+	return EmptyFormat
 }
 
-type formatDetails struct {
+type sniffState struct {
 	Type     string
 	Version  string
 	Encoding string
 }
 
+func (st *sniffState) Format() Format {
+	if st.Type != "" && st.Encoding != "" && st.Version != "" {
+		return Format(fmt.Sprintf("%s+%s;version=%s", st.Type, st.Encoding, st.Version))
+	}
+
+	return EmptyFormat
+}
+
 type cdxSniff struct{}
 
-func (c cdxSniff) sniff(data []byte) formatDetails {
+func (c cdxSniff) Type() string {
+	return "cdx"
+}
+
+func (c cdxSniff) sniff(ctx context.Context, data []byte) Format {
+	state, err := getSniffState(ctx, c.Type())
+	if err != nil {
+		return EmptyFormat
+	}
+
 	stringValue := string(data)
-	var format formatDetails
 	if strings.Contains(stringValue, `"bomFormat"`) && strings.Contains(stringValue, `"CycloneDX"`) {
-		format.Type = "application/vnd.cyclonedx"
-		format.Encoding = JSON
+		state.Type = "application/vnd.cyclonedx"
+		state.Encoding = JSON
 	}
 
 	if strings.Contains(stringValue, `"specVersion"`) {
@@ -103,29 +119,38 @@ func (c cdxSniff) sniff(data []byte) formatDetails {
 		if len(parts) == 2 {
 			ver := strings.TrimPrefix(strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(parts[1]), ","), "\""), "\"")
 			if ver != "" {
-				format.Version = ver
-				format.Encoding = JSON
+				state.Version = ver
+				state.Encoding = JSON
 			}
 		}
 	}
 
-	return format
+	return state.Format()
 }
 
 type spdxSniff struct{}
 
-func (c spdxSniff) sniff(data []byte) formatDetails {
+func (c spdxSniff) Type() string {
+	return "spdx"
+}
+
+func (c spdxSniff) sniff(ctx context.Context, data []byte) Format {
+	state, err := getSniffState(ctx, c.Type())
+	if err != nil {
+		return EmptyFormat
+	}
+
 	stringValue := string(data)
-	var format formatDetails
+	var format sniffState
 
 	if strings.Contains(stringValue, "SPDXVersion:") {
-		format.Type = "text/spdx"
-		format.Encoding = "text"
+		state.Type = "text/spdx"
+		state.Encoding = "text"
 
 		for _, ver := range []string{"2.2", "2.3"} {
 			if strings.Contains(stringValue, fmt.Sprintf("SPDX-%s", ver)) {
-				format.Version = ver
-				return format
+				state.Version = ver
+				return state.Format()
 			}
 		}
 	}
@@ -133,20 +158,32 @@ func (c spdxSniff) sniff(data []byte) formatDetails {
 	// In JSON, the SPDX version field would be quoted
 	if strings.Contains(stringValue, "\"spdxVersion\"") ||
 		strings.Contains(stringValue, "'spdxVersion'") {
-		format.Type = "text/spdx"
-		format.Encoding = JSON
+		state.Type = "text/spdx"
+		state.Encoding = JSON
 		if format.Version != "" {
-			return format
+			return state.Format()
 		}
 	}
 
 	for _, ver := range []string{"2.2", "2.3"} {
 		if strings.Contains(stringValue, fmt.Sprintf("'SPDX-%s'", ver)) ||
 			strings.Contains(stringValue, fmt.Sprintf("\"SPDX-%s\"", ver)) {
-			format.Version = ver
-			return format
+			state.Version = ver
+			return state.Format()
 		}
 	}
 
-	return format
+	return state.Format()
+}
+
+func getSniffState(ctx context.Context, t string) (sniffState, error) {
+	dm, ok := ctx.Value(stateKeySuffix).(map[string]sniffState)
+	if !ok {
+		return sniffState{}, errors.New("unable to cast serializer state from context")
+	}
+	return dm[t], nil
+}
+
+func setSniffState(ctx context.Context, state map[string]sniffState) context.Context {
+	return context.WithValue(context.Background(), stateKeySuffix, state)
 }

@@ -61,7 +61,7 @@ func (u *UnserializerSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom
 
 	for _, r := range spdxDoc.Relationships {
 		// The SPDX go library surfaces the JSON top-level elements as relationships:
-		if r.RefA.ElementRefID == "DOCUMENT" && strings.ToUpper(r.Relationship) == "DESCRIBES" {
+		if r.RefA.ElementRefID == "DOCUMENT" && strings.EqualFold(r.Relationship, "DESCRIBES") {
 			bom.NodeList.RootElements = append(bom.NodeList.RootElements, string(r.RefB.ElementRefID))
 		} else {
 			bom.NodeList.AddEdge(u.relationshipToEdge(r))

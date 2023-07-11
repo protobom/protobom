@@ -296,8 +296,8 @@ func TestNodeListIntersect(t *testing.T) {
 			},
 		},
 	} {
-		new := tc.sut.Intersect(tc.isec)
-		require.True(t, tc.expect.Equal(new), fmt.Sprintf("%s: %v %v", title, tc.expect, new))
+		newNodeList := tc.sut.Intersect(tc.isec)
+		require.True(t, tc.expect.Equal(newNodeList), fmt.Sprintf("%s: %v %v", title, tc.expect, newNodeList))
 	}
 }
 
@@ -408,8 +408,8 @@ func TestNodeListUnion(t *testing.T) {
 			},
 		},
 	} {
-		new := tc.sut.Union(tc.isec)
-		require.Equal(t, tc.expect, new, title)
+		newNodeList := tc.sut.Union(tc.isec)
+		require.Equal(t, tc.expect, newNodeList, title)
 	}
 }
 

@@ -122,7 +122,7 @@ func (v VersionGroups) VersionMap() map[string][]string {
 }
 
 func (v VersionGroups) Formats() []string {
-	var keys []string
+	keys := []string{}
 	for k := range v {
 		keys = append(keys, k)
 	}

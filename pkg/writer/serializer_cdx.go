@@ -298,7 +298,7 @@ func newSerializerCDXState() *serializerCDXState {
 }
 
 func (s *serializerCDXState) components() []cdx.Component {
-	var components []cdx.Component
+	components := []cdx.Component{}
 	for _, c := range s.componentsDict {
 		if _, ok := s.addedDict[c.BOMRef]; ok {
 			continue

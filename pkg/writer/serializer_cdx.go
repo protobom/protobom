@@ -25,7 +25,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
 	state := newSerializerCDXState()
-	ctx := context.WithValue(context.Background(), stateKey, state)
+	ctx := context.WithValue(context.Background(), stateKey, state) //nolint
 
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id

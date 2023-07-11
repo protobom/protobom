@@ -45,6 +45,7 @@ func (di *defaultWriterImplementation) SerializeSBOM(opts options.Options, seria
 	return nil
 }
 
+//nolint:unused
 func findNodeById(bom *sbom.Document, id string) *sbom.Node {
 	for _, n := range bom.NodeList.Nodes {
 		if n.Id == id {

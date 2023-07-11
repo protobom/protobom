@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var filename = filepath.Join(os.TempDir(), "sbom.proto")
+var filename = filepath.Join(os.TempDir(), "sbom.proto") //nolint:unused
 
 // NOTICE:
 // This program is a demo to test the protobom functions while
@@ -23,6 +23,7 @@ func main() {
 	cli.Execute()
 }
 
+//nolint:unused
 func writeProto(bom *sbom.Document) {
 	out, err := proto.Marshal(bom)
 	if err != nil {
@@ -34,6 +35,7 @@ func writeProto(bom *sbom.Document) {
 	}
 }
 
+//nolint:unused
 func readProto() *sbom.Document {
 	data, err := os.ReadFile(filename)
 	if err != nil {

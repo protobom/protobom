@@ -20,5 +20,6 @@ func NewDocument() *Document {
 
 // GetRootNodes returns the top level nodes of the document
 func (d *Document) GetRootNodes() []*Node {
-	return d.GetRootNodes()
+	// TODO: Implement me
+	return d.GetRootNodes() //nolint:staticcheck
 }

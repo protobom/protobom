@@ -99,7 +99,7 @@ func (v VersionGroups) Encodings(format string) []string {
 
 func (v VersionGroups) EncodingMap() map[string][]string {
 	m := make(map[string][]string)
-	for k, _ := range v {
+	for k := range v {
 		m[k] = v.Encodings(k)
 	}
 
@@ -112,7 +112,7 @@ func (v VersionGroups) URI(Type string) string {
 
 func (v VersionGroups) VersionMap() map[string][]string {
 	m := make(map[string][]string)
-	for k, _ := range v {
+	for k := range v {
 		m[k] = v.Versions(k)
 	}
 
@@ -121,7 +121,7 @@ func (v VersionGroups) VersionMap() map[string][]string {
 
 func (v VersionGroups) Formats() []string {
 	var keys []string
-	for k, _ := range v {
+	for k := range v {
 		keys = append(keys, k)
 	}
 

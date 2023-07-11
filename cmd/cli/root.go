@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	version         = "0.0.0"
+	version         = "0.0.0" //nolint:unused
 	ApplicationName = "protobom"
 	Cfg             internal.Application
 )
@@ -58,8 +58,8 @@ var RootCmd = &cobra.Command{
 		}
 		logrus.WithField("config", string(v)).Debugf("Protobom config")
 
-		internal.Translate(path, &Cfg)
-		return nil
+		err = internal.Translate(path, &Cfg)
+		return err
 	},
 }
 

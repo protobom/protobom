@@ -1,6 +1,7 @@
 package sbom
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -296,7 +297,7 @@ func TestNodeListIntersect(t *testing.T) {
 		},
 	} {
 		new := tc.sut.Intersect(tc.isec)
-		require.Equal(t, tc.expect, new, title)
+		require.True(t, tc.expect.Equal(new), fmt.Sprintf("%s: %v %v", title, tc.expect, new))
 	}
 }
 

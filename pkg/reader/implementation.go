@@ -20,11 +20,11 @@ type parserImplementation interface {
 
 type defaultParserImplementation struct{}
 
-func (di *defaultParserImplementation) OpenDocumentFile(path string) (*os.File, error) {
+func (dpi *defaultParserImplementation) OpenDocumentFile(path string) (*os.File, error) {
 	return os.Open(path)
 }
 
-func (di *defaultParserImplementation) DetectFormat(opts *options.Options, r io.ReadSeeker) (formats.Format, error) {
+func (dpi *defaultParserImplementation) DetectFormat(opts *options.Options, r io.ReadSeeker) (formats.Format, error) {
 	sniffer := formats.Sniffer{}
 	format, err := sniffer.SniffReader(r)
 	if err != nil {

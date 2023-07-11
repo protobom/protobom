@@ -146,7 +146,7 @@ func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 }
 
 // spdxDateToTime is a utility function that turns a date into a go time.Time
-func (_ *UnserializerSPDX23) spdxDateToTime(date string) *time.Time {
+func (*UnserializerSPDX23) spdxDateToTime(date string) *time.Time {
 	if date == "" {
 		return nil
 	}
@@ -159,7 +159,7 @@ func (_ *UnserializerSPDX23) spdxDateToTime(date string) *time.Time {
 }
 
 // fileToNode converts a file from SPDX into a protobom node
-func (fp *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
+func (u *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 	n := &sbom.Node{
 		Id:               string(f.FileSPDXIdentifier),
 		Type:             sbom.Node_FILE,
@@ -186,7 +186,7 @@ func (fp *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 }
 
 // relationshipToEdge converts the SPDX relationship to a protobom Edge
-func (_ *UnserializerSPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
+func (*UnserializerSPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
 	// TODO(degradation) How to handle external documents?
 	// TODO(degradation) How to handle NOASSERTION and NONE targets
 	e := &sbom.Edge{

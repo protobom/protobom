@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	stateKey = "cyclonedx_serializer_state"
+	stateKey state = "cyclonedx_serializer_state"
 )
 
+type state string
 type SerializerCDX struct{}
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
@@ -25,7 +26,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
 	state := newSerializerCDXState()
-	ctx := context.WithValue(context.Background(), stateKey, state) //nolint
+	ctx := context.WithValue(context.Background(), stateKey, state)
 
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
@@ -35,7 +36,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	}
 
 	metadata := cdx.Metadata{
-		Component: &cdx.Component{}, //nolint
+		Component: &cdx.Component{},
 	}
 
 	doc.Metadata = &metadata

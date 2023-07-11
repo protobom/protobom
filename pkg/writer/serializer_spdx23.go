@@ -88,7 +88,7 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 	return doc, nil
 }
 
-func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) {
+func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) { //nolint:unparam
 	relationships := []*spdx.Relationship{}
 	for _, e := range bom.NodeList.Edges {
 		for _, dest := range e.To {
@@ -104,7 +104,7 @@ func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) {
 	return relationships, nil
 }
 
-func buildFiles(bom *sbom.Document) ([]*spdx.File, error) {
+func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 	files := []*spdx.File{}
 	for _, node := range bom.NodeList.Nodes {
 		if node.Type == sbom.Node_PACKAGE {
@@ -150,7 +150,7 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) {
 	return files, nil
 }
 
-func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) {
+func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unparam
 	packages := []*spdx.Package{}
 	for _, node := range bom.NodeList.Nodes {
 		if node.Type == sbom.Node_FILE {

@@ -1,3 +1,5 @@
+//go:build !codeanalysis
+
 package writer
 
 import (
@@ -106,8 +108,8 @@ func (v VersionGroups) EncodingMap() map[string][]string {
 	return m
 }
 
-func (v VersionGroups) URI(Type string) string {
-	return v[Type].URI
+func (v VersionGroups) URI(t string) string {
+	return v[t].URI
 }
 
 func (v VersionGroups) VersionMap() map[string][]string {
@@ -120,7 +122,7 @@ func (v VersionGroups) VersionMap() map[string][]string {
 }
 
 func (v VersionGroups) Formats() []string {
-	var keys []string
+	keys := []string{}
 	for k := range v {
 		keys = append(keys, k)
 	}

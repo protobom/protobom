@@ -18,8 +18,8 @@ func NewDocument() *Document {
 	}
 }
 
-// GetRootNodes returns the top level nodes of the document
+// GetRootNodes returns the top level nodes of the document. It calls the underlying
+// method in the document's NodeList.
 func (d *Document) GetRootNodes() []*Node {
-	// TODO: Implement me
-	return d.GetRootNodes() //nolint:staticcheck
+	return d.NodeList.GetRootNodes()
 }

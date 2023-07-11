@@ -25,7 +25,7 @@ var invalidIDCharsRe = regexp.MustCompile(`[^a-zA-Z0-9-.]+`)
 // come from an ingested SBOM.
 //
 // Without any strings seeding it, NewNodeIdentifier generates the identifier
-// using an UUID. If a string is provided, any invalid characters will be removed and the 
+// using an UUID. If a string is provided, any invalid characters will be removed and the
 // new string will be used as the identifier.
 func NewNodeIdentifier(prefixes ...string) string {
 	validPrefixes := []string{}

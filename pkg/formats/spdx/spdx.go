@@ -6,7 +6,10 @@ package spdx
 import "strings"
 
 const (
-	NOASSERTION = "NOASSERTION"
+	NOASSERTION  = "NOASSERTION"
+	Organization = "Organization"
+	Person       = "Person"
+	Tool         = "Tool"
 )
 
 // ParseActorString parses an SPDX "actor string", it is a specially formatted
@@ -21,10 +24,10 @@ func ParseActorString(s string) (actorType, actorName, actorEmail string) {
 	s = strings.TrimSpace(s)
 	if strings.HasPrefix(s, "Person:") {
 		actorType = "person"
-		s = strings.TrimPrefix(s, "Person:")
-	} else if strings.HasPrefix(s, "Organization:") {
+		s = strings.TrimPrefix(s, Person+":")
+	} else if strings.HasPrefix(s, Organization+":") {
 		actorType = "org"
-		s = strings.TrimPrefix(s, "Organization:")
+		s = strings.TrimPrefix(s, Organization+":")
 	}
 	s = strings.TrimSpace(s)
 	actorName = s

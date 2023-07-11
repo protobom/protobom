@@ -15,17 +15,20 @@ import (
 )
 
 const (
-	stateKey = "cyclonedx_serializer_state"
+	stateKey state = "cyclonedx_serializer_state"
 )
 
-type SerializerCDX struct{}
+type (
+	state         string
+	SerializerCDX struct{}
+)
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
 	state := newSerializerCDXState()
-	ctx := context.WithValue(context.Background(), stateKey, state) //nolint
+	ctx := context.WithValue(context.Background(), stateKey, state)
 
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
@@ -35,7 +38,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	}
 
 	metadata := cdx.Metadata{
-		Component: &cdx.Component{}, //nolint
+		Component: &cdx.Component{},
 	}
 
 	doc.Metadata = &metadata
@@ -71,9 +74,9 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 // to all nodes that don't have them. To maintain the closest fidelity, we
 // clear their refs again before output to CDX
 func clearAutoRefs(comps *[]cdx.Component) {
-	for i, comp := range *comps {
-		if strings.HasPrefix(comp.BOMRef, "protobom-") {
-			flags := strings.Split(comp.BOMRef, "--")
+	for i := range *comps {
+		if strings.HasPrefix((*comps)[i].BOMRef, "protobom-") {
+			flags := strings.Split((*comps)[i].BOMRef, "--")
 			if strings.Contains(flags[0], "-auto") {
 				(*comps)[i].BOMRef = ""
 			}
@@ -134,7 +137,6 @@ func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Comp
 
 // NOTE dependencies function modifies the components dictionary
 func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
-
 	var dependencies []cdx.Dependency
 	state, err := getCDXState(ctx)
 	if err != nil {
@@ -153,7 +155,7 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 
 		// In this example, we tree-ify all components related with a
 		// "contains" relationship. This is just an opinion for the demo
-		// and it is somethign we can parameterize
+		// and it is something we can parameterize
 		switch e.Type {
 		case sbom.Edge_contains:
 			// Make sure we have the target component
@@ -296,7 +298,7 @@ func newSerializerCDXState() *serializerCDXState {
 }
 
 func (s *serializerCDXState) components() []cdx.Component {
-	var components []cdx.Component
+	components := []cdx.Component{}
 	for _, c := range s.componentsDict {
 		if _, ok := s.addedDict[c.BOMRef]; ok {
 			continue

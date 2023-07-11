@@ -296,8 +296,8 @@ func TestNodeListIntersect(t *testing.T) {
 			},
 		},
 	} {
-		new := tc.sut.Intersect(tc.isec)
-		require.True(t, tc.expect.Equal(new), fmt.Sprintf("%s: %v %v", title, tc.expect, new))
+		newNodeList := tc.sut.Intersect(tc.isec)
+		require.True(t, tc.expect.Equal(newNodeList), fmt.Sprintf("%s: %v %v", title, tc.expect, newNodeList))
 	}
 }
 
@@ -408,8 +408,8 @@ func TestNodeListUnion(t *testing.T) {
 			},
 		},
 	} {
-		new := tc.sut.Union(tc.isec)
-		require.Equal(t, tc.expect, new, title)
+		newNodeList := tc.sut.Union(tc.isec)
+		require.Equal(t, tc.expect, newNodeList, title)
 	}
 }
 
@@ -435,8 +435,10 @@ func TestGetNodesByName(t *testing.T) {
 		{
 			&NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-arm64", Name: "nginx"}, {Id: "nginx-arm64", Name: "nginx"},
-					{Id: "nginx-libs", Name: "nginx-libs"}, {Id: "nginx-docs", Name: "nginx-docs"},
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-libs", Name: "nginx-libs"},
+					{Id: "nginx-docs", Name: "nginx-docs"},
 				},
 				Edges:        []*Edge{},
 				RootElements: []string{},
@@ -472,8 +474,10 @@ func TestGetNodeByID(t *testing.T) {
 		{
 			&NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-arm64", Name: "nginx"}, {Id: "nginx-arm64", Name: "nginx"},
-					{Id: "nginx-libs", Name: "nginx-libs"}, {Id: "nginx-docs", Name: "nginx-docs"},
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-libs", Name: "nginx-libs"},
+					{Id: "nginx-docs", Name: "nginx-docs"},
 				},
 				Edges:        []*Edge{},
 				RootElements: []string{},

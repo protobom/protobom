@@ -20,11 +20,11 @@ type parserImplementation interface {
 
 type defaultParserImplementation struct{}
 
-func (di *defaultParserImplementation) OpenDocumentFile(path string) (*os.File, error) {
+func (dpi *defaultParserImplementation) OpenDocumentFile(path string) (*os.File, error) {
 	return os.Open(path)
 }
 
-func (di *defaultParserImplementation) DetectFormat(opts *options.Options, r io.ReadSeeker) (formats.Format, error) {
+func (dpi *defaultParserImplementation) DetectFormat(opts *options.Options, r io.ReadSeeker) (formats.Format, error) {
 	sniffer := formats.Sniffer{}
 	format, err := sniffer.SniffReader(r)
 	if err != nil {
@@ -37,8 +37,8 @@ func (dpi *defaultParserImplementation) GetUnserializer(_ *options.Options, form
 	switch string(format) {
 	case "text/spdx+json;version=2.3":
 		return &UnserializerSPDX23{}, nil
-	//case "application/vnd.cyclonedx+json;version=1.4":
-	//	return &FormatParserCDX14{}, nil
+	// case "application/vnd.cyclonedx+json;version=1.4":
+	//	 return &FormatParserCDX14{}, nil
 	default:
 		return nil, fmt.Errorf("no format parser registered for %s", format)
 	}

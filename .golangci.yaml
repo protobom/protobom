@@ -28,7 +28,7 @@ linters:
     - errcheck
     # - goconst Disabled temporarily as we need to const away all the relationships
     - gocritic
-    # - gocyclo Disables until some functions areoptimized
+    # - gocyclo Disables until some functions are optimized
     - godox
     - gofmt
     - gofumpt

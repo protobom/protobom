@@ -25,7 +25,7 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 
 	metadata := cdx.Metadata{
 		// Tools:     []cdx14.Tool{},
-		Component: &cdx.Component{},
+		Component: &cdx.Component{}, //nolint
 	}
 
 	doc.Metadata = &metadata

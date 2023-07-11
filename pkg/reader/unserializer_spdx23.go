@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	protospdx "github.com/bom-squad/protobom/pkg/formats/spdx"
 	"github.com/bom-squad/protobom/pkg/reader/options"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
@@ -43,7 +44,7 @@ func (u *UnserializerSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom
 				continue
 			}
 			a := &sbom.Person{Name: c.Creator}
-			a.IsOrg = (c.CreatorType == "Organization")
+			a.IsOrg = (c.CreatorType == protospdx.Organization)
 			bom.Metadata.Authors = append(bom.Metadata.Authors, a)
 		}
 	}
@@ -92,7 +93,7 @@ func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	}
 
 	// TODO(degradation) NOASSERTION
-	if p.PackageLicenseConcluded != "NOASSERTION" && p.PackageLicenseConcluded != "" {
+	if p.PackageLicenseConcluded != protospdx.NOASSERTION && p.PackageLicenseConcluded != "" {
 		n.LicenseConcluded = p.PackageLicenseConcluded
 	}
 
@@ -127,16 +128,16 @@ func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	// Mmh there is a limitation here on the SPDX libraries. They will not
 	// return the supplier and originator emails as a separate field. Perhaps
 	// we should upstream a fix for that.
-	if p.PackageSupplier != nil && p.PackageSupplier.Supplier != "NOASSERTION" {
+	if p.PackageSupplier != nil && p.PackageSupplier.Supplier != protospdx.NOASSERTION {
 		n.Suppliers = []*sbom.Person{{Name: p.PackageSupplier.Supplier}}
-		if p.PackageSupplier.SupplierType == "Organization" {
+		if p.PackageSupplier.SupplierType == protospdx.Organization {
 			n.Suppliers[0].IsOrg = true
 		}
 	}
 
-	if p.PackageOriginator != nil && p.PackageOriginator.Originator != "NOASSERTION" && p.PackageOriginator.Originator != "" {
+	if p.PackageOriginator != nil && p.PackageOriginator.Originator != protospdx.NOASSERTION && p.PackageOriginator.Originator != "" {
 		n.Originators = []*sbom.Person{{Name: p.PackageOriginator.Originator}}
-		if p.PackageOriginator.OriginatorType == "Organization" {
+		if p.PackageOriginator.OriginatorType == protospdx.Organization {
 			n.Originators[0].IsOrg = true
 		}
 	}

@@ -188,12 +188,12 @@ func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
 }
 
 // copyEdgeList is a utility function that deep copies a list of edges
-func copyEdgeList(original []*Edge) (copy []*Edge) {
-	copy = []*Edge{}
+func copyEdgeList(original []*Edge) []*Edge {
+	nodeCopy := []*Edge{}
 	for _, e := range original {
-		copy = append(copy, e.Copy())
+		nodeCopy = append(nodeCopy, e.Copy())
 	}
-	return copy
+	return nodeCopy
 }
 
 // Intersect returns a new NodeList with nodes which are common in nl and nl2.
@@ -332,7 +332,7 @@ func (nl *NodeList) GetNodeByID(id string) *Node {
 // GetNodesByIdentifier returns nodes that match an identifier of type t and
 // value v, for example t = "purl" v = "pkg:deb/debian/libpam-modules@1.4.0-9+deb11u1?arch=i386"
 // Not that this only does "dumb" string matching no assumptions are made on the
-// identifer type.
+// identifier type.
 func (nl *NodeList) GetNodesByIdentifier(t, v string) []*Node {
 	ret := []*Node{}
 	for i := range nl.Nodes {

@@ -1,3 +1,5 @@
+//go:build !codeanalysis
+
 package cli
 
 import (
@@ -66,9 +68,9 @@ var RootCmd = &cobra.Command{
 func init() {
 	cobra.OnInitialize()
 
-	RootCmd.PersistentFlags().StringVarP(&Cfg.Writer.Type, "format", "f", string(options.Default.Format.Type()), fmt.Sprintf("Select format, Options=%s", writeroptions.Versions.Formats()))
+	RootCmd.PersistentFlags().StringVarP(&Cfg.Writer.Type, "format", "f", options.Default.Format.Type(), fmt.Sprintf("Select format, Options=%s", writeroptions.Versions.Formats()))
 	RootCmd.PersistentFlags().StringVarP(&Cfg.Writer.Version, "version", "v", options.Default.Format.Version(), fmt.Sprintf("Select version, Options=%s", writeroptions.Versions.VersionMap()))
-	RootCmd.PersistentFlags().StringVarP(&Cfg.Writer.Encoding, "encoding", "e", string(options.Default.Format.Encoding()), fmt.Sprintf("Select encoding, Options=%s", writeroptions.Versions.EncodingMap()))
+	RootCmd.PersistentFlags().StringVarP(&Cfg.Writer.Encoding, "encoding", "e", options.Default.Format.Encoding(), fmt.Sprintf("Select encoding, Options=%s", writeroptions.Versions.EncodingMap()))
 }
 
 func Execute() {

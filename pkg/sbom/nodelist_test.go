@@ -435,8 +435,10 @@ func TestGetNodesByName(t *testing.T) {
 		{
 			&NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-arm64", Name: "nginx"}, {Id: "nginx-arm64", Name: "nginx"},
-					{Id: "nginx-libs", Name: "nginx-libs"}, {Id: "nginx-docs", Name: "nginx-docs"},
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-libs", Name: "nginx-libs"},
+					{Id: "nginx-docs", Name: "nginx-docs"},
 				},
 				Edges:        []*Edge{},
 				RootElements: []string{},
@@ -472,8 +474,10 @@ func TestGetNodeByID(t *testing.T) {
 		{
 			&NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-arm64", Name: "nginx"}, {Id: "nginx-arm64", Name: "nginx"},
-					{Id: "nginx-libs", Name: "nginx-libs"}, {Id: "nginx-docs", Name: "nginx-docs"},
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-libs", Name: "nginx-libs"},
+					{Id: "nginx-docs", Name: "nginx-docs"},
 				},
 				Edges:        []*Edge{},
 				RootElements: []string{},

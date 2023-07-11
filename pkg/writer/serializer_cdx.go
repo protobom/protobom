@@ -18,8 +18,10 @@ const (
 	stateKey state = "cyclonedx_serializer_state"
 )
 
-type state string
-type SerializerCDX struct{}
+type (
+	state         string
+	SerializerCDX struct{}
+)
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
@@ -72,9 +74,9 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 // to all nodes that don't have them. To maintain the closest fidelity, we
 // clear their refs again before output to CDX
 func clearAutoRefs(comps *[]cdx.Component) {
-	for i, comp := range *comps {
-		if strings.HasPrefix(comp.BOMRef, "protobom-") {
-			flags := strings.Split(comp.BOMRef, "--")
+	for i := range *comps {
+		if strings.HasPrefix((*comps)[i].BOMRef, "protobom-") {
+			flags := strings.Split((*comps)[i].BOMRef, "--")
 			if strings.Contains(flags[0], "-auto") {
 				(*comps)[i].BOMRef = ""
 			}
@@ -135,7 +137,6 @@ func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Comp
 
 // NOTE dependencies function modifies the components dictionary
 func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
-
 	var dependencies []cdx.Dependency
 	state, err := getCDXState(ctx)
 	if err != nil {
@@ -154,7 +155,7 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 
 		// In this example, we tree-ify all components related with a
 		// "contains" relationship. This is just an opinion for the demo
-		// and it is somethign we can parameterize
+		// and it is something we can parameterize
 		switch e.Type {
 		case sbom.Edge_contains:
 			// Make sure we have the target component

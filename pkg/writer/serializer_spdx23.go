@@ -13,6 +13,7 @@ import (
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	"github.com/spdx/tools-golang/spdx/v2/v2_3"
+	"sigs.k8s.io/release-utils/version"
 )
 
 type SerializerSPDX23 struct{}
@@ -32,7 +33,7 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,
-		SPDXIdentifier:    common.ElementID(bom.Metadata.Id),
+		SPDXIdentifier:    protospdx.DOCUMENT,
 		DocumentName:      bom.Metadata.Name,
 		DocumentNamespace: "https://spdx.org/spdxdocs/", // TODO(puerco): Think how to handle namespacing
 		DocumentComment:   bom.Metadata.Comment,
@@ -40,9 +41,9 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 		CreationInfo: &spdx.CreationInfo{
 			LicenseListVersion: "3.20", // https://spdx.org/licenses/
 			Creators: []spdx.Creator{
-				// Add data from the protobom
+				// Register protobom as one of the document creation tools
 				{
-					Creator:     "protobom/0.0.0",
+					Creator:     fmt.Sprintf("protobom-%s", version.GetVersionInfo().GitVersion),
 					CreatorType: "Tool",
 				},
 			},
@@ -52,6 +53,24 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 			// CreatorComment: bom.Metadata.Authors(),
 			// CreatorComment: bom.Metadata.... /// TODO(puerco): Missing in the proto
 		},
+	}
+
+	for _, t := range bom.Metadata.Tools {
+		// TODO(degradation): SPDX is prescriptive on how this field is structured
+		// it is a tool identifier word separated from the version with a dash.
+		// We should transform the field value
+		// Ref: https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#68-creator-field
+		name := t.Name
+		if t.Version != "" {
+			name = fmt.Sprintf("%s-%s", t.Name, t.Version)
+		}
+
+		// TODO(degradation): Tool vendor gets lost here
+
+		doc.CreationInfo.Creators = append(doc.CreationInfo.Creators, spdx.Creator{
+			Creator:     name,
+			CreatorType: protospdx.Tool,
+		})
 	}
 
 	packages, err := buildPackages(bom)
@@ -71,7 +90,7 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 
 	for _, id := range bom.NodeList.RootElements {
 		rels = append(rels, &spdx.Relationship{
-			RefA:                common.MakeDocElementID("", bom.Metadata.Id),
+			RefA:                common.MakeDocElementID("", protospdx.DOCUMENT),
 			RefB:                common.MakeDocElementID("", id),
 			Relationship:        common.TypeRelationshipDescribe,
 			RelationshipComment: "",

@@ -141,21 +141,19 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 			FileCopyrightText: strings.TrimSpace(node.Copyright),
 			FileComment:       node.Comment,
 			// FileNotice:           node.File, // Missing?
-			// FileContributors:     []string{},
 			FileAttributionTexts: node.Attribution,
 			Annotations:          []v2_3.Annotation{},
 		}
 
 		if f.FileCopyrightText == "" {
-			f.FileCopyrightText = "NONE"
+			f.FileCopyrightText = protospdx.NONE
 		}
 
 		for algo, hash := range node.Hashes {
 			if algoVal, ok := sbom.HashAlgorithm_value[algo]; ok {
 				spdxAlgo := sbom.HashAlgorithm(algoVal).ToSPDX()
 				if spdxAlgo == "" {
-					// Data loss here.
-					// TODO how do we handle when data loss occurs?
+					// TODO(degradation): Data loss. How do we handle more algos?
 					continue
 				}
 				f.Checksums = append(f.Checksums, common.Checksum{
@@ -205,9 +203,9 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			Annotations:               []v2_3.Annotation{},
 
 			// The files field may never be used... Or should it?
-			// We are mirroring the probom graph in the SPDX relationship
+			// We are mirroring the protbom graph in the SPDX relationship
 			// structure so they don't need to be added here and
-			// the resulting document is valid.
+			// the resulting document is still valid.
 			//
 			// There may be tools that rely on files added in the list so
 			// at some point we may need to think of supporting this as an
@@ -246,8 +244,38 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			}
 		}
 
-		// TODO(puerco): Supplier
-		// TODO(puerco): Originator
+		for _, e := range node.ExternalReferences {
+			if e.ToSPDX2Type() == "" || e.Url == "" {
+				// TODO(degradation): Handle incomplete external references
+				continue
+			}
+			p.PackageExternalReferences = append(p.PackageExternalReferences, &v2_3.PackageExternalReference{
+				Category:           e.ToSPDX2Category(),
+				RefType:            e.ToSPDX2Type(),
+				Locator:            e.Url,
+				ExternalRefComment: e.Comment,
+			})
+		}
+
+		if len(node.Suppliers) > 0 {
+			// TODO(degradation): URL, Phone are lost if set
+			// TODO(degradation): If is more than one supplier, it will be lost
+			p.PackageSupplier = &spdx.Supplier{
+				Supplier:     node.Suppliers[0].ToSPDX2ClientString(),
+				SupplierType: node.Suppliers[0].ToSPDX2ClientOrg(),
+			}
+		}
+
+		if len(node.Originators) > 0 {
+			// TODO(degradation): URL, Phone are lost if set
+			// TODO(degradation): If is more than one originator, it will be lost
+			p.PackageSupplier = &spdx.Supplier{
+				Supplier:     node.Originators[0].ToSPDX2ClientString(),
+				SupplierType: node.Originators[0].ToSPDX2ClientOrg(),
+			}
+		}
+
+		// TODO(puerco): Reconcile file in packages
 		packages = append(packages, &p)
 	}
 	return packages, nil

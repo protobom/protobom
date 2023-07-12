@@ -1,7 +1,8 @@
 package sbom
 
 import (
-	reflect "reflect"
+	"fmt"
+	"reflect"
 	"sort"
 
 	"github.com/sirupsen/logrus"
@@ -424,4 +425,47 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 	}
 
 	return true
+}
+
+// RelateNodeListAtID relates the top level nodes in nl2 to the node with ID
+// nodeID using a relationship of type edgeType. Returns an error if nodeID cannot
+// be found in the graph. This function assumes that nodes in nl and nl2 having
+// the same ID are equivalent and will be deduped.
+func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Edge_Type) error {
+	// Check the node exists
+	nlIndex := nl.indexNodes()
+	nlEdges := nl.indexEdges()
+
+	if _, ok := nlIndex[nodeID]; !ok {
+		return fmt.Errorf("node with ID %s not found", nodeID)
+	}
+
+	// Check if we have edges matching
+	var edge *Edge
+	if _, ok := nlEdges[nodeID]; ok {
+		if _, ok2 := nlEdges[nodeID][edgeType]; ok2 {
+			edge = nlEdges[nodeID][edgeType][0]
+		}
+	}
+
+	if edge == nil {
+		edge = &Edge{
+			Type: edgeType,
+			From: nodeID,
+			To:   nl2.RootElements,
+		}
+		nl.Edges = append(nl.Edges, edge)
+	} else {
+		// Perhaps we should filter these
+		edge.To = append(edge.To, nl2.RootElements...)
+	}
+
+	for _, n := range nl2.Nodes {
+		if _, ok := nlIndex[n.Id]; ok {
+			continue
+		}
+		nl.AddNode(n)
+	}
+
+	return nil
 }

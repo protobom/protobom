@@ -102,7 +102,9 @@ func (nl *NodeList) cleanEdges() {
 		for s := range newTos[f] {
 			seenCache[f].To = append(seenCache[f].To, s)
 		}
-		newEdges = append(newEdges, seenCache[f])
+		if len(seenCache[f].To) > 0 {
+			newEdges = append(newEdges, seenCache[f])
+		}
 	}
 
 	nl.Edges = newEdges
@@ -416,7 +418,7 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 	}
 
 	if !reflect.DeepEqual(nlNodes, nl2Nodes) {
-		logrus.Infof("NodeList 1: %+v\nNodeList 2: %+v", nlNodes, nl2Nodes)
+		logrus.Info("No: nodes")
 		return false
 	}
 

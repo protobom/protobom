@@ -541,3 +541,35 @@ func TestGetNodesByIdentifier(t *testing.T) {
 		require.Equal(t, tc.expected, res)
 	}
 }
+
+func TestGetNodesByPurlType(t *testing.T) {
+	for _, tc := range []struct {
+		nl             *NodeList
+		query          string
+		expectedLength int
+	}{
+		{
+			nl: &NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-arm64", Name: "nginx"},
+					{Id: "nginx-arm64", Name: "nginx", ExternalReferences: []*ExternalReference{
+						{Type: "purl", Url: "pkg:/apk/wolfi/nginx@1.21.1"},
+						{Type: "cpe", Url: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
+					}},
+					{Id: "bash-4", Name: "bash", ExternalReferences: []*ExternalReference{
+						{Type: "purl", Url: "pkg:/apk/wolfi/bash@4.0.1"},
+						{Type: "cpe", Url: "cpe:2.3:a:bash:bash:5.0-4:*:*:*:*:*:*:*"},
+					}},
+					{Id: "nginx-docs", Name: "nginx-docs"},
+				},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+			query:          "apk",
+			expectedLength: 2,
+		},
+	} {
+		res := tc.nl.GetNodesByPurlType(tc.query)
+		require.Len(t, res.Nodes, tc.expectedLength)
+	}
+}

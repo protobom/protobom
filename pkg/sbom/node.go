@@ -218,3 +218,20 @@ func (n *Node) flatString() string {
 	sort.Strings(pairs)
 	return strings.Join(pairs, ":")
 }
+
+type PackageURL string
+
+// Purl returns the node purl as a string
+func (n *Node) Purl() PackageURL {
+	if n.Type == Node_FILE {
+		return ""
+	}
+
+	for _, e := range n.ExternalReferences {
+		if e.Type == "purl" {
+			return PackageURL(e.Url)
+		}
+	}
+
+	return ""
+}

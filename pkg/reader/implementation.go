@@ -37,8 +37,8 @@ func (dpi *defaultParserImplementation) GetUnserializer(_ *options.Options, form
 	switch string(format) {
 	case "text/spdx+json;version=2.3":
 		return &UnserializerSPDX23{}, nil
-	// case "application/vnd.cyclonedx+json;version=1.4":
-	//	 return &FormatParserCDX14{}, nil
+	case "application/vnd.cyclonedx+json;version=1.4":
+		return &UnserializerCDX14{}, nil
 	default:
 		return nil, fmt.Errorf("no format parser registered for %s", format)
 	}

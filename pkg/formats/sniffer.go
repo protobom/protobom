@@ -85,11 +85,6 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 		}
 	}
 
-	fmt.Fprintf(
-		os.Stderr, "format: %s version: %s encoding: %s\n",
-		formatType, formatVersion, formatEncoding,
-	)
-
 	for _, f := range List {
 		if string(f) == fmt.Sprintf("%s+%s;version=%s", formatType, formatEncoding, formatVersion) {
 			return f, nil

@@ -6,7 +6,9 @@ package spdx
 import "strings"
 
 const (
+	DOCUMENT     = "DOCUMENT"
 	NOASSERTION  = "NOASSERTION"
+	NONE         = "NONE"
 	Organization = "Organization"
 	Person       = "Person"
 	Tool         = "Tool"

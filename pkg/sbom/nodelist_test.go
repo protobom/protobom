@@ -8,12 +8,11 @@ import (
 )
 
 func TestCleanEdges(t *testing.T) {
-	for _, tc := range []struct {
+	for m, tc := range map[string]struct {
 		sut      *NodeList
 		expected *NodeList
 	}{
-		// Edge does not need to be modified
-		{
+		"Edge does not need to be modified": {
 			sut: &NodeList{
 				Nodes: []*Node{
 					{Id: "node1"}, {Id: "node2"},
@@ -34,8 +33,7 @@ func TestCleanEdges(t *testing.T) {
 				RootElements: []string{"node1"},
 			},
 		},
-		// Edge contains a broken To
-		{
+		"Edge contains a broken To": {
 			sut: &NodeList{
 				Nodes: []*Node{
 					{Id: "node1"}, {Id: "node2"},
@@ -55,8 +53,7 @@ func TestCleanEdges(t *testing.T) {
 				RootElements: []string{"node1"},
 			},
 		},
-		// Edge contains a broken From
-		{
+		"Edge contains a broken From": {
 			sut: &NodeList{
 				Nodes: []*Node{
 					{Id: "node1"}, {Id: "node2"},
@@ -74,8 +71,7 @@ func TestCleanEdges(t *testing.T) {
 				RootElements: []string{"node1"},
 			},
 		},
-		// Duplicated edges should be consolidated
-		{
+		"Duplicated edges should be consolidated": {
 			sut: &NodeList{
 				Nodes: []*Node{
 					{Id: "node1"}, {Id: "node2"}, {Id: "node3"},
@@ -99,7 +95,7 @@ func TestCleanEdges(t *testing.T) {
 		},
 	} {
 		tc.sut.cleanEdges()
-		require.Equal(t, tc.sut, tc.expected)
+		require.True(t, tc.sut.Equal(tc.expected), m)
 	}
 }
 
@@ -409,7 +405,7 @@ func TestNodeListUnion(t *testing.T) {
 		},
 	} {
 		newNodeList := tc.sut.Union(tc.isec)
-		require.Equal(t, tc.expect, newNodeList, title)
+		require.True(t, tc.expect.Equal(newNodeList), title)
 	}
 }
 

@@ -1,8 +1,10 @@
 package sbom
 
 import (
-	reflect "reflect"
+	"fmt"
+	"reflect"
 	"sort"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -57,54 +59,51 @@ func (nl *NodeList) indexRootElements() rootElementsIndex {
 // cleanEdges is a utility function that removes broken
 // connection and orphaned edges
 func (nl *NodeList) cleanEdges() {
-	// First copy the nodelist edges
-	newEdges := []*Edge{}
-
 	// Build a catalog of the elements ids
 	nodeIndex := nl.indexNodes()
 
 	// Add a seen cache to dedupe edges when
 	// cleaning them up
-	seenCache := map[string]map[Edge_Type]*Edge{}
-	var seenEdge bool
+	seenCache := map[string]*Edge{}
+	newTos := map[string]map[string]string{}
+
 	// Now list all edges and rebuild the list
 	for _, edge := range nl.Edges {
-		newTos := []string{}
-		oldTos := []string{}
-
 		// If the from node is not in the index, skip it
 		if _, ok := nodeIndex[edge.From]; !ok {
 			continue
 		}
 
-		// If we already saw an equivalent edge, reuse it
-		seenEdge = false
-		if _, ok := seenCache[edge.From]; ok {
-			if _, ok2 := seenCache[edge.From][edge.Type]; ok2 {
-				oldTos = edge.To
-				edge = seenCache[edge.From][edge.Type]
-				seenEdge = true
-			}
-		} else {
-			seenCache[edge.From] = map[Edge_Type]*Edge{}
+		// Use a string key for a simpler datastruct
+		edgeKey := edge.From + "+++" + edge.Type.String()
+		if _, ok := newTos[edgeKey]; !ok {
+			newTos[edgeKey] = map[string]string{}
 		}
-		seenCache[edge.From][edge.Type] = edge
+
+		// If we already saw an equivalent edge, reuse it
+		if _, ok := seenCache[edgeKey]; !ok {
+			seenCache[edgeKey] = &Edge{
+				Type: edge.Type,
+				From: edge.From,
+				To:   []string{},
+			}
+		}
 
 		for _, s := range edge.To {
-			if _, ok := nodeIndex[s]; ok {
-				newTos = append(newTos, s)
+			if _, ok := nodeIndex[s]; !ok {
+				continue
 			}
+			newTos[edgeKey][s] = s
 		}
+	}
 
-		newTos = append(newTos, oldTos...)
-
-		if len(newTos) == 0 {
-			continue
+	newEdges := []*Edge{}
+	for f := range seenCache {
+		for s := range newTos[f] {
+			seenCache[f].To = append(seenCache[f].To, s)
 		}
-
-		edge.To = newTos
-		if !seenEdge {
-			newEdges = append(newEdges, edge)
+		if len(seenCache[f].To) > 0 {
+			newEdges = append(newEdges, seenCache[f])
 		}
 	}
 
@@ -419,9 +418,100 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 	}
 
 	if !reflect.DeepEqual(nlNodes, nl2Nodes) {
-		logrus.Infof("NodeList 1: %+v\nNodeList 2: %+v", nlNodes, nl2Nodes)
+		logrus.Info("No: nodes")
 		return false
 	}
 
 	return true
+}
+
+// RelateNodeListAtID relates the top level nodes in nl2 to the node with ID
+// nodeID using a relationship of type edgeType. Returns an error if nodeID cannot
+// be found in the graph. This function assumes that nodes in nl and nl2 having
+// the same ID are equivalent and will be deduped.
+func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Edge_Type) error {
+	// Check the node exists
+	nlIndex := nl.indexNodes()
+	nlEdges := nl.indexEdges()
+
+	if _, ok := nlIndex[nodeID]; !ok {
+		return fmt.Errorf("node with ID %s not found", nodeID)
+	}
+
+	// Check if we have edges matching
+	var edge *Edge
+	if _, ok := nlEdges[nodeID]; ok {
+		if _, ok2 := nlEdges[nodeID][edgeType]; ok2 {
+			edge = nlEdges[nodeID][edgeType][0]
+		}
+	}
+
+	if edge == nil {
+		edge = &Edge{
+			Type: edgeType,
+			From: nodeID,
+			To:   nl2.RootElements,
+		}
+		nl.Edges = append(nl.Edges, edge)
+	} else {
+		// Perhaps we should filter these
+		edge.To = append(edge.To, nl2.RootElements...)
+	}
+
+	for _, n := range nl2.Nodes {
+		if _, ok := nlIndex[n.Id]; ok {
+			continue
+		}
+		nl.AddNode(n)
+	}
+
+	return nil
+}
+
+// GetNodesByPurlType returns a nodelist containing all nodes that match
+// a purl (package url) type. An empty purlType returns a blank nodelist
+func (nl *NodeList) GetNodesByPurlType(purlType string) *NodeList {
+	ret := &NodeList{}
+	if nl == nil {
+		return ret
+	}
+
+	for _, n := range nl.Nodes {
+		// I think the SPDX libraries have a bug where an extra slash is added when parsing purls
+		if strings.HasPrefix(string(n.Purl()), fmt.Sprintf("pkg:%s/", purlType)) ||
+			strings.HasPrefix(string(n.Purl()), fmt.Sprintf("pkg:/%s/", purlType)) {
+			ret.Nodes = append(ret.Nodes, n)
+		}
+	}
+
+	index := ret.indexNodes()
+	for _, e := range nl.Edges {
+		if _, ok := index[e.From]; ok {
+			ret.Edges = append(ret.Edges, e.Copy())
+		}
+	}
+
+	ret.reconnectOrphanNodes()
+	ret.cleanEdges()
+
+	return ret
+}
+
+// reconnectOrphanNodes cleans the nodelist graph structure by reconnecting all
+// orphaned nodes to the top of the nodelist
+func (nl *NodeList) reconnectOrphanNodes() {
+	edgeIndex := nl.indexEdges()
+	rootIndex := nl.indexRootElements()
+
+	for _, id := range nl.RootElements {
+		rootIndex[id] = struct{}{}
+	}
+
+	for _, n := range nl.Nodes {
+		if _, ok := edgeIndex[n.Id]; !ok {
+			if _, ok := rootIndex[n.Id]; !ok {
+				nl.RootElements = append(nl.RootElements, n.Id)
+			}
+		}
+	}
 }

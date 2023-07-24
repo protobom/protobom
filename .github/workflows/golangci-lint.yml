@@ -19,4 +19,3 @@ jobs:
           cache: false
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3.6.0
-

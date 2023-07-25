@@ -7,13 +7,6 @@ from urllib.parse import urlparse
 
 import requests
 from git import Repo
-import re
-import requests
-from urllib.parse import urlparse
-import json
-from git import Repo
-import subprocess
-import tempfile
 
 SBOM_OUTPUT = "./SBOM/"
 
@@ -49,7 +42,16 @@ def get_owner_and_repo(url):
     
     return None, None
 
-def validate_cyclonedx_sbom(data):
+def is_library_in_sbom(data):
+    """
+    Check if a library component is present in the SBOM data.
+
+    Args:
+        data (str): The SBOM data in JSON format.
+
+    Returns:
+        bool: True if a library component is found, False otherwise.
+    """
     try:
         sbom = json.loads(data)
         if 'components' in sbom:
@@ -76,7 +78,7 @@ def main():
                     Repo.clone_from(url, download_folder)
 
                     cyclonedx_json = subprocess.check_output(f'syft packages dir:{download_folder} -o cyclonedx-json', shell=True, text=True)
-                    if validate_cyclonedx_sbom(cyclonedx_json):
+                    if is_library_in_sbom(cyclonedx_json):
                         cyclonedx_json_path = f'{SBOM_OUTPUT}/{owner}_{repo}_syft_cyclonedx.json'
                         with open(cyclonedx_json_path, 'w') as file:
                             file.write(cyclonedx_json)

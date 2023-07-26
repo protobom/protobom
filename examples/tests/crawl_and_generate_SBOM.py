@@ -4,11 +4,10 @@ import re
 import subprocess
 import tempfile
 from urllib.parse import urlparse
+import argparse
 
 import requests
 from git import Repo
-
-SBOM_OUTPUT = "./SBOM/"
 
 awesome_language_readme_urls = {
     "python": 'https://raw.githubusercontent.com/vinta/awesome-python/master/README.md',
@@ -22,6 +21,21 @@ awesome_language_readme_urls = {
     "swift": 'https://raw.githubusercontent.com/matteocrippa/awesome-swift/master/README.md',
 }
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Generate SBOMs for libraries in awesome lists.")
+    parser.add_argument(
+        "-o",
+        "--output",
+        default=os.environ.get("SBOM_OUTPUT", "./SBOM/"),
+        help="Specify the output folder for the SBOMs",
+    )
+    args = parser.parse_args()
+
+    sbom_output = args.output
+
+    print(f"Using SBOM_OUTPUT set to: {sbom_output}")
+    return sbom_output
+    
 def find_github_urls(url):
     response = requests.get(url)
     urls = []
@@ -63,6 +77,8 @@ def is_library_in_sbom(data):
     return False
 
 def main():
+    sbom_output_dir = parse_arguments()
+
     for language, readme_url in awesome_language_readme_urls.items():
         urls = find_github_urls(readme_url)
         print(len(urls))
@@ -74,18 +90,18 @@ def main():
                 with tempfile.TemporaryDirectory() as tmp_folder:
                     download_folder = os.path.join(tmp_folder, f"{language}/{owner}/{repo}")
                     os.makedirs(download_folder, exist_ok=True)
-                    os.makedirs(SBOM_OUTPUT, exist_ok=True)
+                    os.makedirs(sbom_output_dir, exist_ok=True)
                     Repo.clone_from(url, download_folder)
 
                     cyclonedx_json = subprocess.check_output(f'syft packages dir:{download_folder} -o cyclonedx-json', shell=True, text=True)
                     if is_library_in_sbom(cyclonedx_json):
-                        cyclonedx_json_path = f'{SBOM_OUTPUT}/{owner}_{repo}_syft_cyclonedx.json'
+                        cyclonedx_json_path = f'{sbom_output_dir}/{owner}_{repo}_syft_cyclonedx.json'
                         with open(cyclonedx_json_path, 'w') as file:
                             file.write(cyclonedx_json)
 
-                        spdx_json_path = f'{SBOM_OUTPUT}/{owner}_{repo}_syft_spdx.json'
+                        spdx_json_path = f'{sbom_output_dir}/{owner}_{repo}_syft_spdx.json'
                         os.system(f'syft packages dir:{download_folder} -o spdx-json > {spdx_json_path}')
-                        spdx_path = f'{SBOM_OUTPUT}/{owner}_{repo}_syft_spdx.txt'
+                        spdx_path = f'{sbom_output_dir}/{owner}_{repo}_syft_spdx.txt'
                         os.system(f'syft packages dir:{download_folder} -o spdx > {spdx_path}')
             except Exception as e:
                 print(e)

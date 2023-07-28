@@ -25,3 +25,24 @@ func (p *Person) ToSPDX2ClientOrg() string {
 		return spdx.Person
 	}
 }
+
+func (p *Person) flatString() string {
+	s := fmt.Sprintf("n(%s)o(%v)", p.Name, p.IsOrg)
+	if p.Email != "" {
+		s += fmt.Sprintf("email(%s)", p.Email)
+	}
+	if p.Url != "" {
+		s += fmt.Sprintf("url(%s)", p.Url)
+	}
+	if p.Phone != "" {
+		s += fmt.Sprintf("p(%s)", p.Phone)
+	}
+	if p.Contacts != nil {
+		s += "c("
+		for _, c := range p.Contacts {
+			s += c.flatString()
+		}
+		s += ")"
+	}
+	return s
+}

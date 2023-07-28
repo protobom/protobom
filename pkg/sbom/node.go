@@ -1,6 +1,8 @@
 package sbom
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"sort"
 	"strings"
 
@@ -211,12 +213,74 @@ func (n *Node) Equal(n2 *Node) bool {
 func (n *Node) flatString() string {
 	pairs := []string{}
 	n.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
-		pairs = append(pairs, string(fd.FullName())+":"+v.String())
+		switch fd.FullName() {
+		case "bomsquad.protobom.Node.external_references":
+			for _, ex := range n.ExternalReferences {
+				pairs = append(pairs, fmt.Sprintf("extref:%s", ex.flatString()))
+			}
+		case "bomsquad.protobom.Node.suppliers":
+			for _, i := range n.Suppliers {
+				pairs = append(pairs, fmt.Sprintf("supplier:%s", i.flatString()))
+			}
+		case "bomsquad.protobom.Node.originators":
+			for _, i := range n.Originators {
+				pairs = append(pairs, fmt.Sprintf("originator:%s", i.flatString()))
+			}
+		case "bomsquad.protobom.Node.identifiers":
+			for _, i := range n.Identifiers {
+				pairs = append(pairs, i.flatString())
+			}
+		case "bomsquad.protobom.Node.attribution":
+			for i := 0; i < v.List().Len(); i++ {
+				pairs = append(pairs, fmt.Sprintf("%s[%d]:%s", fd.FullName(), i, v.List().Get(i)))
+			}
+
+		case "bomsquad.protobom.Node.release_date":
+			if n.ReleaseDate != nil {
+				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ReleaseDate.AsTime().Unix()))
+			}
+		case "bomsquad.protobom.Node.valid_until_date":
+			if n.ValidUntilDate != nil {
+				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ValidUntilDate.AsTime().Unix()))
+			}
+		case "bomsquad.protobom.Node.build_date":
+			if n.BuildDate != nil {
+				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.BuildDate.AsTime().Unix()))
+			}
+		case "bomsquad.protobom.Node.hashes":
+			pairs = append(pairs, string(fd.FullName())+":"+flatStringMap(v.Map()))
+		default:
+			pairs = append(pairs, string(fd.FullName())+":"+v.String())
+		}
 		return true
 	})
 
 	sort.Strings(pairs)
 	return strings.Join(pairs, ":")
+}
+
+func flatStringMap(protoMap protoreflect.Map) string {
+	keys := []string{}
+	values := map[string]string{}
+	protoMap.Range(func(mk protoreflect.MapKey, v protoreflect.Value) bool {
+		keys = append(keys, mk.String())
+		values[mk.String()] = v.String()
+		return true
+	})
+
+	sort.Strings(keys)
+	ret := ""
+	for _, algo := range keys {
+		ret += fmt.Sprintf("%s:%s", algo, values[algo])
+	}
+
+	return ret
+}
+
+// Checksum returns a a sha256 hash representing the node's data
+func (n *Node) Checksum() string {
+	sum := sha256.Sum256([]byte(n.flatString()))
+	return fmt.Sprintf("%x", sum)
 }
 
 type PackageURL string

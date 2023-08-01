@@ -537,3 +537,102 @@ func TestGetNodesByIdentifier(t *testing.T) {
 		require.Equal(t, tc.expected, res)
 	}
 }
+
+func TestEqual(t *testing.T) {
+	getTestNodeList := func() *NodeList {
+		return &NodeList{
+			Nodes: []*Node{
+				{Id: "nginx-arm64", Name: "nginx"},
+				{Id: "nginx-amd64", Name: "nginx", Identifiers: []*Identifier{
+					{Type: "purl", Value: "pkg:/apk/wolfi/nginx@1.21.1"},
+					{Type: "cpe", Value: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
+				}},
+				{Id: "bash-4", Name: "bash", Identifiers: []*Identifier{
+					{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
+					{Type: "cpe", Value: "cpe:2.3:a:bash:bash:5.0-4:*:*:*:*:*:*:*"},
+				}},
+				{Id: "nginx-docs", Name: "nginx-docs"},
+			},
+			Edges: []*Edge{
+				{
+					Type: Edge_dependsOn,
+					From: "nginx-amd64",
+					To:   []string{"bash-4"},
+				},
+				{
+					Type: Edge_dependsOn,
+					From: "nginx-arm64",
+					To:   []string{"bash-4"},
+				},
+			},
+			RootElements: []string{"nginx-arm64", "nginx-amd64"},
+		}
+	}
+	for msg, tc := range map[string]struct {
+		sut1     *NodeList
+		sut2     *NodeList
+		shouldEq bool
+		prepare  func(*NodeList, *NodeList)
+	}{
+		"same nodelist": {
+			sut1:     getTestNodeList(),
+			sut2:     getTestNodeList(),
+			shouldEq: true,
+			prepare:  func(*NodeList, *NodeList) {},
+		},
+		"change top level elements": {
+			sut1:     getTestNodeList(),
+			sut2:     getTestNodeList(),
+			shouldEq: false,
+			prepare: func(_ *NodeList, sut2 *NodeList) {
+				sut2.RootElements = append(sut2.RootElements, "nginx-docs")
+			},
+		},
+		"add an edge": {
+			sut1:     getTestNodeList(),
+			sut2:     getTestNodeList(),
+			shouldEq: false,
+			prepare: func(_ *NodeList, sut2 *NodeList) {
+				sut2.Edges = append(sut2.Edges, &Edge{
+					Type: Edge_documentation,
+					From: "nginx-docs",
+					To:   []string{"nginx-arm64", "nginx-amd64"},
+				})
+			},
+		},
+		"modify an edge": {
+			sut1:     getTestNodeList(),
+			sut2:     getTestNodeList(),
+			shouldEq: false,
+			prepare: func(_ *NodeList, sut2 *NodeList) {
+				sut2.Edges[0].To = append(sut2.Edges[0].To, "nginx-docs")
+			},
+		},
+		"add a node": {
+			sut1:     getTestNodeList(),
+			sut2:     getTestNodeList(),
+			shouldEq: false,
+			prepare: func(_ *NodeList, sut2 *NodeList) {
+				sut2.Nodes = append(sut2.Nodes, &Node{
+					Id:       "new-node",
+					Type:     Node_FILE,
+					Name:     "README",
+					FileName: "README.md",
+					Summary:  "Awesome readme",
+				})
+			},
+		},
+		"modify a node": {
+			sut1:     getTestNodeList(),
+			sut2:     getTestNodeList(),
+			shouldEq: false,
+			prepare: func(_ *NodeList, sut2 *NodeList) {
+				sut2.Nodes[1].FileName = "package.tar"
+			},
+		},
+	} {
+		tc.prepare(tc.sut1, tc.sut2)
+		res := tc.sut1.Equal(tc.sut2)
+		require.Equal(t, tc.shouldEq, res, msg)
+	}
+}

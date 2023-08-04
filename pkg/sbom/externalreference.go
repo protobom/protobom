@@ -1,19 +1,23 @@
 package sbom
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bom-squad/protobom/pkg/formats/spdx"
+)
 
 // ToSPDX2Category returns the type of the external reference in the
 // spdx 2.x vocabulary.
 func (e *ExternalReference) ToSPDX2Category() string {
 	switch e.ToSPDX2Type() {
 	case "cpe22Type", "cpe23Type", "advisory", "fix", "url", "swid":
-		return "SECURITY"
+		return spdx.CategorySecurity
 	case "maven-central", "npm", "nuget", "bower", "purl":
-		return "PACKAGE-MANAGER"
+		return spdx.CategoryPackageManager
 	case "swh", "gitoid":
-		return "PERSISTENT-ID"
+		return spdx.CategoryPersistentID
 	default:
-		return "OTHER"
+		return spdx.CategoryOther
 	}
 }
 
@@ -23,6 +27,7 @@ func (e *ExternalReference) ToSPDX2Type() string {
 	return e.Type
 }
 
+// flatString returns a deterministic string that can be used to hash the external reference
 func (e *ExternalReference) flatString() string {
 	ret := ""
 	if e.Type != "" {

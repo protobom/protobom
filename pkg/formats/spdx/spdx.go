@@ -12,6 +12,12 @@ const (
 	Organization = "Organization"
 	Person       = "Person"
 	Tool         = "Tool"
+
+	// Identifier categories
+	CategorySecurity       = "SECURITY"
+	CategoryPackageManager = "PACKAGE-MANAGER"
+	CategoryPersistentID   = "PERSISTENT-ID"
+	CategoryOther          = "OTHER"
 )
 
 // ParseActorString parses an SPDX "actor string", it is a specially formatted

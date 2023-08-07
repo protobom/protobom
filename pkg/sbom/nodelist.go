@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/google/go-cmp/cmp"
 )
 
 // This file adds a few methods to the NodeList type which
@@ -410,19 +410,14 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 	nlNodes := map[string]string{}
 	nl2Nodes := map[string]string{}
 	for _, n := range nl.Nodes {
-		nlNodes[n.Id] = n.flatString()
+		nlNodes[n.Id] = n.Checksum()
 	}
 
 	for _, n := range nl2.Nodes {
-		nl2Nodes[n.Id] = n.flatString()
+		nl2Nodes[n.Id] = n.Checksum()
 	}
 
-	if !reflect.DeepEqual(nlNodes, nl2Nodes) {
-		logrus.Info("No: nodes")
-		return false
-	}
-
-	return true
+	return cmp.Equal(nlNodes, nl2Nodes)
 }
 
 // RelateNodeListAtID relates the top level nodes in nl2 to the node with ID

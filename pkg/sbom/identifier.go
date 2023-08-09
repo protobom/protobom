@@ -15,7 +15,7 @@ func (i *Identifier) flatString() string {
 // spdx 2.x vocabulary.
 func (i *Identifier) ToSPDX2Category() string {
 	switch i.ToSPDX2Type() {
-	case "cpe22", "cpe23", "advisory", "fix", "url", "swid":
+	case "cpe22Type", "cpe23Type", "advisory", "fix", "url", "swid":
 		return spdx.CategorySecurity
 	case "maven-central", "npm", "nuget", "bower", "purl":
 		return spdx.CategoryPackageManager
@@ -28,6 +28,12 @@ func (i *Identifier) ToSPDX2Category() string {
 
 // ToSPDX2Type converts the external reference type to the SPDX 2.x equivalent.
 func (i *Identifier) ToSPDX2Type() string {
-	// TODO: Should we be more prescriptive here?
-	return i.Type
+	switch i.Type {
+	case "cpe22":
+		return "cpe22Type"
+	case "cpe23":
+		return "cpe23Type"
+	default:
+		return i.Type
+	}
 }

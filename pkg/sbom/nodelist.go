@@ -21,11 +21,13 @@ type edgeIndex map[string]map[Edge_Type][]*Edge
 // rootElementsIndex is an index of the top levele elements by ID
 type rootElementsIndex map[string]struct{}
 
-// hashIndex is a struct that indexes a node list by has values
+// hashIndex is a struct that indexes a NodeList by the hash values of its nodes
 type hashIndex map[string][]*Node
 
 // purlIndex captures the SBOM nodelist ordered by package url
 type purlIndex map[PackageURL][]*Node
+
+var ErrorMoreThanOneMatch = fmt.Errorf("More than one node matches")
 
 // indexNodes returns an inverse dictionary with the IDs of the nodes
 func (nl *NodeList) indexNodes() nodeIndex {
@@ -79,7 +81,7 @@ func (nl *NodeList) indexNodesByHash() hashIndex {
 }
 
 // Returns an indexed map of nodes by their package URLs. Note that more than
-// node may have the same purl.
+// one node may have the same purl.
 func (nl *NodeList) indexNodesByPurl() map[PackageURL][]*Node {
 	ret := map[PackageURL][]*Node{}
 	for _, n := range nl.Nodes {
@@ -363,6 +365,87 @@ func (nl *NodeList) GetNodeByID(id string) *Node {
 	}
 
 	return nil
+}
+
+// GetMatchingNode looks up a node in the NodeList that matches the piece of
+// software described by testNode. It will not match on ID but rather matching
+// is performed by hash then by purl.
+//
+// This function is guaranteed to only return a node when there is a single node
+// match. If more than one node matches, an ErrorMoreThanOneMatch is returned.
+//
+// See node.HashesMatch to understand how hashes are compared.
+func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
+	// If the target node has hashes, look for it
+	foundNodes := map[string]*Node{}
+	if len(node.Hashes) > 0 {
+		hashIndex := nl.indexNodesByHash()
+		for algo, hashVal := range node.Hashes {
+			// If there is at least one node with one of the hashes:
+			if _, ok := hashIndex[fmt.Sprintf("%s:%s", algo, hashVal)]; !ok {
+				continue
+			}
+			// Collect all node where hashes match excactly
+			for _, n := range hashIndex[fmt.Sprintf("%s:%s", algo, hashVal)] {
+				// Ignore if we've seen the node
+				if _, ok := foundNodes[n.Id]; ok {
+					continue
+				}
+
+				// Collect the node if hashes match
+				if n.HashesMatch(node.Hashes) {
+					foundNodes[n.Id] = n
+				}
+			}
+		}
+	}
+
+	// Here, if we have exactly one node, then we have a match. If we have zero
+	// then we reindex and match on the purl. If more than one node matched on
+	// the hashes, we try to disabiguate by looking at the purl of the hash matches.
+	testPurl := node.Purl()
+	switch len(foundNodes) {
+	case 1:
+		// If there is a single match, our job is done.
+		for _, n := range foundNodes {
+			return n, nil
+		}
+	case 0:
+		// No matches by hash, try to match by purl
+		// TODO(puerco): Purls should be normalized to match correctly,
+		// even more: ensuring correct globing of qualifiers.
+		if testPurl == "" {
+			return nil, nil
+		}
+		pindex := nl.indexNodesByPurl()
+		if _, ok := pindex[testPurl]; !ok {
+			return nil, nil
+		}
+		// If there is more than one matching, its a tie. Error.
+		if len(pindex[testPurl]) == 1 {
+			return pindex[testPurl][0], nil
+		}
+		return nil, ErrorMoreThanOneMatch
+	default:
+		// Multiple hash matches, look to see if there is a single one where
+		// the purl matches to break the ambiguity:
+		if testPurl == "" {
+			return nil, ErrorMoreThanOneMatch
+		}
+
+		foundByPurl := []*Node{}
+		for _, n := range foundNodes {
+			if tp := n.Purl(); tp != "" && tp == testPurl {
+				foundByPurl = append(foundByPurl, n)
+			}
+		}
+
+		if len(foundByPurl) == 1 {
+			return foundByPurl[0], nil
+		}
+		return nil, ErrorMoreThanOneMatch
+	}
+	return nil, nil
 }
 
 // GetNodesByIdentifier returns nodes that match an identifier of type t and

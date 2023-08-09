@@ -299,3 +299,30 @@ func (n *Node) Purl() PackageURL {
 
 	return ""
 }
+
+// HashesMatch takes a map of hashes th and returns a boolean indicating
+// if the test hashes match those of the node. The algorithm will only take
+// into account algorithms that are common to the node and test set.
+//
+// In other words, if th has any hashes in algorithms without a peer in the
+// node, the function will ignore them and return true if others match,
+// silently ignoring those missing in the node.
+//
+// If either the node or the test hashes are empty, no match is assumed.
+func (n *Node) HashesMatch(th map[string]string) bool {
+	if len(n.Hashes) == 0 || len(th) == 0 {
+		return false
+	}
+	atLeastOneMatch := false
+	for algo, hashValue := range th {
+		if _, ok := n.Hashes[algo]; !ok {
+			continue
+		}
+
+		if n.Hashes[algo] != hashValue {
+			return false
+		}
+		atLeastOneMatch = true
+	}
+	return atLeastOneMatch
+}

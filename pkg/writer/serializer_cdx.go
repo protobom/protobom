@@ -249,11 +249,6 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 
 	if n.ExternalReferences != nil {
 		for _, er := range n.ExternalReferences {
-			if er.Type == "purl" {
-				c.PackageURL = er.Url
-				continue
-			}
-
 			if c.ExternalReferences == nil {
 				c.ExternalReferences = &[]cdx.ExternalReference{}
 			}
@@ -262,6 +257,22 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				Type: cdx.ExternalReferenceType(er.Type), // Fix to make it valid
 				URL:  er.Url,
 			})
+		}
+	}
+
+	if n.Identifiers != nil {
+		for _, ident := range n.Identifiers {
+			switch ident.Type {
+			case "purl":
+				c.PackageURL = ident.Value
+			case "cpe23":
+				c.CPE = ident.Value
+			case "cpe22":
+				// TODO(degradation): Only one CPE is supperted in CDX
+				if c.CPE == "" {
+					c.CPE = ident.Value
+				}
+			}
 		}
 	}
 

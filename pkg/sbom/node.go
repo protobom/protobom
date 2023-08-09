@@ -227,8 +227,14 @@ func (n *Node) flatString() string {
 				pairs = append(pairs, fmt.Sprintf("originator:%s", i.flatString()))
 			}
 		case "bomsquad.protobom.Node.identifiers":
-			for _, i := range n.Identifiers {
-				pairs = append(pairs, i.flatString())
+			// Index the keys and sort them to make the string deterministic
+			idKeys := []int{}
+			for t := range n.Identifiers {
+				idKeys = append(idKeys, int(t))
+			}
+			sort.Ints(idKeys)
+			for _, t := range idKeys {
+				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)]))
 			}
 		case "bomsquad.protobom.Node.attribution":
 			for i := 0; i < v.List().Len(); i++ {
@@ -291,10 +297,8 @@ func (n *Node) Purl() PackageURL {
 		return ""
 	}
 
-	for _, e := range n.Identifiers {
-		if e.Type == "purl" {
-			return PackageURL(e.Value)
-		}
+	if _, ok := n.Identifiers[int32(SoftwareIdentifierType_PURL)]; ok {
+		return PackageURL(n.Identifiers[int32(SoftwareIdentifierType_PURL)])
 	}
 
 	return ""

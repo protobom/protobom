@@ -454,15 +454,14 @@ func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
 // identifier type.
 func (nl *NodeList) GetNodesByIdentifier(t, v string) []*Node {
 	ret := []*Node{}
+	idType := SoftwareIdentifierTypeFromString(t)
 	for i := range nl.Nodes {
 		if nl.Nodes[i].Identifiers == nil {
 			continue
 		}
 
-		for j := range nl.Nodes[i].Identifiers {
-			if nl.Nodes[i].Identifiers[j].Type == t && nl.Nodes[i].Identifiers[j].Value == v {
-				ret = append(ret, nl.Nodes[i])
-			}
+		if _, ok := nl.Nodes[i].Identifiers[int32(idType)]; ok && nl.Nodes[i].Identifiers[int32(idType)] == v {
+			ret = append(ret, nl.Nodes[i])
 		}
 	}
 	return ret

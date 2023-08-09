@@ -9,10 +9,11 @@ require (
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	sigs.k8s.io/release-utils v0.7.4
 )
+
+require github.com/spf13/cobra v1.7.0 // indirect
 
 require (
 	github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect

@@ -114,7 +114,7 @@ func (u *UnserializerCDX14) componentToNode(c *cdx.Component) (*sbom.Node, error
 		Suppliers:          []*sbom.Person{}, // TODO
 		Originators:        []*sbom.Person{}, // TODO
 		ExternalReferences: []*sbom.ExternalReference{},
-		Identifiers:        []*sbom.Identifier{},
+		Identifiers:        map[int32]string{},
 		FileTypes:          []string{},
 	}
 
@@ -130,21 +130,15 @@ func (u *UnserializerCDX14) componentToNode(c *cdx.Component) (*sbom.Node, error
 
 	// Named external references:
 	if c.CPE != "" {
-		ident := &sbom.Identifier{
-			Value: c.CPE,
-			Type:  "cpe22",
-		}
+		t := sbom.SoftwareIdentifierType_CPE22
 		if strings.HasPrefix(c.CPE, "cpe:2.3") {
-			ident.Type = "cpe23"
+			t = sbom.SoftwareIdentifierType_CPE23
 		}
-		node.Identifiers = append(node.Identifiers, ident)
+		node.Identifiers[int32(t)] = c.CPE
 	}
 
 	if c.PackageURL != "" {
-		node.Identifiers = append(node.Identifiers, &sbom.Identifier{
-			Type:  "purl",
-			Value: c.PackageURL,
-		})
+		node.Identifiers[int32(sbom.SoftwareIdentifierType_PURL)] = c.PackageURL
 	}
 
 	if c.Hashes != nil {

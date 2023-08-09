@@ -261,16 +261,16 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	if n.Identifiers != nil {
-		for _, ident := range n.Identifiers {
-			switch ident.Type {
-			case "purl":
-				c.PackageURL = ident.Value
-			case "cpe23":
-				c.CPE = ident.Value
-			case "cpe22":
+		for idType := range n.Identifiers {
+			switch idType {
+			case int32(sbom.SoftwareIdentifierType_PURL):
+				c.PackageURL = n.Identifiers[idType]
+			case int32(sbom.SoftwareIdentifierType_CPE23):
+				c.CPE = n.Identifiers[idType]
+			case int32(sbom.SoftwareIdentifierType_CPE22):
 				// TODO(degradation): Only one CPE is supperted in CDX
 				if c.CPE == "" {
-					c.CPE = ident.Value
+					c.CPE = n.Identifiers[idType]
 				}
 			}
 		}

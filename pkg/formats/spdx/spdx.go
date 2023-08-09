@@ -18,6 +18,11 @@ const (
 	CategoryPackageManager = "PACKAGE-MANAGER"
 	CategoryPersistentID   = "PERSISTENT-ID"
 	CategoryOther          = "OTHER"
+
+	ExtRefTypePurl   = "purl"
+	ExtRefTypeCPE22  = "cpe22Type"
+	ExtRefTypeCPE23  = "cpe23Type"
+	ExtRefTypeGitoid = "gitoid"
 )
 
 // ParseActorString parses an SPDX "actor string", it is a specially formatted

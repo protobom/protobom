@@ -291,9 +291,9 @@ func (n *Node) Purl() PackageURL {
 		return ""
 	}
 
-	for _, e := range n.ExternalReferences {
+	for _, e := range n.Identifiers {
 		if e.Type == "purl" {
-			return PackageURL(e.Url)
+			return PackageURL(e.Value)
 		}
 	}
 

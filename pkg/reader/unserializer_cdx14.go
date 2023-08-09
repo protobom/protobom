@@ -130,20 +130,20 @@ func (u *UnserializerCDX14) componentToNode(c *cdx.Component) (*sbom.Node, error
 
 	// Named external references:
 	if c.CPE != "" {
-		er := &sbom.ExternalReference{
-			Url:  c.CPE,
-			Type: "cpe22",
+		ident := &sbom.Identifier{
+			Value: c.CPE,
+			Type:  "cpe22",
 		}
 		if strings.HasPrefix(c.CPE, "cpe:2.3") {
-			er.Type = "cpe23"
+			ident.Type = "cpe23"
 		}
-		node.ExternalReferences = append(node.ExternalReferences, er)
+		node.Identifiers = append(node.Identifiers, ident)
 	}
 
 	if c.PackageURL != "" {
-		node.ExternalReferences = append(node.ExternalReferences, &sbom.ExternalReference{
-			Url:  c.PackageURL,
-			Type: "purl",
+		node.Identifiers = append(node.Identifiers, &sbom.Identifier{
+			Type:  "purl",
+			Value: c.PackageURL,
 		})
 	}
 

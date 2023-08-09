@@ -257,6 +257,14 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			})
 		}
 
+		for _, i := range node.Identifiers {
+			p.PackageExternalReferences = append(p.PackageExternalReferences, &v2_3.PackageExternalReference{
+				Category: i.ToSPDX2Category(),
+				RefType:  i.ToSPDX2Type(),
+				Locator:  i.Value,
+			})
+		}
+
 		if len(node.Suppliers) > 0 {
 			// TODO(degradation): URL, Phone are lost if set
 			// TODO(degradation): If is more than one supplier, it will be lost

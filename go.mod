@@ -2,14 +2,13 @@ module github.com/bom-squad/protobom
 
 go 1.20
 
-require google.golang.org/protobuf v1.31.0
-
 require (
 	github.com/CycloneDX/cyclonedx-go v0.7.1
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
+	google.golang.org/protobuf v1.31.0
 	sigs.k8s.io/release-utils v0.7.4
 )
 

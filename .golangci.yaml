@@ -51,7 +51,7 @@ linters:
     - promlinter
     # - revive Disabled for now as we have lots of uppercase consts
     - staticcheck
-    #- stylecheck 
+    #- stylecheck
     - typecheck
     - unconvert
     - unparam
@@ -88,6 +88,20 @@ linters:
     # - wrapcheck
     # - wsl
 linters-settings:
+  depguard:
+    list-type: blacklist
+    include-go-root: true
+    include-go-std-lib: true
+  gci:
+    no-inline-comments: false
+    no-prefix-comments: true
+    sections:
+      - standard
+      - default
+      - prefix(github.com/bom-squad/protobom)
+
+    section-separators:
+      - newLine
   godox:
     keywords:
       - BUG

@@ -29,7 +29,7 @@ message Node {
     string source_info = 13;     // any relevant background information or additional comments about the origin
     string primary_purpose = 14; // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
 
-    string comment = 15; 
+    string comment = 15;
     string summary = 16;      // Short package description
     string description = 17;  // Package description (full)
 
@@ -128,7 +128,7 @@ message Person {
     string name = 1;
     bool is_org = 2;
     string email  = 3;
-    string url = 4;	
+    string url = 4;
     string phone = 5;             // CDX
     repeated Person contacts = 6; // CDX // Support?
 	// repeated PersonIdentifier identifiers // Support?

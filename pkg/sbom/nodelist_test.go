@@ -684,7 +684,7 @@ func TestIndexByHash(t *testing.T) {
 			expectedLength: 4,
 			mustEqual:      true,
 		},
-		"2 nodes, sahred hashes": {
+		"2 nodes, shared hashes": {
 			sut: &NodeList{
 				Nodes: []*Node{
 					{Id: "nginx-amd64", Name: "nginx", Hashes: map[string]string{
@@ -784,5 +784,177 @@ func TestIndexByPurl(t *testing.T) {
 		res := tc.sut.indexNodesByPurl()
 		require.Equal(t, tc.expectedLength, len(res), label)
 		// TODO(puerco): CHheck deeper into result
+	}
+}
+
+func TestGetMatchingNode(t *testing.T) {
+	for label, tc := range map[string]struct {
+		sut         *NodeList
+		node        *Node
+		exptectedId string
+		shouldNil   bool
+		shouldError bool
+	}{
+		"single hash": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "node1", Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+					{Id: "node2", Hashes: map[string]string{"sha1": "4c219efaf4d39295971409f796301a89a304cee6"}},
+				},
+			},
+			node:        &Node{Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+			exptectedId: "node1",
+		},
+		"two matches": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "node1", Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+					{Id: "node2", Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+				},
+			},
+			node:        &Node{Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+			shouldError: true,
+		},
+		"two hashes, one matches, one doesnt": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{
+						Id: "node1", Hashes: map[string]string{
+							"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+							"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+						},
+					},
+				},
+			},
+			node: &Node{
+				Hashes: map[string]string{
+					"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+					"sha256": "no-match-here",
+				},
+			},
+			shouldError: false,
+			shouldNil:   true,
+		},
+		"two hashes, three on the nodelist": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{
+						Id: "node1", Hashes: map[string]string{
+							"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+							"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+							"sha512": "012d52b1ab7abc4b8e98d6767ef6465f63259116f23f954b404ac356425d8488086e1483846fc755750f8bceae54d8c838f843753353d6709c3eaf85c1377cce",
+						},
+					},
+				},
+			},
+			node: &Node{
+				Hashes: map[string]string{
+					"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+					"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+				},
+			},
+			exptectedId: "node1",
+		},
+		"two hashes, both match": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{
+						Id: "node1", Hashes: map[string]string{
+							"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+							"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+						},
+					},
+				},
+			},
+			node: &Node{
+				Hashes: map[string]string{
+					"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+					"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+				},
+			},
+			exptectedId: "node1",
+		},
+		"two shared matches, match on purl": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{
+						Id:          "node1",
+						Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+						Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/alpine/bash@4.0.1"}},
+					},
+					{
+						Id:          "node2",
+						Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+						Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"}},
+					},
+				},
+			},
+			node: &Node{
+				Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+				Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"}},
+			},
+			exptectedId: "node2",
+			shouldError: false,
+		},
+		"purls. no hashes": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{
+						Id:          "node1",
+						Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/alpine/bash@4.0.1"}},
+					},
+					{
+						Id:          "node2",
+						Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"}},
+					},
+				},
+			},
+			node: &Node{
+				Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+				Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"}},
+			},
+			exptectedId: "node2",
+		},
+		/* this one needs to be implemented
+		"rearranged purls should match": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{
+						Id: "node1",
+						Identifiers: []*Identifier{
+							{
+								Type:  "purl",
+								Value: "pkg:deb/libzstd1@1.3.8+dfsg-3+deb10u2?arch=amd64&upstream=libzstd",
+							},
+						},
+					},
+				},
+			},
+			node: &Node{
+				Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+				Identifiers: []*Identifier{
+					{
+						Type:  "purl",
+						Value: "pkg:deb/libzstd1@1.3.8+dfsg-3+deb10u2?upstream=libzstd&arch=amd64",
+					},
+				},
+			},
+			exptectedId: "node1",
+		},
+		*/
+	} {
+		res, err := tc.sut.GetMatchingNode(tc.node)
+		if tc.shouldError {
+			require.Error(t, err, label)
+			continue
+		}
+
+		if tc.shouldNil {
+			require.Nil(t, res, label)
+			continue
+		} else {
+			require.NotNil(t, res, label)
+		}
+		require.Equal(t, tc.exptectedId, res.Id, label)
 	}
 }

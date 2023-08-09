@@ -21,6 +21,12 @@ type edgeIndex map[string]map[Edge_Type][]*Edge
 // rootElementsIndex is an index of the top levele elements by ID
 type rootElementsIndex map[string]struct{}
 
+// hashIndex is a struct that indexes a node list by has values
+type hashIndex map[string][]*Node
+
+// purlIndex captures the SBOM nodelist ordered by package url
+type purlIndex map[PackageURL][]*Node
+
 // indexNodes returns an inverse dictionary with the IDs of the nodes
 func (nl *NodeList) indexNodes() nodeIndex {
 	ret := nodeIndex{}
@@ -54,6 +60,37 @@ func (nl *NodeList) indexRootElements() rootElementsIndex {
 		index[id] = struct{}{}
 	}
 	return index
+}
+
+// indexNodesByHash returns an index of all nodes by their hash value.
+// More than one node can have the same hash.
+func (nl *NodeList) indexNodesByHash() hashIndex {
+	ret := hashIndex{}
+	for _, n := range nl.Nodes {
+		for algo, hashVal := range n.Hashes {
+			if hashVal == "" {
+				continue
+			}
+			s := fmt.Sprintf("%s:%s", algo, hashVal)
+			ret[s] = append(ret[s], n)
+		}
+	}
+	return ret
+}
+
+// Returns an indexed map of nodes by their package URLs. Note that more than
+// node may have the same purl.
+func (nl *NodeList) indexNodesByPurl() map[PackageURL][]*Node {
+	ret := map[PackageURL][]*Node{}
+	for _, n := range nl.Nodes {
+		nodePurl := n.Purl()
+		if nodePurl == "" {
+			continue
+		}
+
+		ret[nodePurl] = append(ret[nodePurl], n)
+	}
+	return ret
 }
 
 // cleanEdges is a utility function that removes broken

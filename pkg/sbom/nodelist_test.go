@@ -636,3 +636,153 @@ func TestEqual(t *testing.T) {
 		require.Equal(t, tc.shouldEq, res, msg)
 	}
 }
+
+func TestIndexByHash(t *testing.T) {
+	for label, tc := range map[string]struct {
+		sut            *NodeList
+		expected       hashIndex
+		expectedLength int
+		mustEqual      bool
+	}{
+		"1 node, no hashes": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-arm64", Name: "nginx"},
+				},
+			},
+			expected:       hashIndex{},
+			expectedLength: 0,
+			mustEqual:      true,
+		},
+		"1 node, with hashes": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-amd64", Name: "nginx", Hashes: map[string]string{
+						"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+						"sha256": "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
+					}},
+				},
+			},
+			expected:       hashIndex{},
+			expectedLength: 2,
+			mustEqual:      true,
+		},
+		"2 node, with hashes": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-amd64", Name: "nginx", Hashes: map[string]string{
+						"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+						"sha256": "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
+					}},
+					{Id: "nginx-arm64", Name: "nginx", Hashes: map[string]string{
+						"sha1":   "7df059597099bb7dcf25d2a9aedfaf4465f72d8d",
+						"sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+					}},
+				},
+			},
+			expected:       hashIndex{},
+			expectedLength: 4,
+			mustEqual:      true,
+		},
+		"2 nodes, sahred hashes": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-amd64", Name: "nginx", Hashes: map[string]string{
+						"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+						"sha256": "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
+					}},
+					{Id: "nginx-arm64", Name: "nginx", Hashes: map[string]string{
+						"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+						"sha256": "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
+					}},
+				},
+			},
+			expected:       hashIndex{},
+			expectedLength: 2,
+			mustEqual:      true,
+		},
+	} {
+		res := tc.sut.indexNodesByHash()
+		require.Equal(t, tc.expectedLength, len(res), label)
+		// TODO(puerco): CHheck deeper into result
+	}
+}
+
+func TestIndexByPurl(t *testing.T) {
+	for label, tc := range map[string]struct {
+		sut            *NodeList
+		expected       purlIndex
+		expectedLength int
+		mustEqual      bool
+	}{
+		"1 node, no purl": {
+			sut: &NodeList{
+				Nodes: []*Node{{Id: "nginx-arm64", Name: "nginx"}},
+			},
+			expected:       purlIndex{},
+			expectedLength: 0,
+			mustEqual:      true,
+		},
+		"1 node, one purl": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
+						{
+							Type:  "purl",
+							Value: "pkg:apk/wolfi/glibc@2.38-r1?arch=x86_64",
+						},
+					}},
+				},
+			},
+			expected:       purlIndex{},
+			expectedLength: 1,
+			mustEqual:      true,
+		},
+		"2 nodes, two purls": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
+						{
+							Type:  "purl",
+							Value: "pkg:apk/wolfi/glibc@2.38-r1?arch=arm64",
+						},
+					}},
+					{Id: "nginx-amd64", Name: "nginx", Identifiers: []*Identifier{
+						{
+							Type:  "purl",
+							Value: "pkg:apk/wolfi/glibc@2.38-r1?arch=x86_64",
+						},
+					}},
+				},
+			},
+			expected:       purlIndex{},
+			expectedLength: 2,
+			mustEqual:      true,
+		},
+		"2 nodes, shared purl": {
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
+						{
+							Type:  "purl",
+							Value: "pkg:apk/wolfi/glibc@2.38-r1",
+						},
+					}},
+					{Id: "nginx-amd64", Name: "nginx", Identifiers: []*Identifier{
+						{
+							Type:  "purl",
+							Value: "pkg:apk/wolfi/glibc@2.38-r1",
+						},
+					}},
+				},
+			},
+			expected:       purlIndex{},
+			expectedLength: 1,
+			mustEqual:      true,
+		},
+	} {
+		res := tc.sut.indexNodesByPurl()
+		require.Equal(t, tc.expectedLength, len(res), label)
+		// TODO(puerco): CHheck deeper into result
+	}
+}

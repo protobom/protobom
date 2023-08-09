@@ -38,7 +38,7 @@ func (r *Reader) ParseFile(path string) (*sbom.Document, error) {
 }
 
 // ParseStream returns a document from a io reader
-func (r *Reader) ParseStream(f io.ReadSeekCloser) (*sbom.Document, error) {
+func (r *Reader) ParseStream(f io.ReadSeeker) (*sbom.Document, error) {
 	format, err := r.impl.DetectFormat(&r.Options, f)
 	if err != nil {
 		return nil, fmt.Errorf("detecting SBOM format: %w", err)

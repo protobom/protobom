@@ -489,51 +489,54 @@ func TestGetNodeByID(t *testing.T) {
 
 func TestGetNodesByIdentifier(t *testing.T) {
 	for _, tc := range []struct {
-		sut        *NodeList
-		identifier *Identifier
-		expected   []*Node
+		sut      *NodeList
+		expected []*Node
+		idType   string
+		idValue  string
 	}{
 		{
 			&NodeList{
 				Nodes: []*Node{
-					{Id: "node1", Name: "apache-tomcat", Identifiers: []*Identifier{
-						{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
-					}},
+					{
+						Id:          "node1",
+						Name:        "apache-tomcat",
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"},
+					},
 					{Id: "node2", Name: "apache"},
 				},
 				Edges:        []*Edge{},
 				RootElements: []string{},
 			},
-			&Identifier{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
-			[]*Node{{Id: "node1", Name: "apache-tomcat", Identifiers: []*Identifier{
-				{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
-			}}},
+			[]*Node{
+				{Id: "node1", Name: "apache-tomcat", Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"}},
+			},
+			"purl", "pkg:/apk/wolfi/bash@4.0.1",
 		},
 		{
 			&NodeList{
 				Nodes: []*Node{
 					{Id: "nginx-arm64", Name: "nginx"},
-					{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
-						{Type: "purl", Value: "pkg:/apk/wolfi/nginx@1.21.1"},
-						{Type: "cpe", Value: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
+					{Id: "nginx-arm64", Name: "nginx", Identifiers: map[int32]string{
+						int32(SoftwareIdentifierType_PURL):  "pkg:/apk/wolfi/nginx@1.21.1",
+						int32(SoftwareIdentifierType_CPE23): "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*",
 					}},
-					{Id: "bash-4", Name: "bash", Identifiers: []*Identifier{
-						{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
-						{Type: "cpe", Value: "cpe:2.3:a:bash:bash:5.0-4:*:*:*:*:*:*:*"},
+					{Id: "bash-4", Name: "bash", Identifiers: map[int32]string{
+						int32(SoftwareIdentifierType_PURL):  "pkg:/apk/wolfi/bash@4.0.1",
+						int32(SoftwareIdentifierType_CPE23): "cpe:2.3:a:bash:bash:5.0-4:*:*:*:*:*:*:*",
 					}},
 					{Id: "nginx-docs", Name: "nginx-docs"},
 				},
 				Edges:        []*Edge{},
 				RootElements: []string{},
 			},
-			&Identifier{Type: "cpe", Value: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
-			[]*Node{{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
-				{Type: "purl", Value: "pkg:/apk/wolfi/nginx@1.21.1"},
-				{Type: "cpe", Value: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
+			[]*Node{{Id: "nginx-arm64", Name: "nginx", Identifiers: map[int32]string{
+				int32(SoftwareIdentifierType_PURL):  "pkg:/apk/wolfi/nginx@1.21.1",
+				int32(SoftwareIdentifierType_CPE23): "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*",
 			}}},
+			"cpe23", "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*",
 		},
 	} {
-		res := tc.sut.GetNodesByIdentifier(tc.identifier.Type, tc.identifier.Value)
+		res := tc.sut.GetNodesByIdentifier(tc.idType, tc.idValue)
 		require.Equal(t, tc.expected, res)
 	}
 }
@@ -543,13 +546,13 @@ func TestEqual(t *testing.T) {
 		return &NodeList{
 			Nodes: []*Node{
 				{Id: "nginx-arm64", Name: "nginx"},
-				{Id: "nginx-amd64", Name: "nginx", Identifiers: []*Identifier{
-					{Type: "purl", Value: "pkg:/apk/wolfi/nginx@1.21.1"},
-					{Type: "cpe", Value: "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*"},
+				{Id: "nginx-amd64", Name: "nginx", Identifiers: map[int32]string{
+					int32(SoftwareIdentifierType_PURL):  "pkg:/apk/wolfi/nginx@1.21.1",
+					int32(SoftwareIdentifierType_CPE23): "cpe:2.3:a:nginx:nginx:1.21.1:*:*:*:*:*:*:*",
 				}},
-				{Id: "bash-4", Name: "bash", Identifiers: []*Identifier{
-					{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"},
-					{Type: "cpe", Value: "cpe:2.3:a:bash:bash:5.0-4:*:*:*:*:*:*:*"},
+				{Id: "bash-4", Name: "bash", Identifiers: map[int32]string{
+					int32(SoftwareIdentifierType_PURL):  "pkg:/apk/wolfi/bash@4.0.1",
+					int32(SoftwareIdentifierType_CPE23): "cpe:2.3:a:bash:bash:5.0-4:*:*:*:*:*:*:*",
 				}},
 				{Id: "nginx-docs", Name: "nginx-docs"},
 			},
@@ -726,12 +729,11 @@ func TestIndexByPurl(t *testing.T) {
 		"1 node, one purl": {
 			sut: &NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
-						{
-							Type:  "purl",
-							Value: "pkg:apk/wolfi/glibc@2.38-r1?arch=x86_64",
-						},
-					}},
+					{
+						Id:          "nginx-arm64",
+						Name:        "nginx",
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:apk/wolfi/glibc@2.38-r1?arch=x86_64"},
+					},
 				},
 			},
 			expected:       purlIndex{},
@@ -741,18 +743,14 @@ func TestIndexByPurl(t *testing.T) {
 		"2 nodes, two purls": {
 			sut: &NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
-						{
-							Type:  "purl",
-							Value: "pkg:apk/wolfi/glibc@2.38-r1?arch=arm64",
-						},
-					}},
-					{Id: "nginx-amd64", Name: "nginx", Identifiers: []*Identifier{
-						{
-							Type:  "purl",
-							Value: "pkg:apk/wolfi/glibc@2.38-r1?arch=x86_64",
-						},
-					}},
+					{
+						Id: "nginx-arm64", Name: "nginx",
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:apk/wolfi/glibc@2.38-r1?arch=arm64"},
+					},
+					{
+						Id: "nginx-amd64", Name: "nginx",
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:apk/wolfi/glibc@2.38-r1?arch=x86_64"},
+					},
 				},
 			},
 			expected:       purlIndex{},
@@ -762,18 +760,14 @@ func TestIndexByPurl(t *testing.T) {
 		"2 nodes, shared purl": {
 			sut: &NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-arm64", Name: "nginx", Identifiers: []*Identifier{
-						{
-							Type:  "purl",
-							Value: "pkg:apk/wolfi/glibc@2.38-r1",
-						},
-					}},
-					{Id: "nginx-amd64", Name: "nginx", Identifiers: []*Identifier{
-						{
-							Type:  "purl",
-							Value: "pkg:apk/wolfi/glibc@2.38-r1",
-						},
-					}},
+					{
+						Id: "nginx-arm64", Name: "nginx",
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:apk/wolfi/glibc@2.38-r1"},
+					},
+					{
+						Id: "nginx-amd64", Name: "nginx",
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:apk/wolfi/glibc@2.38-r1"},
+					},
 				},
 			},
 			expected:       purlIndex{},
@@ -880,18 +874,18 @@ func TestGetMatchingNode(t *testing.T) {
 					{
 						Id:          "node1",
 						Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
-						Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/alpine/bash@4.0.1"}},
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/alpine/bash@4.0.1"},
 					},
 					{
 						Id:          "node2",
 						Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
-						Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"}},
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"},
 					},
 				},
 			},
 			node: &Node{
 				Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
-				Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"}},
+				Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"},
 			},
 			exptectedId: "node2",
 			shouldError: false,
@@ -901,17 +895,17 @@ func TestGetMatchingNode(t *testing.T) {
 				Nodes: []*Node{
 					{
 						Id:          "node1",
-						Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/alpine/bash@4.0.1"}},
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/alpine/bash@4.0.1"},
 					},
 					{
 						Id:          "node2",
-						Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"}},
+						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"},
 					},
 				},
 			},
 			node: &Node{
 				Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
-				Identifiers: []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.0.1"}},
+				Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"},
 			},
 			exptectedId: "node2",
 		},

@@ -89,7 +89,7 @@ func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 		Summary:         p.PackageSummary,
 		Description:     p.PackageDescription,
 		Attribution:     p.PackageAttributionTexts,
-		Identifiers:     []*sbom.Identifier{},
+		Identifiers:     map[int32]string{},
 	}
 
 	// TODO(degradation) NOASSERTION
@@ -107,25 +107,19 @@ func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	if len(p.PackageExternalReferences) > 0 {
 		n.ExternalReferences = []*sbom.ExternalReference{}
 		for _, r := range p.PackageExternalReferences {
-			switch r.RefType {
-			case "purl", "cpe22Type", "cpe23Type", "gitoid":
-				t := r.RefType
-				if t == "cpe22Type" {
-					t = "cpe22"
-				} else if t == "cpe23Type" {
-					t = "cpe23"
-				}
-				n.Identifiers = append(n.Identifiers, &sbom.Identifier{
-					Type:  t,
-					Value: r.Locator,
-				})
-			default:
-				n.ExternalReferences = append(n.ExternalReferences, &sbom.ExternalReference{
-					Url:     r.Locator,
-					Type:    r.RefType,
-					Comment: r.ExternalRefComment,
-				})
+			// If it is a software identifier, catch it and continue:
+			idType := sbom.SoftwareIdentifierTypeFromSPDXExtRefType(r.RefType)
+			if idType != sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE {
+				n.Identifiers[int32(idType)] = r.Locator
+				continue
 			}
+
+			// Else, it goes into the external references
+			n.ExternalReferences = append(n.ExternalReferences, &sbom.ExternalReference{
+				Url:     r.Locator,
+				Type:    r.RefType,
+				Comment: r.ExternalRefComment,
+			})
 		}
 	}
 

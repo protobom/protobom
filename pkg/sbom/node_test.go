@@ -47,13 +47,8 @@ func TestAugment(t *testing.T) {
 				Type: "VCS",
 			},
 		},
-		Identifiers: []*Identifier{
-			{
-				Type:  "pkg:/apk/wolfi/glibc@12.0.0",
-				Value: "purl",
-			},
-		},
-		FileTypes: []string{"TEXT"},
+		Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/glibc@12.0.0"},
+		FileTypes:   []string{"TEXT"},
 	}
 
 	for _, tc := range []struct {
@@ -123,13 +118,8 @@ func TestUpdate(t *testing.T) {
 				ReleaseDate: now,
 			},
 			n2: &Node{
-				Identifiers: []*Identifier{
-					{
-						Type:  "purl",
-						Value: "pkg:generic/mysoftware@1.0.0",
-					},
-				},
-				BuildDate: now,
+				Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:generic/mysoftware@1.0.0"},
+				BuildDate:   now,
 			},
 			expected: &Node{
 				Name:    "My Awesome Software",
@@ -138,13 +128,8 @@ func TestUpdate(t *testing.T) {
 					"SHA1": "9782347892345789234578",
 				},
 				ReleaseDate: now,
-				Identifiers: []*Identifier{
-					{
-						Type:  "purl",
-						Value: "pkg:generic/mysoftware@1.0.0",
-					},
-				},
-				BuildDate: now,
+				Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:generic/mysoftware@1.0.0"},
+				BuildDate:   now,
 			},
 		},
 	} {
@@ -233,7 +218,7 @@ func TestNodeFlatString(t *testing.T) {
 				ReleaseDate:    timestamppb.New(t1),
 				BuildDate:      timestamppb.New(t2),
 				ValidUntilDate: timestamppb.New(t3),
-				Identifiers:    []*Identifier{{Type: "purl", Value: "pkg:/apk/wolfi/bash@4.1.11"}},
+				Identifiers:    map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.1.11"},
 				FileTypes:      []string{},
 				ExternalReferences: []*ExternalReference{
 					{
@@ -245,7 +230,7 @@ func TestNodeFlatString(t *testing.T) {
 					},
 				},
 			},
-			"bomsquad.protobom.Node.build_date:1700166898:bomsquad.protobom.Node.copyright:Copyright (c) 2023 The Protobom Authors:bomsquad.protobom.Node.file_name:test.tar.gz:bomsquad.protobom.Node.hashes:sha-256:b51261db1ecadecf85274e811e537c5811a0ad1ab2a0121aeac4e3d031e1bf83:bomsquad.protobom.Node.id:node-id:bomsquad.protobom.Node.identifiers[purl]:pkg:/apk/wolfi/bash@4.1.11:bomsquad.protobom.Node.license_comments:Comment on the license:bomsquad.protobom.Node.license_concluded:Apache-2.0:bomsquad.protobom.Node.name:test node:bomsquad.protobom.Node.primary_purpose:CONTAINER:bomsquad.protobom.Node.release_date:1700080498:bomsquad.protobom.Node.url_download:http://example.com/file.tar.gz:bomsquad.protobom.Node.url_home:http://example.com/:bomsquad.protobom.Node.valid_until_date:1700253298:bomsquad.protobom.Node.version:1.0.0:extref:(t)VCS(u)http://github.com/external(c)GitHub Link:originator:n(The Open Source Authors)o(false)email(noone@example.com)url(http://github.com/example)p(987-5432):supplier:n(ACME, Inc)o(true)email(acme@example.com)url(http://acme-fixtures.com)p(123-3456)",
+			"bomsquad.protobom.Node.build_date:1700166898:bomsquad.protobom.Node.copyright:Copyright (c) 2023 The Protobom Authors:bomsquad.protobom.Node.file_name:test.tar.gz:bomsquad.protobom.Node.hashes:sha-256:b51261db1ecadecf85274e811e537c5811a0ad1ab2a0121aeac4e3d031e1bf83:bomsquad.protobom.Node.id:node-id:bomsquad.protobom.Node.license_comments:Comment on the license:bomsquad.protobom.Node.license_concluded:Apache-2.0:bomsquad.protobom.Node.name:test node:bomsquad.protobom.Node.primary_purpose:CONTAINER:bomsquad.protobom.Node.release_date:1700080498:bomsquad.protobom.Node.url_download:http://example.com/file.tar.gz:bomsquad.protobom.Node.url_home:http://example.com/:bomsquad.protobom.Node.valid_until_date:1700253298:bomsquad.protobom.Node.version:1.0.0:extref:(t)VCS(u)http://github.com/external(c)GitHub Link:identifiers[1]:pkg:/apk/wolfi/bash@4.1.11:originator:n(The Open Source Authors)o(false)email(noone@example.com)url(http://github.com/example)p(987-5432):supplier:n(ACME, Inc)o(true)email(acme@example.com)url(http://acme-fixtures.com)p(123-3456)",
 		},
 		{
 			&Node{

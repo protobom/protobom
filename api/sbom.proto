@@ -42,9 +42,13 @@ message Node {
     google.protobuf.Timestamp valid_until_date = 23;
 
     repeated ExternalReference external_references = 24;
-    repeated Identifier identifiers = 25;
+
+    // field 25 was the old identifier list.
+    // Removed, see https://github.com/bom-squad/protobom/issues/64
+    // repeated Identifier identifiers = 25;
 
     repeated string file_types = 27; // File types
+    map<int32,string> identifiers = 28;  // Software identifiers
 
     enum NodeType {
         PACKAGE = 0;
@@ -140,12 +144,6 @@ message Tool {
     string vendor = 3;
 }
 
-
-message Identifier {
-    string type = 1;
-    string value = 2;
-}
-
 message NodeList {
     repeated Node nodes = 1;
     repeated Edge edges = 2;
@@ -173,4 +171,12 @@ enum HashAlgorithm {
     MD4 = 15; // Only supported by SPDX
     MD6 = 16; // Only supported by SPDX
     SHA224 = 17; // Only supported by SPDX
-  }
+}
+
+enum SoftwareIdentifierType {
+    UNKNOWN_IDENTIFIER_TYPE = 0;
+    PURL = 1;
+    CPE22 = 2;
+    CPE23 = 3;
+    GITOID = 4;
+}

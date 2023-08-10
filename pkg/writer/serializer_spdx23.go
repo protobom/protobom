@@ -257,11 +257,11 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			})
 		}
 
-		for _, i := range node.Identifiers {
+		for i := range node.Identifiers {
 			p.PackageExternalReferences = append(p.PackageExternalReferences, &v2_3.PackageExternalReference{
-				Category: i.ToSPDX2Category(),
-				RefType:  i.ToSPDX2Type(),
-				Locator:  i.Value,
+				Category: sbom.SoftwareIdentifierType(i).ToSPDX2Category(),
+				RefType:  sbom.SoftwareIdentifierType(i).ToSPDX2Type(),
+				Locator:  node.Identifiers[i],
 			})
 		}
 

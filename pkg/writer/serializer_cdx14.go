@@ -16,5 +16,5 @@ type SerializerCDX14 struct {
 // Render is a wrapper on top of the general CDX serializer
 func (s *SerializerCDX14) Render(_ options.Options, doc interface{}, wr io.Writer) error {
 	// Call the global CycloneDX serializer method to render the doc
-	return s.renderVersion(cdx.SpecVersion1_4, doc, wr)
+	return s.renderVersion(cdx.SpecVersion1_5, doc, wr)
 }

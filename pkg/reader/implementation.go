@@ -38,10 +38,15 @@ func (dpi *defaultParserImplementation) GetUnserializer(_ *options.Options, form
 	case "text/spdx+json;version=2.3":
 		return &UnserializerSPDX23{}, nil
 	case "application/vnd.cyclonedx+json;version=1.0":
+		return &UnserializerCDX{}, nil
 	case "application/vnd.cyclonedx+json;version=1.1":
+		return &UnserializerCDX{}, nil
 	case "application/vnd.cyclonedx+json;version=1.2":
+		return &UnserializerCDX{}, nil
 	case "application/vnd.cyclonedx+json;version=1.3":
+		return &UnserializerCDX{}, nil
 	case "application/vnd.cyclonedx+json;version=1.4":
+		return &UnserializerCDX{}, nil
 	case "application/vnd.cyclonedx+json;version=1.5":
 		return &UnserializerCDX{}, nil
 	}

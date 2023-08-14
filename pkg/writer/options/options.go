@@ -11,5 +11,5 @@ type Options struct {
 
 var Default = Options{
 	Indent: 4,
-	Format: formats.CDX14JSON,
+	Format: formats.CDX15JSON,
 }

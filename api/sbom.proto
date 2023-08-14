@@ -43,8 +43,6 @@ message Node {
 
     repeated ExternalReference external_references = 24;
 
-    repeated Property properties = 25; // CDX Only, SPDX uses annotations
-
     // field 25 was the old identifier list.
     // Removed, see https://github.com/bom-squad/protobom/issues/64
     // repeated Identifier identifiers = 25;
@@ -150,9 +148,8 @@ message Tool {
 message Lifecycle {
     string name = 1;
     optional string description = 2;
+    optional bool enum = 3;
 }
-
-
 
 message Identifier {
     string type = 1;

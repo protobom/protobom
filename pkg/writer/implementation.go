@@ -20,16 +20,18 @@ type writerImplementation interface {
 type defaultWriterImplementation struct{}
 
 func (di *defaultWriterImplementation) GetFormatSerializer(formatOpt formats.Format) (Serializer, error) {
-	switch formatOpt {
-	case formats.CDX14JSON:
-		logrus.Infof("Serializing to %s", formats.CDX14JSON)
+	switch formatOpt.Type() {
+	case formats.CDXFORMAT:
+		logrus.Infof("Serializing to %s", formatOpt)
 		return &SerializerCDX14{}, nil
-	case formats.SPDX23JSON:
+	case formats.SPDXFORMAT:
 		logrus.Infof("Serializing to %s", formats.SPDX23JSON)
-		return &SerializerSPDX23{}, nil
-	default:
-		return nil, fmt.Errorf("no serializer supports rendering to %s", formatOpt)
+		if formatOpt.Encoding() == formats.JSON {
+			return &SerializerSPDX23{}, nil
+		}
 	}
+
+	return nil, fmt.Errorf("no serializer supports rendering to %s", formatOpt)
 }
 
 // SerializeSBOM takes an SBOM in protobuf and a serializer and uses it to render

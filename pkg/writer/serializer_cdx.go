@@ -38,7 +38,8 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	}
 
 	metadata := cdx.Metadata{
-		Component: &cdx.Component{},
+		Component:  &cdx.Component{},
+		Lifecycles: &[]cdx.Lifecycle{},
 	}
 
 	doc.Metadata = &metadata
@@ -53,6 +54,18 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 	doc.Metadata.Component = rootComponent
 	if err := s.componentsMaps(ctx, bom); err != nil {
 		return nil, err
+	}
+
+	for _, ls := range bom.Metadata.Lifecycles {
+		var lfc cdx.Lifecycle
+		if *ls.Enum {
+			lfc.Phase = cdx.LifecyclePhase(ls.Name)
+		} else {
+			lfc.Name = ls.Name
+			lfc.Description = *ls.Description
+		}
+
+		*doc.Metadata.Lifecycles = append(*doc.Metadata.Lifecycles, lfc)
 	}
 
 	deps, err := s.dependencies(ctx, bom)

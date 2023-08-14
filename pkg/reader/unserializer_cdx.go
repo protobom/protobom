@@ -42,15 +42,17 @@ func (u *UnserializerCDX) ParseStream(_ *options.Options, r io.Reader) (*sbom.Do
 	if bom.Metadata.Lifecycles != nil {
 		for _, lc := range *bom.Metadata.Lifecycles {
 			name := lc.Name
-
+			enum := false
 			// TODO: this might be redundant, but I'm not sure
 			if lc.Phase != "" {
 				name = string(lc.Phase)
+				enum = true
 			}
 
 			doc.Metadata.Lifecycles = append(doc.Metadata.Lifecycles, &sbom.Lifecycle{
 				Name:        name,
 				Description: &lc.Description,
+				Enum:        &enum,
 			})
 		}
 	}

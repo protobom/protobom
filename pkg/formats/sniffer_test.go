@@ -52,6 +52,13 @@ func TestSniffReader(t *testing.T) {
 			encoding:   "json",
 		},
 		{
+			filename:   "testdata/trivy.cdx.json",
+			mustError:  false,
+			version:    "1.5",
+			formatType: "cyclonedx",
+			encoding:   "json",
+		},
+		{
 			filename:  "testdata/syft.json",
 			mustError: true,
 		},

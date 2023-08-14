@@ -13,11 +13,11 @@ import (
 	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
-type UnserializerCDX14 struct{}
+type UnserializerCDX struct{}
 
-// ParseStream reads a CycloneDX 1.4 from stream r usinbg the offcial CycloneDX
+// ParseStream reads a CycloneDX 1.x from stream r usinbg the offcial CycloneDX
 // libraries and returns a protobom document with its data.
-func (u *UnserializerCDX14) ParseStream(_ *options.Options, r io.Reader) (*sbom.Document, error) {
+func (u *UnserializerCDX) ParseStream(_ *options.Options, r io.Reader) (*sbom.Document, error) {
 	bom := new(cdx.BOM)
 	decoder := cdx.NewBOMDecoder(r, cdx.BOMFileFormatJSON)
 	if err := decoder.Decode(bom); err != nil {
@@ -29,12 +29,30 @@ func (u *UnserializerCDX14) ParseStream(_ *options.Options, r io.Reader) (*sbom.
 			Id:      bom.SerialNumber,
 			Version: fmt.Sprintf("%d", bom.Version),
 			// Name:    ,
-			Date:    &timestamppb.Timestamp{},
-			Tools:   []*sbom.Tool{},
-			Authors: []*sbom.Person{},
-			// Comment: bom.Com,
+			Date:       &timestamppb.Timestamp{},
+			Tools:      []*sbom.Tool{},
+			Authors:    []*sbom.Person{},
+			Lifecycles: []*sbom.Lifecycle{},
+
+			// Comment: bom.Comment,
 		},
 		NodeList: &sbom.NodeList{},
+	}
+
+	if bom.Metadata.Lifecycles != nil {
+		for _, lc := range *bom.Metadata.Lifecycles {
+			name := lc.Name
+
+			// TODO: this might be redundant, but I'm not sure
+			if lc.Phase != "" {
+				name = string(lc.Phase)
+			}
+
+			doc.Metadata.Lifecycles = append(doc.Metadata.Lifecycles, &sbom.Lifecycle{
+				Name:        name,
+				Description: &lc.Description,
+			})
+		}
 	}
 
 	if bom.Metadata.Component != nil {
@@ -69,7 +87,7 @@ func (u *UnserializerCDX14) ParseStream(_ *options.Options, r io.Reader) (*sbom.
 
 // componentToNodes takes a CycloneDX component and computes its graph fragment,
 // returning a nodelist
-func (u *UnserializerCDX14) componentToNodeList(component *cdx.Component) (*sbom.NodeList, error) {
+func (u *UnserializerCDX) componentToNodeList(component *cdx.Component) (*sbom.NodeList, error) {
 	node, err := u.componentToNode(component)
 	if err != nil {
 		return nil, fmt.Errorf("converting cdx component to node: %w", err)
@@ -96,7 +114,7 @@ func (u *UnserializerCDX14) componentToNodeList(component *cdx.Component) (*sbom
 	return nl, nil
 }
 
-func (u *UnserializerCDX14) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:unparam
+func (u *UnserializerCDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:unparam
 	node := &sbom.Node{
 		Id:      c.BOMRef,
 		Type:    sbom.Node_PACKAGE,
@@ -167,7 +185,7 @@ func (u *UnserializerCDX14) componentToNode(c *cdx.Component) (*sbom.Node, error
 
 // licenseChoicesToLicenseList returns a flat list of license strings combining
 // expressions and IDs in one. This function should be part of a license package.
-func (u *UnserializerCDX14) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
+func (u *UnserializerCDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 	list := []string{}
 	if lcs == nil {
 		return list
@@ -196,7 +214,7 @@ func (u *UnserializerCDX14) licenseChoicesToLicenseList(lcs *cdx.Licenses) []str
 // expression verbatim if its just a single entry.
 // This function is temporary and probably should be part of a more complete
 // license package.
-func (u *UnserializerCDX14) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
+func (u *UnserializerCDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 	if lcs == nil {
 		return ""
 	}

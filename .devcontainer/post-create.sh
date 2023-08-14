@@ -3,7 +3,7 @@
 PYTHON_UTILS=("yamllint" "pre-commit")
 GITHUB_UTILS=("")
 GOLANG_UTILS=("github.com/google/yamlfmt/cmd/yamlfmt@latest" "google.golang.org/protobuf/cmd/protoc-gen-go@latest")
-APT_UTILS=("shellcheck" "vim" "protobuf-compiler")
+APT_UTILS=("shellcheck" "vim")
 
 set -e
 
@@ -64,10 +64,16 @@ for util in "${APT_UTILS[@]}"; do
     fi
 done
 
+# Install Protoctol Buffers
+sudo bash .devcontainer/protoc-install.sh
+
+echo >>/home/vscode/.zshrc
+
 # Update .zshrc
 echo ====================================================
 echo Updating .zshrc ...
 {
+    printf "export PATH=\$PATH:/usr/local/bin\n"
     printf "setopt appendhistory \nsetopt sharehistory \nsetopt incappendhistory \n"
     printf "export GPG_TTY=%s\n" "$(tty)"
 } >>/home/vscode/.zshrc

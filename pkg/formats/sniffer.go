@@ -193,7 +193,7 @@ func getSniffState(ctx context.Context, t string) (sniffState, error) {
 }
 
 func initSniffState(ctx context.Context, state map[string]sniffState) context.Context {
-	return context.WithValue(context.Background(), stateKeySuffix, state)
+	return context.WithValue(ctx, stateKeySuffix, state)
 }
 
 func setSniffState(ctx context.Context, t string, state sniffState) error {

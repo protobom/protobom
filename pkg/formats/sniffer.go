@@ -10,9 +10,11 @@ import (
 	"strings"
 )
 
+type stateKey string
+
 const (
-	stateKeySuffix = "sniffer_state"
-	EmptyFormat    = Format("")
+	stateKeySuffix stateKey = "sniffer_state"
+	EmptyFormat             = Format("")
 )
 
 var sniffFormats = []sniffFormat{
@@ -72,7 +74,6 @@ func (fs *Sniffer) initSniffState(ctx context.Context) context.Context {
 }
 
 func (fs *Sniffer) sniff(ctx context.Context, data []byte) Format {
-
 	for _, sniffer := range sniffFormats {
 		format := sniffer.sniff(ctx, data)
 		if format != EmptyFormat {

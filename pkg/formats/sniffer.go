@@ -49,7 +49,7 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 
 	var format Format
 
-	ctx := fs.setSniffState(context.Background())
+	ctx := fs.initSniffState(context.Background())
 	for fileScanner.Scan() {
 		format = fs.sniff(ctx, fileScanner.Bytes())
 
@@ -66,9 +66,9 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	return "", fmt.Errorf("unknown SBOM format")
 }
 
-func (fs *Sniffer) setSniffState(ctx context.Context) context.Context {
+func (fs *Sniffer) initSniffState(ctx context.Context) context.Context {
 	state := make(map[string]sniffState, len(sniffFormats))
-	return setSniffState(ctx, state)
+	return initSniffState(ctx, state)
 }
 
 func (fs *Sniffer) sniff(ctx context.Context, data []byte) Format {
@@ -125,6 +125,10 @@ func (c cdxSniff) sniff(ctx context.Context, data []byte) Format {
 		}
 	}
 
+	err = setSniffState(ctx, c.Type(), state)
+	if err != nil {
+		return EmptyFormat
+	}
 	return state.Format()
 }
 
@@ -173,6 +177,10 @@ func (c spdxSniff) sniff(ctx context.Context, data []byte) Format {
 		}
 	}
 
+	err = setSniffState(ctx, c.Type(), state)
+	if err != nil {
+		return EmptyFormat
+	}
 	return state.Format()
 }
 
@@ -184,6 +192,15 @@ func getSniffState(ctx context.Context, t string) (sniffState, error) {
 	return dm[t], nil
 }
 
-func setSniffState(ctx context.Context, state map[string]sniffState) context.Context {
+func initSniffState(ctx context.Context, state map[string]sniffState) context.Context {
 	return context.WithValue(context.Background(), stateKeySuffix, state)
+}
+
+func setSniffState(ctx context.Context, t string, state sniffState) error {
+	dm, ok := ctx.Value(stateKeySuffix).(map[string]sniffState)
+	if !ok {
+		return errors.New("unable to cast serializer state from context")
+	}
+	dm[t] = state
+	return nil
 }

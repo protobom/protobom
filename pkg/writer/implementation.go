@@ -45,15 +45,6 @@ func (di *defaultWriterImplementation) SerializeSBOM(opts options.Options, seria
 	return nil
 }
 
-func findNodeById(bom *sbom.Document, id string) *sbom.Node {
-	for _, n := range bom.NodeList.Nodes {
-		if n.Id == id {
-			return n
-		}
-	}
-	return nil
-}
-
 // OpenFile opens the file at path and returns it
 func (di *defaultWriterImplementation) OpenFile(path string) (*os.File, error) {
 	f, err := os.Open(path)

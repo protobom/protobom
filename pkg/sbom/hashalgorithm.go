@@ -6,6 +6,37 @@ import (
 	"github.com/spdx/tools-golang/spdx/v2/common"
 )
 
+func HashAlgorithmFromCycloneDX(cdxAlgo cdx.HashAlgorithm) HashAlgorithm {
+	switch cdxAlgo {
+	case cdx.HashAlgoMD5:
+		return HashAlgorithm_MD5
+	case cdx.HashAlgoSHA1:
+		return HashAlgorithm_SHA1
+	case cdx.HashAlgoSHA256:
+		return HashAlgorithm_SHA256
+	case cdx.HashAlgoSHA384:
+		return HashAlgorithm_SHA384
+	case cdx.HashAlgoSHA512:
+		return HashAlgorithm_SHA512
+	case cdx.HashAlgoSHA3_256:
+		return HashAlgorithm_SHA3_256
+	case cdx.HashAlgoSHA3_384:
+		return HashAlgorithm_SHA3_384
+	case cdx.HashAlgoSHA3_512:
+		return HashAlgorithm_SHA3_512
+	case cdx.HashAlgoBlake2b_256:
+		return HashAlgorithm_BLAKE2B_256
+	case cdx.HashAlgoBlake2b_384:
+		return HashAlgorithm_BLAKE2B_384
+	case cdx.HashAlgoBlake2b_512:
+		return HashAlgorithm_BLAKE2B_512
+	case cdx.HashAlgoBlake3:
+		return HashAlgorithm_BLAKE3
+	default:
+		return HashAlgorithm_UNKNOWN
+	}
+}
+
 func (ha HashAlgorithm) ToCycloneDX() cyclonedx.HashAlgorithm {
 	// TODO(degradation): The use of the following algorithms will result in
 	// dataloss when rendering to CycloneDX 1.4: ADLER32 MD4 MD6 SHA224

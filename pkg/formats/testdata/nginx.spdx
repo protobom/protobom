@@ -18785,4 +18785,3 @@ Relationship: SPDXRef-Package-index.docker.io-library-nginx-e73ba8654ba7fd1834e7
 Relationship: SPDXRef-Package-nginx CONTAINS SPDXRef-Package-index.docker.io-library-nginx-e73ba8654ba7fd1834e78a3d4e9d72ffaaa3372d42996af5c34ba3e1abc293e8
 
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-nginx
-

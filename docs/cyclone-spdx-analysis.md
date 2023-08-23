@@ -1,7 +1,7 @@
 # SBOM translation analysis
 
 ## Background
-This file documents the analysis and decisions taken througout the SBOM translation project. 
+This file documents the analysis and decisions taken througout the SBOM translation project.
 
 - config.input = cycloneDX/spdx
 - config.output = spdx/cycloneDX (opposite of config.input)
@@ -58,10 +58,10 @@ Verification: verify spdx.documentNamespace is a valid uri
 
 #### [External document references](https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#66-external-document-references-field)
 
-This field will not be populated. It is intended for other spdx documents, and these are not expected in a cycloneDX document. 
+This field will not be populated. It is intended for other spdx documents, and these are not expected in a cycloneDX document.
 
 Notes:
-- In the future this filed can be populated from cycloneDX.components.externalReferences if the externalReference type is bom and it is an SPDX document. This requires access to the SPDX document. 
+- In the future this filed can be populated from cycloneDX.components.externalReferences if the externalReference type is bom and it is an SPDX document. This requires access to the SPDX document.
 - the cyclondDX.externalReferences field has a different meaning (it is a list of external relevan docs, and not a list of references used inside the SBOM)
 
 #### [License list version](https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#67-license-list-version-field)
@@ -83,7 +83,7 @@ The spdx.creator is a list of strings as described in the link.
 
 
 Notes:
-- information lost: 
+- information lost:
     - cycloneDX.metadata.authors.phone
     - manufacture and supplier url
     - manufacture and supplier contacts: currently assumed to take only the first email. Another option is to have a list creators with all the contacts.
@@ -125,7 +125,7 @@ Notes:
 For each componen in the CycloneDX create a packege information object.
 Note that the only fields that are required for a cycloneDX package are type and name, thus the folowing conversion rules should handle the case that data is absent from the CycloneDX input.
 
-CycloneDX represents all components as components with a type identifier. 
+CycloneDX represents all components as components with a type identifier.
 
 - if cycloneDX.type == file - create a FileInformation object.
 - else create a package, and store the type information in the Primary Package Purporse field. Following is a finer definition for all possible types **TBD**
@@ -142,14 +142,14 @@ for information about libraries. All third-party and open source reusable compon
 
 A component in cycloneDX has a components field, thus one can create a tree of components. When converting a CycloneDX to SPDX it is required to traverse all components, create for each packageInformation object.
 - No deduping will be done; objects will differ by the PackageSPDXIdentifier
-- **TBD** Traversing in REGO is a challenge 
+- **TBD** Traversing in REGO is a challenge
 
 
 #### [Package name](https://spdx.github.io/spdx-spec/v2.3/package-information/#71-package-name-field)
 spdx.packages[].packageName = cycloneDX.components[].name
 
 #### [Package SPDX identifier](https://spdx.github.io/spdx-spec/v2.3/package-information/#72-package-spdx-identifier-field)
-- if cycloneDX.components[].bomRef exists 
+- if cycloneDX.components[].bomRef exists
 spdx.packages[].PackageSPDXIdentifier = SPDXRef + cycloneDX.components[].bomRef
 
 - else create an identifier: spdx.packages[].PackageSPDXIdentifier = SPDXRef + packageName+packageVersion + uniqeSalt
@@ -175,7 +175,7 @@ spdx.packages[].packageFileName = cycloneDX.components[].properties[_] where the
 
 #### [Package supplier](https://spdx.github.io/spdx-spec/v2.3/package-information/#75-package-supplier-field)
 
-**TBD** Reconsider: 
+**TBD** Reconsider:
 - maybe better to use the spdx author or publisher fields for the supplier, and use the cycloneDX supplier info to populate the Package Originator fields.
 
 
@@ -184,7 +184,7 @@ Notes:
 - The packagSupplier is a single line of text - use normalize2line.
 - The packageSupplier can be one of an organization or person. CycloneDX defines the supplier to be the organzation but supports also a contacts sub component.
 - SPDX suggest the use of "NOASSERTION" in a few cases. In SBOM conversion the converter will not create this field if it cannot make an assertion.
-- if cycloneDX component.supplier has additional url and contact infromation - this information will be lost in the conversion. 
+- if cycloneDX component.supplier has additional url and contact infromation - this information will be lost in the conversion.
 - If the cycloneDX has many contacts the current strategy suggested is to take the first, but anther strategy could be to take the fullest.
 
 
@@ -218,7 +218,7 @@ spdx.packages[].
 
 Notes:
 - The packageVerificationCode is a hash of the sorted file-hash-list of a package. This infromation does not explicitly exist in CycloneDX.
-- The field is mandatory, but not found on syft generated spdx. 
+- The field is mandatory, but not found on syft generated spdx.
 - The solution for this complexity is to have a configuration. **TBD** Decide if default is not to enforce the field as mandatory.
 - The options that it can be included:
     - there is a hashes item in the cycloneDX component that is known to follow the SPDX hash calculation algoritm.
@@ -235,7 +235,7 @@ Else fail the conversion.
 #### [Package checksum](https://spdx.github.io/spdx-spec/v2.3/package-information/#710-package-checksum-field)
 
 Notes:
-- This field is a bit more flexible (and less defined) that the verification code. 
+- This field is a bit more flexible (and less defined) that the verification code.
 
 -If config.spdx.dontIncludePackageChecksum == True then do not create this field.
 
@@ -244,8 +244,8 @@ Notes:
 
 #### [Package home page](https://spdx.github.io/spdx-spec/v2.3/package-information/#711-package-home-page-field)
 
-- This field is not explicitly included in the cycloneDX file. 
-- Since this field is optional - do not create this object. 
+- This field is not explicitly included in the cycloneDX file.
+- Since this field is optional - do not create this object.
 - options to populate in the future **TBD**:
     - Use supplier url field if exists
 
@@ -253,13 +253,13 @@ Notes:
 
 This field in optional.
 
-- if config.spdx.packages.sourceInformation = "CycloneDXpedigree" 
+- if config.spdx.packages.sourceInformation = "CycloneDXpedigree"
     - Then spdx.packages[].sourceInformation = toString(cycloneDX.components[].pedigree)
 - else do not include this field.
 
 #### [Concluded license](https://spdx.github.io/spdx-spec/v2.3/package-information/#713-concluded-license-field)
 
-Need to calculate from cycloneDX.components[].licenses a <license-set> string (see spdx doc). 
+Need to calculate from cycloneDX.components[].licenses a <license-set> string (see spdx doc).
 
 **TBD** Need to define the algorithm of creating a license-set
 
@@ -275,7 +275,7 @@ Otherwise **TBD** It seems from the standard that either a short form or a licen
 {
 CycloneDX has two options to describe licenses:
 - Option 1: A list of license objects.
-    - 
+    -
 - Option 2: A list of expressions
     - In this case - create a list of short form identifiers by parsing the expressions and extracting short-form license from them.
     - If unkown license is found - by default - include it **TBD** Log unknowd refs.

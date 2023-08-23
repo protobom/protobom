@@ -38,7 +38,12 @@ func (fs *Sniffer) SniffFile(path string) (Format, error) {
 
 // SniffReader reads a stream and return the SBOM format
 func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
-	defer f.Seek(0, 0)
+	defer func() {
+		_, err := f.Seek(0, 0)
+		if err != nil {
+			fmt.Printf("WARNING: could not seek to beginning of file: %v", err)
+		}
+	}()
 	fileScanner := bufio.NewScanner(f)
 	fileScanner.Split(bufio.ScanLines)
 
@@ -56,11 +61,6 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	if format != EmptyFormat {
 		return format, nil
 	}
-
-	fmt.Fprintf(
-		os.Stderr, "format: %s version: %s encodingq: %s\n",
-		format.Type(), format.Version(), format.Encoding(),
-	)
 
 	// TODO(puerco): Implement a light parser in case the string hacks don't work
 	return "", fmt.Errorf("unknown SBOM format")

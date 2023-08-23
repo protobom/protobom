@@ -1,10 +1,12 @@
 package sbom
 
 import (
-	reflect "reflect"
+	"fmt"
+	"reflect"
 	"sort"
+	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/google/go-cmp/cmp"
 )
 
 // This file adds a few methods to the NodeList type which
@@ -18,6 +20,14 @@ type edgeIndex map[string]map[Edge_Type][]*Edge
 
 // rootElementsIndex is an index of the top levele elements by ID
 type rootElementsIndex map[string]struct{}
+
+// hashIndex is a struct that indexes a NodeList by the hash values of its nodes
+type hashIndex map[string][]*Node
+
+// purlIndex captures the SBOM nodelist ordered by package url
+type purlIndex map[PackageURL][]*Node
+
+var ErrorMoreThanOneMatch = fmt.Errorf("More than one node matches")
 
 // indexNodes returns an inverse dictionary with the IDs of the nodes
 func (nl *NodeList) indexNodes() nodeIndex {
@@ -54,57 +64,85 @@ func (nl *NodeList) indexRootElements() rootElementsIndex {
 	return index
 }
 
+// indexNodesByHash returns an index of all nodes by their hash value.
+// More than one node can have the same hash.
+func (nl *NodeList) indexNodesByHash() hashIndex {
+	ret := hashIndex{}
+	for _, n := range nl.Nodes {
+		for algo, hashVal := range n.Hashes {
+			if hashVal == "" {
+				continue
+			}
+			s := fmt.Sprintf("%s:%s", algo, hashVal)
+			ret[s] = append(ret[s], n)
+		}
+	}
+	return ret
+}
+
+// Returns an indexed map of nodes by their package URLs. Note that more than
+// one node may have the same purl.
+func (nl *NodeList) indexNodesByPurl() map[PackageURL][]*Node {
+	ret := map[PackageURL][]*Node{}
+	for _, n := range nl.Nodes {
+		nodePurl := n.Purl()
+		if nodePurl == "" {
+			continue
+		}
+
+		ret[nodePurl] = append(ret[nodePurl], n)
+	}
+	return ret
+}
+
 // cleanEdges is a utility function that removes broken
 // connection and orphaned edges
 func (nl *NodeList) cleanEdges() {
-	// First copy the nodelist edges
-	newEdges := []*Edge{}
-
 	// Build a catalog of the elements ids
 	nodeIndex := nl.indexNodes()
 
 	// Add a seen cache to dedupe edges when
 	// cleaning them up
-	seenCache := map[string]map[Edge_Type]*Edge{}
-	var seenEdge bool
+	seenCache := map[string]*Edge{}
+	newTos := map[string]map[string]string{}
+
 	// Now list all edges and rebuild the list
 	for _, edge := range nl.Edges {
-		newTos := []string{}
-		oldTos := []string{}
-
 		// If the from node is not in the index, skip it
 		if _, ok := nodeIndex[edge.From]; !ok {
 			continue
 		}
 
-		// If we already saw an equivalent edge, reuse it
-		seenEdge = false
-		if _, ok := seenCache[edge.From]; ok {
-			if _, ok2 := seenCache[edge.From][edge.Type]; ok2 {
-				oldTos = edge.To
-				edge = seenCache[edge.From][edge.Type]
-				seenEdge = true
-			}
-		} else {
-			seenCache[edge.From] = map[Edge_Type]*Edge{}
+		// Use a string key for a simpler datastruct
+		edgeKey := edge.From + "+++" + edge.Type.String()
+		if _, ok := newTos[edgeKey]; !ok {
+			newTos[edgeKey] = map[string]string{}
 		}
-		seenCache[edge.From][edge.Type] = edge
+
+		// If we already saw an equivalent edge, reuse it
+		if _, ok := seenCache[edgeKey]; !ok {
+			seenCache[edgeKey] = &Edge{
+				Type: edge.Type,
+				From: edge.From,
+				To:   []string{},
+			}
+		}
 
 		for _, s := range edge.To {
-			if _, ok := nodeIndex[s]; ok {
-				newTos = append(newTos, s)
+			if _, ok := nodeIndex[s]; !ok {
+				continue
 			}
+			newTos[edgeKey][s] = s
 		}
+	}
 
-		newTos = append(newTos, oldTos...)
-
-		if len(newTos) == 0 {
-			continue
+	newEdges := []*Edge{}
+	for f := range seenCache {
+		for s := range newTos[f] {
+			seenCache[f].To = append(seenCache[f].To, s)
 		}
-
-		edge.To = newTos
-		if !seenEdge {
-			newEdges = append(newEdges, edge)
+		if len(seenCache[f].To) > 0 {
+			newEdges = append(newEdges, seenCache[f])
 		}
 	}
 
@@ -188,12 +226,12 @@ func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
 }
 
 // copyEdgeList is a utility function that deep copies a list of edges
-func copyEdgeList(original []*Edge) (copy []*Edge) {
-	copy = []*Edge{}
+func copyEdgeList(original []*Edge) []*Edge {
+	nodeCopy := []*Edge{}
 	for _, e := range original {
-		copy = append(copy, e.Copy())
+		nodeCopy = append(nodeCopy, e.Copy())
 	}
-	return copy
+	return nodeCopy
 }
 
 // Intersect returns a new NodeList with nodes which are common in nl and nl2.
@@ -329,21 +367,101 @@ func (nl *NodeList) GetNodeByID(id string) *Node {
 	return nil
 }
 
+// GetMatchingNode looks up a node in the NodeList that matches the piece of
+// software described by testNode. It will not match on ID but rather matching
+// is performed by hash then by purl.
+//
+// This function is guaranteed to only return a node when there is a single node
+// match. If more than one node matches, an ErrorMoreThanOneMatch is returned.
+//
+// See node.HashesMatch to understand how hashes are compared.
+func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
+	// If the target node has hashes, look for it
+	foundNodes := map[string]*Node{}
+	if len(node.Hashes) > 0 {
+		hashIndex := nl.indexNodesByHash()
+		for algo, hashVal := range node.Hashes {
+			// If there is at least one node with one of the hashes:
+			if _, ok := hashIndex[fmt.Sprintf("%s:%s", algo, hashVal)]; !ok {
+				continue
+			}
+			// Collect all node where hashes match excactly
+			for _, n := range hashIndex[fmt.Sprintf("%s:%s", algo, hashVal)] {
+				// Ignore if we've seen the node
+				if _, ok := foundNodes[n.Id]; ok {
+					continue
+				}
+
+				// Collect the node if hashes match
+				if n.HashesMatch(node.Hashes) {
+					foundNodes[n.Id] = n
+				}
+			}
+		}
+	}
+
+	// Here, if we have exactly one node, then we have a match. If we have zero
+	// then we reindex and match on the purl. If more than one node matched on
+	// the hashes, we try to disabiguate by looking at the purl of the hash matches.
+	testPurl := node.Purl()
+	switch len(foundNodes) {
+	case 1:
+		// If there is a single match, our job is done.
+		for _, n := range foundNodes {
+			return n, nil
+		}
+	case 0:
+		// No matches by hash, try to match by purl
+		// TODO(puerco): Purls should be normalized to match correctly,
+		// even more: ensuring correct globing of qualifiers.
+		if testPurl == "" {
+			return nil, nil
+		}
+		pindex := nl.indexNodesByPurl()
+		if _, ok := pindex[testPurl]; !ok {
+			return nil, nil
+		}
+		// If there is more than one matching, its a tie. Error.
+		if len(pindex[testPurl]) == 1 {
+			return pindex[testPurl][0], nil
+		}
+		return nil, ErrorMoreThanOneMatch
+	default:
+		// Multiple hash matches, look to see if there is a single one where
+		// the purl matches to break the ambiguity:
+		if testPurl == "" {
+			return nil, ErrorMoreThanOneMatch
+		}
+
+		foundByPurl := []*Node{}
+		for _, n := range foundNodes {
+			if tp := n.Purl(); tp != "" && tp == testPurl {
+				foundByPurl = append(foundByPurl, n)
+			}
+		}
+
+		if len(foundByPurl) == 1 {
+			return foundByPurl[0], nil
+		}
+		return nil, ErrorMoreThanOneMatch
+	}
+	return nil, nil
+}
+
 // GetNodesByIdentifier returns nodes that match an identifier of type t and
 // value v, for example t = "purl" v = "pkg:deb/debian/libpam-modules@1.4.0-9+deb11u1?arch=i386"
 // Not that this only does "dumb" string matching no assumptions are made on the
-// identifer type.
+// identifier type.
 func (nl *NodeList) GetNodesByIdentifier(t, v string) []*Node {
 	ret := []*Node{}
+	idType := SoftwareIdentifierTypeFromString(t)
 	for i := range nl.Nodes {
 		if nl.Nodes[i].Identifiers == nil {
 			continue
 		}
 
-		for j := range nl.Nodes[i].Identifiers {
-			if nl.Nodes[i].Identifiers[j].Type == t && nl.Nodes[i].Identifiers[j].Value == v {
-				ret = append(ret, nl.Nodes[i])
-			}
+		if _, ok := nl.Nodes[i].Identifiers[int32(idType)]; ok && nl.Nodes[i].Identifiers[int32(idType)] == v {
+			ret = append(ret, nl.Nodes[i])
 		}
 	}
 	return ret
@@ -411,17 +529,103 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 	nlNodes := map[string]string{}
 	nl2Nodes := map[string]string{}
 	for _, n := range nl.Nodes {
-		nlNodes[n.Id] = n.flatString()
+		nlNodes[n.Id] = n.Checksum()
 	}
 
 	for _, n := range nl2.Nodes {
-		nl2Nodes[n.Id] = n.flatString()
+		nl2Nodes[n.Id] = n.Checksum()
 	}
 
-	if !reflect.DeepEqual(nlNodes, nl2Nodes) {
-		logrus.Infof("NodeList 1: %+v\nNodeList 2: %+v", nlNodes, nl2Nodes)
-		return false
+	return cmp.Equal(nlNodes, nl2Nodes)
+}
+
+// RelateNodeListAtID relates the top level nodes in nl2 to the node with ID
+// nodeID using a relationship of type edgeType. Returns an error if nodeID cannot
+// be found in the graph. This function assumes that nodes in nl and nl2 having
+// the same ID are equivalent and will be deduped.
+func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Edge_Type) error {
+	// Check the node exists
+	nlIndex := nl.indexNodes()
+	nlEdges := nl.indexEdges()
+
+	if _, ok := nlIndex[nodeID]; !ok {
+		return fmt.Errorf("node with ID %s not found", nodeID)
 	}
 
-	return true
+	// Check if we have edges matching
+	var edge *Edge
+	if _, ok := nlEdges[nodeID]; ok {
+		if _, ok2 := nlEdges[nodeID][edgeType]; ok2 {
+			edge = nlEdges[nodeID][edgeType][0]
+		}
+	}
+
+	if edge == nil {
+		edge = &Edge{
+			Type: edgeType,
+			From: nodeID,
+			To:   nl2.RootElements,
+		}
+		nl.Edges = append(nl.Edges, edge)
+	} else {
+		// Perhaps we should filter these
+		edge.To = append(edge.To, nl2.RootElements...)
+	}
+
+	for _, n := range nl2.Nodes {
+		if _, ok := nlIndex[n.Id]; ok {
+			continue
+		}
+		nl.AddNode(n)
+	}
+
+	return nil
+}
+
+// GetNodesByPurlType returns a nodelist containing all nodes that match
+// a purl (package url) type. An empty purlType returns a blank nodelist
+func (nl *NodeList) GetNodesByPurlType(purlType string) *NodeList {
+	ret := &NodeList{}
+	if nl == nil {
+		return ret
+	}
+
+	for _, n := range nl.Nodes {
+		// I think the SPDX libraries have a bug where an extra slash is added when parsing purls
+		if strings.HasPrefix(string(n.Purl()), fmt.Sprintf("pkg:%s/", purlType)) ||
+			strings.HasPrefix(string(n.Purl()), fmt.Sprintf("pkg:/%s/", purlType)) {
+			ret.Nodes = append(ret.Nodes, n)
+		}
+	}
+
+	index := ret.indexNodes()
+	for _, e := range nl.Edges {
+		if _, ok := index[e.From]; ok {
+			ret.Edges = append(ret.Edges, e.Copy())
+		}
+	}
+
+	ret.reconnectOrphanNodes()
+	ret.cleanEdges()
+
+	return ret
+}
+
+// reconnectOrphanNodes cleans the nodelist graph structure by reconnecting all
+// orphaned nodes to the top of the nodelist
+func (nl *NodeList) reconnectOrphanNodes() {
+	edgeIndex := nl.indexEdges()
+	rootIndex := nl.indexRootElements()
+
+	for _, id := range nl.RootElements {
+		rootIndex[id] = struct{}{}
+	}
+
+	for _, n := range nl.Nodes {
+		if _, ok := edgeIndex[n.Id]; !ok {
+			if _, ok := rootIndex[n.Id]; !ok {
+				nl.RootElements = append(nl.RootElements, n.Id)
+			}
+		}
+	}
 }

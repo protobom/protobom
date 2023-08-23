@@ -15,10 +15,13 @@ import (
 )
 
 const (
-	stateKey = "cyclonedx_serializer_state"
+	stateKey state = "cyclonedx_serializer_state"
 )
 
-type SerializerCDX struct{}
+type (
+	state         string
+	SerializerCDX struct{}
+)
 
 func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
@@ -71,9 +74,9 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 // to all nodes that don't have them. To maintain the closest fidelity, we
 // clear their refs again before output to CDX
 func clearAutoRefs(comps *[]cdx.Component) {
-	for i, comp := range *comps {
-		if strings.HasPrefix(comp.BOMRef, "protobom-") {
-			flags := strings.Split(comp.BOMRef, "--")
+	for i := range *comps {
+		if strings.HasPrefix((*comps)[i].BOMRef, "protobom-") {
+			flags := strings.Split((*comps)[i].BOMRef, "--")
 			if strings.Contains(flags[0], "-auto") {
 				(*comps)[i].BOMRef = ""
 			}
@@ -123,7 +126,9 @@ func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Comp
 
 			// TODO(degradation): Here we would document other root level elements
 			// are not added to to document
-			break
+			if true { // temp workaround in favor of adding a lint tag
+				break
+			}
 		}
 	}
 
@@ -132,7 +137,6 @@ func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Comp
 
 // NOTE dependencies function modifies the components dictionary
 func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
-
 	var dependencies []cdx.Dependency
 	state, err := getCDXState(ctx)
 	if err != nil {
@@ -151,7 +155,7 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 
 		// In this example, we tree-ify all components related with a
 		// "contains" relationship. This is just an opinion for the demo
-		// and it is somethign we can parameterize
+		// and it is something we can parameterize
 		switch e.Type {
 		case sbom.Edge_contains:
 			// Make sure we have the target component
@@ -245,11 +249,6 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 
 	if n.ExternalReferences != nil {
 		for _, er := range n.ExternalReferences {
-			if er.Type == "purl" {
-				c.PackageURL = er.Url
-				continue
-			}
-
 			if c.ExternalReferences == nil {
 				c.ExternalReferences = &[]cdx.ExternalReference{}
 			}
@@ -258,6 +257,22 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				Type: cdx.ExternalReferenceType(er.Type), // Fix to make it valid
 				URL:  er.Url,
 			})
+		}
+	}
+
+	if n.Identifiers != nil {
+		for idType := range n.Identifiers {
+			switch idType {
+			case int32(sbom.SoftwareIdentifierType_PURL):
+				c.PackageURL = n.Identifiers[idType]
+			case int32(sbom.SoftwareIdentifierType_CPE23):
+				c.CPE = n.Identifiers[idType]
+			case int32(sbom.SoftwareIdentifierType_CPE22):
+				// TODO(degradation): Only one CPE is supperted in CDX
+				if c.CPE == "" {
+					c.CPE = n.Identifiers[idType]
+				}
+			}
 		}
 	}
 
@@ -294,7 +309,7 @@ func newSerializerCDXState() *serializerCDXState {
 }
 
 func (s *serializerCDXState) components() []cdx.Component {
-	var components []cdx.Component
+	components := []cdx.Component{}
 	for _, c := range s.componentsDict {
 		if _, ok := s.addedDict[c.BOMRef]; ok {
 			continue

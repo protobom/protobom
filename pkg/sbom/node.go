@@ -1,6 +1,8 @@
 package sbom
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"sort"
 	"strings"
 
@@ -211,10 +213,120 @@ func (n *Node) Equal(n2 *Node) bool {
 func (n *Node) flatString() string {
 	pairs := []string{}
 	n.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
-		pairs = append(pairs, string(fd.FullName())+":"+v.String())
+		switch fd.FullName() {
+		case "bomsquad.protobom.Node.external_references":
+			for _, ex := range n.ExternalReferences {
+				pairs = append(pairs, fmt.Sprintf("extref:%s", ex.flatString()))
+			}
+		case "bomsquad.protobom.Node.suppliers":
+			for _, i := range n.Suppliers {
+				pairs = append(pairs, fmt.Sprintf("supplier:%s", i.flatString()))
+			}
+		case "bomsquad.protobom.Node.originators":
+			for _, i := range n.Originators {
+				pairs = append(pairs, fmt.Sprintf("originator:%s", i.flatString()))
+			}
+		case "bomsquad.protobom.Node.identifiers":
+			// Index the keys and sort them to make the string deterministic
+			idKeys := []int{}
+			for t := range n.Identifiers {
+				idKeys = append(idKeys, int(t))
+			}
+			sort.Ints(idKeys)
+			for _, t := range idKeys {
+				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)]))
+			}
+		case "bomsquad.protobom.Node.attribution":
+			for i := 0; i < v.List().Len(); i++ {
+				pairs = append(pairs, fmt.Sprintf("%s[%d]:%s", fd.FullName(), i, v.List().Get(i)))
+			}
+
+		case "bomsquad.protobom.Node.release_date":
+			if n.ReleaseDate != nil {
+				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ReleaseDate.AsTime().Unix()))
+			}
+		case "bomsquad.protobom.Node.valid_until_date":
+			if n.ValidUntilDate != nil {
+				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ValidUntilDate.AsTime().Unix()))
+			}
+		case "bomsquad.protobom.Node.build_date":
+			if n.BuildDate != nil {
+				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.BuildDate.AsTime().Unix()))
+			}
+		case "bomsquad.protobom.Node.hashes":
+			pairs = append(pairs, string(fd.FullName())+":"+flatStringMap(v.Map()))
+		default:
+			pairs = append(pairs, string(fd.FullName())+":"+v.String())
+		}
 		return true
 	})
 
 	sort.Strings(pairs)
 	return strings.Join(pairs, ":")
+}
+
+func flatStringMap(protoMap protoreflect.Map) string {
+	keys := []string{}
+	values := map[string]string{}
+	protoMap.Range(func(mk protoreflect.MapKey, v protoreflect.Value) bool {
+		keys = append(keys, mk.String())
+		values[mk.String()] = v.String()
+		return true
+	})
+
+	sort.Strings(keys)
+	ret := ""
+	for _, algo := range keys {
+		ret += fmt.Sprintf("%s:%s", algo, values[algo])
+	}
+
+	return ret
+}
+
+// Checksum returns a a sha256 hash representing the node's data
+func (n *Node) Checksum() string {
+	sum := sha256.Sum256([]byte(n.flatString()))
+	return fmt.Sprintf("%x", sum)
+}
+
+type PackageURL string
+
+// Purl returns the node purl as a string
+func (n *Node) Purl() PackageURL {
+	if n.Type == Node_FILE {
+		return ""
+	}
+
+	if _, ok := n.Identifiers[int32(SoftwareIdentifierType_PURL)]; ok {
+		return PackageURL(n.Identifiers[int32(SoftwareIdentifierType_PURL)])
+	}
+
+	return ""
+}
+
+// HashesMatch takes a map of hashes th and returns a boolean indicating
+// if the test hashes match those of the node. The algorithm will only take
+// into account algorithms that are common to the node and test set.
+//
+// In other words, if th has any hashes in algorithms without a peer in the
+// node, the function will ignore them and return true if others match,
+// silently ignoring those missing in the node.
+//
+// If either the node or the test hashes are empty, no match is assumed.
+func (n *Node) HashesMatch(th map[string]string) bool {
+	if len(n.Hashes) == 0 || len(th) == 0 {
+		return false
+	}
+	atLeastOneMatch := false
+	for algo, hashValue := range th {
+		if _, ok := n.Hashes[algo]; !ok {
+			continue
+		}
+
+		if n.Hashes[algo] != hashValue {
+			return false
+		}
+		atLeastOneMatch = true
+	}
+	return atLeastOneMatch
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	"github.com/spdx/tools-golang/spdx/v2/v2_3"
+	"sigs.k8s.io/release-utils/version"
 )
 
 type SerializerSPDX23 struct{}
@@ -32,7 +33,7 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,
-		SPDXIdentifier:    common.ElementID(bom.Metadata.Id),
+		SPDXIdentifier:    protospdx.DOCUMENT,
 		DocumentName:      bom.Metadata.Name,
 		DocumentNamespace: "https://spdx.org/spdxdocs/", // TODO(puerco): Think how to handle namespacing
 		DocumentComment:   bom.Metadata.Comment,
@@ -40,9 +41,9 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 		CreationInfo: &spdx.CreationInfo{
 			LicenseListVersion: "3.20", // https://spdx.org/licenses/
 			Creators: []spdx.Creator{
-				// Add data from the protobom
+				// Register protobom as one of the document creation tools
 				{
-					Creator:     "protobom/0.0.0",
+					Creator:     fmt.Sprintf("protobom-%s", version.GetVersionInfo().GitVersion),
 					CreatorType: "Tool",
 				},
 			},
@@ -52,6 +53,24 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 			// CreatorComment: bom.Metadata.Authors(),
 			// CreatorComment: bom.Metadata.... /// TODO(puerco): Missing in the proto
 		},
+	}
+
+	for _, t := range bom.Metadata.Tools {
+		// TODO(degradation): SPDX is prescriptive on how this field is structured
+		// it is a tool identifier word separated from the version with a dash.
+		// We should transform the field value
+		// Ref: https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#68-creator-field
+		name := t.Name
+		if t.Version != "" {
+			name = fmt.Sprintf("%s-%s", t.Name, t.Version)
+		}
+
+		// TODO(degradation): Tool vendor gets lost here
+
+		doc.CreationInfo.Creators = append(doc.CreationInfo.Creators, spdx.Creator{
+			Creator:     name,
+			CreatorType: protospdx.Tool,
+		})
 	}
 
 	packages, err := buildPackages(bom)
@@ -71,7 +90,7 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 
 	for _, id := range bom.NodeList.RootElements {
 		rels = append(rels, &spdx.Relationship{
-			RefA:                common.MakeDocElementID("", bom.Metadata.Id),
+			RefA:                common.MakeDocElementID("", protospdx.DOCUMENT),
 			RefB:                common.MakeDocElementID("", id),
 			Relationship:        common.TypeRelationshipDescribe,
 			RelationshipComment: "",
@@ -88,7 +107,7 @@ func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (
 	return doc, nil
 }
 
-func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) {
+func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) { //nolint:unparam
 	relationships := []*spdx.Relationship{}
 	for _, e := range bom.NodeList.Edges {
 		for _, dest := range e.To {
@@ -104,7 +123,7 @@ func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) {
 	return relationships, nil
 }
 
-func buildFiles(bom *sbom.Document) ([]*spdx.File, error) {
+func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 	files := []*spdx.File{}
 	for _, node := range bom.NodeList.Nodes {
 		if node.Type == sbom.Node_PACKAGE {
@@ -122,21 +141,19 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) {
 			FileCopyrightText: strings.TrimSpace(node.Copyright),
 			FileComment:       node.Comment,
 			// FileNotice:           node.File, // Missing?
-			// FileContributors:     []string{},
 			FileAttributionTexts: node.Attribution,
 			Annotations:          []v2_3.Annotation{},
 		}
 
 		if f.FileCopyrightText == "" {
-			f.FileCopyrightText = "NONE"
+			f.FileCopyrightText = protospdx.NONE
 		}
 
 		for algo, hash := range node.Hashes {
 			if algoVal, ok := sbom.HashAlgorithm_value[algo]; ok {
 				spdxAlgo := sbom.HashAlgorithm(algoVal).ToSPDX()
 				if spdxAlgo == "" {
-					// Data loss here.
-					// TODO how do we handle when data loss occurs?
+					// TODO(degradation): Data loss. How do we handle more algos?
 					continue
 				}
 				f.Checksums = append(f.Checksums, common.Checksum{
@@ -150,7 +167,7 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) {
 	return files, nil
 }
 
-func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) {
+func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unparam
 	packages := []*spdx.Package{}
 	for _, node := range bom.NodeList.Nodes {
 		if node.Type == sbom.Node_FILE {
@@ -186,9 +203,9 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) {
 			Annotations:               []v2_3.Annotation{},
 
 			// The files field may never be used... Or should it?
-			// We are mirroring the probom graph in the SPDX relationship
+			// We are mirroring the protbom graph in the SPDX relationship
 			// structure so they don't need to be added here and
-			// the resulting document is valid.
+			// the resulting document is still valid.
 			//
 			// There may be tools that rely on files added in the list so
 			// at some point we may need to think of supporting this as an
@@ -227,8 +244,46 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) {
 			}
 		}
 
-		// TODO(puerco): Supplier
-		// TODO(puerco): Originator
+		for _, e := range node.ExternalReferences {
+			if e.ToSPDX2Type() == "" || e.Url == "" {
+				// TODO(degradation): Handle incomplete external references
+				continue
+			}
+			p.PackageExternalReferences = append(p.PackageExternalReferences, &v2_3.PackageExternalReference{
+				Category:           e.ToSPDX2Category(),
+				RefType:            e.ToSPDX2Type(),
+				Locator:            e.Url,
+				ExternalRefComment: e.Comment,
+			})
+		}
+
+		for i := range node.Identifiers {
+			p.PackageExternalReferences = append(p.PackageExternalReferences, &v2_3.PackageExternalReference{
+				Category: sbom.SoftwareIdentifierType(i).ToSPDX2Category(),
+				RefType:  sbom.SoftwareIdentifierType(i).ToSPDX2Type(),
+				Locator:  node.Identifiers[i],
+			})
+		}
+
+		if len(node.Suppliers) > 0 {
+			// TODO(degradation): URL, Phone are lost if set
+			// TODO(degradation): If is more than one supplier, it will be lost
+			p.PackageSupplier = &spdx.Supplier{
+				Supplier:     node.Suppliers[0].ToSPDX2ClientString(),
+				SupplierType: node.Suppliers[0].ToSPDX2ClientOrg(),
+			}
+		}
+
+		if len(node.Originators) > 0 {
+			// TODO(degradation): URL, Phone are lost if set
+			// TODO(degradation): If is more than one originator, it will be lost
+			p.PackageSupplier = &spdx.Supplier{
+				Supplier:     node.Originators[0].ToSPDX2ClientString(),
+				SupplierType: node.Originators[0].ToSPDX2ClientOrg(),
+			}
+		}
+
+		// TODO(puerco): Reconcile file in packages
 		packages = append(packages, &p)
 	}
 	return packages, nil

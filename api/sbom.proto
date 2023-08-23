@@ -29,7 +29,7 @@ message Node {
     string source_info = 13;     // any relevant background information or additional comments about the origin
     string primary_purpose = 14; // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
 
-    string comment = 15; 
+    string comment = 15;
     string summary = 16;      // Short package description
     string description = 17;  // Package description (full)
 
@@ -42,9 +42,13 @@ message Node {
     google.protobuf.Timestamp valid_until_date = 23;
 
     repeated ExternalReference external_references = 24;
-    repeated Identifier identifiers = 25;
+
+    // field 25 was the old identifier list.
+    // Removed, see https://github.com/bom-squad/protobom/issues/64
+    // repeated Identifier identifiers = 25;
 
     repeated string file_types = 27; // File types
+    map<int32,string> identifiers = 28;  // Software identifiers
 
     enum NodeType {
         PACKAGE = 0;
@@ -128,7 +132,7 @@ message Person {
     string name = 1;
     bool is_org = 2;
     string email  = 3;
-    string url = 4;	
+    string url = 4;
     string phone = 5;             // CDX
     repeated Person contacts = 6; // CDX // Support?
 	// repeated PersonIdentifier identifiers // Support?
@@ -138,12 +142,6 @@ message Tool {
     string name = 1;
     string version = 2;
     string vendor = 3;
-}
-
-
-message Identifier {
-    string type = 1;
-    string value = 2;
 }
 
 message NodeList {
@@ -173,4 +171,12 @@ enum HashAlgorithm {
     MD4 = 15; // Only supported by SPDX
     MD6 = 16; // Only supported by SPDX
     SHA224 = 17; // Only supported by SPDX
-  }
+}
+
+enum SoftwareIdentifierType {
+    UNKNOWN_IDENTIFIER_TYPE = 0;
+    PURL = 1;
+    CPE22 = 2;
+    CPE23 = 3;
+    GITOID = 4;
+}

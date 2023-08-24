@@ -22,10 +22,10 @@ the golang library.
 | --- | --- | --- | --- | --- |
 | SPDX | 2.2 | JSON | planned | - |
 | SPDX | 2.2 | tag-value | planned | - |
-| SPDX | 2.3 | JSON | supported | planned |
+| SPDX | 2.3 | JSON | supported | supported|
 | SPDX | 2.3 | tag-value | planned | - |
 | SPDX | 3.0 | JSON | planned | planned |
-| CycloneDX | 1.4 | JSON | planned | supported |
+| CycloneDX | 1.4 | JSON | supported | supported |
 | CycloneDX | 1.5 | JSON | planned | planned |
 
 Other read and write implementations can potentially be written in

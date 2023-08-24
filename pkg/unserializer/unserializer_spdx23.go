@@ -1,78 +1,74 @@
-package reader
+package unserializer
 
 import (
-	"fmt"
-	"io"
 	"strings"
 	"time"
 
 	protospdx "github.com/bom-squad/protobom/pkg/formats/spdx"
-	"github.com/bom-squad/protobom/pkg/reader/options"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	spdxjson "github.com/spdx/tools-golang/json"
 	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 )
 
+var _ SPDX23Unserializer = &UnserializerSPDX23{}
+
 type UnserializerSPDX23 struct{}
 
-// ParseStream reads an io.Reader to parse an SPDX 2.3 document from it
-func (u *UnserializerSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom.Document, error) {
-	spdxDoc, err := spdxjson.Read(r)
-	if err != nil {
-		return nil, fmt.Errorf("parsing SPDX json: %w", err)
+func (u *UnserializerSPDX23) Metadata(doc *spdx23.Document) (*sbom.Metadata, *sbom.NodeList, error) {
+	md := &sbom.Metadata{
+		Id:   string(doc.SPDXIdentifier),
+		Name: doc.DocumentName,
 	}
-
-	bom := sbom.NewDocument()
-	bom.Metadata.Id = string(spdxDoc.SPDXIdentifier)
-	bom.Metadata.Name = spdxDoc.DocumentName
 
 	// TODO(degradation): External document references
-
 	// TODO(puerco) Top level elements
-	if t := u.spdxDateToTime(spdxDoc.CreationInfo.Created); t != nil {
-		bom.Metadata.Date = timestamppb.New(*t)
+	if t := u.spdxDateToTime(doc.CreationInfo.Created); t != nil {
+		md.Date = timestamppb.New(*t)
 	}
-	if spdxDoc.CreationInfo.Creators != nil {
-		for _, c := range spdxDoc.CreationInfo.Creators {
+	if doc.CreationInfo.Creators != nil {
+		for _, c := range doc.CreationInfo.Creators {
 			// TODO: We need to create a parser library in formats/spdx
 			if c.CreatorType == "Tool" {
 				// TODO: Split the version from the Tool string here.
-				bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: c.Creator})
+				md.Tools = append(md.Tools, &sbom.Tool{Name: c.Creator})
 				continue
 			}
 			a := &sbom.Person{Name: c.Creator}
 			a.IsOrg = (c.CreatorType == protospdx.Organization)
-			bom.Metadata.Authors = append(bom.Metadata.Authors, a)
+			md.Authors = append(md.Authors, a)
 		}
 	}
 
 	// TODO(degradation): SPDX LicenseVersion
+	return md, nil, nil
+}
 
-	for _, p := range spdxDoc.Packages {
-		bom.NodeList.AddNode(u.packageToNode(p))
+func (u *UnserializerSPDX23) NodeList(doc *spdx23.Document) (*sbom.NodeList, error) {
+	nl := &sbom.NodeList{}
+	for _, p := range doc.Packages {
+		nl.AddNode(u.PackageToNode(p))
 	}
 
-	for _, f := range spdxDoc.Files {
-		bom.NodeList.AddNode(u.fileToNode(f))
+	for _, f := range doc.Files {
+		nl.AddNode(u.FileToNode(f))
 	}
 
-	for _, r := range spdxDoc.Relationships {
+	for _, r := range doc.Relationships {
 		// The SPDX go library surfaces the JSON top-level elements as relationships:
 		if r.RefA.ElementRefID == "DOCUMENT" && strings.EqualFold(r.Relationship, "DESCRIBES") {
-			bom.NodeList.RootElements = append(bom.NodeList.RootElements, string(r.RefB.ElementRefID))
+			nl.RootElements = append(nl.RootElements, string(r.RefB.ElementRefID))
 		} else {
-			bom.NodeList.AddEdge(u.relationshipToEdge(r))
+			nl.AddEdge(u.relationshipToEdge(r))
 		}
 	}
 
-	return bom, nil
+	return nl, nil
 }
 
-// packageToNode assigns the data from an SPDX package into a new Node
-func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
+// PackageToNode assigns the data from an SPDX package into a new Node
+func (u *UnserializerSPDX23) PackageToNode(p *spdx23.Package) *sbom.Node {
 	n := &sbom.Node{
 		Id:              string(p.PackageSPDXIdentifier),
 		Type:            sbom.Node_PACKAGE,
@@ -153,21 +149,8 @@ func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	return n
 }
 
-// spdxDateToTime is a utility function that turns a date into a go time.Time
-func (*UnserializerSPDX23) spdxDateToTime(date string) *time.Time {
-	if date == "" {
-		return nil
-	}
-	t, err := time.Parse(time.RFC3339Nano, date)
-	if err != nil {
-		logrus.Warnf("invalid time format in %s", date)
-		return nil
-	}
-	return &t
-}
-
-// fileToNode converts a file from SPDX into a protobom node
-func (u *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
+// FileToNode converts a file from SPDX into a protobom node
+func (u *UnserializerSPDX23) FileToNode(f *spdx23.File) *sbom.Node {
 	n := &sbom.Node{
 		Id:               string(f.FileSPDXIdentifier),
 		Type:             sbom.Node_FILE,
@@ -191,6 +174,19 @@ func (u *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 	}
 
 	return n
+}
+
+// spdxDateToTime is a utility function that turns a date into a go time.Time
+func (*UnserializerSPDX23) spdxDateToTime(date string) *time.Time {
+	if date == "" {
+		return nil
+	}
+	t, err := time.Parse(time.RFC3339Nano, date)
+	if err != nil {
+		logrus.Warnf("invalid time format in %s", date)
+		return nil
+	}
+	return &t
 }
 
 // relationshipToEdge converts the SPDX relationship to a protobom Edge

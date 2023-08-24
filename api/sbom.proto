@@ -64,7 +64,7 @@ message Metadata {
     repeated Tool tools = 5; // TODO: note SPDX 3.0 and CDX 1.5 migrated to use Element (or subclass of Element) so we should too, use Node instead.
     repeated Person authors = 6;
     string comment = 7;
-    repeated Lifecycle lifecycles = 8;
+    repeated DocumentType documentTypes = 8;
 }
 
 message Edge {
@@ -145,10 +145,20 @@ message Tool {
     string vendor = 3;
 }
 
-message Lifecycle {
-    string name = 1;
-    optional string description = 2;
-    optional bool enum = 3;
+message DocumentType {
+    optional SBOMType type = 1;
+    optional string name = 2;
+    optional string description = 3;
+
+    enum SBOMType {
+        OTHER = 0;
+        DESIGN = 1;
+        SOURCE = 2;
+        BUILD = 3;
+        ANALYZED = 4;
+        DEPLOAYED = 5;
+        RUNTIME = 6;
+    }
 }
 
 message Identifier {

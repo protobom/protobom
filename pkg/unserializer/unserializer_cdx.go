@@ -1,96 +1,71 @@
-package reader
+package unserializer
 
 import (
 	"fmt"
-	"io"
 	"strings"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/bom-squad/protobom/pkg/reader/options"
 	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
+var _ CDXUnserializer = &UnserializerCDX{}
+
 type UnserializerCDX struct{}
 
-// ParseStream reads a CycloneDX 1.x from stream r usinbg the offcial CycloneDX
-// libraries and returns a protobom document with its data.
-func (u *UnserializerCDX) ParseStream(_ *options.Options, r io.Reader) (*sbom.Document, error) {
-	bom := new(cdx.BOM)
-	decoder := cdx.NewBOMDecoder(r, cdx.BOMFileFormatJSON)
-	if err := decoder.Decode(bom); err != nil {
-		return nil, fmt.Errorf("decoding cyclonedx: %w", err)
+func (u *UnserializerCDX) Metadata(bom *cdx.BOM) (*sbom.Metadata, *sbom.NodeList, error) {
+	md := &sbom.Metadata{
+		Id:      bom.SerialNumber,
+		Version: fmt.Sprintf("%d", bom.Version),
+		// Name:    ,
+		Date:          &timestamppb.Timestamp{},
+		Tools:         []*sbom.Tool{},
+		Authors:       []*sbom.Person{},
+		DocumentTypes: []*sbom.DocumentType{},
+
+		// Comment: metadata.Comment,
 	}
 
-	doc := &sbom.Document{
-		Metadata: &sbom.Metadata{
-			Id:      bom.SerialNumber,
-			Version: fmt.Sprintf("%d", bom.Version),
-			// Name:    ,
-			Date:       &timestamppb.Timestamp{},
-			Tools:      []*sbom.Tool{},
-			Authors:    []*sbom.Person{},
-			Lifecycles: []*sbom.Lifecycle{},
-
-			// Comment: bom.Comment,
-		},
-		NodeList: &sbom.NodeList{},
-	}
-
-	if bom.Metadata.Lifecycles != nil {
-		for _, lc := range *bom.Metadata.Lifecycles {
+	metadata := bom.Metadata
+	if metadata.Lifecycles != nil {
+		for _, lc := range *metadata.Lifecycles {
+			lc := lc
 			name := lc.Name
-			enum := false
-			// TODO: this might be redundant, but I'm not sure
-			if lc.Phase != "" {
+			desc := lc.Description
+			t := u.phaseToSBOMType(&lc.Phase)
+			if name == "" {
 				name = string(lc.Phase)
-				enum = true
 			}
 
-			doc.Metadata.Lifecycles = append(doc.Metadata.Lifecycles, &sbom.Lifecycle{
-				Name:        name,
-				Description: &lc.Description,
-				Enum:        &enum,
+			md.DocumentTypes = append(md.DocumentTypes, &sbom.DocumentType{
+				Name:        &name,
+				Description: &desc,
+				Type:        t,
 			})
 		}
 	}
 
-	if bom.Metadata.Component != nil {
-		nl, err := u.componentToNodeList(bom.Metadata.Component)
+	var nodeList *sbom.NodeList
+	if metadata.Component != nil {
+		nl, err := u.NodeList(metadata.Component)
 		if err != nil {
-			return nil, fmt.Errorf("converting main bom component to node: %w", err)
+			return nil, nil, fmt.Errorf("converting main bom component to node: %w", err)
 		}
 		if len(nl.RootElements) > 1 {
 			logrus.Warnf("root nodelist has %d components, this should not happen", len(nl.RootElements))
 		}
-		doc.NodeList.Add(nl)
+		nodeList = nl
 	}
 
-	// Cycle all components and get their graph fragments
-	for i := range *bom.Components {
-		nl, err := u.componentToNodeList(&(*bom.Components)[i])
-		if err != nil {
-			return nil, fmt.Errorf("converting component to node: %w", err)
-		}
-
-		if len(doc.NodeList.RootElements) == 0 {
-			doc.NodeList.Add(nl)
-		} else {
-			if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
-				return nil, fmt.Errorf("relating components to root node: %w", err)
-			}
-		}
-	}
-
-	return doc, nil
+	return md, nodeList, nil
 }
 
 // componentToNodes takes a CycloneDX component and computes its graph fragment,
 // returning a nodelist
-func (u *UnserializerCDX) componentToNodeList(component *cdx.Component) (*sbom.NodeList, error) {
-	node, err := u.componentToNode(component)
+func (u *UnserializerCDX) NodeList(component *cdx.Component) (*sbom.NodeList, error) {
+	node, err := u.Node(component)
 	if err != nil {
 		return nil, fmt.Errorf("converting cdx component to node: %w", err)
 	}
@@ -103,7 +78,7 @@ func (u *UnserializerCDX) componentToNodeList(component *cdx.Component) (*sbom.N
 
 	if component.Components != nil {
 		for i := range *component.Components {
-			subList, err := u.componentToNodeList(&(*component.Components)[i])
+			subList, err := u.NodeList(&(*component.Components)[i])
 			if err != nil {
 				return nil, fmt.Errorf("converting subcomponent to nodelist: %w", err)
 			}
@@ -116,7 +91,7 @@ func (u *UnserializerCDX) componentToNodeList(component *cdx.Component) (*sbom.N
 	return nl, nil
 }
 
-func (u *UnserializerCDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:unparam
+func (u *UnserializerCDX) Node(c *cdx.Component) (*sbom.Node, error) {
 	node := &sbom.Node{
 		Id:      c.BOMRef,
 		Type:    sbom.Node_PACKAGE,
@@ -245,4 +220,30 @@ func (u *UnserializerCDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) strin
 		}
 	}
 	return s
+}
+
+// phaseToSBOMType converts a CycloneDX lifecycle phase to an SBOM document type
+// note that most of the CycloneDX phases are not mapped to SBOM document types and they would be used as OTHER
+// this is a temporary solution until we have a better mapping
+// see: https://www.cisa.gov/sites/default/files/2023-04/sbom-types-document-508c.pdf
+func (u *UnserializerCDX) phaseToSBOMType(ph *cdx.LifecyclePhase) *sbom.DocumentType_SBOMType {
+	phase := *ph
+	switch phase {
+	case cdx.LifecyclePhaseBuild:
+		return sbom.DocumentType_BUILD.Enum()
+	case cdx.LifecyclePhaseDecommission:
+		return sbom.DocumentType_OTHER.Enum()
+	case cdx.LifecyclePhaseDesign:
+		return sbom.DocumentType_DESIGN.Enum()
+	case cdx.LifecyclePhaseDiscovery:
+		return sbom.DocumentType_OTHER.Enum()
+	case cdx.LifecyclePhaseOperations:
+		return sbom.DocumentType_OTHER.Enum()
+	case cdx.LifecyclePhasePostBuild:
+		return sbom.DocumentType_OTHER.Enum()
+	case cdx.LifecyclePhasePreBuild:
+		return sbom.DocumentType_OTHER.Enum()
+	default:
+		return nil
+	}
 }

@@ -56,13 +56,16 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 		return nil, err
 	}
 
-	for _, ls := range bom.Metadata.Lifecycles {
+	for _, dt := range bom.Metadata.DocumentTypes {
 		var lfc cdx.Lifecycle
-		if *ls.Enum {
-			lfc.Phase = cdx.LifecyclePhase(ls.Name)
-		} else {
-			lfc.Name = ls.Name
-			lfc.Description = *ls.Description
+
+		if dt.Type == nil {
+			lfc.Name = *dt.Name
+			lfc.Description = *dt.Description
+		} else if *dt.Type == sbom.DocumentType_OTHER {
+			lfc.Phase = cdx.LifecyclePhase(strings.ToLower(*dt.Name))
+		} else if *dt.Type != sbom.DocumentType_OTHER {
+			lfc.Phase = cdx.LifecyclePhase(strings.ToLower(dt.Type.String()))
 		}
 
 		*doc.Metadata.Lifecycles = append(*doc.Metadata.Lifecycles, lfc)

@@ -11,6 +11,7 @@ type Format string
 
 const (
 	JSON       = "json"
+	XML        = "xml"
 	TEXT       = "text"
 	SPDX23TV   = Format("text/spdx+text;version=2.3")
 	SPDX23JSON = Format("text/spdx+json;version=2.3")

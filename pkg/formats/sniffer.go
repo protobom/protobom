@@ -136,7 +136,7 @@ func (c cdxSniff) sniff(ctx context.Context, data []byte) Format {
 type spdxSniff struct{}
 
 func (c spdxSniff) Type() string {
-	return "spdx"
+	return SPDXFORMAT
 }
 
 func (c spdxSniff) sniff(ctx context.Context, data []byte) Format {

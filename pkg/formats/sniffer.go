@@ -24,7 +24,6 @@ var sniffFormats = []sniffFormat{
 
 type sniffFormat interface {
 	sniff(ctx context.Context, data []byte) Format
-	Type() string
 }
 
 type Sniffer struct{}
@@ -99,12 +98,8 @@ func (st *sniffState) Format() Format {
 
 type cdxSniff struct{}
 
-func (c cdxSniff) Type() string {
-	return CDXFORMAT
-}
-
 func (c cdxSniff) sniff(ctx context.Context, data []byte) Format {
-	state, err := getSniffState(ctx, c.Type())
+	state, err := getSniffState(ctx, CDXFORMAT)
 	if err != nil {
 		return EmptyFormat
 	}
@@ -126,7 +121,7 @@ func (c cdxSniff) sniff(ctx context.Context, data []byte) Format {
 		}
 	}
 
-	err = setSniffState(ctx, c.Type(), state)
+	err = setSniffState(ctx, CDXFORMAT, state)
 	if err != nil {
 		return EmptyFormat
 	}
@@ -135,12 +130,8 @@ func (c cdxSniff) sniff(ctx context.Context, data []byte) Format {
 
 type spdxSniff struct{}
 
-func (c spdxSniff) Type() string {
-	return SPDXFORMAT
-}
-
 func (c spdxSniff) sniff(ctx context.Context, data []byte) Format {
-	state, err := getSniffState(ctx, c.Type())
+	state, err := getSniffState(ctx, SPDXFORMAT)
 	if err != nil {
 		return EmptyFormat
 	}
@@ -178,7 +169,7 @@ func (c spdxSniff) sniff(ctx context.Context, data []byte) Format {
 		}
 	}
 
-	err = setSniffState(ctx, c.Type(), state)
+	err = setSniffState(ctx, SPDXFORMAT, state)
 	if err != nil {
 		return EmptyFormat
 	}

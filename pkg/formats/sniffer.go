@@ -100,7 +100,7 @@ func (st *sniffState) Format() Format {
 type cdxSniff struct{}
 
 func (c cdxSniff) Type() string {
-	return "cdx"
+	return CDXFORMAT
 }
 
 func (c cdxSniff) sniff(ctx context.Context, data []byte) Format {

@@ -17,9 +17,11 @@ type Writer struct {
 	format     formats.Format
 }
 
+const defaultIdent = 4
+
 func New(opts ...WriterOption) *Writer {
 	r := &Writer{
-		ident:  4,
+		ident:  defaultIdent,
 		format: formats.CDX15JSON, // TODO: should we really default to format? or should we crash if not set?
 	}
 
@@ -35,19 +37,13 @@ func New(opts ...WriterOption) *Writer {
 }
 
 func (w *Writer) createSerializer(format formats.Format) serializer.Serializer {
-	opt := &serializer.Options{
-		Encoding: format.Encoding(),
-		Version:  format.Version(),
-		Indent:   w.ident,
-	}
-
 	if format.Type() == formats.CDXFORMAT {
-		return serializer.NewCDX(opt)
+		return serializer.NewCDX(format.Version(), format.Encoding())
 	}
 
 	if format.Type() == formats.SPDXFORMAT {
 		if format.Version() == "2.3" {
-			return serializer.NewSPDX23(opt)
+			return serializer.NewSPDX23(w.ident)
 		}
 	}
 

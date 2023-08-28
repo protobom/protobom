@@ -21,16 +21,16 @@ type SerializerCDX struct {
 	version  cdx.SpecVersion
 }
 
-func NewCDX(opt *Options) *SerializerCDX {
+func NewCDX(version, encoding string) *SerializerCDX {
 	var format cdx.BOMFileFormat
-	if opt.Encoding == formats.XML {
+	if encoding == formats.XML {
 		format = cdx.BOMFileFormatXML
-	} else if opt.Encoding == formats.JSON {
+	} else if encoding == formats.JSON {
 		format = cdx.BOMFileFormatJSON
 	}
 
 	var specVersion cdx.SpecVersion
-	switch opt.Version {
+	switch version {
 	case "1.0":
 		specVersion = cdx.SpecVersion1_0
 	case "1.1":

@@ -18,14 +18,12 @@ import (
 var _ Serializer = &SerializerSPDX23{}
 
 type SerializerSPDX23 struct {
-	encoding string
-	ident    int
+	ident int
 }
 
-func NewSPDX23(opt *Options) *SerializerSPDX23 {
+func NewSPDX23(ident int) *SerializerSPDX23 {
 	return &SerializerSPDX23{
-		encoding: opt.Encoding,
-		ident:    opt.Indent,
+		ident: ident,
 	}
 }
 

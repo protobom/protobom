@@ -1,4 +1,4 @@
-package writer
+package serializer
 
 import (
 	"encoding/json"
@@ -9,18 +9,30 @@ import (
 
 	protospdx "github.com/bom-squad/protobom/pkg/formats/spdx"
 	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/writer/options"
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	"github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"sigs.k8s.io/release-utils/version"
 )
 
-type SerializerSPDX23 struct{}
+var _ Serializer = &SerializerSPDX23{}
 
-func (s *SerializerSPDX23) Render(opts options.Options, doc interface{}, wr io.Writer) error {
+type SerializerSPDX23 struct {
+	encoding string
+	ident    int
+}
+
+func NewSPDX23(opt *Options) *SerializerSPDX23 {
+	return &SerializerSPDX23{
+		encoding: opt.Encoding,
+		ident:    opt.Indent,
+	}
+}
+
+func (s *SerializerSPDX23) Render(doc interface{}, wr io.Writer) error {
+	// TODO: add support for XML
 	encoder := json.NewEncoder(wr)
-	encoder.SetIndent("", strings.Repeat(" ", opts.Indent))
+	encoder.SetIndent("", strings.Repeat(" ", s.ident))
 	if err := encoder.Encode(doc.(*spdx.Document)); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
@@ -29,7 +41,7 @@ func (s *SerializerSPDX23) Render(opts options.Options, doc interface{}, wr io.W
 }
 
 // Serialize takes a protobom and returns an SPDX 2.3 struct
-func (s *SerializerSPDX23) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
+func (s *SerializerSPDX23) Serialize(bom *sbom.Document) (interface{}, error) {
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,

@@ -1,51 +1,81 @@
 package writer
 
 import (
-	"errors"
 	"fmt"
 	"io"
+	"os"
 
+	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/writer/options"
+
+	"github.com/bom-squad/protobom/pkg/serializer"
 )
 
-type Option func(*Writer)
-
-func New() *Writer {
-	return &Writer{
-		impl:    &defaultWriterImplementation{},
-		Options: options.Default,
-	}
-}
-
 type Writer struct {
-	impl    writerImplementation
-	Options options.Options
+	serializer serializer.Serializer
+	ident      int
+	format     formats.Format
 }
 
-func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
-	if bom == nil {
-		return errors.New("unable to write sbom to stream, SBOM is nil")
+func New(opts ...WriterOption) *Writer {
+	r := &Writer{
+		ident:  4,
+		format: formats.CDX15JSON, // TODO: should we really default to format? or should we crash if not set?
 	}
 
-	// The target format is in the options ATM. Here we get the
-	// serializer for the target we are writing to
-	serializer, err := w.impl.GetFormatSerializer(w.Options.Format)
-	if err != nil {
-		return fmt.Errorf("getting serializer: %w", err)
+	for _, opt := range opts {
+		opt(r)
 	}
 
-	if err := w.impl.SerializeSBOM(w.Options, serializer, bom, wr); err != nil {
-		return fmt.Errorf("serializing sbom: %w", err)
+	if r.serializer == nil {
+		r.serializer = r.createSerializer(r.format)
+	}
+
+	return r
+}
+
+func (w *Writer) createSerializer(format formats.Format) serializer.Serializer {
+	opt := &serializer.Options{
+		Encoding: format.Encoding(),
+		Version:  format.Version(),
+		Indent:   w.ident,
+	}
+
+	if format.Type() == formats.CDXFORMAT {
+		return serializer.NewCDX(opt)
+	}
+
+	if format.Type() == formats.SPDXFORMAT {
+		if format.Version() == "2.3" {
+			return serializer.NewSPDX23(opt)
+		}
 	}
 
 	return nil
 }
 
-func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
-	f, err := w.impl.OpenFile(path)
+func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
+	if bom == nil {
+		return fmt.Errorf("unable to write sbom to stream, SBOM is nil")
+	}
+
+	nativeDoc, err := w.serializer.Serialize(bom)
 	if err != nil {
-		return err
+		return fmt.Errorf("serializing SBOM to native format: %w", err)
+	}
+
+	if err := w.serializer.Render(nativeDoc, wr); err != nil {
+		return fmt.Errorf("writing rendered document to string: %w", err)
+	}
+
+	return nil
+}
+
+// WriteFile takes an sbom.Document and writes it to the file at path
+func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("opening file %s: %w", path, err)
 	}
 
 	return w.WriteStream(bom, f)

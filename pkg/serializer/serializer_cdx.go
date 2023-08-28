@@ -1,4 +1,4 @@
-package writer
+package serializer
 
 import (
 	"context"
@@ -9,21 +9,57 @@ import (
 	"strings"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
+	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/writer/options"
 	"github.com/sirupsen/logrus"
 )
+
+var _ Serializer = &SerializerCDX{}
+
+type SerializerCDX struct {
+	encoding cdx.BOMFileFormat
+	version  cdx.SpecVersion
+}
+
+func NewCDX(opt *Options) *SerializerCDX {
+	var format cdx.BOMFileFormat
+	if opt.Encoding == formats.XML {
+		format = cdx.BOMFileFormatXML
+	} else if opt.Encoding == formats.JSON {
+		format = cdx.BOMFileFormatJSON
+	}
+
+	var specVersion cdx.SpecVersion
+	switch opt.Version {
+	case "1.0":
+		specVersion = cdx.SpecVersion1_0
+	case "1.1":
+		specVersion = cdx.SpecVersion1_1
+	case "1.2":
+		specVersion = cdx.SpecVersion1_2
+	case "1.3":
+		specVersion = cdx.SpecVersion1_3
+	case "1.4":
+		specVersion = cdx.SpecVersion1_4
+	case "1.5":
+		specVersion = cdx.SpecVersion1_5
+	}
+
+	return &SerializerCDX{
+		encoding: format,
+		version:  specVersion,
+	}
+}
 
 const (
 	stateKey state = "cyclonedx_serializer_state"
 )
 
 type (
-	state         string
-	SerializerCDX struct{}
+	state string
 )
 
-func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
+func (s *SerializerCDX) Serialize(bom *sbom.Document) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
@@ -295,17 +331,16 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	return c
 }
 
-// renderVersion calls the official CDX serializer to render the BOM into a
-// specific version
-func (s *SerializerCDX) renderVersion(cdxVersion cdx.SpecVersion, doc interface{}, wr io.Writer) error {
+// Render calls the official CDX serializer to render the BOM into a specific version
+func (s *SerializerCDX) Render(doc interface{}, wr io.Writer) error {
 	if doc == nil {
 		return errors.New("document is nil")
 	}
 
-	encoder := cdx.NewBOMEncoder(wr, cdx.BOMFileFormatJSON)
+	encoder := cdx.NewBOMEncoder(wr, s.encoding)
 	encoder.SetPretty(true)
 
-	if err := encoder.EncodeVersion(doc.(*cdx.BOM), cdxVersion); err != nil {
+	if err := encoder.EncodeVersion(doc.(*cdx.BOM), s.version); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
 

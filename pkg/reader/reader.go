@@ -16,7 +16,6 @@ import (
 type Reader struct {
 	cdx      unserializer.CDXUnserializer
 	spdx23   unserializer.SPDX23Unserializer
-	version  string
 	encoding string
 	sniffer  formats.Sniffer
 }
@@ -24,8 +23,7 @@ type Reader struct {
 func New(opts ...ReaderOption) *Reader {
 	r := &Reader{
 		cdx:      &unserializer.UnserializerCDX{},
-		spdx23:   nil,
-		version:  "",
+		spdx23:   &unserializer.UnserializerSPDX23{},
 		encoding: formats.JSON,
 	}
 
@@ -84,9 +82,9 @@ func (r *Reader) parseCDX(re io.Reader) (*sbom.Document, error) {
 	return doc, nil
 }
 
-func (r *Reader) parseSPDX(re io.Reader) (*sbom.Document, error) {
+func (r *Reader) parseSPDX(format formats.Format, re io.Reader) (*sbom.Document, error) {
 	var document *sbom.Document
-	if r.version == "2.3" {
+	if format.Version() == "2.3" {
 		doc, err := r.parseSPDX23(re)
 		if err != nil {
 			return nil, fmt.Errorf("parsing SPDX 2.3: %w", err)
@@ -96,7 +94,7 @@ func (r *Reader) parseSPDX(re io.Reader) (*sbom.Document, error) {
 	}
 
 	if document == nil {
-		return nil, fmt.Errorf("unknown SPDX version: %s", r.version)
+		return nil, fmt.Errorf("unknown SPDX version: %s", format.Version())
 	}
 
 	return document, nil
@@ -150,7 +148,7 @@ func (r *Reader) ParseStream(f io.ReadSeeker) (*sbom.Document, error) {
 	var doc *sbom.Document
 	t := format.Type()
 	if t == formats.SPDXFORMAT {
-		doc, err = r.parseSPDX(f)
+		doc, err = r.parseSPDX(format, f)
 		if err != nil {
 			return nil, fmt.Errorf("parsing SPDX: %w", err)
 		}

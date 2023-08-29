@@ -42,7 +42,7 @@ func (u *UnserializerSPDX23) Metadata(doc *spdx23.Document) (*sbom.Metadata, *sb
 	}
 
 	// TODO(degradation): SPDX LicenseVersion
-	return md, nil, nil
+	return md, &sbom.NodeList{}, nil
 }
 
 func (u *UnserializerSPDX23) NodeList(doc *spdx23.Document) (*sbom.NodeList, error) {

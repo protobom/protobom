@@ -196,6 +196,7 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 	}
 
 	for _, e := range bom.NodeList.Edges {
+		e := e
 		if _, ok := state.addedDict[e.From]; ok {
 			continue
 		}

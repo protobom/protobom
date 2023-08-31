@@ -7,10 +7,31 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sync"
 
 	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/reader/options"
 )
+
+var (
+	regMtx        sync.RWMutex
+	unserializers = make(map[formats.Format]Unserializer)
+)
+
+func init() {
+	regMtx.Lock()
+	unserializers[formats.CDX14JSON] = &UnserializerCDX14{}
+	unserializers[formats.SPDX23JSON] = &UnserializerSPDX23{}
+	regMtx.Unlock()
+}
+
+// RegisterUnserializer registers a new unserializer to parse a specific
+// format. The new unserializer replaces any previously defined driver.
+func RegisterUnserializer(format formats.Format, u Unserializer) {
+	regMtx.Lock()
+	unserializers[format] = u
+	regMtx.Unlock()
+}
 
 type parserImplementation interface {
 	OpenDocumentFile(string) (*os.File, error)
@@ -24,6 +45,8 @@ func (dpi *defaultParserImplementation) OpenDocumentFile(path string) (*os.File,
 	return os.Open(path)
 }
 
+// DetectFormat reads from r and detects if the stream is a known SBOM format.
+// If a known format is detected, it returns a format.Format, nil otherwise.
 func (dpi *defaultParserImplementation) DetectFormat(opts *options.Options, r io.ReadSeeker) (formats.Format, error) {
 	sniffer := formats.Sniffer{}
 	format, err := sniffer.SniffReader(r)
@@ -33,13 +56,11 @@ func (dpi *defaultParserImplementation) DetectFormat(opts *options.Options, r io
 	return format, nil
 }
 
+// GetUnserializer returns the registered unserializer for the specified format
 func (dpi *defaultParserImplementation) GetUnserializer(_ *options.Options, format formats.Format) (Unserializer, error) {
-	switch string(format) {
-	case "text/spdx+json;version=2.3":
-		return &UnserializerSPDX23{}, nil
-	case "application/vnd.cyclonedx+json;version=1.4":
-		return &UnserializerCDX14{}, nil
-	default:
-		return nil, fmt.Errorf("no format parser registered for %s", format)
+	if _, ok := unserializers[format]; ok {
+		return unserializers[format], nil
 	}
+
+	return nil, fmt.Errorf("no format parser registered for %s", format)
 }

@@ -179,7 +179,6 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 					return nil, fmt.Errorf("unable to locate node %s", targetID)
 				}
 
-				//nolint:gosec
 				dependencies = append(dependencies, cdx.Dependency{
 					Ref:          e.From,
 					Dependencies: &e.To,

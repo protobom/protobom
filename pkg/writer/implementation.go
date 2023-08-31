@@ -4,12 +4,33 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sync"
 
 	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer/options"
-	"github.com/sirupsen/logrus"
 )
+
+var (
+	regMtx      sync.RWMutex
+	serializers = make(map[formats.Format]Serializer)
+)
+
+func init() {
+	regMtx.Lock()
+	serializers[formats.CDX14JSON] = &SerializerCDX14{}
+	serializers[formats.SPDX23JSON] = &SerializerSPDX23{}
+	regMtx.Unlock()
+}
+
+// RegisterSerializer registers a new serializer to handle writing serialized
+// SBOMs in a specific format. When registerring a new serializer it replaces
+// any other previously defined for the same format.
+func RegisterSerializer(format formats.Format, s Serializer) {
+	regMtx.Lock()
+	serializers[format] = s
+	regMtx.Unlock()
+}
 
 type writerImplementation interface {
 	GetFormatSerializer(formats.Format) (Serializer, error)
@@ -20,16 +41,10 @@ type writerImplementation interface {
 type defaultWriterImplementation struct{}
 
 func (di *defaultWriterImplementation) GetFormatSerializer(formatOpt formats.Format) (Serializer, error) {
-	switch formatOpt {
-	case formats.CDX14JSON:
-		logrus.Infof("Serializing to %s", formats.CDX14JSON)
-		return &SerializerCDX14{}, nil
-	case formats.SPDX23JSON:
-		logrus.Infof("Serializing to %s", formats.SPDX23JSON)
-		return &SerializerSPDX23{}, nil
-	default:
-		return nil, fmt.Errorf("no serializer supports rendering to %s", formatOpt)
+	if _, ok := serializers[formatOpt]; ok {
+		return serializers[formatOpt], nil
 	}
+	return nil, fmt.Errorf("no serializer registered for %s", formatOpt)
 }
 
 // SerializeSBOM takes an SBOM in protobuf and a serializer and uses it to render

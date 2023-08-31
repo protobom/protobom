@@ -173,18 +173,26 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 
 		case sbom.Edge_dependsOn:
 			// Add to the dependency tree
+			targetStrings := []string{}
+			depListCheck := map[string]struct{}{}
 			for _, targetID := range e.To {
-				state.addedDict[targetID] = struct{}{}
+				// Add entries to dependency only once.
+				if _, ok := depListCheck[targetID]; ok {
+					continue
+				}
+
 				if _, ok := state.componentsDict[targetID]; !ok {
 					return nil, fmt.Errorf("unable to locate node %s", targetID)
 				}
 
-				dependencies = append(dependencies, cdx.Dependency{
-					Ref:          e.From,
-					Dependencies: &e.To,
-				})
+				state.addedDict[targetID] = struct{}{}
+				depListCheck[targetID] = struct{}{}
+				targetStrings = append(targetStrings, targetID)
 			}
-
+			dependencies = append(dependencies, cdx.Dependency{
+				Ref:          e.From,
+				Dependencies: &targetStrings,
+			})
 		default:
 			// TODO(degradation) here, we would document how relationships are lost
 			logrus.Warnf(

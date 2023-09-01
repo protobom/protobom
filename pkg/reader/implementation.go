@@ -3,6 +3,8 @@
 
 package reader
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 import (
 	"fmt"
 	"io"
@@ -35,6 +37,8 @@ func RegisterUnserializer(format formats.Format, u native.Unserializer) {
 	unserializers[format] = u
 	regMtx.Unlock()
 }
+
+//counterfeiter:generate . parserImplementation
 
 type parserImplementation interface {
 	OpenDocumentFile(string) (*os.File, error)

@@ -1,5 +1,7 @@
 package writer
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 import (
 	"fmt"
 	"io"
@@ -33,6 +35,8 @@ func RegisterSerializer(format formats.Format, s native.Serializer) {
 	serializers[format] = s
 	regMtx.Unlock()
 }
+
+//counterfeiter:generate . writerImplementation
 
 type writerImplementation interface {
 	GetFormatSerializer(formats.Format) (native.Serializer, error)

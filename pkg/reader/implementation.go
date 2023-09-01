@@ -10,24 +10,27 @@ import (
 	"sync"
 
 	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/bom-squad/protobom/pkg/native"
+	drivers "github.com/bom-squad/protobom/pkg/native/unserializers"
 	"github.com/bom-squad/protobom/pkg/reader/options"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 var (
 	regMtx        sync.RWMutex
-	unserializers = make(map[formats.Format]Unserializer)
+	unserializers = make(map[formats.Format]native.Unserializer)
 )
 
 func init() {
 	regMtx.Lock()
-	unserializers[formats.CDX14JSON] = &UnserializerCDX14{}
-	unserializers[formats.SPDX23JSON] = &UnserializerSPDX23{}
+	unserializers[formats.CDX14JSON] = &drivers.UnserializerCDX14{}
+	unserializers[formats.SPDX23JSON] = &drivers.UnserializerSPDX23{}
 	regMtx.Unlock()
 }
 
 // RegisterUnserializer registers a new unserializer to parse a specific
 // format. The new unserializer replaces any previously defined driver.
-func RegisterUnserializer(format formats.Format, u Unserializer) {
+func RegisterUnserializer(format formats.Format, u native.Unserializer) {
 	regMtx.Lock()
 	unserializers[format] = u
 	regMtx.Unlock()
@@ -35,8 +38,9 @@ func RegisterUnserializer(format formats.Format, u Unserializer) {
 
 type parserImplementation interface {
 	OpenDocumentFile(string) (*os.File, error)
-	DetectFormat(*options.Options, io.ReadSeeker) (formats.Format, error)   // Change string to format
-	GetUnserializer(*options.Options, formats.Format) (Unserializer, error) // Change string to format
+	DetectFormat(*options.Options, io.ReadSeeker) (formats.Format, error)
+	GetUnserializer(*options.Options, formats.Format) (native.Unserializer, error)
+	ParseStream(native.Unserializer, *options.Options, io.Reader) (*sbom.Document, error)
 }
 
 type defaultParserImplementation struct{}
@@ -57,10 +61,18 @@ func (dpi *defaultParserImplementation) DetectFormat(opts *options.Options, r io
 }
 
 // GetUnserializer returns the registered unserializer for the specified format
-func (dpi *defaultParserImplementation) GetUnserializer(_ *options.Options, format formats.Format) (Unserializer, error) {
+func (dpi *defaultParserImplementation) GetUnserializer(_ *options.Options, format formats.Format) (native.Unserializer, error) {
 	if _, ok := unserializers[format]; ok {
 		return unserializers[format], nil
 	}
 
 	return nil, fmt.Errorf("no format parser registered for %s", format)
+}
+
+func (dpi *defaultParserImplementation) ParseStream(formatParser native.Unserializer, opts *options.Options, f io.Reader) (*sbom.Document, error) {
+	doc, err := formatParser.ParseStream(opts, f)
+	if err != nil {
+		return nil, fmt.Errorf("unserializing: %w", err)
+	}
+	return doc, nil
 }

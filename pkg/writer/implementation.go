@@ -41,7 +41,7 @@ func RegisterSerializer(format formats.Format, s native.Serializer) {
 type writerImplementation interface {
 	GetFormatSerializer(formats.Format) (native.Serializer, error)
 	SerializeSBOM(options.Options, native.Serializer, *sbom.Document, io.WriteCloser) error
-	OpenFile(string) (*os.File, error)
+	OpenFile(string) (io.WriteCloser, error)
 }
 
 type defaultWriterImplementation struct{}
@@ -67,7 +67,7 @@ func (di *defaultWriterImplementation) SerializeSBOM(opts options.Options, seria
 }
 
 // OpenFile opens the file at path and returns it
-func (di *defaultWriterImplementation) OpenFile(path string) (*os.File, error) {
+func (di *defaultWriterImplementation) OpenFile(path string) (io.WriteCloser, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("opening file: %w", err)

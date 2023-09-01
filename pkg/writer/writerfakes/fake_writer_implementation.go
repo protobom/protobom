@@ -3,7 +3,6 @@ package writerfakes
 
 import (
 	"io"
-	"os"
 	"sync"
 
 	"github.com/bom-squad/protobom/pkg/formats"
@@ -26,17 +25,17 @@ type FakeWriterImplementation struct {
 		result1 native.Serializer
 		result2 error
 	}
-	OpenFileStub        func(string) (*os.File, error)
+	OpenFileStub        func(string) (io.WriteCloser, error)
 	openFileMutex       sync.RWMutex
 	openFileArgsForCall []struct {
 		arg1 string
 	}
 	openFileReturns struct {
-		result1 *os.File
+		result1 io.WriteCloser
 		result2 error
 	}
 	openFileReturnsOnCall map[int]struct {
-		result1 *os.File
+		result1 io.WriteCloser
 		result2 error
 	}
 	SerializeSBOMStub        func(options.Options, native.Serializer, *sbom.Document, io.WriteCloser) error
@@ -121,7 +120,7 @@ func (fake *FakeWriterImplementation) GetFormatSerializerReturnsOnCall(i int, re
 	}{result1, result2}
 }
 
-func (fake *FakeWriterImplementation) OpenFile(arg1 string) (*os.File, error) {
+func (fake *FakeWriterImplementation) OpenFile(arg1 string) (io.WriteCloser, error) {
 	fake.openFileMutex.Lock()
 	ret, specificReturn := fake.openFileReturnsOnCall[len(fake.openFileArgsForCall)]
 	fake.openFileArgsForCall = append(fake.openFileArgsForCall, struct {
@@ -146,7 +145,7 @@ func (fake *FakeWriterImplementation) OpenFileCallCount() int {
 	return len(fake.openFileArgsForCall)
 }
 
-func (fake *FakeWriterImplementation) OpenFileCalls(stub func(string) (*os.File, error)) {
+func (fake *FakeWriterImplementation) OpenFileCalls(stub func(string) (io.WriteCloser, error)) {
 	fake.openFileMutex.Lock()
 	defer fake.openFileMutex.Unlock()
 	fake.OpenFileStub = stub
@@ -159,28 +158,28 @@ func (fake *FakeWriterImplementation) OpenFileArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeWriterImplementation) OpenFileReturns(result1 *os.File, result2 error) {
+func (fake *FakeWriterImplementation) OpenFileReturns(result1 io.WriteCloser, result2 error) {
 	fake.openFileMutex.Lock()
 	defer fake.openFileMutex.Unlock()
 	fake.OpenFileStub = nil
 	fake.openFileReturns = struct {
-		result1 *os.File
+		result1 io.WriteCloser
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeWriterImplementation) OpenFileReturnsOnCall(i int, result1 *os.File, result2 error) {
+func (fake *FakeWriterImplementation) OpenFileReturnsOnCall(i int, result1 io.WriteCloser, result2 error) {
 	fake.openFileMutex.Lock()
 	defer fake.openFileMutex.Unlock()
 	fake.OpenFileStub = nil
 	if fake.openFileReturnsOnCall == nil {
 		fake.openFileReturnsOnCall = make(map[int]struct {
-			result1 *os.File
+			result1 io.WriteCloser
 			result2 error
 		})
 	}
 	fake.openFileReturnsOnCall[i] = struct {
-		result1 *os.File
+		result1 io.WriteCloser
 		result2 error
 	}{result1, result2}
 }

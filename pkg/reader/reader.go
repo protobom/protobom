@@ -49,7 +49,7 @@ func (r *Reader) ParseStream(f io.ReadSeeker) (*sbom.Document, error) {
 		return nil, fmt.Errorf("getting format parser: %w", err)
 	}
 
-	doc, err := formatParser.ParseStream(&r.Options, f)
+	doc, err := r.impl.ParseStream(formatParser, &r.Options, f)
 	if err != nil {
 		return nil, fmt.Errorf("parsing %s document: %w", format, err)
 	}

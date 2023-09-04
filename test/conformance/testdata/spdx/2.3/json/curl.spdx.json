@@ -1,0 +1,1764 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "sbom-sha256:c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2023-05-30T10:45:35Z",
+    "creators": [
+      "Tool: apko (v0.8.0-53-gfaa1b37)",
+      "Organization: Chainguard, Inc"
+    ],
+    "licenseListVersion": "3.16"
+  },
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://spdx.org/spdxdocs/apko/",
+  "documentDescribes": [
+    "SPDXRef-Package-sha256-47fed8868b46b060efb8699dc40e981a0c785650223e03602d8c4493fc75b68c"
+  ],
+  "files": [
+    {
+      "SPDXID": "SPDXRef-File--etc-ssl-certs-ca-certificates.crt",
+      "fileName": "/etc/ssl/certs/ca-certificates.crt",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "b132b312a42c8be5d632069aecc6797b629f1264"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "824cefcee69de918c76b7b92776f304c3a4b7f6281539118bc1d41a9dd8476d9"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "18d8c151a80c14db8a2b419503d589495ea2377e8f28bbe6f087bcc13d4c9d429616bfc57d3d7fcd40b3406760a036f8737a34ea29be53e3edf7c55e05809108"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95ADDRESS",
+      "fileName": "/usr/lib/locale/C.utf8/LC_ADDRESS",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "12d0e0600557e0dcb3c64e56894b81230e2eaa72"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "26e2800affab801cb36d4ff9625a95c3abceeda2b6553a7aecd0cfcf34c98099"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "d38b225e8204e1e85e6c631481f46d0b8fca8cf8d8dfc290f00adb15b605959f91f0d55dc830fdd82c22f916140090928e44f1b5123facac135705cc81df00b0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95COLLATE",
+      "fileName": "/usr/lib/locale/C.utf8/LC_COLLATE",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "f245e3207984879d0b736c9aa42f4268e27221b9"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "47a5f5359a8f324abc39d69a7f6241a2ac0e2fbbeae5b9c3a756e682b75d087b"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "3220445f9f137f3ff4b02c7b0c4a2bb963e495440a174ff5f15143bbd13cdc1c1f5055f5beaf807554c70bb134e842e963bd2411e0e81ae4fcb0613327fa16de"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95CTYPE",
+      "fileName": "/usr/lib/locale/C.utf8/LC_CTYPE",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "9b237153cdbb14eed476d372b0c5b37141ce3e73"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4af23bb40c8f2e80a26c95369b442986213c50a7308d8d73b85c4911dde0a358"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "83777337c2a8bfe6c7545a78ccd13f17cd3fb96f817ea62d810d87bd073c33f273cbb1746d3f6ae980679b53b88d00c1a0cbeb7cb2f573f363fe16abc007b4ae"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95IDENTIFICATION",
+      "fileName": "/usr/lib/locale/C.utf8/LC_IDENTIFICATION",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "1eeec3b2cb259530d76ef717e24af0fd34d94624"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "38a1d8e5271c86f48910d9c684f64271955335736e71cec35eeac942f90eb091"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "680812c5bc70c90bd7b82a0b42ec8acddbb88dc186388f0c4a0b16bc4a08f49a05f3dc4086d1b9ab497b2617f136fc93eca1030de3712d41baa7e25a7e870cec"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MEASUREMENT",
+      "fileName": "/usr/lib/locale/C.utf8/LC_MEASUREMENT",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "0a7d0d264f9ded94057020e807bfaa13a7573821"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "bb14a6f2cbd5092a755e8f272079822d3e842620dd4542a8dfa1e5e72fc6115b"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "497cea17c3c7cf344e761c9aea4d0a88574d8ab2ff51b76881b1a59e8cf6583841e049cb6b83cb6c5e958c72b6d9fb8ea241728dfe76981da153302de28b00c8"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MESSAGES-SYSC95LCC95MESSAGES",
+      "fileName": "/usr/lib/locale/C.utf8/LC_MESSAGES/SYS_LC_MESSAGES",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "574d7e92bedf1373ec9506859b0d55ee7babbf20"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "f9ad02f1d8eba721d4cbd50c365b5c681c39aec008f90bfc2be2dc80bfbaddcb"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "51606a077ed7fbc15fb361c355fc6a87438ef7a5324defbba8fa04dd58f8095c3dda3de7bc41b2fb5497c33d5c4faa2e82e96bd770eeecbdac91f95423400e8c"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MONETARY",
+      "fileName": "/usr/lib/locale/C.utf8/LC_MONETARY",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "110ed47e32d65c61ab8240202faa2114d025a009"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "bfd9e9975443b834582493fe9a8d7aefcd989376789c17470a1e548aee76fd55"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "b247a6adf097154cb1af52199396ec6465986f5067a4a3b2a97423e0327d837579d689d89eb3ff9dda054228a190a8b163b085336df9bb64ddd9c48615cafe1b"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95NAME",
+      "fileName": "/usr/lib/locale/C.utf8/LC_NAME",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "b5d16f1042c3c1c4bef85766aa2c20c1b0d8cff6"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "14507aad9f806112e464b9ca94c93b2e4d759ddc612b5f87922d7cac7170697d"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "a6f898de0f03959965b7110768c80aff1831398c75f821d0998023bf80594edb02e4b6d82aed6caa0754902b9046ba75334c310bfac1d5cbe2bf19a25733f198"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95NUMERIC",
+      "fileName": "/usr/lib/locale/C.utf8/LC_NUMERIC",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "1bd2f3db04022b8cfe5cd7a7f90176f191e19425"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "f5976e6b3e6b24dfe03caad6a5b98d894d8110d8bd15507e690fd60fd3e04ab2"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "a97712e287b806a07690c3a5ed3dfa88c53d40d89a32f93cbf891b8fc85e4b393db96444068f75e54d944c7a3466d9d85981f4096775cb10e2e9ef83c091a946"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95PAPER",
+      "fileName": "/usr/lib/locale/C.utf8/LC_PAPER",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "567aaf639393135b76e22e72aaee1df95764e990"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "cde048b81e2a026517cc707c906aebbd50f5ee3957b6f0c1c04699dffcb7c015"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "f52473579beada206be140f23a18e3f87bbf89b7ba5d4bcda1e9202e7eafb08efaee69205d9b3a8dd8fa6179369a7e93f9601935244cca10eee9de07328a8e47"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95TELEPHONE",
+      "fileName": "/usr/lib/locale/C.utf8/LC_TELEPHONE",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3316c99e183186c5cad97a71674ef7431c3da845"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "f4caf0d12844219b65ba42edc7ec2f5ac1b2fc36a3c88c28887457275daca1ee"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "5368d67364357cd64d9f7ed727860b809a20c3b84f6f5b606d630e02903cdab0af4fb9131100918304d42347dbb48e26341deccaae19d635d46ad5c3fa3162d8"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95TIME",
+      "fileName": "/usr/lib/locale/C.utf8/LC_TIME",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "e619a4db877e0b54fa14b8a3992da2b561b3239b"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "0910b595d1d5d4e52cc0f415bbb1ff07c015d6860d34aae02505dd9973a63154"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "69a4e27589f003d5607ed6e495183ff282a3f7556199549534ab58f4d53b1673a5140a01d0e6e0f4201216349751954c80f013214805cf72e33882b48f4209d7"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-group",
+      "fileName": "/etc/group",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "ec071ffcbd968b249b10b185b3d6123edfc0c115"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3b207abe452015c17bb872bdfd5999d15a08769b4d385ac7c1db252382410f88"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "2237f35b600512c2749bd4a83aa1899824c268fde6a093e09f5cf7548155939a003dd6ebe8e33bf44357531abf9abaf0e450f5c329bd8c8fe114601ebb98070c"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-hosts",
+      "fileName": "/etc/hosts",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "043eb324a653456caa1a73e2e2d49f77792bb0c5"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "e3998dbe02b51dada33de87ae43d18a93ab6915b9e34f5a751bf2b9b25a55492"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "ac12d0ea9d710cc0122cc3eea5281a489f0c9217ed18fe16b40848f743be1e7e49f8d5b709377ac276559b901356de33b85905426d5e6f5f4b13720629139704"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-nsswitch.conf",
+      "fileName": "/etc/nsswitch.conf",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "ef732648b323a542f701fc1133eb65b9c81adf8d"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b0e81dd0825cba9e39affd4c64f86e3ab983bb731789f19819215c0eadeab7be"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "caf8982ac21dd39020fba730bd7ab7cfc0a6a2a582dd1caf967842d5bd91605491fe17a0c5ff013ef9c14496f4d7ede6999ad44ee1a18e1eeda4d919f84fa4e0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-os-release",
+      "fileName": "/etc/os-release",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7835684dcf49106d117a45ce5618ee6219eb3638"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "fed8ba7bc11d0242ab089888bcc52c75fee81eeae4382b899ff76537814ee1e8"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "52414b3d7b622a802ef5f5d7730388539fc6c6d132ad6fec9cc014ff5c7a587daf3267c976e466541189932caf1e2259b3fe621c30da5e6a5b0b9f3b4f237dfd"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-passwd",
+      "fileName": "/etc/passwd",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "590e103d9271aa287fc7546b954ead3df2852a28"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "dc48a1f79a71702792bdb8d1473a7d3b91b2add4bdad0da8cdf00da51554c155"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "616f13dacc91cc326256787e5c6e78c77e7e212c59d034cbde67d1e7b7916a0ce1eeead458fe972e050805884c3f5680289e1672dbda3b0f68db086afd1eb2c1"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-profile",
+      "fileName": "/etc/profile",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "25aeb4d378af5dd1f260588869ac19b0df6481aa"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8adf547453fe02fdc92e90424bffea4130bf88cc772a492b74912fb50a85c467"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "3328c3596e03c9a3ca1c8b34c48d3ee8475a08d489997ae4a493e81e7b7b5b7668d0079b64548077e84fcf9e1d70a2dccdcbbed94dfbd4941db6808348cf7f6c"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-profile.d-locale.sh",
+      "fileName": "/etc/profile.d/locale.sh",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "4bc8fe596ef5996c5f572f32b61a94ec7515a01c"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "84eb9034099d759ff08e6da5a731cacfc63a319547ad0f1dfc1c64853aca93f2"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "b2fc9b72846a43a45ba9a8749e581cef34d1915836833b51b7919dfbf4e275b7d55fec4dea7b23df3796380910971a41331e53e8cf0d304834e3da02cc135e5a"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-protocols",
+      "fileName": "/etc/protocols",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "a262a5a77be01aad99a98cf20ff28735da3cac37"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a90a2be9c2a88be6fbfc1fc73ba76f34698377bb19513e5de503dbb0bfe13be1"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "eadc83e47fcc354ab83fd109bee452bda170886fb684e67faf615930c11480919505f4af60c685b124efc54af0ded9522663132f911eac6622144f8b4c8be695"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-secfixes.d-wolfi",
+      "fileName": "/etc/secfixes.d/wolfi",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "5fff5aea306234708b1952c565904638ddb8c477"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "fe0d31329e650f504c836dc259f5509cbfe6431920bf4b2b5b1d75dd02083145"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "20b4da4d331bc7d180f539ed4a141bdbe003e2c91c71c73ec0133a8d9be6f34e33f2ca115acb242a2b5987bf87d49707e484f431a938fb21dbda6d55fe16256b"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-services",
+      "fileName": "/etc/services",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "f562c2bf922d2a0e0c1fb4567cd461d48edbc907"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "d85f9ab44e46d6605d749935cf9827a38f767b0e5e56ae8d948ef67e0759e52d"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "adfae0d2f569c2a2f413b7e27683a007fc8ca689b8c3349672fe0dcb6208c192ede4402eff09c604b7e7b4fd9d8df93b875efa5bdaa6c14ff1d8022a7caad5cd"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-shadow",
+      "fileName": "/etc/shadow",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "98289d2ed72352c3d570e5ceb6af3508d363375c"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "9011a201093d11103f6126a778028e5e9c4ef99835ca23569c4cbcbae51d8964"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "8937e4572694513aac54f3686fa0163f4d7076fd6ff339709e22f3d5f94292ed038860edb7162d0ca5e620a82ad0706ce20ac469af2a458cf9debc24b03fd518"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-shells",
+      "fileName": "/etc/shells",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "611f0df9a9db1911e7f93d8cc229ef6248026048"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "35fa7f9244d299e08104d223b43e92d746dadb7d7b2d7df6281a60f675b0237d"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "0fcec5d1e1de10272735bcce634ba0d5629f07f8f5b127269072e0d34ac118d7526fd0b424081ef6bcf2dbf1090c25aa060cc88bb2bcbcff22a63006e7f1924a"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-ld-linux-x86-64.so.2",
+      "fileName": "/lib64/ld-linux-x86-64.so.2",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "92367fbd5a3ec8c47ef2c17c5fbba92d42246fbe"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "61773a3ef82f2f0832ef69f3741aeb1cb28758fb47bc87971d1e953612b623eb"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "601bcb0f2a9da6ab4c5145881aa0f5b11756d44051c88a26fe059cf2bdae32ad80483ab1376603724197db7aeece64799b6c88634988067c50f2d3f9eacc9cb1"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-ld.so.conf",
+      "fileName": "/etc/ld.so.conf",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "d55863b9861caa7835f7a7878b648652543316dc"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4fdfcdfbc49472b5cc928d4d7ead19646ae0e1733a04c7c905ac7309b178567c"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "4a38035c75a1646267ccefa3b6cc1f877003ab22fa42bb339a3b289fbc9c932e25f5b32c69df3d0d5adebce60dfb47604e85c6afd957b4d1aa02211ffce932c8"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--etc-rpc",
+      "fileName": "/etc/rpc",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "8c68c8283757db3e910865b245077387f9166a08"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3b24a975dcde688434258566813a83ce256a4c73efd7a8a9c3998327b0b4de68"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "e0f9aa2d9ab153486923ad2a73eca5088593f4d85c43eedbc813d6fb00683292aba3757c90bd6ab953b7d5ce237fe721c84bdee1fcb12dd890ae35f6f924797e"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libBrokenLocale.so.1",
+      "fileName": "/lib64/libBrokenLocale.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "327b0178b5ed6dee6d1998a9b9621fa08bbf1c4e"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "22000f827338ec01cd647d6f8b58f55a9e998f6375a69dfe7f486a47bf935984"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "f550bebd1f1d46f1f7eb79fc636db6a1d6d74ea7a48b6134714ee1de90a4c94613a77c275c55a4ab5752817d4d0cf2bde7d0c4b742ddb13509577eba8bda136d"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libanl.so.1",
+      "fileName": "/lib64/libanl.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "65ea5828171cd0ea2a781ee6c8c81390c48ecde0"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "dd780cf190711478002d34ac9e50e1f7ad7e19fa66cba16be2c9308621af7646"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "bf0bb9af0bb6a3f7bf39ed2e387b733e702741a3951ef9db9576f7bd347e30b2ff6a6582e6a3b8f818fc090398c46b7711adca4aa9febde4faa85f66e1c3d0e5"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libc.so.6",
+      "fileName": "/lib64/libc.so.6",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "9a69bcb25106e25c07b7eaec91c1587de271ab7f"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "fb8c614791dab45ea48e61acb5a9d030df7a7c189f8d36b71908bb62930a4be2"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "c81684f109d17fd50cfc56bca720b7edab954bf88a5f4b7d3656b5b60d143173d1b0e528c828c582ea201a633b43e6062d190ed7aee5f49087a5fa18a7292784"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libcC95mallocC95debug.so.0",
+      "fileName": "/lib64/libc_malloc_debug.so.0",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "260ae3fe2332e6d16c78a33b6dc7d101944eaea3"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a8601495cf1e6eb774b9b88c24d22bd416d0350eeffc58f83324a4deb5930786"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "d8353c45e66d482cbb1591f5d203495fb7432dc0030d9dd21fb68833fc14ad756a6265e03379d818c29efef44906ae04a418c3ce3766f6efca71e5f5635f184a"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libcrypt.so.1",
+      "fileName": "/lib64/libcrypt.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7a547d4f84d79dfa0eea899269dbccfde6ee6d25"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "1b23b283aa4d14e90e6ebcd580661e17c85fca10f92886b9bb4c46488e83a6ee"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "1e61213a8ecb43962c2112e61c51f25a531ea3f37ef32f8c1cd3323a3960b02b75505df2880ad3d4e0623664f7de5816d708d98c09f6fa71c8c2c33bb4b04d5b"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libdl.so.2",
+      "fileName": "/lib64/libdl.so.2",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "66f828a2503e6789327334516d9ce28983d91301"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "dc5fa3b44ca5c24d18af169f2536b794a24b94425df7bdd09bd9590bf8b01716"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "93be3aba9262b26113feb8a1cfa45461a0123e1e3cbe8e5cc6581ec4b13ce872677ba8c3c443abe0b3c39be0ca274d34dce9af757722799eff56c4d19598359d"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libm.so.6",
+      "fileName": "/lib64/libm.so.6",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "835c9425388b31383769db934eade3f3e977530c"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "d73e6c85e5e24d065c2cd89d2ca560ab5247789f378debfb08193802d18039e5"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "b427149a67ffad90c03c4a6f89f7a8e69b9e4332e5e7760dcaa24f495674385cd5135562ae9bd7373141b12f1e048ed52943b61eba258f28849f023858073d42"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libmemusage.so",
+      "fileName": "/lib64/libmemusage.so",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "79c118836ce424b261885a425d84c29fce3c260d"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "0971a942d513bb98445e51e10b6ea857aeec7c12620939c3ce6d38c538ba1f5c"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "9a9546f7e67af8363f4de1185b9c35ad59599be095f016d1a4cf75e6482edd67a1db9c7e616710d72dbda6ff76215510fd3997804c3d7580c12e6177a2df2716"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libmvec.so.1",
+      "fileName": "/lib64/libmvec.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "5a45994a957d32af8d6f27f97d3eff0a619802c2"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3dbfe93c140cf7150e89b9e5966454dd97d22d0a08a5c9e8c184dac7967772b8"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "fdd4b3ddc67ce24cb36ca6f5efbee21244b72ca30c91032ad0199dd2d5909cf1b502e89d753b0398e1db0c1aed66947a615e419cc4096b6c4384804fd0d3b4dc"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libnsl.so.1",
+      "fileName": "/lib64/libnsl.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "24ef0faa3f7a9b61e2614ede6a8c7b3c7a4704a6"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "124b235c407e67ea250f41613c2682275e9ed994357875249816d75ff716ba58"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "ddeb37e2581765f6faef72ebd851b7f58442316c6b63b04b6bab0be22ddba7b351d7e972d758aa8c3c9dfb3f8414e97339b4f4304d1b8889a7351efc5c32c485"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libnssC95compat.so.2",
+      "fileName": "/lib64/libnss_compat.so.2",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "06d0792859be744ba15f852343aa20c7c41a5e8c"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "387dbab0434bd88a435695149f579a080bfcd4812eb34872e8b0de40ccafe551"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "b45efae541046b1e8661ab46fccb0e2a03caa64d10f1f1faba0aff4376ccf6ab608494669c2155e701ad338490bd3fecf7e1bbaf064bc7082b965d969bd7faea"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libnssC95dns.so.2",
+      "fileName": "/lib64/libnss_dns.so.2",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "ed6551cae890f6169663996e67f85a11949b667a"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "d4a9ca720bb0f5b5017c77565c05c3c2f13f555f48a966abddde327a692ab339"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "6c08332d21a2fe7e9840ff2e2733fb449537a519a71bc9664598de51756d8ee2ab6c4db13015471e55736122decc375671b9a5f27fc311dcf60b34b641e08eae"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libnssC95files.so.2",
+      "fileName": "/lib64/libnss_files.so.2",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "88aadee27bf51d1a2982c5cc8f8edd1f891f9293"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "efda4e24f91ea28057719451a9580be6187c72b39713141f8dff1a1872bafbb2"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "11759b7c6772c73ab4d52b24efdeb9c17533c0ef41103c08ee6d4fa6f679f0ecf15702da8a1389eb77f31afa00b01fdd1eb7fc691f9f7fecb5d47d5793e36843"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libpthread.so.0",
+      "fileName": "/lib64/libpthread.so.0",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "a3cf8bf5f5c2088d448f1b78564a7d05ac3462dd"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "0116fa0a3eeb825de356d4a58a1b5be1ee86daa3398287a78ca9510f54db0f03"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "8dbc20f83df6a240a5307b9283f8023f36a14dc22641f5c36d17ae05eb46e7f7f6b75b68d5c1f2c66419c1827b19586c43d2ac5e8059d900c947c438b0470e94"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libresolv.so.2",
+      "fileName": "/lib64/libresolv.so.2",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "8c6145d433d59d198dee47df4b48503a666da6f2"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "0dba6fdcd523a9e7220fdb7fc74796a0d32a61e458a5b0169779634b28ba540d"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "fd251af4ca1133a03b0426d5756bac714ed1089ae663a15f6dbaa0d0b86430c36bb4e5adb5690c812c233126a666b6077bdb77c3599e7ba55b6c99ad0a507933"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-librt.so.1",
+      "fileName": "/lib64/librt.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "68251fb2539affae7442214693cea02be4deb02b"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a2c9ec49314e65f29174c4e8b13099e8bf984db2c8830a400b9505c2965d4631"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "bcb51cacf054c98ea4dba4e66eece412a8dd9c88aab5e6012385dbd22179a3f631eb48dffded1f389767b8e05237dfb05cb59b8ca36f4acd540dffbd1a35c845"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libthreadC95db.so.1",
+      "fileName": "/lib64/libthread_db.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "c4a38d829f9c6bf368cdda8a014c0c8f91a2044d"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "f21da0b3e7c26cf1a79e1c5a4489d1380755d17f9c207008c25a34bc66375c34"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "f2f0645938bd461da6a03abc9bf5e038487e7c8072d5c96611b585f874c3509842bf86bb514f5bef3af128c25843150092455e435433e6fe58694e39a5385498"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib64-libutil.so.1",
+      "fileName": "/lib64/libutil.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "2c326b171f0f8121dedf065a8abdca19db099166"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a18d5ddd84729d04136686c539f3de686757ed58f04d77a0c4271e48384f1a98"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "3075c42b3eee8c69ebb4450e3d11428650298465267a95dca8a934edb1efb58dd667b4c34396834d85004696b3166442b01c1e6ad1c2bd1683d500570f0dc671"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--sbin-ldconfig",
+      "fileName": "/sbin/ldconfig",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "bb93c2d1036a60d2b12f2efddf995c890755d14e"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "891d6d7d25a2c43dc59a4578789e2d24622c8f5856b5132921d68246bea35f87"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "f4f216d480e101dc4a3aad0dd7a7a7ed70ee39d66f381e6b307163878d52189014c0f5d30a15dcfa28fb6646fab22ff156ca473b2edc1632f08e732852149f24"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-libbrotlicommon.so.1.0.9",
+      "fileName": "/usr/lib/libbrotlicommon.so.1.0.9",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "cedc1eb8badf3949c5a0f301c7ee90e5ed7b4978"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "cf76aaa32afea875887f13dcf1bc337f4c147762c9bab5e7f34f610fc1894e59"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "ddce988ce026fcce2d4ecc37cace24bc2542bca2d3fd0508fb0831fe9705c8eb3effaf2c4bcb913a91fe85ef7f6dd9612fcd474b3a742ffb2bef6f22e415ed78"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-libbrotlidec.so.1.0.9",
+      "fileName": "/usr/lib/libbrotlidec.so.1.0.9",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "93e5d5273b0fd0872c60abc009cddbe1eab9d80d"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "ab648b1bb7b208b3ebc716c3fe3072b0143f690a796c203a9b211a0e648f5929"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "7963d2fbae66e3bbe29293b5cc7f6d586c3ea5227e2ee434fb759f096b3a8c60415bd85986d08858537a091f2442a9e5ebf6dd8c3f5e2900260a1000bc1a54db"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib64-libgccC95s.so.1",
+      "fileName": "/usr/lib64/libgcc_s.so.1",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "33711e9a72fbc0acaa3694ae3c8c8c6cdd61997f"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "eb14ad9295bf6ee39d98620d4bdb308cfa6706838316158f210469e2d737ca75"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "74d25cddcac38535316512d9b22f2a50db6cb07932f69380f79e820b75fba35dccdc6e3a5817975df733abb80dea9db4beacc457ba56a1c78d545a587e85a970"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-libnghttp2.so.14.24.2",
+      "fileName": "/usr/lib/libnghttp2.so.14.24.2",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "dd76a34bbfd78bf56aa2feddfdeca4fb18b88334"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c5c8cd9a935db18770ad1e2e61506896989a22a9846b0e5af98f6e8cef2ce969"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "01a7722d421c2ae27ad63c1351d6cb8e21a9886165b24234cb67292ea1aca30a2d3561a7d7557a49431e955c787081d2427d1a0c49a5f68516bce331d30e1eb7"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--lib-libz.so.1.2.13",
+      "fileName": "/lib/libz.so.1.2.13",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "9b00adb3ba6510f80a34c8149e26a080e1df07cd"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "14386fc28b11efa99ddb41c83efe131b545025153687e895e249c73b9609a625"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "ed1fc98db59604ccad0e8651210378e9c3403721eef578b1e6eb3035c7ee854bced47f8de9f6791c892ec3c27f5ebfe05a7a3625fb12089f256a26580ee57bdd"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-share-man-man3-zlib.3",
+      "fileName": "/usr/share/man/man3/zlib.3",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "e4eef29d98cc16751f1dac42317b677955ceec94"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "aefd0162070fcb0379dc18e27b039253cd98c148104c1097dd60e0d0b435e564"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "b9eb98bc8922d415ad242c34f45289fc4a3c586a39d9b34b1868fa4db94789d62b2b1aef7a9919d52ad63c6b07a54568ee9b8bfd38718b70d03264eb833cae20"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-lib-libcurl.so.4.8.0",
+      "fileName": "/usr/lib/libcurl.so.4.8.0",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "f3ae11065cafc14e27a1410ae8be28e600bb8336"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4f232eeb99e1663d07f0af1af6ea262bf594934b694228e71fd8f159f9a19f32"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "8044d0df34242699ad73bfe99b9ac3d6bbdaa4f8ebce1e23ee5c7f9fe59db8ad7b01fe94e886941793aee802008a35b05a30bc51426db796aa21e5e91b7ed9be"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File--usr-bin-curl",
+      "fileName": "/usr/bin/curl",
+      "licenseConcluded": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "defee82004d22fc92ab81c0c952a62a2172bda8c"
+        },
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "ad291c9572af8fc2ec8fd78d295adf7132c60ad3d10488fb63d120fc967a4132"
+        },
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "5940d8647907831e77ec00d81b318ca06655dbb0fd36d112684b03947412f0f98ea85b32548bc0877f3d7ce8f4de9b2c964062df44742b98c8e9bd851faecce9"
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-sha256-47fed8868b46b060efb8699dc40e981a0c785650223e03602d8c4493fc75b68c",
+      "name": "sha256:47fed8868b46b060efb8699dc40e981a0c785650223e03602d8c4493fc75b68c",
+      "filesAnalyzed": false,
+      "description": "apko container image",
+      "downloadLocation": "NOASSERTION",
+      "primaryPackagePurpose": "CONTAINER",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "47fed8868b46b060efb8699dc40e981a0c785650223e03602d8c4493fc75b68c"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:oci/curl@sha256:47fed8868b46b060efb8699dc40e981a0c785650223e03602d8c4493fc75b68c?arch=amd64\u0026mediaType=application%2Fvnd.oci.image.manifest.v1%2Bjson\u0026os=linux",
+          "referenceType": "purl"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "name": "sha256:c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "versionInfo": "20230201",
+      "filesAnalyzed": false,
+      "description": "apko operating system layer",
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:oci/curl@sha256:c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707?arch=amd64\u0026mediaType=application%2Fvnd.oci.image.layer.v1.tar%2Bgzip\u0026os=linux",
+          "referenceType": "purl"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ca-certificates-bundle-20230506-r0",
+      "name": "ca-certificates-bundle",
+      "versionInfo": "20230506-r0",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--etc-ssl-certs-ca-certificates.crt"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0 AND MIT",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/ca-certificates-bundle@20230506-r0?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "d98736c880d3536649f0593cd6ef1168a5683a06"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "name": "glibc-locale-posix",
+      "versionInfo": "2.37-r7",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95ADDRESS",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95COLLATE",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95CTYPE",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95IDENTIFICATION",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MEASUREMENT",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MESSAGES-SYSC95LCC95MESSAGES",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MONETARY",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95NAME",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95NUMERIC",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95PAPER",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95TELEPHONE",
+        "SPDXRef-File--usr-lib-locale-C.utf8-LCC95TIME"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "GPL-3.0-or-later",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/glibc-locale-posix@2.37-r7?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "02aee1f1f24b311064d298bf69b9a8dab482232d"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "name": "wolfi-baselayout",
+      "versionInfo": "20230201-r2",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--etc-group",
+        "SPDXRef-File--etc-hosts",
+        "SPDXRef-File--etc-nsswitch.conf",
+        "SPDXRef-File--etc-os-release",
+        "SPDXRef-File--etc-passwd",
+        "SPDXRef-File--etc-profile",
+        "SPDXRef-File--etc-profile.d-locale.sh",
+        "SPDXRef-File--etc-protocols",
+        "SPDXRef-File--etc-secfixes.d-wolfi",
+        "SPDXRef-File--etc-services",
+        "SPDXRef-File--etc-shadow",
+        "SPDXRef-File--etc-shells"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/wolfi-baselayout@20230201-r2?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "a63308da2be71a067fdcc5f7608fe5d33783ffbb"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ld-linux-2.37-r7",
+      "name": "ld-linux",
+      "versionInfo": "2.37-r7",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--lib64-ld-linux-x86-64.so.2"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "GPL-3.0-or-later",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/ld-linux@2.37-r7?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "2b58fb1067c37804bb6a16c67258e6de16db2b74"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-glibc-2.37-r6",
+      "name": "glibc",
+      "versionInfo": "2.37-r6",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--etc-ld.so.conf",
+        "SPDXRef-File--etc-rpc",
+        "SPDXRef-File--lib64-libBrokenLocale.so.1",
+        "SPDXRef-File--lib64-libanl.so.1",
+        "SPDXRef-File--lib64-libc.so.6",
+        "SPDXRef-File--lib64-libcC95mallocC95debug.so.0",
+        "SPDXRef-File--lib64-libcrypt.so.1",
+        "SPDXRef-File--lib64-libdl.so.2",
+        "SPDXRef-File--lib64-libm.so.6",
+        "SPDXRef-File--lib64-libmemusage.so",
+        "SPDXRef-File--lib64-libmvec.so.1",
+        "SPDXRef-File--lib64-libnsl.so.1",
+        "SPDXRef-File--lib64-libnssC95compat.so.2",
+        "SPDXRef-File--lib64-libnssC95dns.so.2",
+        "SPDXRef-File--lib64-libnssC95files.so.2",
+        "SPDXRef-File--lib64-libpthread.so.0",
+        "SPDXRef-File--lib64-libresolv.so.2",
+        "SPDXRef-File--lib64-librt.so.1",
+        "SPDXRef-File--lib64-libthreadC95db.so.1",
+        "SPDXRef-File--lib64-libutil.so.1",
+        "SPDXRef-File--sbin-ldconfig"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "GPL-3.0-or-later",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/glibc@2.37-r6?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "de44296ef898d1b65503de8da8f65bf6d3c82c47"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-libbrotlicommon1-1.0.9-r3",
+      "name": "libbrotlicommon1",
+      "versionInfo": "1.0.9-r3",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--usr-lib-libbrotlicommon.so.1.0.9"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/libbrotlicommon1@1.0.9-r3?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "5c42b99275f089513dd5c718ee5abcaac88f9e3d"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-libbrotlidec1-1.0.9-r3",
+      "name": "libbrotlidec1",
+      "versionInfo": "1.0.9-r3",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--usr-lib-libbrotlidec.so.1.0.9"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/libbrotlidec1@1.0.9-r3?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "51a90e00de471ebfb87b5fede3aef8e6e6c56ed5"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-libgcc-13.1.0-r1",
+      "name": "libgcc",
+      "versionInfo": "13.1.0-r1",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--usr-lib64-libgccC95s.so.1"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "GPL-3.0-or-later",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/libgcc@13.1.0-r1?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "d420d355a0f6b351fd0922eda4686ed7d20d13a4"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-libnghttp2-14-1.53.0-r0",
+      "name": "libnghttp2-14",
+      "versionInfo": "1.53.0-r0",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--usr-lib-libnghttp2.so.14.24.2"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/libnghttp2-14@1.53.0-r0?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "43943395f3dc2c68bfe0eb5ca82b2455846696a1"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-zlib-1.2.13-r3",
+      "name": "zlib",
+      "versionInfo": "1.2.13-r3",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--lib-libz.so.1.2.13",
+        "SPDXRef-File--usr-share-man-man3-zlib.3"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0 AND MIT",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "TODO\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/zlib@1.2.13-r3?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "32abb07d47675352453da0b96da439daec22164c"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-libcurl-rustls4-8.1.2-r0",
+      "name": "libcurl-rustls4",
+      "versionInfo": "8.1.2-r0",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--usr-lib-libcurl.so.4.8.0"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/libcurl-rustls4@8.1.2-r0?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "d0c8989164bcb3a684bfa2a46c6b7c09f7f7b5c6"
+      }
+    },
+    {
+      "SPDXID": "SPDXRef-Package-curl-8.1.2-r0",
+      "name": "curl",
+      "versionInfo": "8.1.2-r0",
+      "filesAnalyzed": true,
+      "hasFiles": [
+        "SPDXRef-File--usr-bin-curl"
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "downloadLocation": "NOASSERTION",
+      "copyrightText": "\n",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:apk/wolfi/curl@8.1.2-r0?arch=x86_64",
+          "referenceType": "purl"
+        }
+      ],
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "86db7f97b251f9c2907879b3b0dd5929c49e0a79"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-47fed8868b46b060efb8699dc40e981a0c785650223e03602d8c4493fc75b68c",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-ca-certificates-bundle-20230506-r0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ca-certificates-bundle-20230506-r0",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-ssl-certs-ca-certificates.crt"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-glibc-locale-posix-2.37-r7"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95ADDRESS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95COLLATE"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95CTYPE"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95IDENTIFICATION"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MEASUREMENT"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MESSAGES-SYSC95LCC95MESSAGES"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95MONETARY"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95NAME"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95NUMERIC"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95PAPER"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95TELEPHONE"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-locale-posix-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-locale-C.utf8-LCC95TIME"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-wolfi-baselayout-20230201-r2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-group"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-hosts"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-nsswitch.conf"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-os-release"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-passwd"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-profile"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-profile.d-locale.sh"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-protocols"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-secfixes.d-wolfi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-services"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-shadow"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-wolfi-baselayout-20230201-r2",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-shells"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-ld-linux-2.37-r7"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ld-linux-2.37-r7",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-ld-linux-x86-64.so.2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-glibc-2.37-r6"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-ld.so.conf"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--etc-rpc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libBrokenLocale.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libanl.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libc.so.6"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libcC95mallocC95debug.so.0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libcrypt.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libdl.so.2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libm.so.6"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libmemusage.so"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libmvec.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libnsl.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libnssC95compat.so.2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libnssC95dns.so.2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libnssC95files.so.2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libpthread.so.0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libresolv.so.2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-librt.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libthreadC95db.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib64-libutil.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-glibc-2.37-r6",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--sbin-ldconfig"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-libbrotlicommon1-1.0.9-r3"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-libbrotlicommon1-1.0.9-r3",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-libbrotlicommon.so.1.0.9"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-libbrotlidec1-1.0.9-r3"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-libbrotlidec1-1.0.9-r3",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-libbrotlidec.so.1.0.9"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-libgcc-13.1.0-r1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-libgcc-13.1.0-r1",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib64-libgccC95s.so.1"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-libnghttp2-14-1.53.0-r0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-libnghttp2-14-1.53.0-r0",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-libnghttp2.so.14.24.2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-zlib-1.2.13-r3"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zlib-1.2.13-r3",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--lib-libz.so.1.2.13"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zlib-1.2.13-r3",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-share-man-man3-zlib.3"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-libcurl-rustls4-8.1.2-r0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-libcurl-rustls4-8.1.2-r0",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-lib-libcurl.so.4.8.0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha256-c6580b9a4fded304babd53a027a183c3f9d11863ba1c847971793a139801f707",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-curl-8.1.2-r0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-curl-8.1.2-r0",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-File--usr-bin-curl"
+    }
+  ]
+}

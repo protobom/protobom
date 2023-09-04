@@ -107,7 +107,7 @@ func (u *UnserializerCDX14) componentToNode(c *cdx.Component) (*sbom.Node, error
 		Licenses:           u.licenseChoicesToLicenseList(c.Licenses),
 		LicenseConcluded:   u.licenseChoicesToLicenseString(c.Licenses),
 		Copyright:          c.Copyright,
-		Hashes:             map[string]string{},
+		Hashes:             map[int32]string{},
 		PrimaryPurpose:     string(c.Type),
 		Description:        c.Description,
 		Attribution:        []string{},
@@ -149,11 +149,11 @@ func (u *UnserializerCDX14) componentToNode(c *cdx.Component) (*sbom.Node, error
 				continue
 			}
 
-			if _, ok := node.Hashes[algo.String()]; ok {
+			if _, ok := node.Hashes[int32(algo)]; ok {
 				// TODO(degradation): Data loss from two hashes of the same algorithm
 				continue
 			}
-			node.Hashes[algo.String()] = h.Value
+			node.Hashes[int32(algo)] = h.Value
 		}
 	}
 

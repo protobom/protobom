@@ -71,6 +71,7 @@ func (ha HashAlgorithm) ToCycloneDX() cyclonedx.HashAlgorithm {
 	}
 }
 
+// ToSPDX returns the SPDX label equivalent of the HashAlgorithm
 func (ha HashAlgorithm) ToSPDX() common.ChecksumAlgorithm {
 	switch ha {
 	case HashAlgorithm_ADLER32:
@@ -107,5 +108,44 @@ func (ha HashAlgorithm) ToSPDX() common.ChecksumAlgorithm {
 		return common.BLAKE3
 	default:
 		return common.ChecksumAlgorithm("")
+	}
+}
+
+func HashAlgorithmFromSPDX(spdxAlgo common.ChecksumAlgorithm) HashAlgorithm {
+	switch spdxAlgo {
+	case common.ADLER32:
+		return HashAlgorithm_ADLER32
+	case common.MD4:
+		return HashAlgorithm_MD4
+	case common.MD5:
+		return HashAlgorithm_MD5
+	case common.MD6:
+		return HashAlgorithm_MD6
+	case common.SHA1:
+		return HashAlgorithm_SHA1
+	case common.SHA224:
+		return HashAlgorithm_SHA224
+	case common.SHA256:
+		return HashAlgorithm_SHA256
+	case common.SHA384:
+		return HashAlgorithm_SHA384
+	case common.SHA512:
+		return HashAlgorithm_SHA512
+	case common.SHA3_256:
+		return HashAlgorithm_SHA3_256
+	case common.SHA3_384:
+		return HashAlgorithm_SHA3_384
+	case common.SHA3_512:
+		return HashAlgorithm_SHA3_512
+	case common.BLAKE2b_256:
+		return HashAlgorithm_BLAKE2B_256
+	case common.BLAKE2b_384:
+		return HashAlgorithm_BLAKE2B_384
+	case common.BLAKE2b_512:
+		return HashAlgorithm_BLAKE2B_512
+	case common.BLAKE3:
+		return HashAlgorithm_BLAKE3
+	default:
+		return HashAlgorithm_UNKNOWN
 	}
 }

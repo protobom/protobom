@@ -313,7 +313,7 @@ func (n *Node) Purl() PackageURL {
 // silently ignoring those missing in the node.
 //
 // If either the node or the test hashes are empty, no match is assumed.
-func (n *Node) HashesMatch(th map[string]string) bool {
+func (n *Node) HashesMatch(th map[int32]string) bool {
 	if len(n.Hashes) == 0 || len(th) == 0 {
 		return false
 	}

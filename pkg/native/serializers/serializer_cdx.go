@@ -273,8 +273,7 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	case "":
 		// no node PrimaryPurpose set
 	default:
-		// Data loss here.
-		// TODO how do we handle when data loss occurs?
+		// TODO(degradation): Non-matching primary purpose to component type mapping
 	}
 
 	if n.Licenses != nil && len(n.Licenses) > 0 {

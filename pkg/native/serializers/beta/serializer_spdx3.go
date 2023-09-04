@@ -195,6 +195,7 @@ func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 		ha := sbom.HashAlgorithm(algo)
 		if ha.ToSPDX3() == "" {
 			// TODO(degradation): Algoruithm not supperted in SPDX3
+			continue
 		}
 		p.VerifiedUsing = append(p.VerifiedUsing, hashList{
 			Type:      "Hash",

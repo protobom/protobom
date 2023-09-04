@@ -67,6 +67,22 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 		metadata.Authors = &authors
 	}
 
+	if bom.Metadata != nil && len(bom.GetMetadata().GetTools()) > 0 {
+		var tools []cdx.Tool
+		for _, bomtool := range bom.GetMetadata().GetTools() {
+			tools = append(tools, cdx.Tool{
+				Vendor:  bomtool.Vendor,
+				Name:    bomtool.Name,
+				Version: bomtool.Version,
+			})
+		}
+		metadata.Tools = &tools
+	}
+
+	if bom.Metadata != nil && len(bom.GetMetadata().GetName()) > 0 {
+		doc.Metadata.Component.Name = bom.GetMetadata().GetName()
+	}
+
 	deps, err := s.dependencies(ctx, bom)
 	if err != nil {
 		return nil, err
@@ -224,14 +240,40 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 	c := &cdx.Component{
 		BOMRef:      n.Id,
-		Type:        cdx.ComponentType(strings.ToLower(n.PrimaryPurpose)), // Fix to make it valid
 		Name:        n.Name,
 		Version:     n.Version,
 		Description: n.Description,
 	}
 
-	if n.Type == sbom.Node_FILE {
-		c.Type = "file"
+	switch strings.ToLower(n.PrimaryPurpose) {
+	case "application":
+		c.Type = cdx.ComponentTypeApplication
+	case "container":
+		c.Type = cdx.ComponentTypeContainer
+	case "data":
+		c.Type = cdx.ComponentTypeData
+	case "device":
+		c.Type = cdx.ComponentTypeDevice
+	case "device-driver":
+		c.Type = cdx.ComponentTypeDeviceDriver
+	case "file":
+		c.Type = cdx.ComponentTypeFile
+	case "firmware":
+		c.Type = cdx.ComponentTypeFirmware
+	case "framework":
+		c.Type = cdx.ComponentTypeFramework
+	case "library":
+		c.Type = cdx.ComponentTypeLibrary
+	case "machine-learning-model":
+		c.Type = cdx.ComponentTypeMachineLearningModel
+	case "operating-system":
+		c.Type = cdx.ComponentTypeOS
+	case "platform":
+		c.Type = cdx.ComponentTypePlatform
+	case "":
+		// no node PrimaryPurpose set
+	default:
+		// TODO(degradation): Non-matching primary purpose to component type mapping
 	}
 
 	if n.Licenses != nil && len(n.Licenses) > 0 {
@@ -252,7 +294,7 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n.Hashes != nil && len(n.Hashes) > 0 {
 		c.Hashes = &[]cdx.Hash{}
 		for algoString, hash := range n.Hashes {
-			if algoVal, ok := sbom.HashAlgorithm_value[algoString]; ok {
+			if algoVal, ok := sbom.HashAlgorithm_value[strings.ToUpper(algoString)]; ok {
 				cdxAlgo := sbom.HashAlgorithm(algoVal).ToCycloneDX()
 				if cdxAlgo == "" {
 					// Data loss here.
@@ -294,6 +336,10 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				}
 			}
 		}
+	}
+
+	if len(n.GetCopyright()) > 0 {
+		c.Copyright = n.GetCopyright()
 	}
 
 	return c

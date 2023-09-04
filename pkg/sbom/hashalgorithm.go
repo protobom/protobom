@@ -149,3 +149,44 @@ func HashAlgorithmFromSPDX(spdxAlgo common.ChecksumAlgorithm) HashAlgorithm {
 		return HashAlgorithm_UNKNOWN
 	}
 }
+
+// ToSPDX3 converts the hash algorithm enumeration to an SPDX3 algorithm label.
+// As the SPDX3 spec is still changing these values could change at any moment
+// while we track changers to the vocabulary defined here:
+// https://github.com/spdx/spdx-3-model/blob/main/model/Core/Vocabularies/HashAlgorithm.md
+func (ha HashAlgorithm) ToSPDX3() string {
+	switch ha {
+	case HashAlgorithm_MD4:
+		return "md4"
+	case HashAlgorithm_MD5:
+		return "md5"
+	case HashAlgorithm_MD6:
+		return "md6"
+	case HashAlgorithm_SHA1:
+		return "sha1"
+	case HashAlgorithm_SHA224:
+		return "sha224"
+	case HashAlgorithm_SHA256:
+		return "sha256"
+	case HashAlgorithm_SHA384:
+		return "sha384"
+	case HashAlgorithm_SHA512:
+		return "sha512"
+	case HashAlgorithm_SHA3_256:
+		return "sha3_256"
+	case HashAlgorithm_SHA3_384:
+		return "sha3_384"
+	case HashAlgorithm_SHA3_512:
+		return "sha3_512"
+	case HashAlgorithm_BLAKE2B_256:
+		return "blake2b256"
+	case HashAlgorithm_BLAKE2B_384:
+		return "blake2b384"
+	case HashAlgorithm_BLAKE2B_512:
+		return "blake2b512"
+	case HashAlgorithm_BLAKE3:
+		return "blake3"
+	default:
+		return ""
+	}
+}

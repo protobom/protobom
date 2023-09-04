@@ -192,9 +192,13 @@ func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 	}
 
 	for algo, h := range n.Hashes {
+		ha := sbom.HashAlgorithm(algo)
+		if ha.ToSPDX3() == "" {
+			// TODO(degradation): Algoruithm not supperted in SPDX3
+		}
 		p.VerifiedUsing = append(p.VerifiedUsing, hashList{
 			Type:      "Hash",
-			Algorithm: algo,
+			Algorithm: ha.ToSPDX3(),
 			HashValue: h,
 		})
 	}

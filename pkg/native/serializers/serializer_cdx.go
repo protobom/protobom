@@ -275,7 +275,6 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	default:
 		// Data loss here.
 		// TODO how do we handle when data loss occurs?
-
 	}
 
 	if n.Licenses != nil && len(n.Licenses) > 0 {

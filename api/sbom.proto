@@ -25,7 +25,10 @@ message Node {
     string license_comments = 10;
     string copyright = 11;
 
-    map<string,string> hashes = 12;
+    // field 12 was the old hashes string map.
+    // Removed, see https://github.com/bom-squad/protobom/issues/89
+    // map<string,string> hashes = 12;
+    
     string source_info = 13;     // any relevant background information or additional comments about the origin
     string primary_purpose = 14; // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
 
@@ -49,6 +52,7 @@ message Node {
 
     repeated string file_types = 27; // File types
     map<int32,string> identifiers = 28;  // Software identifiers
+    map<int32,string> hashes = 29;
 
     enum NodeType {
         PACKAGE = 0;
@@ -125,7 +129,9 @@ message ExternalReference {
     string type = 2;
     string comment = 3;
     string authority = 4;
-    map<string,string> hashes = 5;
+    // Field 5 was the old string map.
+    // Removed, see https://github.com/bom-squad/protobom/issues/89
+    map<int32,string> hashes = 6;
 }
 
 message Person {

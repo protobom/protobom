@@ -23,6 +23,8 @@ type Writer struct {
 	Options options.Options
 }
 
+// WriteStream uses the selected serializer to write a document in the selected
+// native format to the wr writer.
 func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 	if bom == nil {
 		return errors.New("unable to write sbom to stream, SBOM is nil")
@@ -42,11 +44,13 @@ func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 	return nil
 }
 
+// WriteFile takes care of opening a file and then invokes WriteStream to write
+// the SBOM into the file.
 func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
 	f, err := w.impl.OpenFile(path)
 	if err != nil {
 		return err
 	}
-
+	defer f.Close()
 	return w.WriteStream(bom, f)
 }

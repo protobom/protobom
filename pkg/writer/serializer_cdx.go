@@ -55,6 +55,18 @@ func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (int
 		return nil, err
 	}
 
+	if bom.Metadata != nil && len(bom.GetMetadata().GetAuthors()) > 0 {
+		var authors []cdx.OrganizationalContact
+		for _, bomauthor := range bom.GetMetadata().GetAuthors() {
+			authors = append(authors, cdx.OrganizationalContact{
+				Name:  bomauthor.Name,
+				Email: bomauthor.Email,
+				Phone: bomauthor.Phone,
+			})
+		}
+		metadata.Authors = &authors
+	}
+
 	deps, err := s.dependencies(ctx, bom)
 	if err != nil {
 		return nil, err

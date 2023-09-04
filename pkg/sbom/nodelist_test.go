@@ -660,9 +660,9 @@ func TestIndexByHash(t *testing.T) {
 		"1 node, with hashes": {
 			sut: &NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-amd64", Name: "nginx", Hashes: map[string]string{
-						"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-						"sha256": "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
+					{Id: "nginx-amd64", Name: "nginx", Hashes: map[int32]string{
+						int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+						int32(HashAlgorithm_SHA256): "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
 					}},
 				},
 			},
@@ -673,13 +673,13 @@ func TestIndexByHash(t *testing.T) {
 		"2 node, with hashes": {
 			sut: &NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-amd64", Name: "nginx", Hashes: map[string]string{
-						"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-						"sha256": "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
+					{Id: "nginx-amd64", Name: "nginx", Hashes: map[int32]string{
+						int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+						int32(HashAlgorithm_SHA256): "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
 					}},
-					{Id: "nginx-arm64", Name: "nginx", Hashes: map[string]string{
-						"sha1":   "7df059597099bb7dcf25d2a9aedfaf4465f72d8d",
-						"sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+					{Id: "nginx-arm64", Name: "nginx", Hashes: map[int32]string{
+						int32(HashAlgorithm_SHA1):   "7df059597099bb7dcf25d2a9aedfaf4465f72d8d",
+						int32(HashAlgorithm_SHA256): "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
 					}},
 				},
 			},
@@ -690,13 +690,13 @@ func TestIndexByHash(t *testing.T) {
 		"2 nodes, shared hashes": {
 			sut: &NodeList{
 				Nodes: []*Node{
-					{Id: "nginx-amd64", Name: "nginx", Hashes: map[string]string{
-						"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-						"sha256": "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
+					{Id: "nginx-amd64", Name: "nginx", Hashes: map[int32]string{
+						int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+						int32(HashAlgorithm_SHA256): "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
 					}},
-					{Id: "nginx-arm64", Name: "nginx", Hashes: map[string]string{
-						"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-						"sha256": "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
+					{Id: "nginx-arm64", Name: "nginx", Hashes: map[int32]string{
+						int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+						int32(HashAlgorithm_SHA256): "e3fc9093ffd6eb531055f8f3bde275e7e9e8ab1884589c195d5f78d0a9b3d2b3",
 					}},
 				},
 			},
@@ -792,38 +792,38 @@ func TestGetMatchingNode(t *testing.T) {
 		"single hash": {
 			sut: &NodeList{
 				Nodes: []*Node{
-					{Id: "node1", Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
-					{Id: "node2", Hashes: map[string]string{"sha1": "4c219efaf4d39295971409f796301a89a304cee6"}},
+					{Id: "node1", Hashes: map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+					{Id: "node2", Hashes: map[int32]string{int32(HashAlgorithm_SHA1): "4c219efaf4d39295971409f796301a89a304cee6"}},
 				},
 			},
-			node:        &Node{Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+			node:        &Node{Hashes: map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
 			exptectedId: "node1",
 		},
 		"two matches": {
 			sut: &NodeList{
 				Nodes: []*Node{
-					{Id: "node1", Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
-					{Id: "node2", Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+					{Id: "node1", Hashes: map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+					{Id: "node2", Hashes: map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
 				},
 			},
-			node:        &Node{Hashes: map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
+			node:        &Node{Hashes: map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"}},
 			shouldError: true,
 		},
 		"two hashes, one matches, one doesnt": {
 			sut: &NodeList{
 				Nodes: []*Node{
 					{
-						Id: "node1", Hashes: map[string]string{
-							"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-							"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+						Id: "node1", Hashes: map[int32]string{
+							int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+							int32(HashAlgorithm_SHA256): "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
 						},
 					},
 				},
 			},
 			node: &Node{
-				Hashes: map[string]string{
-					"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-					"sha256": "no-match-here",
+				Hashes: map[int32]string{
+					int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+					int32(HashAlgorithm_SHA256): "no-match-here",
 				},
 			},
 			shouldError: false,
@@ -833,18 +833,18 @@ func TestGetMatchingNode(t *testing.T) {
 			sut: &NodeList{
 				Nodes: []*Node{
 					{
-						Id: "node1", Hashes: map[string]string{
-							"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-							"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
-							"sha512": "012d52b1ab7abc4b8e98d6767ef6465f63259116f23f954b404ac356425d8488086e1483846fc755750f8bceae54d8c838f843753353d6709c3eaf85c1377cce",
+						Id: "node1", Hashes: map[int32]string{
+							int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+							int32(HashAlgorithm_SHA256): "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+							int32(HashAlgorithm_SHA512): "012d52b1ab7abc4b8e98d6767ef6465f63259116f23f954b404ac356425d8488086e1483846fc755750f8bceae54d8c838f843753353d6709c3eaf85c1377cce",
 						},
 					},
 				},
 			},
 			node: &Node{
-				Hashes: map[string]string{
-					"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-					"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+				Hashes: map[int32]string{
+					int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+					int32(HashAlgorithm_SHA256): "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
 				},
 			},
 			exptectedId: "node1",
@@ -853,17 +853,17 @@ func TestGetMatchingNode(t *testing.T) {
 			sut: &NodeList{
 				Nodes: []*Node{
 					{
-						Id: "node1", Hashes: map[string]string{
-							"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-							"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+						Id: "node1", Hashes: map[int32]string{
+							int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+							int32(HashAlgorithm_SHA256): "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
 						},
 					},
 				},
 			},
 			node: &Node{
-				Hashes: map[string]string{
-					"sha1":   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
-					"sha256": "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
+				Hashes: map[int32]string{
+					int32(HashAlgorithm_SHA1):   "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1",
+					int32(HashAlgorithm_SHA256): "e63a4879428aad2c768954d7be753fde3997771b2ce45bc7f99c35ff00d2a98b",
 				},
 			},
 			exptectedId: "node1",
@@ -873,18 +873,18 @@ func TestGetMatchingNode(t *testing.T) {
 				Nodes: []*Node{
 					{
 						Id:          "node1",
-						Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+						Hashes:      map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
 						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/alpine/bash@4.0.1"},
 					},
 					{
 						Id:          "node2",
-						Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+						Hashes:      map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
 						Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"},
 					},
 				},
 			},
 			node: &Node{
-				Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+				Hashes:      map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
 				Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"},
 			},
 			exptectedId: "node2",
@@ -904,7 +904,7 @@ func TestGetMatchingNode(t *testing.T) {
 				},
 			},
 			node: &Node{
-				Hashes:      map[string]string{"sha1": "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
+				Hashes:      map[int32]string{int32(HashAlgorithm_SHA1): "0b13c24e584ef7075f3d4fd3a9f8872c9fffa1b1"},
 				Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/bash@4.0.1"},
 			},
 			exptectedId: "node2",

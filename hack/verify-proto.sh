@@ -3,6 +3,9 @@
 set -o errexit
 set -o nounset
 set -o pipefail
+set -o xtrace
+
+source hack/common.sh
 
 # These two are pinnedto the versions used in the latest generated code
 export PROTOC_VER="24.2" 
@@ -14,4 +17,4 @@ go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOC_GO_VER}
 
 $HOME/.local/bin/protoc --proto_path=$HOME/.local/include --proto_path=. --go_out=pkg ./api/sbom.proto
 
-git diff --exit-code || echo "The protobuf definitions are not up to date. Check the docs and run make proto" && exit 1
+git diff --exit-code || exit_with_msg "The protobuf definitions are not up to date. Check the docs and run make proto" 

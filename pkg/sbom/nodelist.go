@@ -73,7 +73,7 @@ func (nl *NodeList) indexNodesByHash() hashIndex {
 			if hashVal == "" {
 				continue
 			}
-			s := fmt.Sprintf("%s:%s", algo, hashVal)
+			s := fmt.Sprintf("%d:%s", algo, hashVal)
 			ret[s] = append(ret[s], n)
 		}
 	}
@@ -382,11 +382,11 @@ func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
 		hashIndex := nl.indexNodesByHash()
 		for algo, hashVal := range node.Hashes {
 			// If there is at least one node with one of the hashes:
-			if _, ok := hashIndex[fmt.Sprintf("%s:%s", algo, hashVal)]; !ok {
+			if _, ok := hashIndex[fmt.Sprintf("%d:%s", algo, hashVal)]; !ok {
 				continue
 			}
 			// Collect all node where hashes match excactly
-			for _, n := range hashIndex[fmt.Sprintf("%s:%s", algo, hashVal)] {
+			for _, n := range hashIndex[fmt.Sprintf("%d:%s", algo, hashVal)] {
 				// Ignore if we've seen the node
 				if _, ok := foundNodes[n.Id]; ok {
 					continue

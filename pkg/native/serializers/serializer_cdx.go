@@ -293,19 +293,16 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 
 	if n.Hashes != nil && len(n.Hashes) > 0 {
 		c.Hashes = &[]cdx.Hash{}
-		for algoString, hash := range n.Hashes {
-			if algoVal, ok := sbom.HashAlgorithm_value[strings.ToUpper(algoString)]; ok {
-				cdxAlgo := sbom.HashAlgorithm(algoVal).ToCycloneDX()
-				if cdxAlgo == "" {
-					// Data loss here.
-					// TODO how do we handle when data loss occurs?
-					continue
-				}
-				*c.Hashes = append(*c.Hashes, cdx.Hash{
-					Algorithm: cdxAlgo,
-					Value:     hash,
-				})
+		for algo, hash := range n.Hashes {
+			ha := sbom.HashAlgorithm(algo)
+			if ha.ToCycloneDX() == "" {
+				// TODO(degradation): Algorithm not supported in CDX
+				continue
 			}
+			*c.Hashes = append(*c.Hashes, cdx.Hash{
+				Algorithm: ha.ToCycloneDX(),
+				Value:     hash,
+			})
 		}
 	}
 

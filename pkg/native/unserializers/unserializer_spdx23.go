@@ -98,9 +98,14 @@ func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	}
 
 	if len(p.PackageChecksums) > 0 {
-		n.Hashes = map[string]string{}
+		n.Hashes = map[int32]string{}
 		for _, h := range p.PackageChecksums {
-			n.Hashes[string(h.Algorithm)] = h.Value
+			algo := sbom.HashAlgorithmFromSPDX(h.Algorithm)
+			if algo == sbom.HashAlgorithm_UNKNOWN {
+				// TODO(degradation): Invalid algorithm in SBOM
+				continue
+			}
+			n.Hashes[int32(algo)] = h.Value
 		}
 	}
 
@@ -184,9 +189,14 @@ func (u *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 	}
 
 	if len(f.Checksums) > 0 {
-		n.Hashes = map[string]string{}
+		n.Hashes = map[int32]string{}
 		for _, h := range f.Checksums {
-			n.Hashes[string(h.Algorithm)] = h.Value
+			algo := sbom.HashAlgorithmFromSPDX(h.Algorithm)
+			if algo == sbom.HashAlgorithm_UNKNOWN {
+				// TODO(degradation): Invalid SPDX algorith in SBOM. Error? Warning?
+				continue
+			}
+			n.Hashes[int32(algo)] = h.Value
 		}
 	}
 

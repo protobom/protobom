@@ -150,8 +150,8 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 		}
 
 		for algo, hash := range node.Hashes {
-			if algoVal, ok := sbom.HashAlgorithm_value[algo]; ok {
-				spdxAlgo := sbom.HashAlgorithm(algoVal).ToSPDX()
+			if _, ok := sbom.HashAlgorithm_name[algo]; ok {
+				spdxAlgo := sbom.HashAlgorithm(algo).ToSPDX()
 				if spdxAlgo == "" {
 					// TODO(degradation): Data loss. How do we handle more algos?
 					continue
@@ -230,8 +230,8 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 		}
 
 		for algo, hash := range node.Hashes {
-			if algoVal, ok := sbom.HashAlgorithm_value[algo]; ok {
-				spdxAlgo := sbom.HashAlgorithm(algoVal).ToSPDX()
+			if _, ok := sbom.HashAlgorithm_name[algo]; ok {
+				spdxAlgo := sbom.HashAlgorithm(algo).ToSPDX()
 				if spdxAlgo == "" {
 					// Data loss here.
 					// TODO how do we handle when data loss occurs?

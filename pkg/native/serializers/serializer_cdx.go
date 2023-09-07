@@ -245,35 +245,39 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		Description: n.Description,
 	}
 
-	switch strings.ToLower(n.PrimaryPurpose) {
-	case "application":
-		c.Type = cdx.ComponentTypeApplication
-	case "container":
-		c.Type = cdx.ComponentTypeContainer
-	case "data":
-		c.Type = cdx.ComponentTypeData
-	case "device":
-		c.Type = cdx.ComponentTypeDevice
-	case "device-driver":
-		c.Type = cdx.ComponentTypeDeviceDriver
-	case "file":
+	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
-	case "firmware":
-		c.Type = cdx.ComponentTypeFirmware
-	case "framework":
-		c.Type = cdx.ComponentTypeFramework
-	case "library":
-		c.Type = cdx.ComponentTypeLibrary
-	case "machine-learning-model":
-		c.Type = cdx.ComponentTypeMachineLearningModel
-	case "operating-system":
-		c.Type = cdx.ComponentTypeOS
-	case "platform":
-		c.Type = cdx.ComponentTypePlatform
-	case "":
-		// no node PrimaryPurpose set
-	default:
-		// TODO(degradation): Non-matching primary purpose to component type mapping
+	} else {
+		switch strings.ToLower(n.PrimaryPurpose) {
+		case "application":
+			c.Type = cdx.ComponentTypeApplication
+		case "container":
+			c.Type = cdx.ComponentTypeContainer
+		case "data":
+			c.Type = cdx.ComponentTypeData
+		case "device":
+			c.Type = cdx.ComponentTypeDevice
+		case "device-driver":
+			c.Type = cdx.ComponentTypeDeviceDriver
+		case "file":
+			c.Type = cdx.ComponentTypeFile
+		case "firmware":
+			c.Type = cdx.ComponentTypeFirmware
+		case "framework":
+			c.Type = cdx.ComponentTypeFramework
+		case "library":
+			c.Type = cdx.ComponentTypeLibrary
+		case "machine-learning-model":
+			c.Type = cdx.ComponentTypeMachineLearningModel
+		case "operating-system":
+			c.Type = cdx.ComponentTypeOS
+		case "platform":
+			c.Type = cdx.ComponentTypePlatform
+		case "":
+			// no node PrimaryPurpose set
+		default:
+			// TODO(degradation): Non-matching primary purpose to component type mapping
+		}
 	}
 
 	if n.Licenses != nil && len(n.Licenses) > 0 {

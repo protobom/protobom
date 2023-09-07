@@ -279,7 +279,7 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 			// TODO(degradation): Non-matching primary purpose to component type mapping
 		}
 	}
-	
+
 	if n.Licenses != nil && len(n.Licenses) > 0 {
 		var licenseChoices []cdx.LicenseChoice
 		var licenses cdx.Licenses

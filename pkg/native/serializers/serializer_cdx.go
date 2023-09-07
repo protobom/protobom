@@ -339,6 +339,28 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		}
 	}
 
+	if n.Suppliers != nil && len(n.GetSuppliers()) > 0 {
+		// TODO(degradation): CDX type Component only supports one Supplier while protobom supports multiple
+
+		nodesupplier := n.GetSuppliers()[0]
+		oe := cdx.OrganizationalEntity{
+			Name: nodesupplier.GetName(),
+		}
+		if nodesupplier.Contacts != nil {
+			var contacts []cdx.OrganizationalContact
+			for _, nodecontact := range nodesupplier.GetContacts() {
+				newcontact := cdx.OrganizationalContact{
+					Name:  nodecontact.GetName(),
+					Email: nodecontact.GetEmail(),
+					Phone: nodecontact.GetPhone(),
+				}
+				contacts = append(contacts, newcontact)
+			}
+			oe.Contact = &contacts
+		}
+		c.Supplier = &oe
+	}
+
 	if len(n.GetCopyright()) > 0 {
 		c.Copyright = n.GetCopyright()
 	}

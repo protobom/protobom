@@ -244,7 +244,7 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		Version:     n.Version,
 		Description: n.Description,
 	}
-	
+
 	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
 	} else {

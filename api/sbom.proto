@@ -28,7 +28,7 @@ message Node {
     // field 12 was the old hashes string map.
     // Removed, see https://github.com/bom-squad/protobom/issues/89
     // map<string,string> hashes = 12;
-    
+
     string source_info = 13;     // any relevant background information or additional comments about the origin
     string primary_purpose = 14; // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
 

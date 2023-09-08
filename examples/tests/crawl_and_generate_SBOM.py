@@ -35,7 +35,7 @@ def parse_arguments():
 
     print(f"Using SBOM_OUTPUT set to: {sbom_output}")
     return sbom_output
-    
+
 def find_github_urls(url):
     response = requests.get(url)
     urls = []
@@ -49,11 +49,11 @@ def find_github_urls(url):
 def get_owner_and_repo(url):
     parsed_url = urlparse(url)
     path_parts = parsed_url.path.strip('/').split('/')
-    
+
     if len(path_parts) >= 2:
         owner, repo = path_parts[:2]
         return owner, repo
-    
+
     return None, None
 
 def is_library_in_sbom(data):

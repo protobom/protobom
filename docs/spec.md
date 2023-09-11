@@ -6,7 +6,7 @@
 - Basis for future documentation - to allow users or the tools developed understand our translation decisions and rationale.
 
 Notes:
--   Since most of the translation decisions are doen in the context of protobom readers and writers, this document is located here.
+-   Since most of the translation decisions are done in the context of protobom readers and writers, this document is located here.
 -   This document is a documentation platform; the discussions are to be done through GitHub issues and the cohort meetings.
 
 # Design Decisions

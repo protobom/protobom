@@ -38,7 +38,7 @@ below.
 
 Translating between software bill of materials formats results in data
 loss. There is no way around it. And there is a lot more at stake than
-just shuffling around data bits from one field to another; 
+just shuffling around data bits from one field to another;
 SBOM format translation is really about trying to conserve
 the semantic meaning of elements described in an SBOM as much as
 possible.
@@ -197,8 +197,8 @@ style="width:6.42708in;height:7.11458in" />*A simplified SBOM graph*
 
 The SBOM graph is composed of nodes related to each other. Nodes can
 be either packages or files but any successful handling of SBOM data
-necessarily means traversing the graph regardless of kind. The model 
-should handle all SBOM elements as abstract nodes while keeping awareness 
+necessarily means traversing the graph regardless of kind. The model
+should handle all SBOM elements as abstract nodes while keeping awareness
 of their kind.
 
 The data model used to capture each kind of node is extensible and can
@@ -214,7 +214,7 @@ nodes. The data model models the CDX tree using two relationship types
 (one for the dependency graph, and one for the components tree). No
 attempt is made to endow meaning to relationships between nodes in the
 CDX documents beyond those inferred from their position in the
-<a href=https://cyclonedx.org/docs/1.4/json/#components>components tree</a> 
+<a href=https://cyclonedx.org/docs/1.4/json/#components>components tree</a>
 or the <a href=https://cyclonedx.org/docs/1.4/json/#dependencies>dependency graph.</a>
 This is true even if the SBOM contains data about the role one or more nodes have
 in the described software. For example, even if we infer a set of
@@ -245,7 +245,7 @@ never use hacks such as using annotations or comments to perpetuate
 data. Also, no custom extensions will be used even when formats may
 support them.
 
-<sup>2</sup>See the <a href=https://spdx.github.io/spdx-spec/v2.3/relationships-between-SPDX-elements/>relationships 
+<sup>2</sup>See the <a href=https://spdx.github.io/spdx-spec/v2.3/relationships-between-SPDX-elements/>relationships
 chapter</a> on the SPDX specification for more on the kinds of relationships available.
 <sup>3</sup>See the
 current SPDX3 model relationship proposal:

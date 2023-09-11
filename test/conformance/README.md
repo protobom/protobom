@@ -11,7 +11,7 @@ every time.
 
 SBOM diffing is a complex problem. SBOMs cannot be compared as simple strings or
 comparing data structs. Verifying that documents are equivalent needs more precise,
-semantic comparison. 
+semantic comparison.
 
 The approach the protrobom conformance tests take is to ask the same group of
 questions to a generated and to its equivalent golden sample and contrast the
@@ -74,7 +74,7 @@ supported formats and regenerate all protobuf blobs from sample SBOMs it finds.
 ```
 make conformance
 
-INFO[0000] Wrote text/spdx+json;version=2.3 sample to test/conformance/testdata/spdx/2.3/json/curl.spdx.json.proto 
+INFO[0000] Wrote text/spdx+json;version=2.3 sample to test/conformance/testdata/spdx/2.3/json/curl.spdx.json.proto
 ```
 
 Please note that rebuilds of the blobs are not expected to be reproducible so

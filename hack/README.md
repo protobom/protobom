@@ -8,7 +8,7 @@ consistency, autogenerate code, etc. This document documents what each of them d
 `hack/verify-fakes.sh`
 
 This script runs as a presubmit and fails if the fake implementations used for
-testing need to be updated. If you find your PR is failing because the fakes are 
+testing need to be updated. If you find your PR is failing because the fakes are
 out of date, simply run:
 
 ```
@@ -26,13 +26,13 @@ be rebuilt when the protobuf definitions change. The script has two variables wi
 versions of the `protoc` and `protoc-gen-go` tools used to check the code:
 
 ```bash
-export PROTOC_VER="24.2" 
+export PROTOC_VER="24.2"
 export PROTOC_GO_VER="v1.31.0"
 ```
 
 If this check fails, ensure the following conditions are met:
 
-1. Ensure the versions of protoc and protoc-ge-go in your machine match 
+1. Ensure the versions of protoc and protoc-ge-go in your machine match
 those in `verify-proto.sh` (`protoc-gen-go --version` and `protoc --version`
 are your friends here).
 2. Run protoc and commit the results:

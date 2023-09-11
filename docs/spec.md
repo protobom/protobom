@@ -10,7 +10,7 @@ Notes:
 -   This document is a documentation platform; the discussions are to be done through GitHub issues and the cohort meetings.
 
 # Design Decisions
-Note: this section documents main design decisions - these decisions do not directly map to spec, code or test cases but they do convay our approach and our understanding of the SBOM problem space.
+Note: this section documents main design decisions - these decisions do not directly map to spec, code or test cases but they do convey our approach and our understanding of the SBOM problem space.
 
 ## A Translated SBOM is a New SBOM
 -   A translated SBOM is a new SBOM - it is not a copy of the original SBOM.

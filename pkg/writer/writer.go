@@ -18,14 +18,16 @@ type Writer struct {
 }
 
 var (
-	regMtx       sync.RWMutex
-	serializers  = make(map[formats.Format]native.Serializer)
-	defaultIdent = 4
+	regMtx        sync.RWMutex
+	serializers   = make(map[formats.Format]native.Serializer)
+	defaultIdent  = 4
+	defaultFormat = formats.CDX15JSON
 )
 
 func New(opts ...WriterOption) *Writer {
 	r := &Writer{
 		Indent: defaultIdent,
+		Format: defaultFormat,
 	}
 
 	for _, opt := range opts {

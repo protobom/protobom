@@ -188,8 +188,6 @@ func TestWriteFile(t *testing.T) {
 			} else {
 				r.NoError(err)
 			}
-
-			println("done!", tt.path)
 		})
 	}
 }

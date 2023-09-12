@@ -9,10 +9,13 @@ import (
 	"strings"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
+	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/bom-squad/protobom/pkg/native"
 	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/writer/options"
 	"github.com/sirupsen/logrus"
 )
+
+var _ native.Serializer = &SerializerCDX{}
 
 const (
 	stateKey state = "cyclonedx_serializer_state"
@@ -20,10 +23,20 @@ const (
 
 type (
 	state         string
-	SerializerCDX struct{}
+	SerializerCDX struct {
+		version  string
+		encoding string
+	}
 )
 
-func (s *SerializerCDX) Serialize(opts options.Options, bom *sbom.Document) (interface{}, error) {
+func NewCDX(version, encoding string) *SerializerCDX {
+	return &SerializerCDX{
+		version:  version,
+		encoding: encoding,
+	}
+}
+
+func (s *SerializerCDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
@@ -172,6 +185,7 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 	}
 
 	for _, e := range bom.NodeList.Edges {
+		e := e
 		if _, ok := state.addedDict[e.From]; ok {
 			continue
 		}
@@ -368,17 +382,26 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	return c
 }
 
-// renderVersion calls the official CDX serializer to render the BOM into a
-// specific version
-func (s *SerializerCDX) renderVersion(cdxVersion cdx.SpecVersion, doc interface{}, wr io.Writer) error {
+// Render calls the official CDX serializer to render the BOM into a specific version
+func (s *SerializerCDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
 	if doc == nil {
 		return errors.New("document is nil")
 	}
 
-	encoder := cdx.NewBOMEncoder(wr, cdx.BOMFileFormatJSON)
+	version, err := s.getCDXVersion()
+	if err != nil {
+		return fmt.Errorf("getting CDX version: %w", err)
+	}
+
+	encoding, err := s.getCDXEncoding()
+	if err != nil {
+		return fmt.Errorf("getting CDX encoding: %w", err)
+	}
+
+	encoder := cdx.NewBOMEncoder(wr, encoding)
 	encoder.SetPretty(true)
 
-	if err := encoder.EncodeVersion(doc.(*cdx.BOM), cdxVersion); err != nil {
+	if err := encoder.EncodeVersion(doc.(*cdx.BOM), version); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
 
@@ -415,4 +438,40 @@ func getCDXState(ctx context.Context) (*serializerCDXState, error) {
 		return nil, errors.New("unable to cast serializer state from context")
 	}
 	return dm, nil
+}
+
+func (s *SerializerCDX) getCDXVersion() (cdx.SpecVersion, error) {
+	var specVersion cdx.SpecVersion
+	switch s.version {
+	case "1.0":
+		specVersion = cdx.SpecVersion1_0
+	case "1.1":
+		specVersion = cdx.SpecVersion1_1
+	case "1.2":
+		specVersion = cdx.SpecVersion1_2
+	case "1.3":
+		specVersion = cdx.SpecVersion1_3
+	case "1.4":
+		specVersion = cdx.SpecVersion1_4
+	case "1.5":
+		specVersion = cdx.SpecVersion1_5
+	default:
+		return specVersion, fmt.Errorf("unsupported CDX version %s", s.version)
+	}
+
+	return specVersion, nil
+}
+
+func (s *SerializerCDX) getCDXEncoding() (cdx.BOMFileFormat, error) {
+	var format cdx.BOMFileFormat
+	switch s.encoding {
+	case formats.XML:
+		format = cdx.BOMFileFormatXML
+	case formats.JSON:
+		format = cdx.BOMFileFormatJSON
+	default:
+		return format, fmt.Errorf("unsupported CDX encoding %s", s.encoding)
+	}
+
+	return format, nil
 }

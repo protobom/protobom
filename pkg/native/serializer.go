@@ -1,13 +1,21 @@
 package native
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 import (
 	"io"
 
 	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/writer/options"
 )
 
+//counterfeiter:generate . Serializer
 type Serializer interface {
-	Serialize(options.Options, *sbom.Document) (interface{}, error)
-	Render(options.Options, interface{}, io.Writer) error
+	Serialize(*sbom.Document, *SerializeOptions) (interface{}, error)
+	Render(interface{}, io.Writer, *RenderOptions) error
+}
+
+type SerializeOptions struct{}
+
+type RenderOptions struct {
+	Indent int
 }

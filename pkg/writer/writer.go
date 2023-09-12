@@ -93,8 +93,8 @@ func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("opening file %s: %w", path, err)
+		return err
 	}
-
+	defer f.Close()
 	return w.WriteStream(bom, f)
 }

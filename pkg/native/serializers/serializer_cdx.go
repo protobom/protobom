@@ -55,6 +55,7 @@ func (s *SerializerCDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions
 	}
 
 	doc.Metadata = &metadata
+	doc.Metadata.Lifecycles = &[]cdx.Lifecycle{}
 	doc.Components = &[]cdx.Component{}
 	doc.Dependencies = &[]cdx.Dependency{}
 
@@ -66,6 +67,21 @@ func (s *SerializerCDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions
 	doc.Metadata.Component = rootComponent
 	if err := s.componentsMaps(ctx, bom); err != nil {
 		return nil, err
+	}
+
+	for _, dt := range bom.Metadata.DocumentTypes {
+		var lfc cdx.Lifecycle
+
+		if dt.Type == nil {
+			lfc.Name = *dt.Name
+			lfc.Description = *dt.Description
+		} else if *dt.Type == sbom.DocumentType_OTHER {
+			lfc.Phase = cdx.LifecyclePhase(strings.ToLower(*dt.Name))
+		} else if *dt.Type != sbom.DocumentType_OTHER {
+			lfc.Phase = cdx.LifecyclePhase(strings.ToLower(dt.Type.String()))
+		}
+
+		*doc.Metadata.Lifecycles = append(*doc.Metadata.Lifecycles, lfc)
 	}
 
 	if bom.Metadata != nil && len(bom.GetMetadata().GetAuthors()) > 0 {

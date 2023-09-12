@@ -26,6 +26,9 @@ var (
 func init() {
 	regMtx.Lock()
 	unserializers[formats.CDX14JSON] = &drivers.UnserializerCDX14{}
+	unserializers[formats.CDX15JSON] = &drivers.UnserializerCDX15{
+		UnserializerCDX14: drivers.UnserializerCDX14{},
+	}
 	unserializers[formats.SPDX23JSON] = &drivers.UnserializerSPDX23{}
 	regMtx.Unlock()
 }

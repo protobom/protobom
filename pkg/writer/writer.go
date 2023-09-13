@@ -13,21 +13,20 @@ import (
 )
 
 type Writer struct {
-	Indent int
-	Format formats.Format
+	Config *Config
 }
 
 var (
 	regMtx        sync.RWMutex
 	serializers   = make(map[formats.Format]native.Serializer)
-	defaultIdent  = 4
-	defaultFormat = formats.CDX15JSON
+	defaultConfig = &Config{
+		Indent: 4,
+	}
 )
 
 func New(opts ...WriterOption) *Writer {
 	r := &Writer{
-		Indent: defaultIdent,
-		Format: defaultFormat,
+		Config: defaultConfig,
 	}
 
 	for _, opt := range opts {
@@ -72,14 +71,14 @@ func GetFormatSerializer(format formats.Format) (native.Serializer, error) {
 	return nil, fmt.Errorf("no serializer registered for %s", format)
 }
 
-func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
+func (w *Writer) WriteStreamWithConfig(bom *sbom.Document, format formats.Format, config *Config, wr io.WriteCloser) error {
 	if bom == nil {
 		return fmt.Errorf("unable to write sbom to stream, SBOM is nil")
 	}
 
-	serializer, err := GetFormatSerializer(w.Format)
+	serializer, err := GetFormatSerializer(format)
 	if err != nil {
-		return fmt.Errorf("getting serializer for format %s: %w", w.Format, err)
+		return fmt.Errorf("getting serializer for format %s: %w", format, err)
 	}
 
 	nativeDoc, err := serializer.Serialize(bom, &native.SerializeOptions{})
@@ -88,7 +87,7 @@ func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 	}
 
 	if err := serializer.Render(nativeDoc, wr, &native.RenderOptions{
-		Indent: w.Indent,
+		Indent: config.Indent,
 	}); err != nil {
 		return fmt.Errorf("writing rendered document to string: %w", err)
 	}
@@ -96,12 +95,20 @@ func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 	return nil
 }
 
+func (w *Writer) WriteStream(bom *sbom.Document, format formats.Format, wr io.WriteCloser) error {
+	return w.WriteStreamWithConfig(bom, format, w.Config, wr)
+}
+
 // WriteFile takes an sbom.Document and writes it to the file at path
-func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
+func (w *Writer) WriteFileWithConfig(bom *sbom.Document, format formats.Format, config *Config, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	return w.WriteStream(bom, f)
+	return w.WriteStream(bom, format, f)
+}
+
+func (w *Writer) WriteFile(bom *sbom.Document, format formats.Format, path string) error {
+	return w.WriteFileWithConfig(bom, format, w.Config, path)
 }

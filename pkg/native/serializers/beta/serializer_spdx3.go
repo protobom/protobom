@@ -14,14 +14,14 @@ import (
 	"github.com/bom-squad/protobom/pkg/writer"
 )
 
-var _ native.Serializer = &SerializerSPDX3{}
+var _ native.Serializer = &SPDX3{}
 
 func init() {
-	writer.RegisterSerializer(formats.Format("text/spdx+json;version=3.0"), &SerializerSPDX3{})
+	writer.RegisterSerializer(formats.Format("text/spdx+json;version=3.0"), &SPDX3{})
 }
 
-func NewSPDX3() *SerializerSPDX3 {
-	return &SerializerSPDX3{}
+func NewSPDX3() *SPDX3 {
+	return &SPDX3{}
 }
 
 //nolint:unused // Document will be used when supporting JSON-LD framed mode
@@ -108,9 +108,9 @@ type hashList struct {
 	HashValue string `json:"hashValue"`
 }
 
-type SerializerSPDX3 struct{}
+type SPDX3 struct{}
 
-func (spdx3 *SerializerSPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
+func (spdx3 *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
 	now := time.Now()
 	spdxSBOM := sbomType{
 		Type: "Sbom",
@@ -160,7 +160,7 @@ func (spdx3 *SerializerSPDX3) Serialize(bom *sbom.Document, _ *native.SerializeO
 }
 
 // edgeToRelationship converts a protobom edge to an SPDX3 relationship
-func (spdx3 *SerializerSPDX3) edgeToRelationship(e *sbom.Edge) (relationship, error) {
+func (spdx3 *SPDX3) edgeToRelationship(e *sbom.Edge) (relationship, error) {
 	if e.Type.String() == "" {
 		return relationship{}, errors.New("unable to serialize relationship without type")
 	}
@@ -173,7 +173,7 @@ func (spdx3 *SerializerSPDX3) edgeToRelationship(e *sbom.Edge) (relationship, er
 	return r, nil
 }
 
-func (spdx3 *SerializerSPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
+func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 	if n.Type != sbom.Node_PACKAGE {
 		return pkg{}, fmt.Errorf("attempt to serialize SPDX package from non pkg node")
 	}
@@ -221,7 +221,7 @@ func (spdx3 *SerializerSPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 	return p, nil
 }
 
-func (spdx3 *SerializerSPDX3) nodeToFile(n *sbom.Node) (file, error) {
+func (spdx3 *SPDX3) nodeToFile(n *sbom.Node) (file, error) {
 	if n.Type != sbom.Node_FILE {
 		return file{}, errors.New("attempt to build a file from a package node")
 	}
@@ -236,7 +236,7 @@ func (spdx3 *SerializerSPDX3) nodeToFile(n *sbom.Node) (file, error) {
 	return f, nil
 }
 
-func (spdx3 *SerializerSPDX3) Render(rawDoc interface{}, w io.Writer, o *native.RenderOptions) error {
+func (spdx3 *SPDX3) Render(rawDoc interface{}, w io.Writer, o *native.RenderOptions) error {
 	doc, ok := rawDoc.(sbomType)
 	if !ok {
 		return errors.New("unable to cast SBOM as an SPDX 3.0 SBOM")

@@ -10,7 +10,7 @@ import (
 )
 
 func TestComponentType(t *testing.T) {
-	sut := SerializerCDX{}
+	sut := CDX{}
 	node := &sbom.Node{}
 
 	for s, tc := range map[string]struct {

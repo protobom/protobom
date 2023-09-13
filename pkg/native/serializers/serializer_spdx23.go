@@ -16,15 +16,15 @@ import (
 	"sigs.k8s.io/release-utils/version"
 )
 
-var _ native.Serializer = &SerializerSPDX23{}
+var _ native.Serializer = &SPDX23{}
 
-type SerializerSPDX23 struct{}
+type SPDX23 struct{}
 
-func NewSPDX23() *SerializerSPDX23 {
-	return &SerializerSPDX23{}
+func NewSPDX23() *SPDX23 {
+	return &SPDX23{}
 }
 
-func (s *SerializerSPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
+func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
 	// TODO: add support for XML
 	encoder := json.NewEncoder(wr)
 	encoder.SetIndent("", strings.Repeat(" ", o.Indent))
@@ -36,7 +36,7 @@ func (s *SerializerSPDX23) Render(doc interface{}, wr io.Writer, o *native.Rende
 }
 
 // Serialize takes a protobom and returns an SPDX 2.3 struct
-func (s *SerializerSPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
+func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,

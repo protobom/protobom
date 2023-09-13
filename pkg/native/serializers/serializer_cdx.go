@@ -15,28 +15,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ native.Serializer = &SerializerCDX{}
+var _ native.Serializer = &CDX{}
 
 const (
 	stateKey state = "cyclonedx_serializer_state"
 )
 
 type (
-	state         string
-	SerializerCDX struct {
+	state string
+	CDX   struct {
 		version  string
 		encoding string
 	}
 )
 
-func NewCDX(version, encoding string) *SerializerCDX {
-	return &SerializerCDX{
+func NewCDX(version, encoding string) *CDX {
+	return &CDX{
 		version:  version,
 		encoding: encoding,
 	}
 }
 
-func (s *SerializerCDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
+func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
@@ -128,7 +128,7 @@ func clearAutoRefs(comps *[]cdx.Component) {
 	}
 }
 
-func (s *SerializerCDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
+func (s *CDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
 	state, err := getCDXState(ctx)
 	if err != nil {
 		return fmt.Errorf("reading state: %w", err)
@@ -146,7 +146,7 @@ func (s *SerializerCDX) componentsMaps(ctx context.Context, bom *sbom.Document) 
 	return nil
 }
 
-func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, error) {
+func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, error) {
 	var rootComp *cdx.Component
 	// First, assign the top level nodes
 	state, err := getCDXState(ctx)
@@ -177,7 +177,7 @@ func (s *SerializerCDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Comp
 }
 
 // NOTE dependencies function modifies the components dictionary
-func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
+func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
 	var dependencies []cdx.Dependency
 	state, err := getCDXState(ctx)
 	if err != nil {
@@ -248,7 +248,7 @@ func (s *SerializerCDX) dependencies(ctx context.Context, bom *sbom.Document) ([
 }
 
 // nodeToComponent converts a node in protobuf to a CycloneDX component
-func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
+func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n == nil {
 		return nil
 	}
@@ -383,7 +383,7 @@ func (s *SerializerCDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 }
 
 // Render calls the official CDX serializer to render the BOM into a specific version
-func (s *SerializerCDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
+func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
 	if doc == nil {
 		return errors.New("document is nil")
 	}
@@ -440,7 +440,7 @@ func getCDXState(ctx context.Context) (*serializerCDXState, error) {
 	return dm, nil
 }
 
-func (s *SerializerCDX) getCDXVersion() (cdx.SpecVersion, error) {
+func (s *CDX) getCDXVersion() (cdx.SpecVersion, error) {
 	var specVersion cdx.SpecVersion
 	switch s.version {
 	case "1.0":
@@ -462,7 +462,7 @@ func (s *SerializerCDX) getCDXVersion() (cdx.SpecVersion, error) {
 	return specVersion, nil
 }
 
-func (s *SerializerCDX) getCDXEncoding() (cdx.BOMFileFormat, error) {
+func (s *CDX) getCDXEncoding() (cdx.BOMFileFormat, error) {
 	var format cdx.BOMFileFormat
 	switch s.encoding {
 	case formats.XML:

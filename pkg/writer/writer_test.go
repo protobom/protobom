@@ -191,3 +191,45 @@ func TestWriteFile(t *testing.T) {
 		})
 	}
 }
+
+func TestSerializerRegistry(t *testing.T) {
+	invalid := formats.Format("invalid")
+	tests := []struct {
+		name    string
+		format  formats.Format
+		wantErr bool
+	}{
+		{
+			name:   "known format success",
+			format: formats.JSON,
+		},
+		{
+			name:   "new format success",
+			format: formats.XML,
+		},
+		{
+			name:    "invalid format success",
+			format:  invalid,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := require.New(t)
+
+			serializer := &nativefakes.FakeSerializer{}
+			if tt.format != invalid {
+				writer.RegisterSerializer(tt.format, serializer)
+			}
+
+			got, err := writer.GetFormatSerializer(tt.format)
+			if tt.wantErr {
+				r.Error(err)
+			} else {
+				r.Equal(serializer, got)
+				r.NoError(err)
+			}
+		})
+	}
+}

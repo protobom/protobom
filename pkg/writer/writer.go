@@ -58,7 +58,7 @@ func RegisterSerializer(format formats.Format, s native.Serializer) {
 	regMtx.Unlock()
 }
 
-func (w *Writer) getFormatSerializer(format formats.Format) (native.Serializer, error) {
+func GetFormatSerializer(format formats.Format) (native.Serializer, error) {
 	if _, ok := serializers[format]; ok {
 		return serializers[format], nil
 	}
@@ -70,7 +70,7 @@ func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 		return fmt.Errorf("unable to write sbom to stream, SBOM is nil")
 	}
 
-	serializer, err := w.getFormatSerializer(w.Format)
+	serializer, err := GetFormatSerializer(w.Format)
 	if err != nil {
 		return fmt.Errorf("getting serializer for format %s: %w", w.Format, err)
 	}

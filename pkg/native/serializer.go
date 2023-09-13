@@ -10,6 +10,6 @@ import (
 
 //counterfeiter:generate . Serializer
 type Serializer interface {
-	Serialize(*sbom.Document, interface{}) (interface{}, error)
+	Serialize(doc *sbom.Document, options interface{}) (interface{}, error)
 	Render(doc interface{}, writer io.Writer, options interface{}) error
 }

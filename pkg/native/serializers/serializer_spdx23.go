@@ -28,10 +28,10 @@ func NewSPDX23() *SPDX23 {
 	return &SPDX23{}
 }
 
-func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
+func (s *SPDX23) Render(doc interface{}, wr io.Writer, o interface{}) error {
 	// TODO: add support for XML
 	encoder := json.NewEncoder(wr)
-	encoder.SetIndent("", strings.Repeat(" ", o.Indent))
+	encoder.SetIndent("", strings.Repeat(" ", o.(*SPDX3Options).Indent))
 	if err := encoder.Encode(doc.(*spdx.Document)); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
@@ -40,7 +40,7 @@ func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) 
 }
 
 // Serialize takes a protobom and returns an SPDX 2.3 struct
-func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
+func (s *SPDX23) Serialize(bom *sbom.Document, _ interface{}) (interface{}, error) {
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,

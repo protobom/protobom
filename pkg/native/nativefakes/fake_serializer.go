@@ -10,12 +10,12 @@ import (
 )
 
 type FakeSerializer struct {
-	RenderStub        func(interface{}, io.Writer, *native.RenderOptions) error
+	RenderStub        func(interface{}, io.Writer, interface{}) error
 	renderMutex       sync.RWMutex
 	renderArgsForCall []struct {
 		arg1 interface{}
 		arg2 io.Writer
-		arg3 *native.RenderOptions
+		arg3 interface{}
 	}
 	renderReturns struct {
 		result1 error
@@ -23,11 +23,11 @@ type FakeSerializer struct {
 	renderReturnsOnCall map[int]struct {
 		result1 error
 	}
-	SerializeStub        func(*sbom.Document, *native.SerializeOptions) (interface{}, error)
+	SerializeStub        func(*sbom.Document, interface{}) (interface{}, error)
 	serializeMutex       sync.RWMutex
 	serializeArgsForCall []struct {
 		arg1 *sbom.Document
-		arg2 *native.SerializeOptions
+		arg2 interface{}
 	}
 	serializeReturns struct {
 		result1 interface{}
@@ -41,13 +41,13 @@ type FakeSerializer struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSerializer) Render(arg1 interface{}, arg2 io.Writer, arg3 *native.RenderOptions) error {
+func (fake *FakeSerializer) Render(arg1 interface{}, arg2 io.Writer, arg3 interface{}) error {
 	fake.renderMutex.Lock()
 	ret, specificReturn := fake.renderReturnsOnCall[len(fake.renderArgsForCall)]
 	fake.renderArgsForCall = append(fake.renderArgsForCall, struct {
 		arg1 interface{}
 		arg2 io.Writer
-		arg3 *native.RenderOptions
+		arg3 interface{}
 	}{arg1, arg2, arg3})
 	stub := fake.RenderStub
 	fakeReturns := fake.renderReturns
@@ -68,13 +68,13 @@ func (fake *FakeSerializer) RenderCallCount() int {
 	return len(fake.renderArgsForCall)
 }
 
-func (fake *FakeSerializer) RenderCalls(stub func(interface{}, io.Writer, *native.RenderOptions) error) {
+func (fake *FakeSerializer) RenderCalls(stub func(interface{}, io.Writer, interface{}) error) {
 	fake.renderMutex.Lock()
 	defer fake.renderMutex.Unlock()
 	fake.RenderStub = stub
 }
 
-func (fake *FakeSerializer) RenderArgsForCall(i int) (interface{}, io.Writer, *native.RenderOptions) {
+func (fake *FakeSerializer) RenderArgsForCall(i int) (interface{}, io.Writer, interface{}) {
 	fake.renderMutex.RLock()
 	defer fake.renderMutex.RUnlock()
 	argsForCall := fake.renderArgsForCall[i]
@@ -104,12 +104,12 @@ func (fake *FakeSerializer) RenderReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeSerializer) Serialize(arg1 *sbom.Document, arg2 *native.SerializeOptions) (interface{}, error) {
+func (fake *FakeSerializer) Serialize(arg1 *sbom.Document, arg2 interface{}) (interface{}, error) {
 	fake.serializeMutex.Lock()
 	ret, specificReturn := fake.serializeReturnsOnCall[len(fake.serializeArgsForCall)]
 	fake.serializeArgsForCall = append(fake.serializeArgsForCall, struct {
 		arg1 *sbom.Document
-		arg2 *native.SerializeOptions
+		arg2 interface{}
 	}{arg1, arg2})
 	stub := fake.SerializeStub
 	fakeReturns := fake.serializeReturns
@@ -130,13 +130,13 @@ func (fake *FakeSerializer) SerializeCallCount() int {
 	return len(fake.serializeArgsForCall)
 }
 
-func (fake *FakeSerializer) SerializeCalls(stub func(*sbom.Document, *native.SerializeOptions) (interface{}, error)) {
+func (fake *FakeSerializer) SerializeCalls(stub func(*sbom.Document, interface{}) (interface{}, error)) {
 	fake.serializeMutex.Lock()
 	defer fake.serializeMutex.Unlock()
 	fake.SerializeStub = stub
 }
 
-func (fake *FakeSerializer) SerializeArgsForCall(i int) (*sbom.Document, *native.SerializeOptions) {
+func (fake *FakeSerializer) SerializeArgsForCall(i int) (*sbom.Document, interface{}) {
 	fake.serializeMutex.RLock()
 	defer fake.serializeMutex.RUnlock()
 	argsForCall := fake.serializeArgsForCall[i]

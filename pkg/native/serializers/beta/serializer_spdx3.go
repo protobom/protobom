@@ -114,7 +114,7 @@ type hashList struct {
 
 type SPDX3 struct{}
 
-func (spdx3 *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
+func (spdx3 *SPDX3) Serialize(bom *sbom.Document, _ interface{}) (interface{}, error) {
 	now := time.Now()
 	spdxSBOM := sbomType{
 		Type: "Sbom",
@@ -240,13 +240,13 @@ func (spdx3 *SPDX3) nodeToFile(n *sbom.Node) (file, error) {
 	return f, nil
 }
 
-func (spdx3 *SPDX3) Render(rawDoc interface{}, w io.Writer, o *native.RenderOptions) error {
+func (spdx3 *SPDX3) Render(rawDoc interface{}, w io.Writer, o interface{}) error {
 	doc, ok := rawDoc.(sbomType)
 	if !ok {
 		return errors.New("unable to cast SBOM as an SPDX 3.0 SBOM")
 	}
 	enc := json.NewEncoder(w)
-	enc.SetIndent("", strings.Repeat(" ", o.Indent))
+	enc.SetIndent("", strings.Repeat(" ", o.(SPDX3Options).Indent))
 	if err := enc.Encode(doc); err != nil {
 		return fmt.Errorf("encoding SBOM: %w", err)
 	}

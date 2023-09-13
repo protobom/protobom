@@ -36,3 +36,10 @@ type Options struct {
 	RenderOptions    *native.RenderOptions
 	SerializeOptions *native.SerializeOptions
 }
+
+type DefaultSerializeOptions struct{}
+
+type Config struct {
+	RenderOptions    interface{}
+	SerializeOptions interface{}
+}

@@ -20,7 +20,10 @@ var (
 	regMtx        sync.RWMutex
 	serializers   = make(map[formats.Format]native.Serializer)
 	defaultConfig = &Config{
-		Indent: 4,
+		RenderOptions: &DefaultRenderOptions{
+			Indent: 4,
+		},
+		SerializeOptions: &DefaultSerializeOptions{},
 	}
 )
 
@@ -81,14 +84,20 @@ func (w *Writer) WriteStreamWithConfig(bom *sbom.Document, format formats.Format
 		return fmt.Errorf("getting serializer for format %s: %w", format, err)
 	}
 
-	nativeDoc, err := serializer.Serialize(bom, &native.SerializeOptions{})
+	so := config.SerializeOptions
+	if so == nil {
+		so = w.Config.SerializeOptions
+	}
+	nativeDoc, err := serializer.Serialize(bom, so)
 	if err != nil {
 		return fmt.Errorf("serializing SBOM to native format: %w", err)
 	}
 
-	if err := serializer.Render(nativeDoc, wr, &native.RenderOptions{
-		Indent: config.Indent,
-	}); err != nil {
+	ro := config.RenderOptions
+	if ro == nil {
+		ro = w.Config.RenderOptions
+	}
+	if err := serializer.Render(nativeDoc, wr, ro); err != nil {
 		return fmt.Errorf("writing rendered document to string: %w", err)
 	}
 

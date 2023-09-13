@@ -8,6 +8,13 @@ func WithConfig(config *Config) WriterOption {
 	}
 }
 
-type Config struct {
+type DefaultRenderOptions struct {
 	Indent int
+}
+
+type DefaultSerializeOptions struct{}
+
+type Config struct {
+	RenderOptions    interface{}
+	SerializeOptions interface{}
 }

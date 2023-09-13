@@ -36,7 +36,7 @@ func NewCDX(version, encoding string) *CDX {
 	}
 }
 
-func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
+func (s *CDX) Serialize(bom *sbom.Document, _ interface{}) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
@@ -383,7 +383,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 }
 
 // Render calls the official CDX serializer to render the BOM into a specific version
-func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
+func (s *CDX) Render(doc interface{}, wr io.Writer, o interface{}) error {
 	if doc == nil {
 		return errors.New("document is nil")
 	}

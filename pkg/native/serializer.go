@@ -10,12 +10,6 @@ import (
 
 //counterfeiter:generate . Serializer
 type Serializer interface {
-	Serialize(*sbom.Document, *SerializeOptions) (interface{}, error)
-	Render(interface{}, io.Writer, *RenderOptions) error
-}
-
-type SerializeOptions struct{}
-
-type RenderOptions struct {
-	Indent int
+	Serialize(*sbom.Document, interface{}) (interface{}, error)
+	Render(doc interface{}, writer io.Writer, options interface{}) error
 }

@@ -58,6 +58,13 @@ func RegisterSerializer(format formats.Format, s native.Serializer) {
 	regMtx.Unlock()
 }
 
+// UnregisterSerializer removes a serializer from the list of available
+func UnregisterSerializer(format formats.Format) {
+	regMtx.Lock()
+	delete(serializers, format)
+	regMtx.Unlock()
+}
+
 func GetFormatSerializer(format formats.Format) (native.Serializer, error) {
 	if _, ok := serializers[format]; ok {
 		return serializers[format], nil

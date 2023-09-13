@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/bom-squad/protobom/pkg/native"
 	"github.com/bom-squad/protobom/pkg/native/nativefakes"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer"
@@ -87,7 +88,7 @@ func TestWriteStream(t *testing.T) {
 		{
 			name:   "render error",
 			bom:    &sbom.Document{},
-			format: formats.Format("invalid"),
+			format: formats.CDX15JSON,
 			prepare: func(f formats.Format) {
 				s := &nativefakes.FakeSerializer{}
 				s.RenderReturns(fmt.Errorf("render error"))
@@ -98,7 +99,7 @@ func TestWriteStream(t *testing.T) {
 		{
 			name:   "serializer error",
 			bom:    &sbom.Document{},
-			format: formats.Format("invalid"),
+			format: formats.CDX15JSON,
 			prepare: func(f formats.Format) {
 				s := &nativefakes.FakeSerializer{}
 				s.SerializeReturns(nil, fmt.Errorf("serializer error"))
@@ -134,29 +135,30 @@ func TestWriteFile(t *testing.T) {
 	bom := &sbom.Document{}
 
 	tests := []struct {
-		name           string
-		format         formats.Format
-		path           string
-		mockSerializer bool
-		wantErr        bool
+		name    string
+		format  formats.Format
+		path    string
+		prepare func(formats.Format)
+		wantErr bool
 	}{
 		{
-			name:           "valid format success",
-			path:           "test.json",
-			format:         formats.CDX15JSON,
-			mockSerializer: true,
+			name:    "valid format success",
+			path:    "test.json",
+			format:  formats.CDX15JSON,
+			prepare: func(f formats.Format) { writer.RegisterSerializer(f, &nativefakes.FakeSerializer{}) },
 		},
 		{
 			name:    "invalid format error",
 			format:  formats.Format("invalid"),
+			prepare: func(f formats.Format) {},
 			wantErr: true,
 		},
 		{
-			name:           "invalid file path",
-			format:         formats.CDX15JSON,
-			path:           "",
-			mockSerializer: true,
-			wantErr:        true,
+			name:    "invalid file path",
+			format:  formats.CDX15JSON,
+			path:    "",
+			prepare: func(f formats.Format) { writer.RegisterSerializer(f, &nativefakes.FakeSerializer{}) },
+			wantErr: true,
 		},
 	}
 
@@ -164,10 +166,7 @@ func TestWriteFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			// register a fake serializer for the format
-			if tt.mockSerializer {
-				writer.RegisterSerializer(tt.format, &nativefakes.FakeSerializer{})
-			}
+			tt.prepare(tt.format)
 
 			w := writer.New(
 				writer.WithFormat(tt.format),
@@ -201,14 +200,14 @@ func TestSerializerRegistry(t *testing.T) {
 	}{
 		{
 			name:   "known format success",
-			format: formats.JSON,
+			format: formats.CDX15JSON,
 		},
 		{
 			name:   "new format success",
-			format: formats.XML,
+			format: formats.Format("new"),
 		},
 		{
-			name:    "invalid format success",
+			name:    "invalid format fail",
 			format:  invalid,
 			wantErr: true,
 		},
@@ -218,9 +217,10 @@ func TestSerializerRegistry(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			serializer := &nativefakes.FakeSerializer{}
+			var serializer native.Serializer
 			if tt.format != invalid {
 				writer.RegisterSerializer(tt.format, serializer)
+				defer writer.UnregisterSerializer(tt.format)
 			}
 
 			got, err := writer.GetFormatSerializer(tt.format)

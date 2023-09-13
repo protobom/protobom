@@ -29,7 +29,7 @@ func (u *UnserializerCDX15) ParseStream(_ *options.Options, r io.Reader) (*sbom.
 		Id:      bom.SerialNumber,
 		Version: fmt.Sprintf("%d", bom.Version),
 		// Name:    ,
-		Date:          &timestamppb.Timestamp{},
+		Date:          timestamppb.Now(),
 		Tools:         []*sbom.Tool{},
 		Authors:       []*sbom.Person{},
 		DocumentTypes: []*sbom.DocumentType{},
@@ -98,17 +98,17 @@ func (u *UnserializerCDX15) phaseToSBOMType(ph *cdx.LifecyclePhase) *sbom.Docume
 	case cdx.LifecyclePhaseBuild:
 		return sbom.DocumentType_BUILD.Enum()
 	case cdx.LifecyclePhaseDecommission:
-		return sbom.DocumentType_OTHER.Enum()
+		return sbom.DocumentType_DECOMISSION.Enum()
 	case cdx.LifecyclePhaseDesign:
 		return sbom.DocumentType_DESIGN.Enum()
 	case cdx.LifecyclePhaseDiscovery:
-		return sbom.DocumentType_OTHER.Enum()
+		return sbom.DocumentType_DISCOVERY.Enum()
 	case cdx.LifecyclePhaseOperations:
-		return sbom.DocumentType_OTHER.Enum()
-	case cdx.LifecyclePhasePostBuild:
-		return sbom.DocumentType_OTHER.Enum()
+		return sbom.DocumentType_DEPLOYED.Enum()
 	case cdx.LifecyclePhasePreBuild:
-		return sbom.DocumentType_OTHER.Enum()
+		return sbom.DocumentType_SOURCE.Enum()
+	case cdx.LifecyclePhasePostBuild:
+		return sbom.DocumentType_ANALYZED.Enum()
 	default:
 		return nil
 	}

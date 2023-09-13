@@ -158,12 +158,14 @@ message DocumentType {
 
     enum SBOMType {
         OTHER = 0;
-        DESIGN = 1;
-        SOURCE = 2;
-        BUILD = 3;
-        ANALYZED = 4;
-        DEPLOAYED = 5;
-        RUNTIME = 6;
+        DESIGN = 1; // CDX: design
+        SOURCE = 2; // CDX: pre-build
+        BUILD = 3; // CDX: build
+        ANALYZED = 4; // CDX: post-build
+        DEPLOYED = 5; // CDX: operations
+        RUNTIME = 6; // CDX: none
+        DISCOVERY = 7;  // CDX Specific
+        DECOMISSION = 8; // CDX Specific
     }
 }
 

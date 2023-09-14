@@ -1,20 +1,38 @@
 package writer
 
+import (
+	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/bom-squad/protobom/pkg/native"
+)
+
 type WriterOption func(*Writer)
 
-func WithConfig(config *Config) WriterOption {
+func WithRenderOptions(ro map[string]*native.RenderOptions) WriterOption {
 	return func(w *Writer) {
-		w.Config = config
+		if ro != nil {
+			w.RenderOptions = ro
+		}
 	}
 }
 
-type DefaultRenderOptions struct {
-	Indent int
+func WithSerializeOptions(so map[string]*native.SerializeOptions) WriterOption {
+	return func(w *Writer) {
+		if so != nil {
+			w.SerialzeOptions = so
+		}
+	}
 }
 
-type DefaultSerializeOptions struct{}
+func WithFormat(f formats.Format) WriterOption {
+	return func(w *Writer) {
+		if f != "" {
+			w.Format = f
+		}
+	}
+}
 
-type Config struct {
-	RenderOptions    interface{}
-	SerializeOptions interface{}
+type Options struct {
+	Format           formats.Format
+	RenderOptions    *native.RenderOptions
+	SerializeOptions *native.SerializeOptions
 }

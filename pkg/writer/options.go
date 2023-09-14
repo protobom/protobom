@@ -37,9 +37,16 @@ type Options struct {
 	SerializeOptions *native.SerializeOptions
 }
 
-type DefaultSerializeOptions struct{}
+func WithFormat(f formats.Format) WriterOption {
+	return func(w *Writer) {
+		if f != "" {
+			w.Format = f
+		}
+	}
+}
 
-type Config struct {
-	RenderOptions    interface{}
-	SerializeOptions interface{}
+type Options struct {
+	Format           formats.Format
+	RenderOptions    *native.RenderOptions
+	SerializeOptions *native.SerializeOptions
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -950,5 +951,262 @@ func TestGetMatchingNode(t *testing.T) {
 			require.NotNil(t, res, label)
 		}
 		require.Equal(t, tc.exptectedId, res.Id, label)
+	}
+}
+
+func TestNodeSiblings(t *testing.T) {
+	rootNode := "testRootNode"
+	for _, tc := range []struct {
+		testName string
+		sut      *NodeList
+		expected *NodeList
+	}{
+		{
+			testName: "simple_root",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: rootNode}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: rootNode, To: []string{"a-a", "a-b"}},
+				},
+				RootElements: []string{rootNode},
+			},
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: rootNode}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: rootNode, To: []string{"a-a", "a-b"}},
+				},
+				RootElements: []string{rootNode},
+			},
+		},
+		{
+			testName: "two_roots",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: rootNode}, {Id: "b"}, {Id: "a-a"}, {Id: "a-b"}, {Id: "b-c"},
+				},
+				Edges: []*Edge{
+					{From: rootNode, To: []string{"a-a", "a-b"}},
+					{From: "b", To: []string{"b-c"}},
+				},
+				RootElements: []string{rootNode, "b"},
+			},
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: rootNode}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: rootNode, To: []string{"a-a", "a-b"}},
+				},
+				RootElements: []string{rootNode},
+			},
+		},
+		{
+			testName: "two_roots_linked",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: rootNode}, {Id: "b"}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: rootNode, To: []string{"b", "a-a", "a-b"}},
+				},
+				RootElements: []string{rootNode, "b"},
+			},
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: rootNode}, {Id: "b"}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: rootNode, To: []string{"b", "a-a", "a-b"}},
+				},
+				RootElements: []string{rootNode},
+			},
+		},
+		{
+			testName: "two_roots_more_descendants",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: rootNode}, {Id: "b"}, {Id: "a-a"}, {Id: "a-b"}, {Id: "a-b-c"},
+				},
+				Edges: []*Edge{
+					{From: rootNode, To: []string{"a-a", "a-b"}},
+					{From: "a-b", To: []string{"a-b-c"}},
+				},
+				RootElements: []string{rootNode, "b"},
+			},
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: rootNode}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: rootNode, To: []string{"a-a", "a-b"}},
+				},
+				RootElements: []string{rootNode},
+			},
+		},
+	} {
+		t.Run(tc.testName, func(t *testing.T) {
+			result := tc.sut.NodeSiblings(rootNode)
+			require.Truef(t, result.Equal(tc.expected), "%s:\n\n%s\n\n%s", tc.testName, result, tc.expected)
+		})
+	}
+}
+
+func TestNodeGraph(t *testing.T) {
+	root := "testRootNode"
+	for _, tc := range []struct {
+		testName string
+		id       string
+		sut      *NodeList
+		expected *NodeList
+	}{
+		{
+			// One root. Returns same
+			// root
+			//   |- a-a
+			//   \- a-b
+			//
+			testName: "simple",
+			id:       root,
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: root}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: root, To: []string{"a-a", "a-b"}},
+				},
+				RootElements: []string{root},
+			},
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: root}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: root, To: []string{"a-a", "a-b"}},
+				},
+				RootElements: []string{root},
+			},
+		},
+		{
+			// One root. Index the end of the leaf
+			// root
+			//   |- a-a
+			//   \- a-b
+			//
+			testName: "simple_idx_finish",
+			id:       "a-a",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: root}, {Id: "a-a"}, {Id: "a-b"},
+				},
+				Edges: []*Edge{
+					{From: root, To: []string{"a-a", "a-b"}},
+				},
+				RootElements: []string{root},
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "a-a"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"a-a"},
+			},
+		},
+		{
+			// One root. Ancestor descendant, index at middle
+			// root
+			//   \- middle
+			//       \- end
+			//
+			testName: "mid-tree",
+			id:       "middle",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: root}, {Id: "middle"}, {Id: "end"},
+				},
+				Edges: []*Edge{
+					{From: root, To: []string{"middle"}},
+					{From: "middle", To: []string{"end"}},
+				},
+				RootElements: []string{root},
+			},
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: "middle"}, {Id: "end"},
+				},
+				Edges: []*Edge{
+					{From: "middle", To: []string{"end"}},
+				},
+				RootElements: []string{"middle"},
+			},
+		},
+		{
+			// Two roots. Single descendant, index root1
+			// root1
+			//   \- descendant
+			// root2
+			testName: "two roots index root1",
+			id:       "root1",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "root1"}, {Id: "root2"}, {Id: "descendant"},
+				},
+				Edges: []*Edge{
+					{From: "root1", To: []string{"descendant"}},
+				},
+				RootElements: []string{"root1", "root2"},
+			},
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: "root1"}, {Id: "descendant"},
+				},
+				Edges: []*Edge{
+					{From: "root1", To: []string{"descendant"}},
+				},
+				RootElements: []string{"root1"},
+			},
+		},
+		{
+			// Two roots. Common descendant, index root2
+			// root1
+			//   \
+			//    >= descendant
+			//   /
+			// root2
+			testName: "two roots index root1",
+			id:       "root2",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "root1"}, {Id: "root2"}, {Id: "descendant"},
+				},
+				Edges: []*Edge{
+					{From: "root2", To: []string{"descendant"}},
+					{From: "descendant", To: []string{"root1"}},
+				},
+				RootElements: []string{"root1", "root2"},
+			},
+			expected: &NodeList{
+				Nodes: []*Node{
+					{Id: "root2"}, {Id: "descendant"},
+				},
+				Edges: []*Edge{
+					{From: "root2", To: []string{"descendant"}},
+				},
+				RootElements: []string{"root2"},
+			},
+		},
+	} {
+		t.Run(tc.testName, func(t *testing.T) {
+			graph := tc.sut.NodeGraph(tc.id)
+			if tc.expected != nil {
+				require.NotNil(t, graph)
+			}
+			logrus.Infof("%T %+v", graph, graph)
+			require.True(
+				t, tc.expected.Equal(graph), "%s:\n\nResult: %s\n\nExpected: %s",
+				tc.testName, graph, tc.expected,
+			)
+		})
 	}
 }

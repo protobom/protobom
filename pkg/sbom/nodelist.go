@@ -629,3 +629,123 @@ func (nl *NodeList) reconnectOrphanNodes() {
 		}
 	}
 }
+
+// NodeGraph looks for node id and returns a new NodeList with its full dependency
+// graph. NodeGraph will traverse the SBOM graph and add all nodes connected to id.
+func (nl *NodeList) NodeGraph(id string) *NodeList {
+	nodelist := &NodeList{
+		Nodes:        []*Node{},
+		Edges:        []*Edge{},
+		RootElements: []string{},
+	}
+
+	// Get the list of connected nodes
+	graphIndex := nl.indexConnectedNodes(id)
+
+	// Verify that the root is in the resulting index
+	if _, ok := graphIndex[id]; !ok {
+		return nil
+	}
+
+	edgeIdx := nl.indexEdges()
+	for id, n := range graphIndex {
+		// Add the node
+		nodelist.AddNode(n)
+
+		if _, ok := edgeIdx[id]; !ok {
+			continue
+		}
+
+		for t := range edgeIdx[id] {
+			nodelist.Edges = append(nodelist.Edges, edgeIdx[id][t]...)
+		}
+	}
+	nodelist.RootElements = append(nodelist.RootElements, id)
+	nodelist.cleanEdges()
+
+	return nodelist
+}
+
+// indexConnectedNodes traverses the graph of NodeList nl and returns an index of
+// nodes connected to id. Root nodes are considered boundaries and recursion will
+// stop when reaching them.
+func (nl *NodeList) indexConnectedNodes(id string) nodeIndex {
+	index := nodeIndex{}
+	node := nl.GetNodeByID(id)
+	if node == nil {
+		return index
+	}
+
+	index[id] = node
+
+	boundaries := nl.indexRootElements()
+	nl.connectedIndexRecursion(node.Id, &boundaries, &index)
+	return index
+}
+
+// connectedIndexRecursion traverses the NodeList graph starting at id to
+// populate the connectedNodes index stopping at the end of the edges or when
+// it hits a node in the boundaries list.
+func (nl *NodeList) connectedIndexRecursion(id string, boundaries *rootElementsIndex, connectedNodes *nodeIndex) {
+	siblings := nl.NodeSiblings(id)
+	for _, s := range siblings.Nodes {
+		// If we've seen it, skip
+		if _, ok := (*connectedNodes)[s.Id]; ok {
+			continue
+		}
+
+		// If the node is in the boundaries list, skip
+		if _, ok := (*boundaries)[s.Id]; ok {
+			continue
+		}
+
+		(*connectedNodes)[s.Id] = s
+
+		// Traverse the node path:
+		nl.connectedIndexRecursion(s.Id, boundaries, connectedNodes)
+	}
+}
+
+// NodeSiblings takes a node identifier `id` and returns a NodeList with the node
+// at the top and the immediate siblings that are related to it.
+func (nl *NodeList) NodeSiblings(id string) *NodeList {
+	nodelist := &NodeList{}
+
+	if id == "" {
+		return nil
+	}
+
+	// Check that the node actually esists
+	node := nl.GetNodeByID(id)
+	if node == nil {
+		return nodelist
+	}
+
+	nodelist.RootElements = append(nodelist.RootElements, node.Id)
+	ni := nodeIndex{node.Id: node}
+	for _, r := range nl.Edges {
+		if r.From != id {
+			continue
+		}
+
+		for _, to := range r.To {
+			if _, ok := ni[to]; !ok {
+				n := nl.GetNodeByID(to)
+				if n == nil {
+					continue
+				}
+				ni[to] = n
+			}
+		}
+
+		nodelist.Edges = append(nodelist.Edges, r)
+	}
+
+	for _, n := range ni {
+		nodelist.Nodes = append(nodelist.Nodes, n)
+	}
+
+	nodelist.cleanEdges()
+
+	return nodelist
+}

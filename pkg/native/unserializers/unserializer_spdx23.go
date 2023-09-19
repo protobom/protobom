@@ -32,20 +32,22 @@ func (u *UnserializerSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom
 	// TODO(degradation): External document references
 
 	// TODO(puerco) Top level elements
-	if t := u.spdxDateToTime(spdxDoc.CreationInfo.Created); t != nil {
-		bom.Metadata.Date = timestamppb.New(*t)
-	}
-	if spdxDoc.CreationInfo.Creators != nil {
-		for _, c := range spdxDoc.CreationInfo.Creators {
-			// TODO: We need to create a parser library in formats/spdx
-			if c.CreatorType == "Tool" {
-				// TODO: Split the version from the Tool string here.
-				bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: c.Creator})
-				continue
+	if spdxDoc.CreationInfo != nil {
+		if t := u.spdxDateToTime(spdxDoc.CreationInfo.Created); t != nil {
+			bom.Metadata.Date = timestamppb.New(*t)
+		}
+		if spdxDoc.CreationInfo.Creators != nil {
+			for _, c := range spdxDoc.CreationInfo.Creators {
+				// TODO: We need to create a parser library in formats/spdx
+				if c.CreatorType == "Tool" {
+					// TODO: Split the version from the Tool string here.
+					bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: c.Creator})
+					continue
+				}
+				a := &sbom.Person{Name: c.Creator}
+				a.IsOrg = (c.CreatorType == protospdx.Organization)
+				bom.Metadata.Authors = append(bom.Metadata.Authors, a)
 			}
-			a := &sbom.Person{Name: c.Creator}
-			a.IsOrg = (c.CreatorType == protospdx.Organization)
-			bom.Metadata.Authors = append(bom.Metadata.Authors, a)
 		}
 	}
 

@@ -37,29 +37,33 @@ func (u *UnserializerCDX14) ParseStream(_ *options.Options, r io.Reader) (*sbom.
 		NodeList: &sbom.NodeList{},
 	}
 
-	if bom.Metadata.Component != nil {
-		nl, err := u.componentToNodeList(bom.Metadata.Component)
-		if err != nil {
-			return nil, fmt.Errorf("converting main bom component to node: %w", err)
+	if bom.Metadata != nil {
+		if bom.Metadata.Component != nil {
+			nl, err := u.componentToNodeList(bom.Metadata.Component)
+			if err != nil {
+				return nil, fmt.Errorf("converting main bom component to node: %w", err)
+			}
+			if len(nl.RootElements) > 1 {
+				logrus.Warnf("root nodelist has %d components, this should not happen", len(nl.RootElements))
+			}
+			doc.NodeList.Add(nl)
 		}
-		if len(nl.RootElements) > 1 {
-			logrus.Warnf("root nodelist has %d components, this should not happen", len(nl.RootElements))
-		}
-		doc.NodeList.Add(nl)
 	}
 
 	// Cycle all components and get their graph fragments
-	for i := range *bom.Components {
-		nl, err := u.componentToNodeList(&(*bom.Components)[i])
-		if err != nil {
-			return nil, fmt.Errorf("converting component to node: %w", err)
-		}
+	if bom.Components != nil {
+		for i := range *bom.Components {
+			nl, err := u.componentToNodeList(&(*bom.Components)[i])
+			if err != nil {
+				return nil, fmt.Errorf("converting component to node: %w", err)
+			}
 
-		if len(doc.NodeList.RootElements) == 0 {
-			doc.NodeList.Add(nl)
-		} else {
-			if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
-				return nil, fmt.Errorf("relating components to root node: %w", err)
+			if len(doc.NodeList.RootElements) == 0 {
+				doc.NodeList.Add(nl)
+			} else {
+				if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
+					return nil, fmt.Errorf("relating components to root node: %w", err)
+				}
 			}
 		}
 	}

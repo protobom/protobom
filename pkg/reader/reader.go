@@ -1,5 +1,7 @@
 package reader
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 import (
 	"fmt"
 	"io"
@@ -53,12 +55,20 @@ func GetFormatUnserializer(format formats.Format) (native.Unserializer, error) {
 }
 
 type Reader struct {
-	sniffer            formats.Sniffer
+	sniffer            Sniffer
 	UnserializeOptions map[string]*native.UnserializeOptions
 }
 
+//counterfeiter:generate . Sniffer
+type Sniffer interface {
+	SniffReader(rs io.ReadSeeker) (formats.Format, error)
+	SniffFile(path string) (formats.Format, error)
+}
+
 func New(opts ...ReaderOption) *Reader {
-	r := &Reader{}
+	r := &Reader{
+		sniffer: &formats.Sniffer{},
+	}
 
 	for _, opt := range opts {
 		opt(r)
@@ -90,11 +100,15 @@ func (r *Reader) ParseFileWithOptions(path string, o *Options) (*sbom.Document, 
 	}
 	defer f.Close()
 
-	return r.ParseStream(f)
+	return r.ParseStreamWithOptions(f, o)
 }
 
 // ParseStreamWithOptions returns a document from a ioreader, accept options for unserializer
 func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Document, error) {
+	if o == nil {
+		return nil, fmt.Errorf("options cannot be nil")
+	}
+
 	format := o.Format
 	if o.Format == "" {
 		f, err := r.detectFormat(f)
@@ -109,7 +123,7 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		return nil, fmt.Errorf("getting format parser: %w", err)
 	}
 
-	doc, err := unserializer.Unserialize(f, &native.UnserializeOptions{})
+	doc, err := unserializer.Unserialize(f, o.UnserializeOptions)
 	if err != nil {
 		return nil, fmt.Errorf("unserializing: %w", err)
 	}
@@ -152,5 +166,6 @@ func (r *Reader) getOptions(f io.ReadSeeker) (*Options, error) {
 
 	return &Options{
 		UnserializeOptions: uo,
+		Format:             format,
 	}, nil
 }

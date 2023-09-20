@@ -15,6 +15,14 @@ func WithUnserializeOptions(uo map[string]*native.UnserializeOptions) ReaderOpti
 	}
 }
 
+func WithSniffer(s Sniffer) ReaderOption {
+	return func(w *Reader) {
+		if s != nil {
+			w.sniffer = s
+		}
+	}
+}
+
 type Options struct {
 	Format             formats.Format
 	UnserializeOptions *native.UnserializeOptions

@@ -77,7 +77,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions) (*sbom.Docu
 			}
 		}
 		if metadata.Component != nil {
-			nl, err := u.componentToNodeList(bom.Metadata.Component)
+			nl, err := u.componentToNodeList(metadata.Component)
 			if err != nil {
 				return nil, fmt.Errorf("converting main bom component to node: %w", err)
 			}
@@ -279,17 +279,17 @@ func (u *CDX) phaseToSBOMType(ph *cdx.LifecyclePhase) *sbom.DocumentType_SBOMTyp
 	case cdx.LifecyclePhaseBuild:
 		return sbom.DocumentType_BUILD.Enum()
 	case cdx.LifecyclePhaseDecommission:
-		return sbom.DocumentType_OTHER.Enum()
+		return sbom.DocumentType_DECOMISSION.Enum()
 	case cdx.LifecyclePhaseDesign:
 		return sbom.DocumentType_DESIGN.Enum()
 	case cdx.LifecyclePhaseDiscovery:
-		return sbom.DocumentType_OTHER.Enum()
+		return sbom.DocumentType_DISCOVERY.Enum()
 	case cdx.LifecyclePhaseOperations:
-		return sbom.DocumentType_OTHER.Enum()
-	case cdx.LifecyclePhasePostBuild:
-		return sbom.DocumentType_OTHER.Enum()
+		return sbom.DocumentType_DEPLOYED.Enum()
 	case cdx.LifecyclePhasePreBuild:
-		return sbom.DocumentType_OTHER.Enum()
+		return sbom.DocumentType_SOURCE.Enum()
+	case cdx.LifecyclePhasePostBuild:
+		return sbom.DocumentType_ANALYZED.Enum()
 	default:
 		return nil
 	}

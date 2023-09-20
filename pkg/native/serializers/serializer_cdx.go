@@ -126,6 +126,7 @@ func (s *SerializerCDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions
 	return doc, nil
 }
 
+// sbomTypeToPhase converts a SBOM document type to a CDX lifecycle phase
 func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
 	switch *dt.Type {
 	case sbom.DocumentType_BUILD:

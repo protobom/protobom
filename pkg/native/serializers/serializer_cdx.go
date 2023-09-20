@@ -75,10 +75,11 @@ func (s *SerializerCDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions
 		if dt.Type == nil {
 			lfc.Name = *dt.Name
 			lfc.Description = *dt.Description
-		} else if *dt.Type == sbom.DocumentType_OTHER {
-			lfc.Phase = cdx.LifecyclePhase(strings.ToLower(*dt.Name))
-		} else if *dt.Type != sbom.DocumentType_OTHER {
-			lfc.Phase = cdx.LifecyclePhase(strings.ToLower(dt.Type.String()))
+		} else {
+			lfc.Phase, err = sbomTypeToPhase(dt)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		*doc.Metadata.Lifecycles = append(*doc.Metadata.Lifecycles, lfc)
@@ -123,6 +124,29 @@ func (s *SerializerCDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions
 	doc.Components = &components
 
 	return doc, nil
+}
+
+func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
+	switch *dt.Type {
+	case sbom.DocumentType_BUILD:
+		return cdx.LifecyclePhaseBuild, nil
+	case sbom.DocumentType_DESIGN:
+		return cdx.LifecyclePhaseDesign, nil
+	case sbom.DocumentType_ANALYZED:
+		return cdx.LifecyclePhasePostBuild, nil
+	case sbom.DocumentType_SOURCE:
+		return cdx.LifecyclePhasePreBuild, nil
+	case sbom.DocumentType_DECOMISSION:
+		return cdx.LifecyclePhaseDecommission, nil
+	case sbom.DocumentType_DEPLOYED:
+		return cdx.LifecyclePhaseOperations, nil
+	case sbom.DocumentType_DISCOVERY:
+		return cdx.LifecyclePhaseDiscovery, nil
+	case sbom.DocumentType_OTHER:
+		return cdx.LifecyclePhase(strings.ToLower(*dt.Name)), nil
+	}
+
+	return "", fmt.Errorf("unknown document type %s", *dt.Name)
 }
 
 // clearAutoRefs

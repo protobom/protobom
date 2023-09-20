@@ -29,7 +29,7 @@ func (u *UnserializerCDX14) ParseStream(_ *options.Options, r io.Reader) (*sbom.
 			Id:      bom.SerialNumber,
 			Version: fmt.Sprintf("%d", bom.Version),
 			// Name:    ,
-			Date:    &timestamppb.Timestamp{},
+			Date:    timestamppb.Now(),
 			Tools:   []*sbom.Tool{},
 			Authors: []*sbom.Person{},
 			// Comment: bom.Com,

@@ -68,6 +68,7 @@ message Metadata {
     repeated Tool tools = 5;
     repeated Person authors = 6;
     string comment = 7;
+    repeated DocumentType documentTypes = 8;
 }
 
 message Edge {
@@ -148,6 +149,24 @@ message Tool {
     string name = 1;
     string version = 2;
     string vendor = 3;
+}
+
+message DocumentType {
+    optional SBOMType type = 1;
+    optional string name = 2;
+    optional string description = 3;
+
+    enum SBOMType {
+        OTHER = 0;
+        DESIGN = 1; // CDX: design
+        SOURCE = 2; // CDX: pre-build
+        BUILD = 3; // CDX: build
+        ANALYZED = 4; // CDX: post-build
+        DEPLOYED = 5; // CDX: operations
+        RUNTIME = 6; // CDX: none
+        DISCOVERY = 7;  // CDX Specific
+        DECOMISSION = 8; // CDX Specific
+    }
 }
 
 message NodeList {

@@ -1,3 +1,5 @@
+github.com/CycloneDX/cyclonedx-go v0.7.2-0.20230730203904-8c9798ced848 h1:Ta5edmSt/sgbf/Ox6IPfI42309PPe+lsGZ0H4DQxl0E=
+github.com/CycloneDX/cyclonedx-go v0.7.2-0.20230730203904-8c9798ced848/go.mod h1:K2bA+324+Og0X84fA8HhN2X066K7Bxz4rpMQ4ZhjtSk=
 github.com/CycloneDX/cyclonedx-go v0.7.2 h1:kKQ0t1dPOlugSIYVOMiMtFqeXI2wp/f5DBIdfux8gnQ=
 github.com/CycloneDX/cyclonedx-go v0.7.2/go.mod h1:K2bA+324+Og0X84fA8HhN2X066K7Bxz4rpMQ4ZhjtSk=
 github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092/go.mod h1:rYqSE9HbjzpHTI74vwPvae4ZVYZd1lue2ta6xHPdblA=

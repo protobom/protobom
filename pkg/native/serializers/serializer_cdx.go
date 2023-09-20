@@ -55,6 +55,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interfa
 	}
 
 	doc.Metadata = &metadata
+	doc.Metadata.Lifecycles = &[]cdx.Lifecycle{}
 	doc.Components = &[]cdx.Component{}
 	doc.Dependencies = &[]cdx.Dependency{}
 
@@ -66,6 +67,22 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interfa
 	doc.Metadata.Component = rootComponent
 	if err := s.componentsMaps(ctx, bom); err != nil {
 		return nil, err
+	}
+
+	for _, dt := range bom.Metadata.DocumentTypes {
+		var lfc cdx.Lifecycle
+
+		if dt.Type == nil {
+			lfc.Name = *dt.Name
+			lfc.Description = *dt.Description
+		} else {
+			lfc.Phase, err = sbomTypeToPhase(dt)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		*doc.Metadata.Lifecycles = append(*doc.Metadata.Lifecycles, lfc)
 	}
 
 	if bom.Metadata != nil && len(bom.GetMetadata().GetAuthors()) > 0 {
@@ -107,6 +124,30 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interfa
 	doc.Components = &components
 
 	return doc, nil
+}
+
+// sbomTypeToPhase converts a SBOM document type to a CDX lifecycle phase
+func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
+	switch *dt.Type {
+	case sbom.DocumentType_BUILD:
+		return cdx.LifecyclePhaseBuild, nil
+	case sbom.DocumentType_DESIGN:
+		return cdx.LifecyclePhaseDesign, nil
+	case sbom.DocumentType_ANALYZED:
+		return cdx.LifecyclePhasePostBuild, nil
+	case sbom.DocumentType_SOURCE:
+		return cdx.LifecyclePhasePreBuild, nil
+	case sbom.DocumentType_DECOMISSION:
+		return cdx.LifecyclePhaseDecommission, nil
+	case sbom.DocumentType_DEPLOYED:
+		return cdx.LifecyclePhaseOperations, nil
+	case sbom.DocumentType_DISCOVERY:
+		return cdx.LifecyclePhaseDiscovery, nil
+	case sbom.DocumentType_OTHER:
+		return cdx.LifecyclePhase(strings.ToLower(*dt.Name)), nil
+	}
+
+	return "", fmt.Errorf("unknown document type %s", *dt.Name)
 }
 
 // clearAutoRefs

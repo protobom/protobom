@@ -53,59 +53,55 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions) (*sbom.Docu
 	}
 
 	doc := &sbom.Document{
-		Metadata: &sbom.Metadata{
-			Id:      bom.SerialNumber,
-			Version: fmt.Sprintf("%d", bom.Version),
-			// Name:    ,
-			Date:    timestamppb.Now(),
-			Tools:   []*sbom.Tool{},
-			Authors: []*sbom.Person{},
-			// Comment: bom.Com,
-		},
+		Metadata: md,
 		NodeList: &sbom.NodeList{},
 	}
 
 	metadata := bom.Metadata
-	if metadata.Lifecycles != nil {
-		for _, lc := range *metadata.Lifecycles {
-			lc := lc
-			name := lc.Name
-			desc := lc.Description
-			t := u.phaseToSBOMType(&lc.Phase)
-			if name == "" {
-				name = string(lc.Phase)
-			}
+	if metadata != nil {
+		if metadata.Lifecycles != nil {
+			for _, lc := range *metadata.Lifecycles {
+				lc := lc
+				name := lc.Name
+				desc := lc.Description
+				t := u.phaseToSBOMType(&lc.Phase)
+				if name == "" {
+					name = string(lc.Phase)
+				}
 
-			md.DocumentTypes = append(md.DocumentTypes, &sbom.DocumentType{
-				Name:        &name,
-				Description: &desc,
-				Type:        t,
-			})
+				md.DocumentTypes = append(md.DocumentTypes, &sbom.DocumentType{
+					Name:        &name,
+					Description: &desc,
+					Type:        t,
+				})
+			}
 		}
-	}
-	if bom.Metadata.Component != nil {
-		nl, err := u.componentToNodeList(bom.Metadata.Component)
-		if err != nil {
-			return nil, fmt.Errorf("converting main bom component to node: %w", err)
+		if metadata.Component != nil {
+			nl, err := u.componentToNodeList(bom.Metadata.Component)
+			if err != nil {
+				return nil, fmt.Errorf("converting main bom component to node: %w", err)
+			}
+			if len(nl.RootElements) > 1 {
+				logrus.Warnf("root nodelist has %d components, this should not happen", len(nl.RootElements))
+			}
+			doc.NodeList.Add(nl)
 		}
-		if len(nl.RootElements) > 1 {
-			logrus.Warnf("root nodelist has %d components, this should not happen", len(nl.RootElements))
-		}
-		doc.NodeList.Add(nl)
 	}
 
 	// Cycle all components and get their graph fragments
-	for i := range *bom.Components {
-		nl, err := u.componentToNodeList(&(*bom.Components)[i])
-		if err != nil {
-			return nil, fmt.Errorf("converting component to node: %w", err)
-		}
+	if bom.Components == nil {
+		for i := range *bom.Components {
+			nl, err := u.componentToNodeList(&(*bom.Components)[i])
+			if err != nil {
+				return nil, fmt.Errorf("converting component to node: %w", err)
+			}
 
-		if len(doc.NodeList.RootElements) == 0 {
-			doc.NodeList.Add(nl)
-		} else {
-			if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
-				return nil, fmt.Errorf("relating components to root node: %w", err)
+			if len(doc.NodeList.RootElements) == 0 {
+				doc.NodeList.Add(nl)
+			} else {
+				if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
+					return nil, fmt.Errorf("relating components to root node: %w", err)
+				}
 			}
 		}
 	}

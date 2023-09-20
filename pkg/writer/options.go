@@ -2,23 +2,37 @@ package writer
 
 import (
 	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/bom-squad/protobom/pkg/native"
 )
 
 type WriterOption func(*Writer)
 
-func WithFormat(f formats.Format) WriterOption {
+func WithRenderOptions(ro map[string]*native.RenderOptions) WriterOption {
 	return func(w *Writer) {
-		w.Format = f
+		if ro != nil {
+			w.RenderOptions = ro
+		}
 	}
 }
 
-func WithIndent(i int) WriterOption {
+func WithSerializeOptions(so map[string]*native.SerializeOptions) WriterOption {
 	return func(w *Writer) {
-		w.Indent = i
+		if so != nil {
+			w.SerialzeOptions = so
+		}
+	}
+}
+
+func WithFormat(f formats.Format) WriterOption {
+	return func(w *Writer) {
+		if f != "" {
+			w.Format = f
+		}
 	}
 }
 
 type Options struct {
-	Format formats.Format `yaml:"format,omitempty" json:"format,omitempty"`
-	Indent int            `yaml:"indent,omitempty" json:"indent,omitempty"`
+	Format           formats.Format
+	RenderOptions    *native.RenderOptions
+	SerializeOptions *native.SerializeOptions
 }

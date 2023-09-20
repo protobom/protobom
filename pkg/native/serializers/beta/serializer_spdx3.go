@@ -16,6 +16,10 @@ import (
 
 var _ native.Serializer = &SPDX3{}
 
+type SPDX3Options struct {
+	Indent int
+}
+
 func init() {
 	writer.RegisterSerializer(formats.Format("text/spdx+json;version=3.0"), &SPDX3{})
 }

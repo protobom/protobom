@@ -20,6 +20,10 @@ var _ native.Serializer = &SPDX23{}
 
 type SPDX23 struct{}
 
+type SPDX3Options struct {
+	Indent int
+}
+
 func NewSPDX23() *SPDX23 {
 	return &SPDX23{}
 }

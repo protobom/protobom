@@ -7,7 +7,7 @@ import (
 	"time"
 
 	protospdx "github.com/bom-squad/protobom/pkg/formats/spdx"
-	"github.com/bom-squad/protobom/pkg/reader/options"
+	"github.com/bom-squad/protobom/pkg/native"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -16,10 +16,16 @@ import (
 	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 )
 
-type UnserializerSPDX23 struct{}
+var _ native.Unserializer = &SPDX23{}
+
+type SPDX23 struct{}
+
+func NewSPDX23() *SPDX23 {
+	return &SPDX23{}
+}
 
 // ParseStream reads an io.Reader to parse an SPDX 2.3 document from it
-func (u *UnserializerSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom.Document, error) {
+func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions) (*sbom.Document, error) {
 	spdxDoc, err := spdxjson.Read(r)
 	if err != nil {
 		return nil, fmt.Errorf("parsing SPDX json: %w", err)
@@ -72,7 +78,7 @@ func (u *UnserializerSPDX23) ParseStream(_ *options.Options, r io.Reader) (*sbom
 }
 
 // packageToNode assigns the data from an SPDX package into a new Node
-func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
+func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	n := &sbom.Node{
 		Id:              string(p.PackageSPDXIdentifier),
 		Type:            sbom.Node_PACKAGE,
@@ -159,7 +165,7 @@ func (u *UnserializerSPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 }
 
 // spdxDateToTime is a utility function that turns a date into a go time.Time
-func (*UnserializerSPDX23) spdxDateToTime(date string) *time.Time {
+func (*SPDX23) spdxDateToTime(date string) *time.Time {
 	if date == "" {
 		return nil
 	}
@@ -172,7 +178,7 @@ func (*UnserializerSPDX23) spdxDateToTime(date string) *time.Time {
 }
 
 // fileToNode converts a file from SPDX into a protobom node
-func (u *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
+func (u *SPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 	n := &sbom.Node{
 		Id:               string(f.FileSPDXIdentifier),
 		Type:             sbom.Node_FILE,
@@ -204,7 +210,7 @@ func (u *UnserializerSPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 }
 
 // relationshipToEdge converts the SPDX relationship to a protobom Edge
-func (*UnserializerSPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
+func (*SPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
 	// TODO(degradation) How to handle external documents?
 	// TODO(degradation) How to handle NOASSERTION and NONE targets
 	e := &sbom.Edge{

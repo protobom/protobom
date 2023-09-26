@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	cdx "github.com/CycloneDX/cyclonedx-go"
-	cdxformats "github.com/bom-squad/protobom/pkg/formats/cdx"
+	"github.com/CycloneDX/cyclonedx-go"
+	cdxformats "github.com/bom-squad/protobom/pkg/formats/cyclonedx"
 	"github.com/bom-squad/protobom/pkg/native"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
@@ -43,21 +43,21 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interfa
 	state := newSerializerCDXState()
 	ctx := context.WithValue(context.Background(), stateKey, state)
 
-	doc := cdx.NewBOM()
+	doc := cyclonedx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
 	ver, err := strconv.Atoi(bom.Metadata.Version)
 	if err == nil {
 		doc.Version = ver
 	}
 
-	metadata := cdx.Metadata{
-		Component: &cdx.Component{},
+	metadata := cyclonedx.Metadata{
+		Component: &cyclonedx.Component{},
 	}
 
 	doc.Metadata = &metadata
-	doc.Metadata.Lifecycles = &[]cdx.Lifecycle{}
-	doc.Components = &[]cdx.Component{}
-	doc.Dependencies = &[]cdx.Dependency{}
+	doc.Metadata.Lifecycles = &[]cyclonedx.Lifecycle{}
+	doc.Components = &[]cyclonedx.Component{}
+	doc.Dependencies = &[]cyclonedx.Dependency{}
 
 	rootComponent, err := s.root(ctx, bom)
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interfa
 	}
 
 	for _, dt := range bom.Metadata.DocumentTypes {
-		var lfc cdx.Lifecycle
+		var lfc cyclonedx.Lifecycle
 
 		if dt.Type == nil {
 			lfc.Name = *dt.Name
@@ -86,9 +86,9 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interfa
 	}
 
 	if bom.Metadata != nil && len(bom.GetMetadata().GetAuthors()) > 0 {
-		var authors []cdx.OrganizationalContact
+		var authors []cyclonedx.OrganizationalContact
 		for _, bomauthor := range bom.GetMetadata().GetAuthors() {
-			authors = append(authors, cdx.OrganizationalContact{
+			authors = append(authors, cyclonedx.OrganizationalContact{
 				Name:  bomauthor.Name,
 				Email: bomauthor.Email,
 				Phone: bomauthor.Phone,
@@ -98,9 +98,9 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interfa
 	}
 
 	if bom.Metadata != nil && len(bom.GetMetadata().GetTools()) > 0 {
-		var tools []cdx.Tool
+		var tools []cyclonedx.Tool
 		for _, bomtool := range bom.GetMetadata().GetTools() {
-			tools = append(tools, cdx.Tool{
+			tools = append(tools, cyclonedx.Tool{
 				Vendor:  bomtool.Vendor,
 				Name:    bomtool.Name,
 				Version: bomtool.Version,
@@ -127,24 +127,24 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interfa
 }
 
 // sbomTypeToPhase converts a SBOM document type to a CDX lifecycle phase
-func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
+func sbomTypeToPhase(dt *sbom.DocumentType) (cyclonedx.LifecyclePhase, error) {
 	switch *dt.Type {
 	case sbom.DocumentType_BUILD:
-		return cdx.LifecyclePhaseBuild, nil
+		return cyclonedx.LifecyclePhaseBuild, nil
 	case sbom.DocumentType_DESIGN:
-		return cdx.LifecyclePhaseDesign, nil
+		return cyclonedx.LifecyclePhaseDesign, nil
 	case sbom.DocumentType_ANALYZED:
-		return cdx.LifecyclePhasePostBuild, nil
+		return cyclonedx.LifecyclePhasePostBuild, nil
 	case sbom.DocumentType_SOURCE:
-		return cdx.LifecyclePhasePreBuild, nil
+		return cyclonedx.LifecyclePhasePreBuild, nil
 	case sbom.DocumentType_DECOMISSION:
-		return cdx.LifecyclePhaseDecommission, nil
+		return cyclonedx.LifecyclePhaseDecommission, nil
 	case sbom.DocumentType_DEPLOYED:
-		return cdx.LifecyclePhaseOperations, nil
+		return cyclonedx.LifecyclePhaseOperations, nil
 	case sbom.DocumentType_DISCOVERY:
-		return cdx.LifecyclePhaseDiscovery, nil
+		return cyclonedx.LifecyclePhaseDiscovery, nil
 	case sbom.DocumentType_OTHER:
-		return cdx.LifecyclePhase(strings.ToLower(*dt.Name)), nil
+		return cyclonedx.LifecyclePhase(strings.ToLower(*dt.Name)), nil
 	}
 
 	return "", fmt.Errorf("unknown document type %s", *dt.Name)
@@ -155,7 +155,7 @@ func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
 // refs added by the protobom reader. These are added on CycloneDX ingestion
 // to all nodes that don't have them. To maintain the closest fidelity, we
 // clear their refs again before output to CDX
-func clearAutoRefs(comps *[]cdx.Component) {
+func clearAutoRefs(comps *[]cyclonedx.Component) {
 	for i := range *comps {
 		if strings.HasPrefix((*comps)[i].BOMRef, "protobom-") {
 			flags := strings.Split((*comps)[i].BOMRef, "--")
@@ -187,8 +187,8 @@ func (s *CDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
 	return nil
 }
 
-func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, error) {
-	var rootComp *cdx.Component
+func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cyclonedx.Component, error) {
+	var rootComp *cyclonedx.Component
 	// First, assign the top level nodes
 	state, err := getCDXState(ctx)
 	if err != nil {
@@ -218,8 +218,8 @@ func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, err
 }
 
 // NOTE dependencies function modifies the components dictionary
-func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
-	var dependencies []cdx.Dependency
+func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cyclonedx.Dependency, error) {
+	var dependencies []cyclonedx.Dependency
 	state, err := getCDXState(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("reading state: %w", err)
@@ -249,7 +249,7 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 				}
 
 				if state.componentsDict[e.From].Components == nil {
-					state.componentsDict[e.From].Components = &[]cdx.Component{}
+					state.componentsDict[e.From].Components = &[]cyclonedx.Component{}
 				}
 				*state.componentsDict[e.From].Components = append(*state.componentsDict[e.From].Components, *state.componentsDict[targetID])
 			}
@@ -272,7 +272,7 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 				depListCheck[targetID] = struct{}{}
 				targetStrings = append(targetStrings, targetID)
 			}
-			dependencies = append(dependencies, cdx.Dependency{
+			dependencies = append(dependencies, cyclonedx.Dependency{
 				Ref:          e.From,
 				Dependencies: &targetStrings,
 			})
@@ -289,11 +289,11 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 }
 
 // nodeToComponent converts a node in protobuf to a CycloneDX component
-func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
+func (s *CDX) nodeToComponent(n *sbom.Node) *cyclonedx.Component {
 	if n == nil {
 		return nil
 	}
-	c := &cdx.Component{
+	c := &cyclonedx.Component{
 		BOMRef:      n.Id,
 		Name:        n.Name,
 		Version:     n.Version,
@@ -301,33 +301,33 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	if n.Type == sbom.Node_FILE {
-		c.Type = cdx.ComponentTypeFile
+		c.Type = cyclonedx.ComponentTypeFile
 	} else {
 		switch strings.ToLower(n.PrimaryPurpose) {
 		case "application":
-			c.Type = cdx.ComponentTypeApplication
+			c.Type = cyclonedx.ComponentTypeApplication
 		case "container":
-			c.Type = cdx.ComponentTypeContainer
+			c.Type = cyclonedx.ComponentTypeContainer
 		case "data":
-			c.Type = cdx.ComponentTypeData
+			c.Type = cyclonedx.ComponentTypeData
 		case "device":
-			c.Type = cdx.ComponentTypeDevice
+			c.Type = cyclonedx.ComponentTypeDevice
 		case "device-driver":
-			c.Type = cdx.ComponentTypeDeviceDriver
+			c.Type = cyclonedx.ComponentTypeDeviceDriver
 		case "file":
-			c.Type = cdx.ComponentTypeFile
+			c.Type = cyclonedx.ComponentTypeFile
 		case "firmware":
-			c.Type = cdx.ComponentTypeFirmware
+			c.Type = cyclonedx.ComponentTypeFirmware
 		case "framework":
-			c.Type = cdx.ComponentTypeFramework
+			c.Type = cyclonedx.ComponentTypeFramework
 		case "library":
-			c.Type = cdx.ComponentTypeLibrary
+			c.Type = cyclonedx.ComponentTypeLibrary
 		case "machine-learning-model":
-			c.Type = cdx.ComponentTypeMachineLearningModel
+			c.Type = cyclonedx.ComponentTypeMachineLearningModel
 		case "operating-system":
-			c.Type = cdx.ComponentTypeOS
+			c.Type = cyclonedx.ComponentTypeOS
 		case "platform":
-			c.Type = cdx.ComponentTypePlatform
+			c.Type = cyclonedx.ComponentTypePlatform
 		case "":
 			// no node PrimaryPurpose set
 		default:
@@ -336,11 +336,11 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	if n.Licenses != nil && len(n.Licenses) > 0 {
-		var licenseChoices []cdx.LicenseChoice
-		var licenses cdx.Licenses
+		var licenseChoices []cyclonedx.LicenseChoice
+		var licenses cyclonedx.Licenses
 		for _, l := range n.Licenses {
-			licenseChoices = append(licenseChoices, cdx.LicenseChoice{
-				License: &cdx.License{
+			licenseChoices = append(licenseChoices, cyclonedx.LicenseChoice{
+				License: &cyclonedx.License{
 					ID: l,
 				},
 			})
@@ -351,14 +351,14 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	if n.Hashes != nil && len(n.Hashes) > 0 {
-		c.Hashes = &[]cdx.Hash{}
+		c.Hashes = &[]cyclonedx.Hash{}
 		for algo, hash := range n.Hashes {
 			ha := sbom.HashAlgorithm(algo)
 			if ha.ToCycloneDX() == "" {
 				// TODO(degradation): Algorithm not supported in CDX
 				continue
 			}
-			*c.Hashes = append(*c.Hashes, cdx.Hash{
+			*c.Hashes = append(*c.Hashes, cyclonedx.Hash{
 				Algorithm: ha.ToCycloneDX(),
 				Value:     hash,
 			})
@@ -368,11 +368,11 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n.ExternalReferences != nil {
 		for _, er := range n.ExternalReferences {
 			if c.ExternalReferences == nil {
-				c.ExternalReferences = &[]cdx.ExternalReference{}
+				c.ExternalReferences = &[]cyclonedx.ExternalReference{}
 			}
 
-			*c.ExternalReferences = append(*c.ExternalReferences, cdx.ExternalReference{
-				Type: cdx.ExternalReferenceType(er.Type), // Fix to make it valid
+			*c.ExternalReferences = append(*c.ExternalReferences, cyclonedx.ExternalReference{
+				Type: cyclonedx.ExternalReferenceType(er.Type), // Fix to make it valid
 				URL:  er.Url,
 			})
 		}
@@ -398,13 +398,13 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		// TODO(degradation): CDX type Component only supports one Supplier while protobom supports multiple
 
 		nodesupplier := n.GetSuppliers()[0]
-		oe := cdx.OrganizationalEntity{
+		oe := cyclonedx.OrganizationalEntity{
 			Name: nodesupplier.GetName(),
 		}
 		if nodesupplier.Contacts != nil {
-			var contacts []cdx.OrganizationalContact
+			var contacts []cyclonedx.OrganizationalContact
 			for _, nodecontact := range nodesupplier.GetContacts() {
-				newcontact := cdx.OrganizationalContact{
+				newcontact := cyclonedx.OrganizationalContact{
 					Name:  nodecontact.GetName(),
 					Email: nodecontact.GetEmail(),
 					Phone: nodecontact.GetPhone(),
@@ -439,10 +439,10 @@ func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) err
 		return fmt.Errorf("getting CDX encoding: %w", err)
 	}
 
-	encoder := cdx.NewBOMEncoder(wr, encoding)
+	encoder := cyclonedx.NewBOMEncoder(wr, encoding)
 	encoder.SetPretty(true)
 
-	if err := encoder.EncodeVersion(doc.(*cdx.BOM), version); err != nil {
+	if err := encoder.EncodeVersion(doc.(*cyclonedx.BOM), version); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
 
@@ -451,18 +451,18 @@ func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) err
 
 type serializerCDXState struct {
 	addedDict      map[string]struct{}
-	componentsDict map[string]*cdx.Component
+	componentsDict map[string]*cyclonedx.Component
 }
 
 func newSerializerCDXState() *serializerCDXState {
 	return &serializerCDXState{
 		addedDict:      map[string]struct{}{},
-		componentsDict: map[string]*cdx.Component{},
+		componentsDict: map[string]*cyclonedx.Component{},
 	}
 }
 
-func (s *serializerCDXState) components() []cdx.Component {
-	components := []cdx.Component{}
+func (s *serializerCDXState) components() []cyclonedx.Component {
+	components := []cyclonedx.Component{}
 	for _, c := range s.componentsDict {
 		if _, ok := s.addedDict[c.BOMRef]; ok {
 			continue

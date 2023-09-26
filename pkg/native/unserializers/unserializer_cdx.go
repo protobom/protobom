@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
-	cdxformats "github.com/bom-squad/protobom/pkg/formats/cdx"
+	cdxformats "github.com/bom-squad/protobom/pkg/formats/cyclonedx"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -89,7 +89,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions) (*sbom.Docu
 	}
 
 	// Cycle all components and get their graph fragments
-	if bom.Components == nil {
+	if bom.Components != nil {
 		for i := range *bom.Components {
 			nl, err := u.componentToNodeList(&(*bom.Components)[i])
 			if err != nil {

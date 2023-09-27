@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2023 The Protobom Authors
+// SPDX-License-Identifier: Apache-2.0
+
 package reader
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate

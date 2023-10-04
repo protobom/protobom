@@ -2,6 +2,7 @@ package formats
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -102,13 +103,27 @@ func (c cdxSniff) sniff(data []byte) Format {
 		state.Encoding = JSON
 	}
 
-	if strings.Contains(stringValue, `"specVersion"`) {
-		parts := strings.Split(stringValue, ":")
-		if len(parts) == 2 {
-			ver := strings.TrimPrefix(strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(parts[1]), ","), "\""), "\"")
-			if ver != "" {
-				state.Version = ver
-				state.Encoding = JSON
+	if state.Encoding == JSON {
+		type SpecVersionStruct struct {
+			SpecVersion string `json:"specVersion"`
+		}
+
+		var specversionjson SpecVersionStruct
+		err := json.Unmarshal(data, &specversionjson)
+		if err == nil {
+			state.Version = specversionjson.SpecVersion
+		}
+	}
+
+	if state.Version == "" || state.Encoding == "" {
+		if strings.Contains(stringValue, `"specVersion"`) {
+			parts := strings.Split(stringValue, ":")
+			if len(parts) == 2 {
+				ver := strings.TrimPrefix(strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(parts[1]), ","), "\""), "\"")
+				if ver != "" {
+					state.Version = ver
+					state.Encoding = JSON
+				}
 			}
 		}
 	}

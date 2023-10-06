@@ -58,7 +58,7 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	var specversionjson SpecVersionStruct
 	err := decoder.Decode(&specversionjson)
 	if err == nil {
-		if strings.ToLower(specversionjson.BomFormat) == CDXFORMAT {
+		if strings.EqualFold(specversionjson.BomFormat, CDXFORMAT) {
 			if specversionjson.CDXSpecVersion == "1.3" {
 				return CDX13JSON, nil
 			} else if specversionjson.CDXSpecVersion == "1.4" {

@@ -138,7 +138,6 @@ func (st *sniffState) Format() Format {
 type cdxSniff struct{}
 
 func (c cdxSniff) sniff(data []byte) Format {
-
 	// protobom only supports CDX formats as JSON
 	//  we are parsing the JSON in SniffReader by decoding to the SpecVersionStruct
 	//   removing all the previous JSON-related string matching from this function

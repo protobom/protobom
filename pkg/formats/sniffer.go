@@ -86,7 +86,7 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 
 	_, err = f.Seek(0, 0)
 	if err != nil {
-		return fmt.Errorf("seeking to the beginning of SBOM file: %w", err)
+		return "", fmt.Errorf("seeking to the beginning of SBOM file: %w", err)
 	}
 
 	fileScanner := bufio.NewScanner(f)

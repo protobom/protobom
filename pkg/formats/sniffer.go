@@ -138,27 +138,14 @@ func (st *sniffState) Format() Format {
 type cdxSniff struct{}
 
 func (c cdxSniff) sniff(data []byte) Format {
-	state := getSniffState(CDXFORMAT)
 
-	stringValue := string(data)
-	if strings.Contains(stringValue, `"bomFormat"`) && strings.Contains(stringValue, `"CycloneDX"`) {
-		state.Type = "application/vnd.cyclonedx"
-		state.Encoding = JSON
-	}
+	// protobom only supports CDX formats as JSON
+	//  we are parsing the JSON in SniffReader by decoding to the SpecVersionStruct
+	//   removing all the previous JSON-related string matching from this function
+	//   if we want to support CDX XML formats in the future, could sniff for that in this func
+	//   until then, return EmptyFormat because we wont get here with a supported scenario
 
-	if strings.Contains(stringValue, `"specVersion"`) {
-		parts := strings.Split(stringValue, ":")
-		if len(parts) == 2 {
-			ver := strings.TrimPrefix(strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(parts[1]), ","), "\""), "\"")
-			if ver != "" {
-				state.Version = ver
-				state.Encoding = JSON
-			}
-		}
-	}
-
-	setSniffState(CDXFORMAT, state)
-	return state.Format()
+	return EmptyFormat
 }
 
 type spdxSniff struct{}
@@ -167,7 +154,6 @@ func (c spdxSniff) sniff(data []byte) Format {
 	state := getSniffState(SPDXFORMAT)
 
 	stringValue := string(data)
-	var format sniffState
 
 	if strings.Contains(stringValue, "SPDXVersion:") {
 		state.Type = "text/spdx"
@@ -181,15 +167,8 @@ func (c spdxSniff) sniff(data []byte) Format {
 		}
 	}
 
-	// In JSON, the SPDX version field would be quoted
-	if strings.Contains(stringValue, "\"spdxVersion\"") ||
-		strings.Contains(stringValue, "'spdxVersion'") {
-		state.Type = "text/spdx"
-		state.Encoding = JSON
-		if format.Version != "" {
-			return state.Format()
-		}
-	}
+	// Removed the strings.Contains to check for the JSON version
+	//  JSON version should be detected above in SniffReader via json.NewDecoder()
 
 	for _, ver := range []string{"2.2", "2.3"} {
 		if strings.Contains(stringValue, fmt.Sprintf("'SPDX-%s'", ver)) ||

@@ -1,15 +1,21 @@
-// SPDX-FileCopyrightText: Copyright 2023 The StarBOM Authors
-// SPDX-License-Identifier: Apache-2.0
-
 package native
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 import (
 	"io"
 
-	"github.com/bom-squad/protobom/pkg/reader/options"
 	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
+//counterfeiter:generate . Unserializer
 type Unserializer interface {
-	ParseStream(*options.Options, io.Reader) (*sbom.Document, error)
+	Unserialize(io.Reader, *UnserializeOptions) (*sbom.Document, error)
+}
+
+type CommonUnserializeOptions struct{}
+
+type UnserializeOptions struct {
+	CommonUnserializeOptions
+	Options interface{}
 }

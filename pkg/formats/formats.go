@@ -11,11 +11,15 @@ type Format string
 
 const (
 	JSON       = "json"
+	XML        = "xml"
 	TEXT       = "text"
 	SPDX23TV   = Format("text/spdx+text;version=2.3")
 	SPDX23JSON = Format("text/spdx+json;version=2.3")
 	SPDX22TV   = Format("text/spdx+text;version=2.2")
 	SPDX22JSON = Format("text/spdx+json;version=2.2")
+	CDX10JSON  = Format("application/vnd.cyclonedx+json;version=1.0")
+	CDX11JSON  = Format("application/vnd.cyclonedx+json;version=1.1")
+	CDX12JSON  = Format("application/vnd.cyclonedx+json;version=1.2")
 	CDX13JSON  = Format("application/vnd.cyclonedx+json;version=1.3")
 	CDX14JSON  = Format("application/vnd.cyclonedx+json;version=1.4")
 	CDX15JSON  = Format("application/vnd.cyclonedx+json;version=1.5")

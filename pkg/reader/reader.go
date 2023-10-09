@@ -1,58 +1,174 @@
-// SPDX-FileCopyrightText: Copyright 2023 The StarBOM Authors
+// SPDX-FileCopyrightText: Copyright 2023 The Protobom Authors
 // SPDX-License-Identifier: Apache-2.0
 
 package reader
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 import (
 	"fmt"
 	"io"
+	"os"
+	"sync"
 
-	"github.com/bom-squad/protobom/pkg/reader/options"
+	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/bom-squad/protobom/pkg/native"
+	drivers "github.com/bom-squad/protobom/pkg/native/unserializers"
 	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
-var defaultOptions = options.Options{}
+var (
+	regMtx                    sync.RWMutex
+	unserializers             = make(map[formats.Format]native.Unserializer)
+	defaultUnserializeOptions = &native.UnserializeOptions{}
+)
 
-type Reader struct {
-	impl    parserImplementation
-	Options options.Options
+func init() {
+	regMtx.Lock()
+	unserializers[formats.CDX10JSON] = drivers.NewCDX("1.0", formats.JSON)
+	unserializers[formats.CDX11JSON] = drivers.NewCDX("1.1", formats.JSON)
+	unserializers[formats.CDX12JSON] = drivers.NewCDX("1.2", formats.JSON)
+	unserializers[formats.CDX13JSON] = drivers.NewCDX("1.3", formats.JSON)
+	unserializers[formats.CDX14JSON] = drivers.NewCDX("1.4", formats.JSON)
+	unserializers[formats.CDX15JSON] = drivers.NewCDX("1.5", formats.JSON)
+	unserializers[formats.SPDX23JSON] = drivers.NewSPDX23()
+	regMtx.Unlock()
 }
 
-// New returns a new Reader with the default options
-func New() *Reader {
-	return &Reader{
-		Options: defaultOptions,
-		impl:    &defaultParserImplementation{},
+// RegisterUnserializer registers a new unserializer to parse a specific
+// format. The new unserializer replaces any previously defined driver.
+func RegisterUnserializer(format formats.Format, u native.Unserializer) {
+	regMtx.Lock()
+	unserializers[format] = u
+	regMtx.Unlock()
+}
+
+// UnregisterUnserializer removes a serializer from the list of available
+func UnregisterUnserializer(format formats.Format) {
+	regMtx.Lock()
+	delete(unserializers, format)
+	regMtx.Unlock()
+}
+
+func GetFormatUnserializer(format formats.Format) (native.Unserializer, error) {
+	if _, ok := unserializers[format]; ok {
+		return unserializers[format], nil
 	}
+	return nil, fmt.Errorf("no serializer registered for %s", format)
+}
+
+type Reader struct {
+	sniffer            Sniffer
+	UnserializeOptions map[string]*native.UnserializeOptions
+}
+
+//counterfeiter:generate . Sniffer
+type Sniffer interface {
+	SniffReader(rs io.ReadSeeker) (formats.Format, error)
+	SniffFile(path string) (formats.Format, error)
+}
+
+func New(opts ...ReaderOption) *Reader {
+	r := &Reader{
+		sniffer: &formats.Sniffer{},
+	}
+
+	for _, opt := range opts {
+		opt(r)
+	}
+
+	return r
 }
 
 // ParseFile reads a file and returns an sbom.Document
 func (r *Reader) ParseFile(path string) (*sbom.Document, error) {
-	f, err := r.impl.OpenDocumentFile(path)
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("opening SBOM file: %w", err)
 	}
 	defer f.Close()
 
-	return r.ParseStream(f)
+	options, err := r.getOptions(f)
+	if err != nil {
+		return nil, err
+	}
+	return r.ParseStreamWithOptions(f, options)
 }
 
-// ParseStream returns a document from a io reader
-func (r *Reader) ParseStream(f io.ReadSeeker) (*sbom.Document, error) {
-	format, err := r.impl.DetectFormat(&r.Options, f)
+// ParseFile reads a file and returns an sbom.Document
+func (r *Reader) ParseFileWithOptions(path string, o *Options) (*sbom.Document, error) {
+	f, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("detecting SBOM format: %w", err)
+		return nil, fmt.Errorf("opening SBOM file: %w", err)
+	}
+	defer f.Close()
+
+	return r.ParseStreamWithOptions(f, o)
+}
+
+// ParseStreamWithOptions returns a document from a ioreader, accept options for unserializer
+func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Document, error) {
+	if o == nil {
+		return nil, fmt.Errorf("options cannot be nil")
 	}
 
-	formatParser, err := r.impl.GetUnserializer(&r.Options, format)
+	format := o.Format
+	if o.Format == "" {
+		f, err := r.detectFormat(f)
+		if err != nil {
+			return nil, fmt.Errorf("detecting SBOM format: %w", err)
+		}
+		format = f
+	}
+
+	unserializer, err := GetFormatUnserializer(format)
 	if err != nil {
 		return nil, fmt.Errorf("getting format parser: %w", err)
 	}
 
-	doc, err := r.impl.ParseStream(formatParser, &r.Options, f)
+	doc, err := unserializer.Unserialize(f, o.UnserializeOptions)
 	if err != nil {
-		return nil, fmt.Errorf("parsing %s document: %w", format, err)
+		return nil, fmt.Errorf("unserializing: %w", err)
 	}
 
 	return doc, err
+}
+
+// ParseStreamWithOptions returns a document from a ioreader
+func (r *Reader) ParseStream(f io.ReadSeeker) (*sbom.Document, error) {
+	options, err := r.getOptions(f)
+	if err != nil {
+		return nil, err
+	}
+	return r.ParseStreamWithOptions(f, options)
+}
+
+func (r *Reader) detectFormat(rs io.ReadSeeker) (formats.Format, error) {
+	format, err := r.sniffer.SniffReader(rs)
+	if err != nil {
+		return "", fmt.Errorf("detecting format: %w", err)
+	}
+	return format, nil
+}
+
+func (r *Reader) getOptions(f io.ReadSeeker) (*Options, error) {
+	format, err := r.detectFormat(f)
+	if err != nil {
+		return nil, fmt.Errorf("detecting SBOM format: %w", err)
+	}
+
+	s, err := GetFormatUnserializer(format)
+	if err != nil {
+		return nil, err
+	}
+
+	uo := r.UnserializeOptions[fmt.Sprintf("%T", s)]
+	if uo == nil {
+		uo = defaultUnserializeOptions
+	}
+
+	return &Options{
+		UnserializeOptions: uo,
+		Format:             format,
+	}, nil
 }

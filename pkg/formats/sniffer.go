@@ -46,6 +46,49 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 			fmt.Printf("WARNING: could not seek to beginning of file: %v", err)
 		}
 	}()
+
+	type SpecVersionStruct struct {
+		BomFormat       string `json:"bomFormat"`
+		CDXSpecVersion  string `json:"specVersion"`
+		SPDXSpecVersion string `json:"spdxVersion"`
+	}
+
+	decoder := json.NewDecoder(f)
+
+	var specversionjson SpecVersionStruct
+	err := decoder.Decode(&specversionjson)
+	if err == nil {
+		if strings.EqualFold(specversionjson.BomFormat, CDXFORMAT) {
+			if specversionjson.CDXSpecVersion == "1.3" {
+				return CDX13JSON, nil
+			} else if specversionjson.CDXSpecVersion == "1.4" {
+				return CDX14JSON, nil
+			} else if specversionjson.CDXSpecVersion == "1.5" {
+				return CDX15JSON, nil
+			} else {
+				// JSON + BomFormat CycloneDX but specVersion not 1.3, 1.4, or 1.5
+				return "", fmt.Errorf("unknown SBOM format")
+			}
+		} else {
+			// JSON but not CycloneDX so assuming SPDX
+			if specversionjson.SPDXSpecVersion == "SPDX-2.2" {
+				return SPDX22JSON, nil
+			} else if specversionjson.SPDXSpecVersion == "SPDX-2.3" {
+				return SPDX23JSON, nil
+			} else {
+				// JSON + not CycloneDX but spdxVersion not SPDX-2.2 or SPDX-2.3
+				return "", fmt.Errorf("unknown SBOM format")
+			}
+		}
+	}
+
+	// not JSON.  Parse line-by-line with string hacks
+
+	_, err = f.Seek(0, 0)
+	if err != nil {
+		return "", fmt.Errorf("seeking to the beginning of SBOM file: %w", err)
+	}
+
 	fileScanner := bufio.NewScanner(f)
 	fileScanner.Split(bufio.ScanLines)
 
@@ -95,41 +138,13 @@ func (st *sniffState) Format() Format {
 type cdxSniff struct{}
 
 func (c cdxSniff) sniff(data []byte) Format {
-	state := getSniffState(CDXFORMAT)
+	// protobom only supports CDX formats as JSON
+	//  we are parsing the JSON in SniffReader by decoding to the SpecVersionStruct
+	//   removing all the previous JSON-related string matching from this function
+	//   if we want to support CDX XML formats in the future, could sniff for that in this func
+	//   until then, return EmptyFormat because we wont get here with a supported scenario
 
-	stringValue := string(data)
-	if strings.Contains(stringValue, `"bomFormat"`) && strings.Contains(stringValue, `"CycloneDX"`) {
-		state.Type = "application/vnd.cyclonedx"
-		state.Encoding = JSON
-	}
-
-	if state.Encoding == JSON {
-		type SpecVersionStruct struct {
-			SpecVersion string `json:"specVersion"`
-		}
-
-		var specversionjson SpecVersionStruct
-		err := json.Unmarshal(data, &specversionjson)
-		if err == nil {
-			state.Version = specversionjson.SpecVersion
-		}
-	}
-
-	if state.Version == "" || state.Encoding == "" {
-		if strings.Contains(stringValue, `"specVersion"`) {
-			parts := strings.Split(stringValue, ":")
-			if len(parts) == 2 {
-				ver := strings.TrimPrefix(strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(parts[1]), ","), "\""), "\"")
-				if ver != "" {
-					state.Version = ver
-					state.Encoding = JSON
-				}
-			}
-		}
-	}
-
-	setSniffState(CDXFORMAT, state)
-	return state.Format()
+	return EmptyFormat
 }
 
 type spdxSniff struct{}
@@ -138,7 +153,6 @@ func (c spdxSniff) sniff(data []byte) Format {
 	state := getSniffState(SPDXFORMAT)
 
 	stringValue := string(data)
-	var format sniffState
 
 	if strings.Contains(stringValue, "SPDXVersion:") {
 		state.Type = "text/spdx"
@@ -152,15 +166,8 @@ func (c spdxSniff) sniff(data []byte) Format {
 		}
 	}
 
-	// In JSON, the SPDX version field would be quoted
-	if strings.Contains(stringValue, "\"spdxVersion\"") ||
-		strings.Contains(stringValue, "'spdxVersion'") {
-		state.Type = "text/spdx"
-		state.Encoding = JSON
-		if format.Version != "" {
-			return state.Format()
-		}
-	}
+	// Removed the strings.Contains to check for the JSON version
+	//  JSON version should be detected above in SniffReader via json.NewDecoder()
 
 	for _, ver := range []string{"2.2", "2.3"} {
 		if strings.Contains(stringValue, fmt.Sprintf("'SPDX-%s'", ver)) ||

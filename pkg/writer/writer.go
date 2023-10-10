@@ -1,6 +1,7 @@
 package writer
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -13,9 +14,9 @@ import (
 )
 
 type Writer struct {
-	RenderOptions   map[string]*native.RenderOptions
-	SerialzeOptions map[string]*native.SerializeOptions
-	Format          formats.Format
+	RenderOptions    map[string]*native.RenderOptions
+	SerializeOptions map[string]*native.SerializeOptions
+	Format           formats.Format
 }
 
 var (
@@ -27,14 +28,12 @@ var (
 		},
 	}
 	defaultSerializeOptions = &native.SerializeOptions{}
-	defaultFormat           = formats.CDX15JSON
 )
 
 func New(opts ...WriterOption) *Writer {
 	r := &Writer{
-		RenderOptions:   make(map[string]*native.RenderOptions),
-		SerialzeOptions: make(map[string]*native.SerializeOptions),
-		Format:          defaultFormat,
+		RenderOptions:    make(map[string]*native.RenderOptions),
+		SerializeOptions: make(map[string]*native.SerializeOptions),
 	}
 
 	for _, opt := range opts {
@@ -72,13 +71,21 @@ func UnregisterSerializer(format formats.Format) {
 	regMtx.Unlock()
 }
 
+// GetFormatSerializer returns the registered serializer for a specific format. If
+// format is a blank string or no serializer for the format is registered, it will
+// return an error.
 func GetFormatSerializer(format formats.Format) (native.Serializer, error) {
+	if format == "" {
+		return nil, errors.New("unable to find serializer, no format specified")
+	}
 	if _, ok := serializers[format]; ok {
 		return serializers[format], nil
 	}
 	return nil, fmt.Errorf("no serializer registered for %s", format)
 }
 
+// WriteStreamWithOptions writes an SBOM in a native format to the stream w using
+// the options set o.
 func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o *Options) error {
 	if bom == nil {
 		return fmt.Errorf("unable to write sbom to stream, SBOM is nil")
@@ -91,14 +98,14 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 
 	serializer, err := GetFormatSerializer(format)
 	if err != nil {
-		return fmt.Errorf("getting serializer for format %s: %w", format, err)
+		return fmt.Errorf("getting serializer: %w", err)
 	}
 
 	key := fmt.Sprintf("%T", serializer)
 
 	so := o.SerializeOptions
 	if so == nil {
-		so = w.SerialzeOptions[key]
+		so = w.SerializeOptions[key]
 	}
 	nativeDoc, err := serializer.Serialize(bom, so)
 	if err != nil {
@@ -153,7 +160,7 @@ func (w *Writer) getOptions() (*Options, error) {
 		ro = defaultRenderOptions
 	}
 
-	so := w.SerialzeOptions[fmt.Sprintf("%T", s)]
+	so := w.SerializeOptions[fmt.Sprintf("%T", s)]
 	if so == nil {
 		so = defaultSerializeOptions
 	}

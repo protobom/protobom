@@ -101,12 +101,21 @@ func TestWriteStreamWithOptions(t *testing.T) {
 			},
 		},
 		{
-			name: "cdx 1.4 success",
+			name:    "no format fail",
+			bom:     &sbom.Document{},
+			prepare: func(f formats.Format) { writer.RegisterSerializer(f, &nativefakes.FakeSerializer{}) },
+			options: &writer.Options{},
+			wantErr: true,
+		},
+		{
+			name: "cdx 1.5 success",
 			bom:  &sbom.Document{},
 			prepare: func(_ formats.Format) {
 				writer.RegisterSerializer(formats.CDX15JSON, &nativefakes.FakeSerializer{})
 			},
-			options: &writer.Options{},
+			options: &writer.Options{
+				Format: formats.CDX15JSON,
+			},
 		},
 		{
 			name:    "no bom fail",
@@ -188,6 +197,12 @@ func TestWriteStream(t *testing.T) {
 		{
 			name:    "default options success",
 			prepare: func(_ formats.Format) { writer.RegisterSerializer(formats.CDX15JSON, fakeSerializer) },
+			format:  formats.CDX15JSON,
+		},
+		{
+			name:    "no format failure",
+			prepare: func(_ formats.Format) { writer.RegisterSerializer(formats.CDX15JSON, fakeSerializer) },
+			wantErr: true,
 		},
 		{
 			name:    "preconfigured options success",
@@ -202,7 +217,7 @@ func TestWriteStream(t *testing.T) {
 		},
 	}
 
-	for i, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
@@ -226,10 +241,10 @@ func TestWriteStream(t *testing.T) {
 			} else {
 				r.NoError(err)
 				if tt.ro != nil {
-					_, _, a := fakeSerializer.RenderArgsForCall(i)
+					_, _, a := fakeSerializer.RenderArgsForCall(fakeSerializer.RenderCallCount() - 1)
 					r.Equal(tt.ro, a)
 
-					_, b := fakeSerializer.SerializeArgsForCall(i)
+					_, b := fakeSerializer.SerializeArgsForCall(fakeSerializer.SerializeCallCount() - 1)
 					r.Equal(tt.so, b)
 				}
 			}
@@ -259,7 +274,20 @@ func TestWriteFile(t *testing.T) {
 				}
 				writer.RegisterSerializer(format, fakeSerializer)
 			},
-			path: "test.json",
+			format: formats.CDX15JSON,
+			path:   "test.json",
+		},
+		{
+			name: "default options fail",
+			prepare: func(f formats.Format) {
+				format := f
+				if f == "" {
+					format = formats.CDX15JSON
+				}
+				writer.RegisterSerializer(format, fakeSerializer)
+			},
+			wantErr: true,
+			path:    "test.json",
 		},
 		{
 			name:    "preconfigured options success",
@@ -275,7 +303,7 @@ func TestWriteFile(t *testing.T) {
 		},
 	}
 
-	for i, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
@@ -307,10 +335,10 @@ func TestWriteFile(t *testing.T) {
 			} else {
 				r.NoError(err)
 				if tt.ro != nil {
-					_, _, a := fakeSerializer.RenderArgsForCall(i)
+					_, _, a := fakeSerializer.RenderArgsForCall(fakeSerializer.RenderCallCount() - 1)
 					r.Equal(tt.ro, a)
 
-					_, b := fakeSerializer.SerializeArgsForCall(i)
+					_, b := fakeSerializer.SerializeArgsForCall(fakeSerializer.SerializeCallCount() - 1)
 					r.Equal(tt.so, b)
 				}
 			}

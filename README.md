@@ -78,16 +78,16 @@ func main() {
 
 Developers can use the `protobom` library to generate SBOM documents based on the content of a separate SBOM document, as shown by the sbom-convert project (https://github.com/bom-squad/sbom-convert).
 
-However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, to which format the SBOM should be written (default is CycloneDX 1.4), and call WriteStream() passing in the programmatically-defined SBOM structure.  
+However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The protobom 0.2.0 release includes five registered serializer formats for Writer.New(): SPDX23JSON, CDX12JSON, CDX13JSON, CDX14JSON, and CDX15JSON.
 
 ```
 package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
+	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	"github.com/bom-squad/protobom/pkg/writer"
 )
@@ -150,29 +150,12 @@ func main() {
 
 	document.NodeList.AddNode(node2)
 
-	file, err := os.CreateTemp("", "*.cdx.json")
-	if err != nil {
-		return
-	}
-
-	w := writer.New()
-	err = w.WriteStream(document, file)
+	//w := writer.New(writer.WithFormat(formats.SPDX23JSON))
+	w := writer.New(writer.WithFormat(formats.CDX14JSON))
+	err := w.WriteStream(document, os.Stdout)
 
 	if err != nil {
 		fmt.Printf("error serializing SBOM, err %v\n", err)
-		return
-	} else {
-		fmt.Printf("Created SBOM as %s\n", file.Name())
 	}
-
-	content, err := ioutil.ReadFile(file.Name())
-	if err != nil {
-		fmt.Printf("Error reading file: %v\n", err)
-		return
-	}
-
-	// Display the file content to stdout
-	fmt.Println(string(content))
-
 }
 ```

@@ -28,8 +28,8 @@ func NewCDX(version, encoding string) *CDX {
 	}
 }
 
-// ParseStream reads a CycloneDX 1.5 from stream r usinbg the offcial CycloneDX
-// libraries and returns a protobom document with its data.
+// Unserialize reads datq data from io.Reader r and parses it as a CycloneDX
+// document. If successful returns a protobom Document loaded with the SBOM data.
 func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions) (*sbom.Document, error) {
 	bom := new(cdx.BOM)
 

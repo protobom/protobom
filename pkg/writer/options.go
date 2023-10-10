@@ -18,7 +18,7 @@ func WithRenderOptions(ro map[string]*native.RenderOptions) WriterOption {
 func WithSerializeOptions(so map[string]*native.SerializeOptions) WriterOption {
 	return func(w *Writer) {
 		if so != nil {
-			w.SerialzeOptions = so
+			w.SerializeOptions = so
 		}
 	}
 }

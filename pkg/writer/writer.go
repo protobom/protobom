@@ -14,9 +14,9 @@ import (
 )
 
 type Writer struct {
-	RenderOptions   map[string]*native.RenderOptions
-	SerialzeOptions map[string]*native.SerializeOptions
-	Format          formats.Format
+	RenderOptions    map[string]*native.RenderOptions
+	SerializeOptions map[string]*native.SerializeOptions
+	Format           formats.Format
 }
 
 var (
@@ -32,8 +32,8 @@ var (
 
 func New(opts ...WriterOption) *Writer {
 	r := &Writer{
-		RenderOptions:   make(map[string]*native.RenderOptions),
-		SerialzeOptions: make(map[string]*native.SerializeOptions),
+		RenderOptions:    make(map[string]*native.RenderOptions),
+		SerializeOptions: make(map[string]*native.SerializeOptions),
 	}
 
 	for _, opt := range opts {
@@ -105,7 +105,7 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 
 	so := o.SerializeOptions
 	if so == nil {
-		so = w.SerialzeOptions[key]
+		so = w.SerializeOptions[key]
 	}
 	nativeDoc, err := serializer.Serialize(bom, so)
 	if err != nil {
@@ -160,7 +160,7 @@ func (w *Writer) getOptions() (*Options, error) {
 		ro = defaultRenderOptions
 	}
 
-	so := w.SerialzeOptions[fmt.Sprintf("%T", s)]
+	so := w.SerializeOptions[fmt.Sprintf("%T", s)]
 	if so == nil {
 		so = defaultSerializeOptions
 	}

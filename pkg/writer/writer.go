@@ -104,7 +104,7 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 		so = defaultOptions.SerializeOptions
 	}
 
-	nativeDoc, err := serializer.Serialize(bom, so)
+	nativeDoc, err := serializer.Serialize(bom, so, o.GetFormatOptions(serializer))
 	if err != nil {
 		return fmt.Errorf("serializing SBOM to native format: %w", err)
 	}
@@ -114,7 +114,7 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 		ro = defaultOptions.RenderOptions
 	}
 
-	if err := serializer.Render(nativeDoc, wr, ro); err != nil {
+	if err := serializer.Render(nativeDoc, wr, ro, o.GetFormatOptions(serializer)); err != nil {
 		return fmt.Errorf("writing rendered document to string: %w", err)
 	}
 

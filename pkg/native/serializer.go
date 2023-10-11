@@ -10,8 +10,8 @@ import (
 
 //counterfeiter:generate . Serializer
 type Serializer interface {
-	Serialize(*sbom.Document, *SerializeOptions) (interface{}, error)
-	Render(interface{}, io.Writer, *RenderOptions) error
+	Serialize(*sbom.Document, *SerializeOptions, interface{}) (interface{}, error)
+	Render(interface{}, io.Writer, *RenderOptions, interface{}) error
 }
 
 type RenderOptions struct {

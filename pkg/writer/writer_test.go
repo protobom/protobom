@@ -34,14 +34,13 @@ func TestNew(t *testing.T) {
 		format formats.Format
 		ro     *native.RenderOptions
 		so     *native.SerializeOptions
+		fo     map[string]interface{}
 	}{
 		{
 			name:   "CDX format with 2 indent",
 			format: formats.CDX15JSON,
 			ro: &native.RenderOptions{
-				CommonRenderOptions: native.CommonRenderOptions{
-					Indent: 2,
-				},
+				Indent: 2,
 			},
 			so: &native.SerializeOptions{},
 		},
@@ -49,37 +48,29 @@ func TestNew(t *testing.T) {
 			name:   "SPDX23 format with 4 indent and custom options",
 			format: formats.SPDX23JSON,
 			ro: &native.RenderOptions{
-				CommonRenderOptions: native.CommonRenderOptions{
-					Indent: 4,
-				},
-				Options: &dummyOptions{
+				Indent: 4,
+			},
+			so: &native.SerializeOptions{},
+			fo: map[string]interface{}{
+				string(formats.SPDX23JSON): &dummyOptions{
 					TestProperty: "test",
 				},
 			},
-			so: &native.SerializeOptions{},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
-
-			rom := map[string]*native.RenderOptions{
-				fakeType: tt.ro,
-			}
-
-			som := map[string]*native.SerializeOptions{
-				fakeType: tt.so,
-			}
-
 			w := writer.New(
 				writer.WithFormat(tt.format),
-				writer.WithRenderOptions(rom),
-				writer.WithSerializeOptions(som),
+				writer.WithRenderOptions(tt.ro),
+				writer.WithSerializeOptions(tt.so),
+				writer.WithFormatOptions(fakeType, tt.fo),
 			)
 			r.NotNil(w)
-			r.Equal(tt.format, w.Format)
-			r.Equal(rom, w.RenderOptions)
+			r.Equal(tt.format, w.Options.Format)
+			r.Equal(tt.ro, w.Options.RenderOptions)
 		})
 	}
 }
@@ -186,22 +177,24 @@ func TestWriteStream(t *testing.T) {
 	bom := &sbom.Document{}
 	fakeSerializer := &nativefakes.FakeSerializer{}
 	fakeKey := fmt.Sprintf("%T", fakeSerializer)
+
 	tests := []struct {
 		name    string
 		format  formats.Format
 		ro      *native.RenderOptions
 		so      *native.SerializeOptions
+		fo      map[string]interface{}
 		prepare func(formats.Format)
 		wantErr bool
 	}{
 		{
 			name:    "default options success",
-			prepare: func(_ formats.Format) { writer.RegisterSerializer(formats.CDX15JSON, fakeSerializer) },
+			prepare: func(f formats.Format) { writer.RegisterSerializer(f, fakeSerializer) },
 			format:  formats.CDX15JSON,
 		},
 		{
 			name:    "no format failure",
-			prepare: func(_ formats.Format) { writer.RegisterSerializer(formats.CDX15JSON, fakeSerializer) },
+			prepare: func(_ formats.Format) {},
 			wantErr: true,
 		},
 		{
@@ -209,15 +202,14 @@ func TestWriteStream(t *testing.T) {
 			prepare: func(f formats.Format) { writer.RegisterSerializer(f, fakeSerializer) },
 			format:  formats.SPDX23JSON,
 			ro: &native.RenderOptions{
-				CommonRenderOptions: native.CommonRenderOptions{
-					Indent: 100,
-				},
+				Indent: 100,
 			},
 			so: &native.SerializeOptions{},
 		},
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
@@ -225,19 +217,16 @@ func TestWriteStream(t *testing.T) {
 
 			w := writer.New(
 				writer.WithFormat(tt.format),
-				writer.WithRenderOptions(map[string]*native.RenderOptions{
-					fakeKey: tt.ro,
-				}),
-				writer.WithSerializeOptions(map[string]*native.SerializeOptions{
-					fakeKey: tt.so,
-				}),
+				writer.WithRenderOptions(tt.ro),
+				writer.WithSerializeOptions(tt.so),
+				writer.WithFormatOptions(fakeKey, tt.fo),
 			)
 
 			r.NotNil(w)
 
 			err := w.WriteStream(bom, &fakeWriteCloser{})
 			if tt.wantErr {
-				r.Error(err)
+				r.Error(err, "Format: "+w.Options.Format+" en tt: "+tt.format)
 			} else {
 				r.NoError(err)
 				if tt.ro != nil {
@@ -261,6 +250,7 @@ func TestWriteFile(t *testing.T) {
 		format  formats.Format
 		ro      *native.RenderOptions
 		so      *native.SerializeOptions
+		fo      map[string]interface{}
 		prepare func(formats.Format)
 		path    string
 		wantErr bool
@@ -294,9 +284,7 @@ func TestWriteFile(t *testing.T) {
 			prepare: func(f formats.Format) { writer.RegisterSerializer(f, fakeSerializer) },
 			format:  formats.SPDX23JSON,
 			ro: &native.RenderOptions{
-				CommonRenderOptions: native.CommonRenderOptions{
-					Indent: 100,
-				},
+				Indent: 100,
 			},
 			so:   &native.SerializeOptions{},
 			path: "test.json",
@@ -311,12 +299,9 @@ func TestWriteFile(t *testing.T) {
 
 			w := writer.New(
 				writer.WithFormat(tt.format),
-				writer.WithRenderOptions(map[string]*native.RenderOptions{
-					fakeKey: tt.ro,
-				}),
-				writer.WithSerializeOptions(map[string]*native.SerializeOptions{
-					fakeKey: tt.so,
-				}),
+				writer.WithRenderOptions(tt.ro),
+				writer.WithSerializeOptions(tt.so),
+				writer.WithFormatOptions(fakeKey, tt.fo),
 			)
 
 			file, err := os.Create(tt.path)

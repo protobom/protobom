@@ -14,18 +14,9 @@ type Serializer interface {
 	Render(interface{}, io.Writer, *RenderOptions) error
 }
 
-type CommonRenderOptions struct {
+type RenderOptions struct {
 	Indent int
 }
 
-type CommonSerializeOptions struct{}
-
-type RenderOptions struct {
-	CommonRenderOptions
-	Options interface{}
-}
-
 type SerializeOptions struct {
-	CommonSerializeOptions
-	Options interface{}
 }

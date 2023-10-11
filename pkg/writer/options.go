@@ -64,7 +64,7 @@ func (o *Options) GetFormatOptions(key interface{}) interface{} {
 	return nil
 }
 
-func (o *Options) SetFormatOptions(key interface{}, opts interface{}) {
+func (o *Options) SetFormatOptions(key, opts interface{}) {
 	if o.formatOptions == nil {
 		o.formatOptions = map[string]interface{}{}
 	}

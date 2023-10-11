@@ -230,10 +230,10 @@ func TestWriteStream(t *testing.T) {
 			} else {
 				r.NoError(err)
 				if tt.ro != nil {
-					_, _, a := fakeSerializer.RenderArgsForCall(fakeSerializer.RenderCallCount() - 1)
+					_, _, a, _ := fakeSerializer.RenderArgsForCall(fakeSerializer.RenderCallCount() - 1)
 					r.Equal(tt.ro, a)
 
-					_, b := fakeSerializer.SerializeArgsForCall(fakeSerializer.SerializeCallCount() - 1)
+					_, b, _ := fakeSerializer.SerializeArgsForCall(fakeSerializer.SerializeCallCount() - 1)
 					r.Equal(tt.so, b)
 				}
 			}
@@ -320,10 +320,10 @@ func TestWriteFile(t *testing.T) {
 			} else {
 				r.NoError(err)
 				if tt.ro != nil {
-					_, _, a := fakeSerializer.RenderArgsForCall(fakeSerializer.RenderCallCount() - 1)
+					_, _, a, _ := fakeSerializer.RenderArgsForCall(fakeSerializer.RenderCallCount() - 1)
 					r.Equal(tt.ro, a)
 
-					_, b := fakeSerializer.SerializeArgsForCall(fakeSerializer.SerializeCallCount() - 1)
+					_, b, _ := fakeSerializer.SerializeArgsForCall(fakeSerializer.SerializeCallCount() - 1)
 					r.Equal(tt.so, b)
 				}
 			}

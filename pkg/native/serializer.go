@@ -18,5 +18,4 @@ type RenderOptions struct {
 	Indent int
 }
 
-type SerializeOptions struct {
-}
+type SerializeOptions struct{}

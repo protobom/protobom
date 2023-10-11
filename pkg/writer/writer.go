@@ -114,7 +114,11 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 
 	ro := o.RenderOptions
 	if ro == nil {
-		ro = w.RenderOptions[key]
+		if _, ok := w.RenderOptions[key]; ok {
+			ro = w.RenderOptions[key]
+		} else {
+			ro = defaultRenderOptions
+		}
 	}
 	if err := serializer.Render(nativeDoc, wr, ro); err != nil {
 		return fmt.Errorf("writing rendered document to string: %w", err)

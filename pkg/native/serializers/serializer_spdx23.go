@@ -30,6 +30,9 @@ func NewSPDX23() *SPDX23 {
 
 func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
 	// TODO: add support for XML
+	if o == nil {
+		o = &native.RenderOptions{}
+	}
 	encoder := json.NewEncoder(wr)
 	encoder.SetIndent("", strings.Repeat(" ", o.Indent))
 	if err := encoder.Encode(doc.(*spdx.Document)); err != nil {

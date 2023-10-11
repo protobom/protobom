@@ -45,7 +45,7 @@ The `protobom` library is the best and easiest way to interact with SBOM documen
 
 This particular example iterates over each node of the SBOM document's list of nodes and prints the ID, Name, and Version of each node.  If the input document is an SPDX SBOM, each protobom Node will describe a single SPDX package.  If the input document is a CycloneDX SBOM, each protobom Node will describe a CycloneDX component.  The developer using protobom does not need to change the code based on the input format.  The protobom library parses the input document to present an intermediate format of the data allowing the developer to work with a consistent intermediate format instead.
 
-```
+```golang
 package main
 
 import (
@@ -55,7 +55,7 @@ import (
 )
 
 func main() {
-
+	// Create a new protobom SBOM reader:
 	reader := reader.New()
 	document, err := reader.ParseFile("sbom.spdx.json")
 	if err != nil {
@@ -63,13 +63,9 @@ func main() {
 		return
 	}
 
-	if document.GetNodeList() == nil {
-		fmt.Printf("No Nodelist\n")
-		return
-	}
-
+	// List all nodes in the SBOM and print some information about them:
 	for _, node := range document.GetNodeList().GetNodes() {
-		fmt.Printf("Node ID [%v]: %v version %v\n", node.GetId(), node.GetName(), node.GetVersion())
+		fmt.Printf("Node ID [%v]: name: %v version: %v\n", node.GetId(), node.GetName(), node.GetVersion())
 	}
 }
 ```
@@ -78,13 +74,12 @@ func main() {
 
 Developers can use the `protobom` library to generate SBOM documents based on the content of a separate SBOM document, as shown by the sbom-convert project (https://github.com/bom-squad/sbom-convert).
 
-However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The protobom 0.2.0 release includes five registered serializer formats for Writer.New(): SPDX23JSON, CDX12JSON, CDX13JSON, CDX14JSON, and CDX15JSON.
+However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The protobom v0.2.0 release includes five registered serializer formats for Writer.New(): SPDX23JSON, CDX12JSON, CDX13JSON, CDX14JSON, and CDX15JSON.
 
-```
+```golang
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/bom-squad/protobom/pkg/formats"
@@ -93,69 +88,97 @@ import (
 )
 
 func main() {
-
+	// Create a new protobom document
 	document := sbom.NewDocument()
-	document.Metadata.Authors = append(document.Metadata.Authors, &sbom.Person{Name: "John Doe"})
-	document.Metadata.Tools = append(document.Metadata.Tools,
-		&sbom.Tool{Name: "ACME SBOM Tool", Version: "1.0", Vendor: "ACME Corporation"})
+	// Populate some of the document metadata:
 
-	metadata_node := &sbom.Node{
-		Id:             "pkg:my-software@v1.0.0",
-		PrimaryPurpose: "application",
-		Name:           "My Software Name",
-	}
+	// ...for example the author:
+	document.Metadata.Authors = append(
+		document.Metadata.Authors,
+		&sbom.Person{Name: "John Doe"},
+	)
 
-	document.NodeList.AddNode(metadata_node)
-	document.NodeList.RootElements = append(document.NodeList.RootElements, metadata_node.Id)
+	// ...and the tool that produced the SBOM:
+	document.Metadata.Tools = append(
+		document.Metadata.Tools,
+		&sbom.Tool{
+			Name:    "ACME SBOM Tool",
+			Version: "1.0",
+			Vendor:  "ACME Corporation"},
+	)
 
-	node1 := &sbom.Node{
-		Id:               "File--usr-lib-libsoftware.so",
-		Type:             sbom.Node_FILE,
-		Name:             "/usr/lib/libsoftware.so",
-		Version:          "1",
-		FileName:         "libsoftware.so",
+	// Create a node to represent the application:
+	appNode := &sbom.Node{
+		Id:               "pkg:generic/my-software@v1.0.0",
+		PrimaryPurpose:   "application",
+		Name:             "My Software Name",
+		Version:          "v1.0.0",
 		Licenses:         []string{"Apache-2.0"},
 		LicenseConcluded: "Apache-2.0",
 		LicenseComments:  "Apache License",
-		Copyright:        "Copyright 2023 The ACME Corporation",
-		Description:      "Software Lib",
 	}
 
-	hashes := make(map[int32]string)
-	hashes[int32(sbom.HashAlgorithm_SHA1)] = "f3ae11065cafc14e27a1410ae8be28e600bb8336"
-	hashes[int32(sbom.HashAlgorithm_SHA256)] = "4f232eeb99e1663d07f0af1af6ea262bf594934b694228e71fd8f159f9a19f32"
-	hashes[int32(sbom.HashAlgorithm_SHA512)] = "8044d0df34242699ad73bfe99b9ac3d6bbdaa4f8ebce1e23ee5c7f9fe59db8ad7b01fe94e886941793aee802008a35b05a30bc51426db796aa21e5e91b7ed9be"
-	node1.Hashes = hashes
+	// Add the application node to the document's nodelist:
+	document.NodeList.AddNode(appNode)
+	// ... and to the document's root elements:
+	document.NodeList.RootElements = append(document.NodeList.RootElements, appNode.Id)
+
+	// Create two nodes to describe files in the application
+
+	node1 := &sbom.Node{
+		Id:          "File--usr-lib-libsoftware.so",
+		Type:        sbom.Node_FILE,
+		Name:        "/usr/lib/libsoftware.so",
+		Version:     "1",
+		Copyright:   "Copyright 2023 The ACME Corporation",
+		Description: "Software Lib",
+	}
+
+	node1.Hashes = map[int32]string{
+		int32(sbom.HashAlgorithm_SHA1):   "f3ae11065cafc14e27a1410ae8be28e600bb8336",
+		int32(sbom.HashAlgorithm_SHA256): "4f232eeb99e1663d07f0af1af6ea262bf594934b694228e71fd8f159f9a19f32",
+		int32(sbom.HashAlgorithm_SHA512): "8044d0df34242699ad73bfe99b9ac3d6bbdaa4f8ebce1e23ee5c7f9fe59db8ad7b01fe94e886941793aee802008a35b05a30bc51426db796aa21e5e91b7ed9be",
+	}
 
 	document.NodeList.AddNode(node1)
 
 	node2 := &sbom.Node{
-		Id:               "File--usr-bin-software",
-		Type:             sbom.Node_FILE,
-		Name:             "/usr/lib/software",
-		Version:          "1",
-		FileName:         "software",
-		Licenses:         []string{"Apache-2.0"},
-		LicenseConcluded: "Apache-2.0",
-		LicenseComments:  "Apache License",
-		Copyright:        "Copyright 2023 The ACME Corporation",
-		Description:      "Software binary",
+		Id:          "File--usr-bin-software",
+		Type:        sbom.Node_FILE,
+		Name:        "/usr/bin/software",
+		Version:     "1",
+		Copyright:   "Copyright 2023 The ACME Corporation",
+		Description: "Software binary",
 	}
 
-	hashes = make(map[int32]string)
-	hashes[int32(sbom.HashAlgorithm_SHA1)] = "defee82004d22fc92ab81c0c952a62a2172bda8c"
-	hashes[int32(sbom.HashAlgorithm_SHA256)] = "ad291c9572af8fc2ec8fd78d295adf7132c60ad3d10488fb63d120fc967a4132"
-	hashes[int32(sbom.HashAlgorithm_SHA512)] = "5940d8647907831e77ec00d81b318ca06655dbb0fd36d112684b03947412f0f98ea85b32548bc0877f3d7ce8f4de9b2c964062df44742b98c8e9bd851faecce9"
-	node2.Hashes = hashes
+	node2.Hashes = map[int32]string{
+		int32(sbom.HashAlgorithm_SHA1):   "defee82004d22fc92ab81c0c952a62a2172bda8c",
+		int32(sbom.HashAlgorithm_SHA256): "ad291c9572af8fc2ec8fd78d295adf7132c60ad3d10488fb63d120fc967a4132",
+		int32(sbom.HashAlgorithm_SHA512): "5940d8647907831e77ec00d81b318ca06655dbb0fd36d112684b03947412f0f98ea85b32548bc0877f3d7ce8f4de9b2c964062df44742b98c8e9bd851faecce9",
+	}
 
 	document.NodeList.AddNode(node2)
 
-	//w := writer.New(writer.WithFormat(formats.SPDX23JSON))
-	w := writer.New(writer.WithFormat(formats.CDX14JSON))
-	err := w.WriteStream(document, os.Stdout)
-
-	if err != nil {
-		fmt.Printf("error serializing SBOM, err %v\n", err)
+	// Relate the application package and the files:
+	edge := &sbom.Edge{
+		Type: sbom.Edge_contains,
+		From: appNode.Id,
+		To:   []string{node1.Id, node2.Id},
 	}
+
+	document.NodeList.Edges = append(document.NodeList.Edges, edge)
+
+	// Now render the document to STDOUT:
+	w := writer.New()
+
+	// Write the SBOM to STDOUT in SPDX 2.3:
+	w.WriteStreamWithOptions(
+		document, os.Stdout, &writer.Options{Format: formats.SPDX23JSON},
+	)
+
+	// Write the SBOM to STDOUT in CycloneDX 1.4:
+	w.WriteStreamWithOptions(
+		document, os.Stdout, &writer.Options{Format: formats.CDX14JSON},
+	)
 }
 ```

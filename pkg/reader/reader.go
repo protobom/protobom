@@ -58,8 +58,8 @@ func GetFormatUnserializer(format formats.Format) (native.Unserializer, error) {
 }
 
 type Reader struct {
-	sniffer            Sniffer
-	UnserializeOptions map[string]*native.UnserializeOptions
+	sniffer Sniffer
+	Options *Options
 }
 
 //counterfeiter:generate . Sniffer
@@ -68,9 +68,15 @@ type Sniffer interface {
 	SniffFile(path string) (formats.Format, error)
 }
 
+var defaultOptions = &Options{
+	UnserializeOptions: defaultUnserializeOptions,
+	formatOptions:      map[string]interface{}{},
+}
+
 func New(opts ...ReaderOption) *Reader {
 	r := &Reader{
 		sniffer: &formats.Sniffer{},
+		Options: defaultOptions,
 	}
 
 	for _, opt := range opts {
@@ -88,11 +94,7 @@ func (r *Reader) ParseFile(path string) (*sbom.Document, error) {
 	}
 	defer f.Close()
 
-	options, err := r.getOptions(f)
-	if err != nil {
-		return nil, err
-	}
-	return r.ParseStreamWithOptions(f, options)
+	return r.ParseStreamWithOptions(f, r.Options)
 }
 
 // ParseFile reads a file and returns an sbom.Document
@@ -126,7 +128,9 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		return nil, fmt.Errorf("getting format parser: %w", err)
 	}
 
-	doc, err := unserializer.Unserialize(f, o.UnserializeOptions)
+	doc, err := unserializer.Unserialize(
+		f, o.UnserializeOptions, r.Options.GetFormatOptions(unserializer),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("unserializing: %w", err)
 	}
@@ -136,11 +140,7 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 
 // ParseStreamWithOptions returns a document from a ioreader
 func (r *Reader) ParseStream(f io.ReadSeeker) (*sbom.Document, error) {
-	options, err := r.getOptions(f)
-	if err != nil {
-		return nil, err
-	}
-	return r.ParseStreamWithOptions(f, options)
+	return r.ParseStreamWithOptions(f, r.Options)
 }
 
 func (r *Reader) detectFormat(rs io.ReadSeeker) (formats.Format, error) {
@@ -149,26 +149,4 @@ func (r *Reader) detectFormat(rs io.ReadSeeker) (formats.Format, error) {
 		return "", fmt.Errorf("detecting format: %w", err)
 	}
 	return format, nil
-}
-
-func (r *Reader) getOptions(f io.ReadSeeker) (*Options, error) {
-	format, err := r.detectFormat(f)
-	if err != nil {
-		return nil, fmt.Errorf("detecting SBOM format: %w", err)
-	}
-
-	s, err := GetFormatUnserializer(format)
-	if err != nil {
-		return nil, err
-	}
-
-	uo := r.UnserializeOptions[fmt.Sprintf("%T", s)]
-	if uo == nil {
-		uo = defaultUnserializeOptions
-	}
-
-	return &Options{
-		UnserializeOptions: uo,
-		Format:             format,
-	}, nil
 }

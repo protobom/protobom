@@ -30,7 +30,7 @@ func NewCDX(version, encoding string) *CDX {
 
 // Unserialize reads datq data from io.Reader r and parses it as a CycloneDX
 // document. If successful returns a protobom Document loaded with the SBOM data.
-func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions) (*sbom.Document, error) {
+func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface{}) (*sbom.Document, error) {
 	bom := new(cdx.BOM)
 
 	encoding, err := cdxformats.ParseEncoding(u.encoding)

@@ -25,7 +25,7 @@ func NewSPDX23() *SPDX23 {
 }
 
 // ParseStream reads an io.Reader to parse an SPDX 2.3 document from it
-func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions) (*sbom.Document, error) {
+func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface{}) (*sbom.Document, error) {
 	spdxDoc, err := spdxjson.Read(r)
 	if err != nil {
 		return nil, fmt.Errorf("parsing SPDX json: %w", err)

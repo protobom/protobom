@@ -31,7 +31,6 @@ func (f *fakeReadSeeker) Read(p []byte) (int, error) {
 
 func TestReader_ParseFile(t *testing.T) {
 	fake := &nativefakes.FakeUnserializer{}
-	fakeKey := fmt.Sprintf("%T", fake)
 	fakeSniffer := &readerfakes.FakeSniffer{}
 	doc := &sbom.Document{}
 	tests := []struct {
@@ -121,9 +120,7 @@ func TestReader_ParseFile(t *testing.T) {
 
 			rdr := reader.New(
 				reader.WithSniffer(fakeSniffer),
-				reader.WithUnserializeOptions(map[string]*native.UnserializeOptions{
-					fakeKey: tt.uo,
-				}),
+				reader.WithUnserializeOptions(&native.UnserializeOptions{}),
 			)
 
 			doc, err := rdr.ParseFile(tt.path)
@@ -133,7 +130,7 @@ func TestReader_ParseFile(t *testing.T) {
 				r.NoError(err)
 				r.Equal(tt.want, doc)
 				if tt.uo != nil {
-					_, a := fake.UnserializeArgsForCall(i)
+					_, a, _ := fake.UnserializeArgsForCall(i)
 					r.Equal(tt.uo, a)
 				}
 			}
@@ -339,9 +336,10 @@ func TestReader_ParseStream(t *testing.T) {
 			rdr := reader.New(
 				reader.WithSniffer(fakeSniffer),
 				reader.WithUnserializeOptions(
-					map[string]*native.UnserializeOptions{
-						fakeKey: tt.uo,
-					},
+					&native.UnserializeOptions{},
+				),
+				reader.WithFormatOptions(
+					fakeKey, struct{}{},
 				),
 			)
 			doc, err := rdr.ParseStream(&fakeReadSeeker{})
@@ -351,7 +349,7 @@ func TestReader_ParseStream(t *testing.T) {
 				r.NoError(err)
 				r.Equal(tt.want, doc)
 				if tt.uo != nil {
-					_, a := fake.UnserializeArgsForCall(i)
+					_, a, _ := fake.UnserializeArgsForCall(i)
 					r.Equal(tt.uo, a)
 				}
 			}

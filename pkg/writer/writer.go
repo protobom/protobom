@@ -14,33 +14,31 @@ import (
 )
 
 type Writer struct {
-	RenderOptions    map[string]*native.RenderOptions
-	SerializeOptions map[string]*native.SerializeOptions
-	Format           formats.Format
+	Options *Options
 }
 
 var (
-	regMtx               sync.RWMutex
-	serializers          = make(map[formats.Format]native.Serializer)
-	defaultRenderOptions = &native.RenderOptions{
-		CommonRenderOptions: native.CommonRenderOptions{
+	regMtx         sync.RWMutex
+	serializers    = make(map[formats.Format]native.Serializer)
+	defaultOptions = &Options{
+		RenderOptions: &native.RenderOptions{
 			Indent: 4,
 		},
+		SerializeOptions: &native.SerializeOptions{},
+		formatOptions:    map[string]interface{}{},
 	}
-	defaultSerializeOptions = &native.SerializeOptions{}
 )
 
 func New(opts ...WriterOption) *Writer {
-	r := &Writer{
-		RenderOptions:    make(map[string]*native.RenderOptions),
-		SerializeOptions: make(map[string]*native.SerializeOptions),
+	w := &Writer{
+		Options: defaultOptions,
 	}
 
 	for _, opt := range opts {
-		opt(r)
+		opt(w)
 	}
 
-	return r
+	return w
 }
 
 func init() {
@@ -93,7 +91,7 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 
 	format := o.Format
 	if o.Format == "" {
-		format = w.Format
+		format = w.Options.Format
 	}
 
 	serializer, err := GetFormatSerializer(format)
@@ -101,22 +99,22 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 		return fmt.Errorf("getting serializer: %w", err)
 	}
 
-	key := fmt.Sprintf("%T", serializer)
-
 	so := o.SerializeOptions
 	if so == nil {
-		so = w.SerializeOptions[key]
+		so = defaultOptions.SerializeOptions
 	}
-	nativeDoc, err := serializer.Serialize(bom, so)
+
+	nativeDoc, err := serializer.Serialize(bom, so, o.GetFormatOptions(serializer))
 	if err != nil {
 		return fmt.Errorf("serializing SBOM to native format: %w", err)
 	}
 
 	ro := o.RenderOptions
 	if ro == nil {
-		ro = w.RenderOptions[key]
+		ro = defaultOptions.RenderOptions
 	}
-	if err := serializer.Render(nativeDoc, wr, ro); err != nil {
+
+	if err := serializer.Render(nativeDoc, wr, ro, o.GetFormatOptions(serializer)); err != nil {
 		return fmt.Errorf("writing rendered document to string: %w", err)
 	}
 
@@ -124,11 +122,7 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 }
 
 func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
-	options, err := w.getOptions()
-	if err != nil {
-		return err
-	}
-	return w.WriteStreamWithOptions(bom, wr, options)
+	return w.WriteStreamWithOptions(bom, wr, w.Options)
 }
 
 // WriteFile takes an sbom.Document and writes it to the file at path
@@ -141,33 +135,8 @@ func (w *Writer) WriteFileWithOptions(bom *sbom.Document, path string, o *Option
 	return w.WriteStreamWithOptions(bom, f, o)
 }
 
+// WriteFile
 func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
-	options, err := w.getOptions()
-	if err != nil {
-		return err
-	}
-	return w.WriteFileWithOptions(bom, path, options)
-}
-
-func (w *Writer) getOptions() (*Options, error) {
-	s, err := GetFormatSerializer(w.Format)
-	if err != nil {
-		return nil, err
-	}
-
-	ro := w.RenderOptions[fmt.Sprintf("%T", s)]
-	if ro == nil {
-		ro = defaultRenderOptions
-	}
-
-	so := w.SerializeOptions[fmt.Sprintf("%T", s)]
-	if so == nil {
-		so = defaultSerializeOptions
-	}
-
-	return &Options{
-		Format:           w.Format,
-		RenderOptions:    ro,
-		SerializeOptions: so,
-	}, nil
+	return w.WriteFileWithOptions(
+		bom, path, w.Options)
 }

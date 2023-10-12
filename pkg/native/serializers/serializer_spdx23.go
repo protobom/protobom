@@ -2,6 +2,7 @@ package serializers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -28,7 +29,7 @@ func NewSPDX23() *SPDX23 {
 	return &SPDX23{}
 }
 
-func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) error {
+func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, _ interface{}) error {
 	// TODO: add support for XML
 	encoder := json.NewEncoder(wr)
 	encoder.SetIndent("", strings.Repeat(" ", o.Indent))
@@ -40,7 +41,13 @@ func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions) 
 }
 
 // Serialize takes a protobom and returns an SPDX 2.3 struct
-func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions) (interface{}, error) {
+func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interface{}) (interface{}, error) {
+	if bom == nil {
+		return nil, errors.New("document is nil, unable to serialize to SPDX 2.3")
+	}
+	if bom.Metadata == nil {
+		return nil, errors.New("document metadata is nil, unable to serialize to SPDX 2.3")
+	}
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,

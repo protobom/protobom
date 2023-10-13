@@ -10,12 +10,7 @@ import (
 
 //counterfeiter:generate . Unserializer
 type Unserializer interface {
-	Unserialize(io.Reader, *UnserializeOptions) (*sbom.Document, error)
+	Unserialize(io.Reader, *UnserializeOptions, interface{}) (*sbom.Document, error)
 }
 
-type CommonUnserializeOptions struct{}
-
-type UnserializeOptions struct {
-	CommonUnserializeOptions
-	Options interface{}
-}
+type UnserializeOptions struct{}

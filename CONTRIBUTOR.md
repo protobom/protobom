@@ -1,10 +1,10 @@
-# Contributing to BOM Squad
+# Contributing to Protobom
 
-We welcome contributions to the BOM Squad project! By participating in this project, you agree to abide by the [Code of Conduct](code-of-conduct.md).
+We welcome contributions to the protobom project! By participating in this project, you agree to abide by the [Code of Conduct](code-of-conduct.md).
 
 ## Getting Started
 
-To contribute to the BOM Squad repository, follow these steps:
+To contribute to the protobom repository, follow these steps:
 
 1. Fork the repository.
 2. Create a new branch for your contribution:
@@ -17,12 +17,12 @@ To contribute to the BOM Squad repository, follow these steps:
    ```
    git push origin feature/new-feature
    ```
-6. Open a pull request against the `main` branch of the BOM Squad repository.
+6. Open a pull request against the `main` branch of the protobom repository.
 
 
 ## Development Guide
 
-For detailed information on setting up your development environment and contributing to the BOM Squad project, please refer to the [Development Guide](/docs/development.md).
+For detailed information on setting up your development environment and contributing to the protobom repository, please refer to the [Development Guide](/docs/development.md).
 
 ## Code Style
 
@@ -39,10 +39,10 @@ We highly encourage writing tests for new features and bug fixes. This ensures t
 
 ## Issue Tracker
 
-If you encounter any issues or have suggestions for improvements, please open an issue on the [issue tracker](https://github.com/bom-squad/issues).
+If you encounter any issues or have suggestions for improvements, please open an issue on the [issue tracker](https://github.com/bom-squad/protobom/issues).
 
 ## License
 
-By contributing to the BOM Squad project, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing to the BOM Squad project, you agree that your contributions will be licensed under the [Apache 2.0 License](LICENSE).
 
-Thank you for contributing to BOM Squad! We appreciate your help in making our project better.
+Thank you for contributing to protobom! We appreciate your help in making our project better.

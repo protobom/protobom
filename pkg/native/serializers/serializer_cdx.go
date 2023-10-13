@@ -62,7 +62,8 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	rootComponent, err := s.root(ctx, bom)
 	if err != nil {
 		return nil, fmt.Errorf("generating SBOM root component: %w", err)
-	} 
+	}
+
 	if rootComponent != nil {
 		doc.Metadata.Component = rootComponent
 	}

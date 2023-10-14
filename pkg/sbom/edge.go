@@ -5,6 +5,12 @@ import (
 	"strings"
 )
 
+func NewEdge() *Edge {
+	return &Edge{
+		To: []string{},
+	}
+}
+
 // Copy returns a new edge with copies of all edges
 func (e *Edge) Copy() *Edge {
 	return &Edge{

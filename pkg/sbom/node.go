@@ -370,3 +370,15 @@ func (n *Node) HashesMatch(th map[int32]string) bool {
 	}
 	return atLeastOneMatch
 }
+
+// AddHash adds a new hash of algorithm algo to the node. If the node
+// already has a hash of the same algorithm it will get silently replaced.
+func (n *Node) AddHash(algo HashAlgorithm, value string) {
+	if value == "" {
+		return
+	}
+	if n.Hashes == nil {
+		n.Hashes = map[int32]string{}
+	}
+	n.Hashes[int32(algo)] = value
+}

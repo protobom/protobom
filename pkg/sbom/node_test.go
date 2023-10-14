@@ -410,3 +410,50 @@ func TestNodeDescendants(t *testing.T) {
 		})
 	}
 }
+
+func TestNodeAddHash(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		sut      *Node
+		algo     HashAlgorithm
+		val      string
+		expected map[int32]string
+	}{
+		{
+			name: "regular add",
+			sut:  &Node{Hashes: map[int32]string{}},
+			algo: HashAlgorithm_SHA256,
+			val:  "a127ceedc934ccbe6e5fc2fac4c1afa2bf59271d2df288dd0cba01fbf93ce694",
+			expected: map[int32]string{
+				int32(HashAlgorithm_SHA256): "a127ceedc934ccbe6e5fc2fac4c1afa2bf59271d2df288dd0cba01fbf93ce694",
+			},
+		},
+		{
+			name: "replace existing",
+			sut: &Node{Hashes: map[int32]string{
+				int32(HashAlgorithm_SHA256): "a127ceedc934ccbe6e5fc2fac4c1afa2bf59271d2df288dd0cba01fbf93ce694",
+			}},
+			algo: HashAlgorithm_SHA256,
+			val:  "c2c306cf6281251126b8bff2e747d89019de78de51324f3a48f9c83b794be46c",
+			expected: map[int32]string{
+				int32(HashAlgorithm_SHA256): "c2c306cf6281251126b8bff2e747d89019de78de51324f3a48f9c83b794be46c",
+			},
+		},
+		{
+			name: "empty hash does not replace value",
+			sut: &Node{Hashes: map[int32]string{
+				int32(HashAlgorithm_SHA256): "a127ceedc934ccbe6e5fc2fac4c1afa2bf59271d2df288dd0cba01fbf93ce694",
+			}},
+			algo: HashAlgorithm_SHA256,
+			val:  "",
+			expected: map[int32]string{
+				int32(HashAlgorithm_SHA256): "a127ceedc934ccbe6e5fc2fac4c1afa2bf59271d2df288dd0cba01fbf93ce694",
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.sut.AddHash(tc.algo, tc.val)
+			require.True(t, tc.sut.Equal(&Node{Hashes: tc.expected}))
+		})
+	}
+}

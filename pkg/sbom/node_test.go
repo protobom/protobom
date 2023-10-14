@@ -304,3 +304,109 @@ func TestNodeCopy(t *testing.T) {
 	require.Equal(t, "f3ae11065cafc14e27a1410ae8be28e600bb8336", copied.Hashes[int32(HashAlgorithm_SHA1)])
 	require.Equal(t, "TEXT", copied.FileTypes[0])
 }
+
+func TestNodeDescendants(t *testing.T) {
+	sutId := "mynode"
+	for _, tc := range []struct {
+		name                string
+		sut                 *NodeList
+		expectedNodesLength int
+		depth               int
+	}{
+		{
+			// SA graph with a single node. We should get a one node result but
+			// we use a max distance of 10 to catch any possible errors traversing
+			// the graph that could lead to duplications.
+			//
+			//     mynode
+			//       |
+			name: "single node",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: sutId}},
+				Edges:        []*Edge{},
+				RootElements: []string{sutId},
+			},
+			expectedNodesLength: 1,
+			depth:               10,
+		},
+		{
+			//     mynode
+			//     /    \
+			// child1  child2
+			name: "two descendants one level",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: "child1"}, {Id: "child2"}},
+				Edges: []*Edge{{
+					From: sutId, To: []string{"child1", "child2"},
+				}},
+				RootElements: []string{sutId},
+			},
+			expectedNodesLength: 3,
+			depth:               10,
+		},
+		{
+			//      mynode
+			//      /   \
+			//  child1  child2
+			//     |      |
+			// child1-1 child2-1
+			name: "four descendants two levels",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: "child1"}, {Id: "child2"}, {Id: "child1-1"}, {Id: "child2-1"}},
+				Edges: []*Edge{
+					{From: sutId, To: []string{"child1", "child2"}},
+					{From: "child1", To: []string{"child1-1"}},
+					{From: "child2", To: []string{"child2-1"}},
+				},
+				RootElements: []string{sutId},
+			},
+			expectedNodesLength: 5,
+			depth:               10,
+		},
+		{
+			//      mynode        <-- Depth 1
+			//      /   \
+			//  child1  child2    <-- Depth 2
+			//     |      |
+			// child1-1 child2-1  <-- Depth 3
+			name: "four descendants two levels, depth 2",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: "child1"}, {Id: "child2"}, {Id: "child1-1"}, {Id: "child2-1"}},
+				Edges: []*Edge{
+					{From: sutId, To: []string{"child1", "child2"}},
+					{From: "child1", To: []string{"child1-1"}},
+					{From: "child2", To: []string{"child2-1"}},
+				},
+				RootElements: []string{sutId},
+			},
+			expectedNodesLength: 3,
+			depth:               2,
+		},
+		{
+			//       root1    /-> root2
+			//          \    /       \
+			//       =mynode=      child3
+			//            |
+			//        child2-1
+			name: "mid node check we stop at root",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: "root1"}, {Id: "root2"}, {Id: "child2-1"}, {Id: "child3"}},
+				Edges: []*Edge{
+					{From: "root1", To: []string{sutId}},
+					{From: sutId, To: []string{"child2-1", "root2"}},
+					{From: "root2", To: []string{"child3"}},
+				},
+				RootElements: []string{"root1", "root2"},
+			},
+			expectedNodesLength: 3, // Must not contain root1 or child3
+			depth:               10,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			res := tc.sut.NodeDescendants(sutId, tc.depth)
+			require.NotNil(t, res)
+			require.Len(t, res.RootElements, 1)
+			require.Len(t, res.Nodes, tc.expectedNodesLength)
+		})
+	}
+}

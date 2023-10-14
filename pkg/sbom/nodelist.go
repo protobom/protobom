@@ -749,3 +749,77 @@ func (nl *NodeList) NodeSiblings(id string) *NodeList {
 
 	return nodelist
 }
+
+// NodeDescendants traverses the NodeList graph starting at the node specified
+// by id and returns a new node list with elements related at a maximal distance
+// of maxDepth levels. If the specified id is not found, the NodeList will be
+// empty. Traversing the graph will stop if any of the related nodes is a RootNode.
+func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
+	rootIdx := nl.indexRootElements()
+	edgeIdx := nl.indexEdges()
+	startNode := nl.GetNodeByID(id)
+	if startNode == nil {
+		return &NodeList{}
+	}
+
+	nl2 := NodeList{
+		Nodes:        []*Node{},
+		Edges:        nl.Edges,
+		RootElements: []string{startNode.Id},
+	}
+
+	siblings := nodeIndex{}
+
+	var loopNodes []*Node
+	newLoopNodes := []*Node{}
+
+	for i := 0; i < maxDepth; i++ {
+		if i == 0 {
+			loopNodes = []*Node{startNode}
+		} else {
+			loopNodes = newLoopNodes
+		}
+		newLoopNodes = []*Node{}
+		for _, n := range loopNodes {
+			// If we've seen it, we're done
+			if _, ok := siblings[n.Id]; ok {
+				continue
+			}
+
+			siblings[n.Id] = n
+
+			// If node has no relationships, we're done
+			if _, ok := edgeIdx[n.Id]; !ok {
+				continue
+			}
+
+			// If node is a root node, we're done
+			if _, ok := rootIdx[n.Id]; ok && n.Id != id {
+				continue
+			}
+
+			for et := range edgeIdx[n.Id] {
+				for j := range edgeIdx[n.Id][et] {
+					for _, siblingID := range edgeIdx[n.Id][et][j].To {
+						if _, ok := siblings[siblingID]; ok {
+							continue
+						}
+
+						sibling := nl.GetNodeByID(siblingID)
+						if sibling != nil {
+							newLoopNodes = append(newLoopNodes, sibling)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Assign found nodes to nodelist
+	for _, n := range siblings {
+		nl2.AddNode(n)
+	}
+
+	nl2.cleanEdges()
+	return &nl2
+}

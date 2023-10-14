@@ -29,6 +29,14 @@ type purlIndex map[PackageURL][]*Node
 
 var ErrorMoreThanOneMatch = fmt.Errorf("More than one node matches")
 
+func NewNodeList() *NodeList {
+	return &NodeList{
+		Nodes:        []*Node{},
+		Edges:        []*Edge{},
+		RootElements: []string{},
+	}
+}
+
 // indexNodes returns an inverse dictionary with the IDs of the nodes
 func (nl *NodeList) indexNodes() nodeIndex {
 	ret := nodeIndex{}
@@ -151,6 +159,25 @@ func (nl *NodeList) cleanEdges() {
 
 func (nl *NodeList) AddEdge(e *Edge) {
 	nl.Edges = append(nl.Edges, e)
+}
+
+// AddRootNode adds a node to the nodelist and alos registers it to the
+// RootElements list.
+func (nl *NodeList) AddRootNode(n *Node) {
+	if n.Id == "" {
+		// TODO warn here
+		return
+	}
+
+	for _, id := range nl.RootElements {
+		if id == n.Id {
+			// TODO warn here
+			return
+		}
+	}
+
+	nl.AddNode(n)
+	nl.RootElements = append(nl.RootElements, n.Id)
 }
 
 func (nl *NodeList) AddNode(n *Node) {

@@ -110,7 +110,7 @@ func main() {
 	// Create a node to represent the application:
 	appNode := &sbom.Node{
 		Id:               "pkg:generic/my-software@v1.0.0",
-		PrimaryPurpose:   "application",
+		PrimaryPurpose:   []sbom.Purpose{sbom.Purpose_APPLICATION},
 		Name:             "My Software Name",
 		Version:          "v1.0.0",
 		Licenses:         []string{"Apache-2.0"},

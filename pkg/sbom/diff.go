@@ -6,6 +6,156 @@ import (
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type NodeDiff struct {
+	Added     *Node
+	Removed   *Node
+	DiffCount int
+}
+
+// Diff analyses a node and returns a a new node populated with all fields
+// that are different in n2 from n. If no changes are found, Diff returns nil
+func (n *Node) Diff(n2 *Node) *NodeDiff {
+	nd := NodeDiff{
+		Added:   NewNode(),
+		Removed: NewNode(),
+	}
+
+	a, r, c := diffString(n.Id, n2.Id)
+	nd.Added.Id = a
+	nd.Removed.Id = r
+	nd.DiffCount += c
+
+	if n.Type != n2.Type {
+		nd.Added.Type = n2.Type
+		nd.DiffCount++
+	}
+
+	a, r, c = diffString(n.Name, n2.Name)
+	nd.Added.Name = a
+	nd.Removed.Name = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.Version, n2.Version)
+	nd.Added.Version = a
+	nd.Removed.Version = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.FileName, n2.FileName)
+	nd.Added.FileName = a
+	nd.Removed.FileName = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.UrlHome, n2.UrlHome)
+	nd.Added.UrlHome = a
+	nd.Removed.UrlHome = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.UrlDownload, n2.UrlDownload)
+	nd.Added.UrlDownload = a
+	nd.Removed.UrlDownload = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.LicenseConcluded, n2.LicenseConcluded)
+	nd.Added.LicenseConcluded = a
+	nd.Removed.LicenseConcluded = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.LicenseComments, n2.LicenseComments)
+	nd.Added.LicenseComments = a
+	nd.Removed.LicenseComments = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.Copyright, n2.Copyright)
+	nd.Added.Copyright = a
+	nd.Removed.Copyright = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.SourceInfo, n2.SourceInfo)
+	nd.Added.SourceInfo = a
+	nd.Removed.SourceInfo = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.PrimaryPurpose, n2.PrimaryPurpose)
+	nd.Added.PrimaryPurpose = a
+	nd.Removed.PrimaryPurpose = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.Comment, n2.Comment)
+	nd.Added.Comment = a
+	nd.Removed.Comment = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.Summary, n2.Summary)
+	nd.Added.Summary = a
+	nd.Removed.Summary = r
+	nd.DiffCount += c
+
+	a, r, c = diffString(n.Description, n2.Description)
+	nd.Added.Description = a
+	nd.Removed.Description = r
+	nd.DiffCount += c
+
+	addedD, removedD, count := diffDates(n.ReleaseDate, n2.ReleaseDate)
+	nd.Added.ReleaseDate = addedD
+	nd.Removed.ReleaseDate = removedD
+	nd.DiffCount += int(count)
+
+	addedD, removedD, count = diffDates(n.BuildDate, n2.BuildDate)
+	nd.Added.BuildDate = addedD
+	nd.Removed.BuildDate = removedD
+	nd.DiffCount += count
+
+	addedD, removedD, count = diffDates(n.ValidUntilDate, n2.ValidUntilDate)
+	nd.Added.ValidUntilDate = addedD
+	nd.Removed.ValidUntilDate = removedD
+	nd.DiffCount += count
+
+	added, removed, count := diffStrSlice(n.Licenses, n2.Licenses)
+	nd.Added.Licenses = added
+	nd.Removed.Licenses = removed
+	nd.DiffCount += count
+
+	added, removed, count = diffStrSlice(n.Attribution, n2.Attribution)
+	nd.Added.Attribution = added
+	nd.Removed.Attribution = removed
+	nd.DiffCount += count
+
+	added, removed, count = diffStrSlice(n.FileTypes, n2.FileTypes)
+	nd.Added.FileTypes = added
+	nd.Removed.FileTypes = removed
+	nd.DiffCount += count
+
+	addedP, removedP, count := diffPersonList(n.Suppliers, n2.Suppliers)
+	nd.Added.Suppliers = addedP
+	nd.Removed.Suppliers = removedP
+	nd.DiffCount += count
+
+	addedP, removedP, count = diffPersonList(n.Originators, n2.Originators)
+	nd.Added.Originators = addedP
+	nd.Removed.Originators = removedP
+	nd.DiffCount += count
+
+	addedER, removedER, count := diffExtRefList(n.ExternalReferences, n2.ExternalReferences)
+	nd.Added.ExternalReferences = addedER
+	nd.Removed.ExternalReferences = removedER
+	nd.DiffCount += count
+
+	addedM, removedM, count := diffIntStrMap(n.Identifiers, n2.Identifiers)
+	nd.Added.Identifiers = addedM
+	nd.Removed.Identifiers = removedM
+	nd.DiffCount += count
+
+	addedM, removedM, count = diffIntStrMap(n.Hashes, n2.Hashes)
+	nd.Added.Hashes = addedM
+	nd.Removed.Hashes = removedM
+	nd.DiffCount += count
+
+	if nd.DiffCount > 0 {
+		return &nd
+	}
+	return nil
+}
+
 // diffString takes compares s2 against s1. If they differ returns the value of
 // s2 in the removed return value. If s2 is blank, removed will have the original
 // value of s1. If the strings are differente count will be 1, zero if not.

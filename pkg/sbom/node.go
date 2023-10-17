@@ -3,6 +3,7 @@ package sbom
 import (
 	"crypto/sha256"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
@@ -236,11 +237,6 @@ func (n *Node) flatString() string {
 			for _, t := range idKeys {
 				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)]))
 			}
-		case "bomsquad.protobom.Node.attribution":
-			for i := 0; i < v.List().Len(); i++ {
-				pairs = append(pairs, fmt.Sprintf("%s[%d]:%s", fd.FullName(), i, v.List().Get(i)))
-			}
-
 		case "bomsquad.protobom.Node.release_date":
 			if n.ReleaseDate != nil {
 				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ReleaseDate.AsTime().Unix()))
@@ -255,6 +251,11 @@ func (n *Node) flatString() string {
 			}
 		case "bomsquad.protobom.Node.hashes":
 			pairs = append(pairs, string(fd.FullName())+":"+flatStringMap(v.Map()))
+		case "bomsquad.protobom.Node.licenses",
+			"bomsquad.protobom.Node.attribution",
+			"bomsquad.protobom.Node.file_types":
+			pairs = append(pairs, flatStringStrSlice(fd.FullName(), v.List()))
+
 		default:
 			pairs = append(pairs, string(fd.FullName())+":"+v.String())
 		}
@@ -263,6 +264,20 @@ func (n *Node) flatString() string {
 
 	sort.Strings(pairs)
 	return strings.Join(pairs, ":")
+}
+
+// flatStringStrSlice returns a deterministic string representation of a slice of strings
+func flatStringStrSlice(name protoreflect.FullName, protoSlice protoreflect.List) string {
+	vals := []string{}
+	for i := 0; i < protoSlice.Len(); i++ {
+		vals = append(vals, protoSlice.Get(i).String())
+	}
+	slices.Sort(vals)
+	ret := ""
+	for i, s := range vals {
+		ret += fmt.Sprintf("%s[%d]:%s", name, i, s)
+	}
+	return ret
 }
 
 func flatStringMap(protoMap protoreflect.Map) string {

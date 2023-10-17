@@ -50,7 +50,7 @@ func (n *Node) Update(n2 *Node) {
 	if n2.SourceInfo != "" {
 		n.SourceInfo = n2.SourceInfo
 	}
-	if n2.PrimaryPurpose != "" {
+	if n2.PrimaryPurpose != Purpose(0) {
 		n.PrimaryPurpose = n2.PrimaryPurpose
 	}
 	if n2.Comment != "" {
@@ -127,7 +127,7 @@ func (n *Node) Augment(n2 *Node) {
 	if n.SourceInfo == "" && n2.SourceInfo != "" {
 		n.SourceInfo = n2.SourceInfo
 	}
-	if n.PrimaryPurpose == "" && n2.PrimaryPurpose != "" {
+	if n.PrimaryPurpose == Purpose(0) && n2.PrimaryPurpose != Purpose(0) {
 		n.PrimaryPurpose = n2.PrimaryPurpose
 	}
 	if n.Comment == "" && n2.Comment != "" {

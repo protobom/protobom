@@ -62,13 +62,13 @@ type creationInfo struct {
 }
 
 type file struct {
-	Type              string        `json:"type"` // File
-	SpdxId            string        `json:"SpdxId,omitempty"`
-	Name              string        `json:"name"`
-	ContentType       string        `json:"contentType,omitempty"` // "image/png"
-	Purpose           []string      `json:"purpose,omitempty"`
-	ContentIdentifier string        `json:"contentIdentifier,omitempty"`
-	CreationInfo      *creationInfo `json:"creationInfo,omitempty"`
+	Type              string         `json:"type"` // File
+	SpdxId            string         `json:"SpdxId,omitempty"`
+	Name              string         `json:"name"`
+	ContentType       string         `json:"contentType,omitempty"` // "image/png"
+	Purpose           []sbom.Purpose `json:"purpose,omitempty"`
+	ContentIdentifier string         `json:"contentIdentifier,omitempty"`
+	CreationInfo      *creationInfo  `json:"creationInfo,omitempty"`
 }
 type relationship struct {
 	Type             string        `json:"type"` // Relationship
@@ -92,7 +92,7 @@ type pkg struct {
 	DownloadLocation   string              `json:"downloadLocation,omitempty"`
 	PackageUrl         string              `json:"packageUrl,omitempty"`
 	HomePage           string              `json:"homepage,omitempty"`
-	Purpose            []string            `json:"purpose,omitempty"`
+	Purpose            []sbom.Purpose      `json:"purpose,omitempty"`
 	ContentIdentifier  string              `json:"contentIdentifier,omitempty"`
 	OriginatedBy       []string            `json:"originatedBy,omitempty"`
 	SuppliedBy         []string            `json:"suppliedBy,omitempty"`
@@ -193,7 +193,7 @@ func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 		DownloadLocation:   n.UrlDownload,
 		PackageUrl:         string(n.Purl()),
 		HomePage:           n.UrlHome,
-		Purpose:            []string{},
+		Purpose:            []sbom.Purpose{},
 		ContentIdentifier:  "",
 		OriginatedBy:       []string{},
 		SuppliedBy:         []string{},
@@ -234,7 +234,7 @@ func (spdx3 *SPDX3) nodeToFile(n *sbom.Node) (file, error) {
 		SpdxId:            n.Id,
 		Name:              n.Name,
 		ContentType:       "",
-		Purpose:           []string{},
+		Purpose:           []sbom.Purpose{},
 		ContentIdentifier: "",
 	}
 	return f, nil

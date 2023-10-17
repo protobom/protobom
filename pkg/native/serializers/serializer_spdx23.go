@@ -217,8 +217,8 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			PackageComment:            node.Comment,
 			PackageExternalReferences: []*v2_3.PackageExternalReference{},
 			PackageAttributionTexts:   node.Attribution,
-			PrimaryPackagePurpose:     node.PrimaryPurpose,
-			Annotations:               []v2_3.Annotation{},
+			//PrimaryPackagePurpose:     node.PrimaryPurpose,
+			Annotations: []v2_3.Annotation{},
 
 			// The files field may never be used... Or should it?
 			// We are mirroring the protbom graph in the SPDX relationship
@@ -229,6 +229,9 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			// at some point we may need to think of supporting this as an
 			// option.
 			// Files:                       []*v2_3.File{},
+		}
+		if node.PrimaryPurpose != sbom.Purpose_UNKNOWN_PURPOSE {
+			p.PrimaryPackagePurpose = node.PrimaryPurpose.String()
 		}
 
 		if node.ReleaseDate != nil {

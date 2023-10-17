@@ -2,6 +2,7 @@ package sbom
 
 import (
 	"fmt"
+	"maps"
 
 	"github.com/bom-squad/protobom/pkg/formats/spdx"
 )
@@ -46,4 +47,15 @@ func (e *ExternalReference) flatString() string {
 	}
 
 	return ret
+}
+
+// Copy returns an exact copy of ExternalReference e.
+func (e *ExternalReference) Copy() *ExternalReference {
+	return &ExternalReference{
+		Url:       e.Url,
+		Type:      e.Type,
+		Comment:   e.Comment,
+		Authority: e.Authority,
+		Hashes:    maps.Clone(e.Hashes),
+	}
 }

@@ -46,3 +46,20 @@ func (p *Person) flatString() string {
 	}
 	return s
 }
+
+// Copy returns a new Person pointer which is a duplicate of Person p. The copy is
+// recursive into the Contacts array.
+func (p *Person) Copy() *Person {
+	np := &Person{
+		Name:     p.Name,
+		IsOrg:    p.IsOrg,
+		Email:    p.Email,
+		Url:      p.Url,
+		Phone:    p.Phone,
+		Contacts: []*Person{},
+	}
+	for _, op := range p.Contacts {
+		op.Contacts = append(op.Contacts, op.Copy())
+	}
+	return np
+}

@@ -3,11 +3,13 @@ package sbom
 import (
 	"crypto/sha256"
 	"fmt"
+	"maps"
 	"slices"
 	"sort"
 	"strings"
 
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // This file contains methods to work with the generated node type
@@ -171,7 +173,7 @@ func (n *Node) Augment(n2 *Node) {
 
 // Copy returns a new node that is a copy of the node
 func (n *Node) Copy() *Node {
-	return &Node{
+	no := &Node{
 		Id:                 n.Id,
 		Type:               n.Type,
 		Name:               n.Name,
@@ -179,26 +181,48 @@ func (n *Node) Copy() *Node {
 		FileName:           n.FileName,
 		UrlHome:            n.UrlHome,
 		UrlDownload:        n.UrlDownload,
-		Licenses:           n.Licenses,
+		Licenses:           slices.Clone(n.Licenses),
 		LicenseConcluded:   n.LicenseConcluded,
 		LicenseComments:    n.LicenseComments,
 		Copyright:          n.Copyright,
-		Hashes:             n.Hashes,
+		Hashes:             maps.Clone(n.Hashes),
 		SourceInfo:         n.SourceInfo,
 		PrimaryPurpose:     n.PrimaryPurpose,
 		Comment:            n.Comment,
 		Summary:            n.Summary,
 		Description:        n.Description,
-		Attribution:        n.Attribution,
-		Suppliers:          n.Suppliers,
-		Originators:        n.Originators,
-		ReleaseDate:        n.ReleaseDate,
-		BuildDate:          n.BuildDate,
-		ValidUntilDate:     n.ValidUntilDate,
-		ExternalReferences: n.ExternalReferences,
-		Identifiers:        n.Identifiers,
-		FileTypes:          n.FileTypes,
+		Attribution:        slices.Clone(n.Attribution),
+		Suppliers:          []*Person{},
+		Originators:        []*Person{},
+		ReleaseDate:        nil,
+		BuildDate:          nil,
+		ValidUntilDate:     nil,
+		ExternalReferences: []*ExternalReference{},
+		Identifiers:        maps.Clone(n.Identifiers),
+		FileTypes:          slices.Clone(n.FileTypes),
 	}
+
+	if n.ReleaseDate != nil {
+		no.ReleaseDate = timestamppb.New(n.ReleaseDate.AsTime())
+	}
+	if n.BuildDate != nil {
+		no.BuildDate = timestamppb.New(n.BuildDate.AsTime())
+	}
+	if n.ValidUntilDate != nil {
+		no.ValidUntilDate = timestamppb.New(n.ValidUntilDate.AsTime())
+	}
+
+	for _, p := range n.Suppliers {
+		no.Suppliers = append(no.Suppliers, p.Copy())
+	}
+	for _, p := range n.Originators {
+		no.Originators = append(no.Originators, p.Copy())
+	}
+	for _, e := range n.ExternalReferences {
+		no.ExternalReferences = append(no.ExternalReferences, e.Copy())
+	}
+
+	return no
 }
 
 // Equal compares Node n to n2 and returns true if they are the same

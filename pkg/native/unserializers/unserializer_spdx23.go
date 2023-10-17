@@ -99,7 +99,7 @@ func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 		Identifiers:     map[int32]string{},
 	}
 
-	purpose_value, ok := sbom.Purpose_value[string(p.PrimaryPackagePurpose)]
+	purpose_value, ok := sbom.Purpose_value[p.PrimaryPackagePurpose]
 	if !ok {
 		// Handle the error or set a default value
 		// node.PrimaryPurpose = sbom.Purpose_UNKNOWN_PURPOSE

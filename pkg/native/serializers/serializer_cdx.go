@@ -305,7 +305,6 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
 	} else {
-
 		// TODO: Does not account for n.PrimaryPurpose of sbom.Purpose_FIRMWARE, sbom.Purpose_SOURCE,
 		//            sbom.Purpose_ARCHIVE, sbom.Purpose_INSTALL
 		// TODO: Does not ever assign c.Type of cdx.ComponentTypeData, cdx.ComponentTypeDeviceDriver,

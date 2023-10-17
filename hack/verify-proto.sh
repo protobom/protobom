@@ -8,7 +8,7 @@ set -o xtrace
 source hack/common.sh
 
 # These two are pinnedto the versions used in the latest generated code
-export PROTOC_VER="24.2"
+export PROTOC_VER="24.4"
 export PROTOC_GO_VER="v1.31.0"
 
 curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VER}/protoc-${PROTOC_VER}-linux-x86_64.zip

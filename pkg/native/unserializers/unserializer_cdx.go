@@ -172,7 +172,6 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 		} else {
 			node.PrimaryPurpose = sbom.Purpose(value)
 		}
-
 	}
 
 	// External references

@@ -30,7 +30,9 @@ message Node {
     // map<string,string> hashes = 12;
 
     string source_info = 13;     // any relevant background information or additional comments about the origin
-    string primary_purpose = 14; // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
+    // field 14 was the old string primary_purpose.
+    // Removed, see https://github.com/bom-squad/protobom/issues/124
+    // string primary_purpose = 14; // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
 
     string comment = 15;
     string summary = 16;      // Short package description
@@ -53,6 +55,7 @@ message Node {
     repeated string file_types = 27; // File types
     map<int32,string> identifiers = 28;  // Software identifiers
     map<int32,string> hashes = 29;
+    Purpose primary_purpose = 30;
 
     enum NodeType {
         PACKAGE = 0;
@@ -204,4 +207,20 @@ enum SoftwareIdentifierType {
     CPE22 = 2;
     CPE23 = 3;
     GITOID = 4;
+}
+
+enum Purpose {
+    UNKNOWN_PURPOSE = 0;
+    APPLICATION = 1;
+    FRAMEWORK = 2;
+    LIBRARY = 3;
+    CONTAINER = 4;
+    OPERATINGSYSTEM = 5;
+    DEVICE = 6;
+    FIRMWARE = 7;
+    SOURCE = 8;
+    ARCHIVE = 9;
+    FILE = 10;
+    INSTALL = 11;
+    OTHER = 12;
 }

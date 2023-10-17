@@ -8,6 +8,224 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+func TestNodeDiff(t *testing.T) {
+	mytime := timestamppb.New(time.Date(2023, 10, 16, 11, 41, 0, 0, time.UTC))
+	testNode := &Node{
+		Id:               "test-node",
+		Type:             Node_PACKAGE,
+		Name:             "test",
+		Version:          "1.0.0",
+		FileName:         "test.zip",
+		UrlHome:          "http://example.com/",
+		UrlDownload:      "http://example.com/test-node.zip",
+		Licenses:         []string{"Apache-2.0"},
+		LicenseConcluded: "Apache-2.0",
+		LicenseComments:  "License inferred by an automated classifer",
+		Copyright:        "Copyright (c) 2023 The Protobom Authors",
+		SourceInfo:       "",
+		PrimaryPurpose:   "APPLICATION",
+		Comment:          "This a node to test node diffing",
+		Summary:          "A non existent node that serves as an example to diff",
+		Description:      "A non existent software package that can be used to test data",
+		Attribution:      []string{},
+		Suppliers: []*Person{
+			{
+				Name:  "The protobom Authors",
+				IsOrg: true,
+				Email: "protobom@example.dev",
+				Url:   "http://github.com/protobom",
+			},
+		},
+		Originators:    []*Person{},
+		ReleaseDate:    mytime,
+		BuildDate:      nil,
+		ValidUntilDate: nil,
+		ExternalReferences: []*ExternalReference{
+			{
+				Url:     "http://github.com/protobom",
+				Type:    "URL",
+				Comment: "Organization Repo",
+			},
+		},
+		Identifiers: map[int32]string{
+			int32(SoftwareIdentifierType_PURL): "pkg:github/protobom@1.0.0",
+		},
+		Hashes: map[int32]string{
+			int32(HashAlgorithm_SHA1): "781721ca4eccbf8fe65c44dcdf141ca1b4e44adf",
+		},
+	}
+
+	for _, tc := range []struct {
+		name     string
+		prepare  func(*Node, *Node)
+		sut      *Node
+		node     *Node
+		expected *NodeDiff
+	}{
+		{
+			name:     "nochange",
+			prepare:  func(sutNode, newNode *Node) {},
+			expected: nil,
+		},
+		{
+			name: "alter node id",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Id = "modified"
+			},
+			expected: &NodeDiff{
+				Added: &Node{
+					Id: "modified",
+				},
+				Removed:   &Node{},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "alter node name",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Name = "newname"
+			},
+			expected: &NodeDiff{
+				Added: &Node{
+					Name: "newname",
+				},
+				Removed:   &Node{},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "alter node name and id",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Id = "modified"
+				newNode.Name = "newname"
+			},
+			expected: &NodeDiff{
+				Added: &Node{
+					Id:   "modified",
+					Name: "newname",
+				},
+				Removed:   &Node{},
+				DiffCount: 2,
+			},
+		},
+		{
+			name: "blank DownloadURL",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.UrlDownload = ""
+			},
+			expected: &NodeDiff{
+				Added: &Node{},
+				Removed: &Node{
+					UrlDownload: "http://example.com/test-node.zip",
+				},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "add a license",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Licenses = append(newNode.Licenses, "GPL3")
+			},
+			expected: &NodeDiff{
+				Added: &Node{
+					Licenses: []string{"GPL3"},
+				},
+				Removed:   &Node{},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "remove a license",
+			prepare: func(sutNode, newNode *Node) {
+				sutNode.Licenses = newNode.Licenses
+				sutNode.Licenses = append(sutNode.Licenses, "GPL3")
+			},
+			expected: &NodeDiff{
+				Added: &Node{},
+				Removed: &Node{
+					Licenses: []string{"GPL3"},
+				},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "add a hash",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Hashes[int32(HashAlgorithm_SHA256)] = "2f2ed83cb80d77c14b7a23284fa73fbe3150a571fdb9388dcce9a7209bb11055"
+			},
+			expected: &NodeDiff{
+				Added: &Node{
+					Hashes: map[int32]string{
+						int32(HashAlgorithm_SHA256): "2f2ed83cb80d77c14b7a23284fa73fbe3150a571fdb9388dcce9a7209bb11055",
+					},
+				},
+				Removed:   &Node{},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "remove a hash",
+			prepare: func(sutNode, newNode *Node) {
+				sutNode.Hashes[int32(HashAlgorithm_SHA256)] = "2f2ed83cb80d77c14b7a23284fa73fbe3150a571fdb9388dcce9a7209bb11055"
+			},
+			expected: &NodeDiff{
+				Added: &Node{},
+				Removed: &Node{
+					Hashes: map[int32]string{
+						int32(HashAlgorithm_SHA256): "2f2ed83cb80d77c14b7a23284fa73fbe3150a571fdb9388dcce9a7209bb11055",
+					},
+				},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "change external reference",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.ExternalReferences[0].Type = "HOMEPAGE"
+			},
+			expected: &NodeDiff{
+				Added: &Node{
+					ExternalReferences: []*ExternalReference{
+						{
+							Url:     "http://github.com/protobom",
+							Type:    "HOMEPAGE",
+							Comment: "Organization Repo",
+						},
+					},
+				},
+				Removed: &Node{
+					ExternalReferences: []*ExternalReference{
+						{
+							Url:     "http://github.com/protobom",
+							Type:    "URL",
+							Comment: "Organization Repo",
+						},
+					},
+				},
+				DiffCount: 1,
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// Tests start with a copy of the test node
+			tc.sut = testNode.Copy()
+			tc.node = testNode.Copy()
+			// The prepare function modifies them for the test
+			tc.prepare(tc.sut, tc.node)
+			result := tc.sut.Diff(tc.node)
+			if tc.expected == nil {
+				require.Nil(t, result)
+				return
+			}
+			// Compare the nodes in the diff report
+			require.NotNil(t, result)
+			require.Truef(t, tc.expected.Added.Equal(result.Added), "comparing added: %s %s", result.Added.flatString(), tc.expected.Added.flatString())
+			require.Truef(t, tc.expected.Removed.Equal(result.Removed), "comparing removed: %s %s", result.Removed.flatString(), tc.expected.Removed.flatString())
+			require.Equal(t, tc.expected.DiffCount, result.DiffCount)
+		})
+	}
+}
+
 func TestDiffString(t *testing.T) {
 	for _, tc := range []struct {
 		name            string
@@ -175,6 +393,7 @@ func TestDiffPersonList(t *testing.T) {
 	p3 := &Person{
 		Name: "Inky",
 	}
+	//nolint:dupl
 	for _, tc := range []struct {
 		name            string
 		sut1            []*Person
@@ -238,6 +457,7 @@ func TestDiffExtRefList(t *testing.T) {
 		Url:  "https://example.org/",
 		Type: "URL",
 	}
+	//nolint:dupl
 	for _, tc := range []struct {
 		name            string
 		sut1            []*ExternalReference

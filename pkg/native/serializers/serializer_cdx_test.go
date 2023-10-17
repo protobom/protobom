@@ -27,10 +27,10 @@ func TestComponentType(t *testing.T) {
 		"firmware":              {func(n *sbom.Node) { n.PrimaryPurpose = sbom.Purpose_FIRMWARE; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeFirmware},
 		"framework":             {func(n *sbom.Node) { n.PrimaryPurpose = sbom.Purpose_FRAMEWORK; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeFramework},
 		"operating-system":      {func(n *sbom.Node) { n.PrimaryPurpose = sbom.Purpose_OPERATINGSYSTEM; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeOS},
-		//"data":                  {func(n *sbom.Node) { n.PrimaryPurpose = "data"; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeData},
-		//"device-driver":         {func(n *sbom.Node) { n.PrimaryPurpose = "device-driver"; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeDeviceDriver},
-		//"machine-learning-model": {func(n *sbom.Node) { n.PrimaryPurpose = "machine-learning-model"; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeMachineLearningModel},
-		//"platform": {func(n *sbom.Node) { n.PrimaryPurpose = "platform"; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypePlatform},
+		// "data":                  {func(n *sbom.Node) { n.PrimaryPurpose = "data"; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeData},
+		// "device-driver":         {func(n *sbom.Node) { n.PrimaryPurpose = "device-driver"; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeDeviceDriver},
+		// "machine-learning-model": {func(n *sbom.Node) { n.PrimaryPurpose = "machine-learning-model"; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypeMachineLearningModel},
+		// "platform": {func(n *sbom.Node) { n.PrimaryPurpose = "platform"; n.Type = sbom.Node_PACKAGE }, cdx.ComponentTypePlatform},
 	} {
 		tc.prepare(node)
 		comp := sut.nodeToComponent(node)

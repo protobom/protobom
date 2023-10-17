@@ -1,6 +1,6 @@
 module github.com/bom-squad/protobom
 
-go 1.20
+go 1.21
 
 require (
 	github.com/CycloneDX/cyclonedx-go v0.7.2-0.20230730203904-8c9798ced848

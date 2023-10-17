@@ -305,33 +305,44 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
 	} else {
-		switch strings.ToLower(n.PrimaryPurpose) {
-		case "application":
+
+		// TODO: Does not account for n.PrimaryPurpose of sbom.Purpose_FIRMWARE, sbom.Purpose_SOURCE,
+		//            sbom.Purpose_ARCHIVE, sbom.Purpose_INSTALL
+		// TODO: Does not ever assign c.Type of cdx.ComponentTypeData, cdx.ComponentTypeDeviceDriver,
+		//            cdx.ComponentTypeMachineLearningModel, cdx.ComponentTypePlatform
+		switch n.PrimaryPurpose {
+		case sbom.Purpose_APPLICATION:
 			c.Type = cdx.ComponentTypeApplication
-		case "container":
+		case sbom.Purpose_CONTAINER:
 			c.Type = cdx.ComponentTypeContainer
-		case "data":
-			c.Type = cdx.ComponentTypeData
-		case "device":
+		/*
+			case "data":
+				c.Type = cdx.ComponentTypeData
+		*/
+		case sbom.Purpose_DEVICE:
 			c.Type = cdx.ComponentTypeDevice
-		case "device-driver":
-			c.Type = cdx.ComponentTypeDeviceDriver
-		case "file":
+		/*
+			case "device-driver":
+				c.Type = cdx.ComponentTypeDeviceDriver
+		*/
+		case sbom.Purpose_FILE:
 			c.Type = cdx.ComponentTypeFile
-		case "firmware":
+		case sbom.Purpose_FIRMWARE:
 			c.Type = cdx.ComponentTypeFirmware
-		case "framework":
+		case sbom.Purpose_FRAMEWORK:
 			c.Type = cdx.ComponentTypeFramework
-		case "library":
+		case sbom.Purpose_LIBRARY:
 			c.Type = cdx.ComponentTypeLibrary
-		case "machine-learning-model":
-			c.Type = cdx.ComponentTypeMachineLearningModel
-		case "operating-system":
+		/*
+			case "machine-learning-model":
+				c.Type = cdx.ComponentTypeMachineLearningModel
+		*/
+		case sbom.Purpose_OPERATINGSYSTEM:
 			c.Type = cdx.ComponentTypeOS
-		case "platform":
-			c.Type = cdx.ComponentTypePlatform
-		case "":
-			// no node PrimaryPurpose set
+		/*
+			case "platform":
+				c.Type = cdx.ComponentTypePlatform
+		*/
 		default:
 			// TODO(degradation): Non-matching primary purpose to component type mapping
 		}

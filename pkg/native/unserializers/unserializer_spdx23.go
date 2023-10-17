@@ -92,12 +92,19 @@ func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 		LicenseComments: p.PackageLicenseComments,
 		Copyright:       p.PackageCopyrightText,
 		SourceInfo:      p.PackageSourceInfo,
-		PrimaryPurpose:  p.PrimaryPackagePurpose,
 		Comment:         p.PackageComment,
 		Summary:         p.PackageSummary,
 		Description:     p.PackageDescription,
 		Attribution:     p.PackageAttributionTexts,
 		Identifiers:     map[int32]string{},
+	}
+
+	purpose_value, ok := sbom.Purpose_value[string(p.PrimaryPackagePurpose)]
+	if !ok {
+		// Handle the error or set a default value
+		//node.PrimaryPurpose = sbom.Purpose_UNKNOWN_PURPOSE
+	} else {
+		n.PrimaryPurpose = sbom.Purpose(purpose_value)
 	}
 
 	// TODO(degradation) NOASSERTION

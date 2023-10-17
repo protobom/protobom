@@ -150,7 +150,6 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 		LicenseConcluded:   u.licenseChoicesToLicenseString(c.Licenses),
 		Copyright:          c.Copyright,
 		Hashes:             map[int32]string{},
-		PrimaryPurpose:     string(c.Type),
 		Description:        c.Description,
 		Attribution:        []string{},
 		Suppliers:          []*sbom.Person{}, // TODO
@@ -164,6 +163,16 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 	// application | framework | library | container | operating-system | device | firmware | file
 	if c.Type == cdx.ComponentTypeFile {
 		node.Type = sbom.Node_FILE
+		node.PrimaryPurpose = sbom.Purpose(sbom.Purpose_value["FILE"])
+	} else {
+		value, ok := sbom.Purpose_value[string(c.Type)]
+		if !ok {
+			// Handle the error or set a default value
+			//node.PrimaryPurpose = sbom.Purpose_UNKNOWN_PURPOSE
+		} else {
+			node.PrimaryPurpose = sbom.Purpose(value)
+		}
+
 	}
 
 	// External references

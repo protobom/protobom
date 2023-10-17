@@ -217,7 +217,7 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			PackageComment:            node.Comment,
 			PackageExternalReferences: []*v2_3.PackageExternalReference{},
 			PackageAttributionTexts:   node.Attribution,
-			//PrimaryPackagePurpose:     node.PrimaryPurpose,
+			// PrimaryPackagePurpose:     node.PrimaryPurpose,
 			Annotations: []v2_3.Annotation{},
 
 			// The files field may never be used... Or should it?

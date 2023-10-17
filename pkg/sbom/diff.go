@@ -2,6 +2,7 @@ package sbom
 
 import (
 	"slices"
+	"time"
 
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -16,8 +17,8 @@ type NodeDiff struct {
 // that are different in n2 from n. If no changes are found, Diff returns nil
 func (n *Node) Diff(n2 *Node) *NodeDiff {
 	nd := NodeDiff{
-		Added:   NewNode(),
-		Removed: NewNode(),
+		Added:   &Node{},
+		Removed: &Node{},
 	}
 
 	a, r, c := diffString(n.Id, n2.Id)
@@ -172,11 +173,20 @@ func diffString(s1, s2 string) (added, removed string, count int) {
 
 // diffDates takes two dates, comapres them and returns d2 in added if there is
 // a change, s1 in removed if d2 is nil. count will be 1 if there was a change.
-func diffDates(d1, d2 *timestamppb.Timestamp) (added, removed *timestamppb.Timestamp, count int) {
-	if (d1 != nil && d2 != nil && d1 != d2) || (d1 == nil && d2 != nil) {
-		return d2, nil, 1
+func diffDates(dt1, dt2 *timestamppb.Timestamp) (added, removed *timestamppb.Timestamp, count int) {
+	var d1, d2 *time.Time
+	if dt1 != nil {
+		da1 := dt1.AsTime()
+		d1 = &da1
+	}
+	if dt2 != nil {
+		da2 := dt2.AsTime()
+		d2 = &da2
+	}
+	if (d1 != nil && d2 != nil && d1.Unix() != d2.Unix()) || (d1 == nil && d2 != nil) {
+		return dt2, nil, 1
 	} else if d1 != nil && d2 == nil {
-		return nil, d1, 1
+		return nil, dt1, 1
 	}
 	return nil, nil, 0
 }

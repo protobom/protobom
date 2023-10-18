@@ -305,45 +305,38 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
 	} else {
-		// TODO: Does not account for n.PrimaryPurpose of sbom.Purpose_FIRMWARE, sbom.Purpose_SOURCE,
-		//            sbom.Purpose_ARCHIVE, sbom.Purpose_INSTALL
-		// TODO: Does not ever assign c.Type of cdx.ComponentTypeData, cdx.ComponentTypeDeviceDriver,
-		//            cdx.ComponentTypeMachineLearningModel, cdx.ComponentTypePlatform
-		switch n.PrimaryPurpose {
-		case sbom.Purpose_APPLICATION:
-			c.Type = cdx.ComponentTypeApplication
-		case sbom.Purpose_CONTAINER:
-			c.Type = cdx.ComponentTypeContainer
-		/*
-			case "data":
+		if len(n.PrimaryPurpose) > 1 {
+			// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but cdx.Component only allows single Type so we are using the first
+		}
+		if len(n.PrimaryPurpose) > 0 {
+			switch n.PrimaryPurpose[0] {
+			case sbom.Purpose_APPLICATION, sbom.Purpose_EXECUTABLE, sbom.Purpose_INSTALL:
+				c.Type = cdx.ComponentTypeApplication
+			case sbom.Purpose_CONTAINER:
+				c.Type = cdx.ComponentTypeContainer
+			case sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST, sbom.Purpose_OTHER:
 				c.Type = cdx.ComponentTypeData
-		*/
-		case sbom.Purpose_DEVICE:
-			c.Type = cdx.ComponentTypeDevice
-		/*
-			case "device-driver":
+			case sbom.Purpose_DEVICE:
+				c.Type = cdx.ComponentTypeDevice
+			case sbom.Purpose_DEVICE_DRIVER:
 				c.Type = cdx.ComponentTypeDeviceDriver
-		*/
-		case sbom.Purpose_FILE:
-			c.Type = cdx.ComponentTypeFile
-		case sbom.Purpose_FIRMWARE:
-			c.Type = cdx.ComponentTypeFirmware
-		case sbom.Purpose_FRAMEWORK:
-			c.Type = cdx.ComponentTypeFramework
-		case sbom.Purpose_LIBRARY:
-			c.Type = cdx.ComponentTypeLibrary
-		/*
-			case "machine-learning-model":
+			case sbom.Purpose_FILE, sbom.Purpose_PATCH, sbom.Purpose_SOURCE, sbom.Purpose_ARCHIVE:
+				c.Type = cdx.ComponentTypeFile
+			case sbom.Purpose_FIRMWARE:
+				c.Type = cdx.ComponentTypeFirmware
+			case sbom.Purpose_FRAMEWORK:
+				c.Type = cdx.ComponentTypeFramework
+			case sbom.Purpose_LIBRARY, sbom.Purpose_MODULE:
+				c.Type = cdx.ComponentTypeLibrary
+			case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
 				c.Type = cdx.ComponentTypeMachineLearningModel
-		*/
-		case sbom.Purpose_OPERATINGSYSTEM:
-			c.Type = cdx.ComponentTypeOS
-		/*
-			case "platform":
+			case sbom.Purpose_OPERATING_SYSTEM:
+				c.Type = cdx.ComponentTypeOS
+			case sbom.Purpose_PLATFORM:
 				c.Type = cdx.ComponentTypePlatform
-		*/
-		default:
-			// TODO(degradation): Non-matching primary purpose to component type mapping
+			default:
+				// TODO(degradation): Non-matching primary purpose to component type mapping
+			}
 		}
 	}
 

@@ -30,12 +30,22 @@ We strive to maintain a consistent code style throughout the project. When contr
 
 - Use meaningful variable and function names following the camel case convention (`myVariable`, `myFunction`).
 - Write clear and concise comments to describe your code's purpose and functionality.
-- Adhere to the official Go formatting guidelines by running `gofmt` or using an editor that automatically formats your code.
+- Adhere to Go formatting guidelines by running using gofumpt and can be ran using `golangci-lint run` or by using recommit hooks. 
 - Follow the best practices and idiomatic style described in [Effective Go](https://golang.org/doc/effective_go.html).
 
 ## Testing
 
-We highly encourage writing tests for new features and bug fixes. This ensures the stability and reliability of the codebase. Reference [README.md](test/conformance/README.md) for conformance testing. 
+We highly encourage writing tests for new features and bug fixes. This ensures the stability and reliability of the codebase. There is unit/integration testing and conformance testing. 
+
+### Conformance Testing
+The purpose of conformance testing is to ensure that the system or software meets the requirements set forth by the relevant standards or specifications. Reference [README.md](test/conformance/README.md) for more details about conformance testing.
+
+### Unit Testing
+The purpose of unit testing is to ensure that each unit of code functions correctly and performs as intended. Reference [README.md](test/unit_testing/README.md) for more details about unit testing.
+
+
+### Integration Testing
+The purpose of integration testing is to verify that different components or modules of a system work together correctly and produce the expected outputs when integrated. Reference [README.md](test/integration_testing/README.md) for more details about integration testing.
 
 ## Issue Tracker
 
@@ -43,6 +53,8 @@ If you encounter any issues or have suggestions for improvements, please open an
 
 ## License
 
-By contributing to the BOM Squad project, you agree that your contributions will be licensed under the [Apache 2.0 License](LICENSE).
+When contributing to the protobom project, it is important to understand and agree to the licensing terms. All contributions to the project will be licensed under the Apache 2.0 License. By submitting a pull request, you are agreeing to these terms.
+
+To ensure a clear licensing history and proper attribution, code commits in the project require a signoff. The signoff indicates that you have read and agree to the Developer Certificate of Origin (DCO), which states that you have the right to contribute the code and that it does not infringe on any copyright or intellectual property rights. The DCO signoff helps protect the project and its contributors.
 
 Thank you for contributing to protobom! We appreciate your help in making our project better.

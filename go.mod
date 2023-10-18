@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/CycloneDX/cyclonedx-go v0.7.2
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.3.1
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
 	github.com/sirupsen/logrus v1.9.3

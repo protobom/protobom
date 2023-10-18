@@ -335,6 +335,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 			case sbom.Purpose_PLATFORM:
 				c.Type = cdx.ComponentTypePlatform
 			default:
+				//nolint:staticcheck // SA9003: empty branch intended for future use
 				// TODO(degradation): Non-matching primary purpose to component type mapping
 			}
 		}

@@ -268,7 +268,7 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			case sbom.Purpose_PLATFORM:
 				p.PrimaryPackagePurpose = "OTHER"
 			default:
-				//nolint:staticcheck // SA9003: empty branch intended for future use
+				//nolint:unused // SA9003: empty branch intended for future use
 				// TODO(degradation): Non-matching primary purpose to component type mapping
 			}
 

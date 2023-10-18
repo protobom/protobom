@@ -11,7 +11,7 @@ require (
 	github.com/spdx/tools-golang v0.5.3
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/protobuf v1.31.0
-	sigs.k8s.io/release-utils v0.7.4
+	sigs.k8s.io/release-utils v0.7.5
 )
 
 require (

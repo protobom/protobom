@@ -193,7 +193,7 @@ func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 		DownloadLocation:   n.UrlDownload,
 		PackageUrl:         string(n.Purl()),
 		HomePage:           n.UrlHome,
-		Purpose:            []string{},
+		Purpose:            purposeStringsFromPurpose(n.PrimaryPurpose),
 		ContentIdentifier:  "",
 		OriginatedBy:       []string{},
 		SuppliedBy:         []string{},
@@ -234,7 +234,7 @@ func (spdx3 *SPDX3) nodeToFile(n *sbom.Node) (file, error) {
 		SpdxId:            n.Id,
 		Name:              n.Name,
 		ContentType:       "",
-		Purpose:           []string{},
+		Purpose:           purposeStringsFromPurpose(n.PrimaryPurpose),
 		ContentIdentifier: "",
 	}
 	return f, nil
@@ -251,4 +251,73 @@ func (spdx3 *SPDX3) Render(rawDoc interface{}, w io.Writer, o *native.RenderOpti
 		return fmt.Errorf("encoding SBOM: %w", err)
 	}
 	return nil
+}
+
+func purposeStringsFromPurpose(purposes []sbom.Purpose) []string {
+	var returnstrings []string
+
+	for _, purpose := range purposes {
+		// Allowed values: application, archive, bom, configuration, container, data, device, documentation, evidence, executable, file, firmware, framework, install, library, manifest, model, module, operatingSystem, other, patch, requirement, source, specification, test
+		// Only two CDX values dont map perfectly:
+		//  "device-driver" mapped to "device"
+		//  "platform" mapped to "other"
+
+		switch purpose {
+		case sbom.Purpose_APPLICATION:
+			returnstrings = append(returnstrings, "application")
+		case sbom.Purpose_ARCHIVE:
+			returnstrings = append(returnstrings, "archive")
+		case sbom.Purpose_BOM:
+			returnstrings = append(returnstrings, "bom")
+		case sbom.Purpose_CONFIGURATION:
+			returnstrings = append(returnstrings, "configuration")
+		case sbom.Purpose_CONTAINER:
+			returnstrings = append(returnstrings, "container")
+		case sbom.Purpose_DATA:
+			returnstrings = append(returnstrings, "data")
+		case sbom.Purpose_DEVICE, sbom.Purpose_DEVICE_DRIVER:
+			returnstrings = append(returnstrings, "device")
+		case sbom.Purpose_DOCUMENTATION:
+			returnstrings = append(returnstrings, "documentation")
+		case sbom.Purpose_EVIDENCE:
+			returnstrings = append(returnstrings, "evidence")
+		case sbom.Purpose_EXECUTABLE:
+			returnstrings = append(returnstrings, "executable")
+		case sbom.Purpose_FILE:
+			returnstrings = append(returnstrings, "file")
+		case sbom.Purpose_FIRMWARE:
+			returnstrings = append(returnstrings, "firmware")
+		case sbom.Purpose_FRAMEWORK:
+			returnstrings = append(returnstrings, "framework")
+		case sbom.Purpose_INSTALL:
+			returnstrings = append(returnstrings, "install")
+		case sbom.Purpose_LIBRARY:
+			returnstrings = append(returnstrings, "library")
+		case sbom.Purpose_MANIFEST:
+			returnstrings = append(returnstrings, "manifest")
+		case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
+			returnstrings = append(returnstrings, "model")
+		case sbom.Purpose_MODULE:
+			returnstrings = append(returnstrings, "module")
+		case sbom.Purpose_OPERATING_SYSTEM:
+			returnstrings = append(returnstrings, "operatingSystem")
+		case sbom.Purpose_PATCH:
+			returnstrings = append(returnstrings, "patch")
+		case sbom.Purpose_REQUIREMENT:
+			returnstrings = append(returnstrings, "requirement")
+		case sbom.Purpose_SOURCE:
+			returnstrings = append(returnstrings, "source")
+		case sbom.Purpose_SPECIFICATION:
+			returnstrings = append(returnstrings, "specification")
+		case sbom.Purpose_TEST:
+			returnstrings = append(returnstrings, "test")
+		case sbom.Purpose_OTHER, sbom.Purpose_PLATFORM:
+			returnstrings = append(returnstrings, "other")
+
+		default:
+			// TODO(degradation): Non-matching primary purpose to component type mapping
+		}
+	}
+
+	return returnstrings
 }

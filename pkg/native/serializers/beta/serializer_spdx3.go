@@ -202,7 +202,6 @@ func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 	}
 
 	for _, purpose := range n.GetPrimaryPurpose() {
-
 		// Allowed values: application, archive, bom, configuration, container, data, device, documentation, evidence, executable, file, firmware, framework, install, library, manifest, model, module, operatingSystem, other, patch, requirement, source, specification, test
 		// Only two CDX values dont map perfectly:
 		//  "device-driver" mapped to "device"
@@ -263,7 +262,6 @@ func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 		default:
 			// TODO(degradation): Non-matching primary purpose to component type mapping
 		}
-
 	}
 
 	for algo, h := range n.Hashes {
@@ -304,7 +302,6 @@ func (spdx3 *SPDX3) nodeToFile(n *sbom.Node) (file, error) {
 	}
 
 	for _, purpose := range n.GetPrimaryPurpose() {
-
 		// Allowed values: application, archive, bom, configuration, container, data, device, documentation, evidence, executable, file, firmware, framework, install, library, manifest, model, module, operatingSystem, other, patch, requirement, source, specification, test
 		// Only two CDX values dont map perfectly:
 		//  "device-driver" mapped to "device"
@@ -367,7 +364,6 @@ func (spdx3 *SPDX3) nodeToFile(n *sbom.Node) (file, error) {
 		default:
 			// TODO(degradation): Non-matching primary purpose to component type mapping
 		}
-
 	}
 	return f, nil
 }

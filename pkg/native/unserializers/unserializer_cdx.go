@@ -159,19 +159,35 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 		FileTypes:          []string{},
 	}
 
-	// type should be one of
-	// application | framework | library | container | operating-system | device | firmware | file
-	if c.Type == cdx.ComponentTypeFile {
+	// CycloneDX 1.5 types: "application", "framework", "library", "container", "platform", "operating-system", "device", "device-driver", "firmware", "file", "machine-learning-model", "data"
+	switch c.Type {
+	case cdx.ComponentTypeApplication:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_APPLICATION}
+	case cdx.ComponentTypeFramework:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FRAMEWORK}
+	case cdx.ComponentTypeLibrary:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY}
+	case cdx.ComponentTypeContainer:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_CONTAINER}
+	case cdx.ComponentTypePlatform:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_PLATFORM}
+	case cdx.ComponentTypeOS:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_OPERATING_SYSTEM}
+	case cdx.ComponentTypeDevice:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DEVICE}
+	case cdx.ComponentTypeDeviceDriver:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DEVICE_DRIVER}
+	case cdx.ComponentTypeFirmware:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FIRMWARE}
+	case cdx.ComponentTypeFile:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FILE}
 		node.Type = sbom.Node_FILE
-		node.PrimaryPurpose = sbom.Purpose(sbom.Purpose_value["FILE"])
-	} else {
-		value, ok := sbom.Purpose_value[string(c.Type)]
-		if !ok {
-			// Handle the error or set a default value
-			// node.PrimaryPurpose = sbom.Purpose_UNKNOWN_PURPOSE
-		} else {
-			node.PrimaryPurpose = sbom.Purpose(value)
-		}
+	case cdx.ComponentTypeMachineLearningModel:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_MACHINE_LEARNING_MODEL}
+	case cdx.ComponentTypeData:
+		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DATA}
+	default:
+		// TODO(degradation): unknown ComponentType not preserved in protobom struct
 	}
 
 	// External references

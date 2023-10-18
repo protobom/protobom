@@ -55,7 +55,7 @@ message Node {
     repeated string file_types = 27; // File types
     map<int32,string> identifiers = 28;  // Software identifiers
     map<int32,string> hashes = 29;
-    Purpose primary_purpose = 30;
+    repeated Purpose primary_purpose = 30;
 
     enum NodeType {
         PACKAGE = 0;
@@ -211,16 +211,32 @@ enum SoftwareIdentifierType {
 
 enum Purpose {
     UNKNOWN_PURPOSE = 0;
-    APPLICATION = 1;
-    FRAMEWORK = 2;
-    LIBRARY = 3;
-    CONTAINER = 4;
-    OPERATINGSYSTEM = 5;
-    DEVICE = 6;
-    FIRMWARE = 7;
-    SOURCE = 8;
-    ARCHIVE = 9;
-    FILE = 10;
-    INSTALL = 11;
-    OTHER = 12;
+    APPLICATION = 1;  			// SPDX2.3, CDX1.5, SPDX3.0
+    ARCHIVE = 2; 				// SPDX2.3, SPDX3.0
+    BOM = 3;  					// SPDX3.0
+    CONFIGURATION = 4;  		// SPDX3.0
+    CONTAINER = 5;  			// SPDX2.3, CDX1.5, SPDX3.0
+    DATA = 6; 					// CDX1.5, SPDX3.0
+    DEVICE = 7;  				// SPDX2.3, CDX1.5, SPDX3.0
+    DEVICE_DRIVER = 8; 			// CDX1.5, SPDX3.0
+    DOCUMENTATION = 9; 			// SPDX3.0
+    EVIDENCE = 10; 				// SPDX3.0
+    EXECUTABLE = 11; 			// SPDX3.0
+    FILE = 12;					// SPDX2.3, CDX1.5, SPDX3.0
+    FIRMWARE = 13;				// SPDX2.3, CDX1.5, SPDX3.0
+    FRAMEWORK = 14;			    // SPDX2.3, CDX1.5, SPDX3.0
+    INSTALL = 15;				// SPDX2.3, SPDX3.0
+    LIBRARY = 16;				// SPDX2.3, CDX1.5, SPDX3.0
+    MACHINE_LEARNING_MODEL = 17;	// CDX1.5
+    MANIFEST = 18; 				// SPDX3.0
+    MODEL = 19;				    // SPDX3.0
+    MODULE = 20;				// SPDX3.0
+    OPERATING_SYSTEM = 21;		// SPDX2.3, CDX1.5, SPDX3.0
+    OTHER = 22;				    // SPDX2.3, SPDX3.0
+    PATCH = 23;					// SPDX3.0
+    PLATFORM = 24;				// SPDX2.3, CDX1.5, SPDX3.0
+    REQUIREMENT = 25;			// SPDX3.0
+    SOURCE = 26;				// SPDX2.3, SPDX3.0
+    SPECIFICATION = 27;			// SPDX3.0
+    TEST = 28; 					// SPDX3.0
 }

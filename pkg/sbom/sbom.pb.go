@@ -198,9 +198,9 @@ const (
 	Purpose_OPERATING_SYSTEM       Purpose = 21 // SPDX2.3, CDX1.5, SPDX3.0
 	Purpose_OTHER                  Purpose = 22 // SPDX2.3, SPDX3.0
 	Purpose_PATCH                  Purpose = 23 // SPDX3.0
-	Purpose_PLATFORM               Purpose = 24 // SPDX2.3, SPDX3.0
+	Purpose_PLATFORM               Purpose = 24 // SPDX2.3, CDX1.5, SPDX3.0
 	Purpose_REQUIREMENT            Purpose = 25 // SPDX3.0
-	Purpose_SOURCE                 Purpose = 26 // CDX1.5, SPDX3.0
+	Purpose_SOURCE                 Purpose = 26 // SPDX2.3, SPDX3.0
 	Purpose_SPECIFICATION          Purpose = 27 // SPDX3.0
 	Purpose_TEST                   Purpose = 28 // SPDX3.0
 )

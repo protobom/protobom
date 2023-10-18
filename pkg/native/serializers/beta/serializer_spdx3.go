@@ -254,7 +254,6 @@ func (spdx3 *SPDX3) Render(rawDoc interface{}, w io.Writer, o *native.RenderOpti
 }
 
 func purposeStringsFromPurpose(purposes []sbom.Purpose) []string {
-
 	var returnstrings []string
 
 	for _, purpose := range purposes {

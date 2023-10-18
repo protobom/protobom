@@ -50,7 +50,7 @@ func (n *Node) Update(n2 *Node) {
 	if n2.SourceInfo != "" {
 		n.SourceInfo = n2.SourceInfo
 	}
-	if n2.PrimaryPurpose != "" {
+	if len(n2.PrimaryPurpose) > 0 {
 		n.PrimaryPurpose = n2.PrimaryPurpose
 	}
 	if n2.Comment != "" {
@@ -127,7 +127,7 @@ func (n *Node) Augment(n2 *Node) {
 	if n.SourceInfo == "" && n2.SourceInfo != "" {
 		n.SourceInfo = n2.SourceInfo
 	}
-	if n.PrimaryPurpose == "" && n2.PrimaryPurpose != "" {
+	if len(n.PrimaryPurpose) == 0 && len(n2.PrimaryPurpose) > 0 {
 		n.PrimaryPurpose = n2.PrimaryPurpose
 	}
 	if n.Comment == "" && n2.Comment != "" {
@@ -240,7 +240,10 @@ func (n *Node) flatString() string {
 			for i := 0; i < v.List().Len(); i++ {
 				pairs = append(pairs, fmt.Sprintf("%s[%d]:%s", fd.FullName(), i, v.List().Get(i)))
 			}
-
+		case "bomsquad.protobom.Node.primary_purpose":
+			for _, p := range n.PrimaryPurpose {
+				pairs = append(pairs, fmt.Sprintf("primary_purpose:%s", p.String()))
+			}
 		case "bomsquad.protobom.Node.release_date":
 			if n.ReleaseDate != nil {
 				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ReleaseDate.AsTime().Unix()))

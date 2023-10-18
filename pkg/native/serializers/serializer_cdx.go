@@ -210,9 +210,7 @@ func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, err
 
 			// TODO(degradation): Here we would document other root level elements
 			// are not added to to document
-			if true { // temp workaround in favor of adding a lint tag
-				break
-			}
+			noop() // temp workaround in favor of adding a lint tag
 		}
 	}
 
@@ -290,6 +288,8 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 	return dependencies, nil
 }
 
+func noop() {}
+
 // nodeToComponent converts a node in protobuf to a CycloneDX component
 func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n == nil {
@@ -307,6 +307,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	} else {
 		if len(n.PrimaryPurpose) > 1 {
 			// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but cdx.Component only allows single Type so we are using the first
+			noop() // temp workaround in favor of adding a lint tag
 		}
 		if len(n.PrimaryPurpose) > 0 {
 			switch n.PrimaryPurpose[0] {
@@ -336,9 +337,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				c.Type = cdx.ComponentTypePlatform
 			default:
 				// TODO(degradation): Non-matching primary purpose to component type mapping
-				if true { // temp workaround in favor of adding a lint tag
-					break
-				}
+				noop() // temp workaround in favor of adding a lint tag
 			}
 		}
 	}

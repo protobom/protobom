@@ -92,12 +92,42 @@ func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 		LicenseComments: p.PackageLicenseComments,
 		Copyright:       p.PackageCopyrightText,
 		SourceInfo:      p.PackageSourceInfo,
-		PrimaryPurpose:  p.PrimaryPackagePurpose,
 		Comment:         p.PackageComment,
 		Summary:         p.PackageSummary,
 		Description:     p.PackageDescription,
 		Attribution:     p.PackageAttributionTexts,
 		Identifiers:     map[int32]string{},
+	}
+
+	// SPDX 2.3 PrimaryPackagePurpose types: APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER
+	switch p.PrimaryPackagePurpose {
+	case "APPLICATION":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_APPLICATION}
+	case "FRAMEWORK":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FRAMEWORK}
+	case "LIBRARY":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY}
+	case "CONTAINER":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_CONTAINER}
+	case "OPERATING-SYSTEM":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_OPERATING_SYSTEM}
+	case "DEVICE":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DEVICE}
+	case "FIRMWARE":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FIRMWARE}
+	case "SOURCE":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_SOURCE}
+	case "ARCHIVE":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_ARCHIVE}
+	case "FILE":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FILE}
+	case "INSTALL":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_INSTALL}
+	case "OTHER":
+		n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_OTHER}
+	case "":
+	default:
+		// TODO(degradation): unknown PrimaryPackagePurpose not preserved in protobom struct
 	}
 
 	// TODO(degradation) NOASSERTION

@@ -264,3 +264,43 @@ func TestNodeFlatString(t *testing.T) {
 		require.Equal(t, tc.expectedString, s)
 	}
 }
+
+func TestNodeCopy(t *testing.T) {
+	original := &Node{
+		Licenses: []string{"Apache-2.0"},
+		Hashes: map[int32]string{
+			int32(HashAlgorithm_SHA1):   "f3ae11065cafc14e27a1410ae8be28e600bb8336",
+			int32(HashAlgorithm_SHA256): "4f232eeb99e1663d07f0af1af6ea262bf594934b694228e71fd8f159f9a19f32",
+			int32(HashAlgorithm_SHA512): "8044d0df34242699ad73bfe99b9ac3d6bbdaa4f8ebce1e23ee5c7f9fe59db8ad7b01fe94e886941793aee802008a35b05a30bc51426db796aa21e5e91b7ed9be",
+		},
+		FileTypes: []string{"TEXT"},
+		Suppliers: []*Person{
+			{
+				Name:  "John Doe",
+				Email: "john@doe.com",
+			},
+		},
+		Originators: []*Person{
+			{
+				Name:  "Jane Doe",
+				Email: "jane@doe.com",
+			},
+		},
+	}
+
+	copied := original.Copy()
+
+	// modifying the original to ensure the deep copy worked
+	original.Suppliers[0].Name = "Suppliers Copy Failed"
+	original.Originators[0].Email = "Originators Copy Failed"
+	original.Licenses[0] = "Licenses Copy Failed"
+	original.Hashes[int32(HashAlgorithm_SHA1)] = "Hashes Copy Failed"
+	original.FileTypes[0] = "FileTypes Copy Failed"
+
+	// The copied Node should reflect the original values, not the subsequent changes.
+	require.Equal(t, "John Doe", copied.Suppliers[0].Name)
+	require.Equal(t, "jane@doe.com", copied.Originators[0].Email)
+	require.Equal(t, "Apache-2.0", copied.Licenses[0])
+	require.Equal(t, "f3ae11065cafc14e27a1410ae8be28e600bb8336", copied.Hashes[int32(HashAlgorithm_SHA1)])
+	require.Equal(t, "TEXT", copied.FileTypes[0])
+}

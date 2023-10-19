@@ -10,6 +10,9 @@ issues:
         - gocritic
         - golint
         - dupl
+    - linters:
+        - staticcheck
+      text: "^SA9003:"  # Ignore empty branch lint errors while we are scaffolding new functionality
 
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0

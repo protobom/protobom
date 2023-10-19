@@ -309,12 +309,10 @@ func flatStringStrSlice(name protoreflect.FullName, protoSlice protoreflect.List
 	}
 
 	sort.Strings(vals)
-
 	ret := ""
 	for i, s := range vals {
 		ret += fmt.Sprintf("%s[%d]:%s", name, i, s)
 	}
-
 	return ret
 }
 

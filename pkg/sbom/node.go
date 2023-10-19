@@ -3,10 +3,13 @@ package sbom
 import (
 	"crypto/sha256"
 	"fmt"
+	"maps"
+	"slices"
 	"sort"
 	"strings"
 
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // This file contains methods to work with the generated node type
@@ -170,7 +173,7 @@ func (n *Node) Augment(n2 *Node) {
 
 // Copy returns a new node that is a copy of the node
 func (n *Node) Copy() *Node {
-	return &Node{
+	no := &Node{
 		Id:                 n.Id,
 		Type:               n.Type,
 		Name:               n.Name,
@@ -178,26 +181,48 @@ func (n *Node) Copy() *Node {
 		FileName:           n.FileName,
 		UrlHome:            n.UrlHome,
 		UrlDownload:        n.UrlDownload,
-		Licenses:           n.Licenses,
+		Licenses:           slices.Clone(n.Licenses),
 		LicenseConcluded:   n.LicenseConcluded,
 		LicenseComments:    n.LicenseComments,
 		Copyright:          n.Copyright,
-		Hashes:             n.Hashes,
+		Hashes:             maps.Clone(n.Hashes),
 		SourceInfo:         n.SourceInfo,
 		PrimaryPurpose:     n.PrimaryPurpose,
 		Comment:            n.Comment,
 		Summary:            n.Summary,
 		Description:        n.Description,
-		Attribution:        n.Attribution,
-		Suppliers:          n.Suppliers,
-		Originators:        n.Originators,
-		ReleaseDate:        n.ReleaseDate,
-		BuildDate:          n.BuildDate,
-		ValidUntilDate:     n.ValidUntilDate,
-		ExternalReferences: n.ExternalReferences,
-		Identifiers:        n.Identifiers,
-		FileTypes:          n.FileTypes,
+		Attribution:        slices.Clone(n.Attribution),
+		Suppliers:          []*Person{},
+		Originators:        []*Person{},
+		ReleaseDate:        nil,
+		BuildDate:          nil,
+		ValidUntilDate:     nil,
+		ExternalReferences: []*ExternalReference{},
+		Identifiers:        maps.Clone(n.Identifiers),
+		FileTypes:          slices.Clone(n.FileTypes),
 	}
+
+	if n.ReleaseDate != nil {
+		no.ReleaseDate = timestamppb.New(n.ReleaseDate.AsTime())
+	}
+	if n.BuildDate != nil {
+		no.BuildDate = timestamppb.New(n.BuildDate.AsTime())
+	}
+	if n.ValidUntilDate != nil {
+		no.ValidUntilDate = timestamppb.New(n.ValidUntilDate.AsTime())
+	}
+
+	for _, p := range n.Suppliers {
+		no.Suppliers = append(no.Suppliers, p.Copy())
+	}
+	for _, p := range n.Originators {
+		no.Originators = append(no.Originators, p.Copy())
+	}
+	for _, e := range n.ExternalReferences {
+		no.ExternalReferences = append(no.ExternalReferences, e.Copy())
+	}
+
+	return no
 }
 
 // Equal compares Node n to n2 and returns true if they are the same
@@ -236,11 +261,6 @@ func (n *Node) flatString() string {
 			for _, t := range idKeys {
 				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)]))
 			}
-		case "bomsquad.protobom.Node.attribution":
-			for i := 0; i < v.List().Len(); i++ {
-				pairs = append(pairs, fmt.Sprintf("%s[%d]:%s", fd.FullName(), i, v.List().Get(i)))
-			}
-
 		case "bomsquad.protobom.Node.release_date":
 			if n.ReleaseDate != nil {
 				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ReleaseDate.AsTime().Unix()))
@@ -255,6 +275,11 @@ func (n *Node) flatString() string {
 			}
 		case "bomsquad.protobom.Node.hashes":
 			pairs = append(pairs, string(fd.FullName())+":"+flatStringMap(v.Map()))
+		case "bomsquad.protobom.Node.licenses",
+			"bomsquad.protobom.Node.attribution",
+			"bomsquad.protobom.Node.file_types":
+			pairs = append(pairs, flatStringStrSlice(fd.FullName(), v.List()))
+
 		default:
 			pairs = append(pairs, string(fd.FullName())+":"+v.String())
 		}
@@ -263,6 +288,20 @@ func (n *Node) flatString() string {
 
 	sort.Strings(pairs)
 	return strings.Join(pairs, ":")
+}
+
+// flatStringStrSlice returns a deterministic string representation of a slice of strings
+func flatStringStrSlice(name protoreflect.FullName, protoSlice protoreflect.List) string {
+	vals := []string{}
+	for i := 0; i < protoSlice.Len(); i++ {
+		vals = append(vals, protoSlice.Get(i).String())
+	}
+	slices.Sort(vals)
+	ret := ""
+	for i, s := range vals {
+		ret += fmt.Sprintf("%s[%d]:%s", name, i, s)
+	}
+	return ret
 }
 
 func flatStringMap(protoMap protoreflect.Map) string {

@@ -23,7 +23,7 @@ func TestNodeDiff(t *testing.T) {
 		LicenseComments:  "License inferred by an automated classifer",
 		Copyright:        "Copyright (c) 2023 The Protobom Authors",
 		SourceInfo:       "",
-		PrimaryPurpose:   "APPLICATION",
+		PrimaryPurpose:   []Purpose{Purpose_APPLICATION},
 		Comment:          "This a node to test node diffing",
 		Summary:          "A non existent node that serves as an example to diff",
 		Description:      "A non existent software package that can be used to test data",

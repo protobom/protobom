@@ -76,10 +76,10 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 	nd.Removed.SourceInfo = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.PrimaryPurpose, n2.PrimaryPurpose)
-	nd.Added.PrimaryPurpose = a
-	nd.Removed.PrimaryPurpose = r
-	nd.DiffCount += c
+	ap, rp, cp := diffPurposeSlice(n.PrimaryPurpose, n2.PrimaryPurpose)
+	nd.Added.PrimaryPurpose = ap
+	nd.Removed.PrimaryPurpose = rp
+	nd.DiffCount += cp
 
 	a, r, c = diffString(n.Comment, n2.Comment)
 	nd.Added.Comment = a
@@ -99,7 +99,7 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 	addedD, removedD, count := diffDates(n.ReleaseDate, n2.ReleaseDate)
 	nd.Added.ReleaseDate = addedD
 	nd.Removed.ReleaseDate = removedD
-	nd.DiffCount += int(count)
+	nd.DiffCount += count
 
 	addedD, removedD, count = diffDates(n.BuildDate, n2.BuildDate)
 	nd.Added.BuildDate = addedD
@@ -157,9 +157,9 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 	return nil
 }
 
-// diffString takes compares s2 against s1. If they differ returns the value of
+// diffString compares s2 against s1. If they differ returns the value of
 // s2 in the removed return value. If s2 is blank, removed will have the original
-// value of s1. If the strings are differente count will be 1, zero if not.
+// value of s1. If the strings are different count will be 1, zero if not.
 func diffString(s1, s2 string) (added, removed string, count int) {
 	if s1 == s2 {
 		return "", "", 0
@@ -171,7 +171,7 @@ func diffString(s1, s2 string) (added, removed string, count int) {
 	return s2, "", 1
 }
 
-// diffDates takes two dates, comapres them and returns d2 in added if there is
+// diffDates takes two dates, compares them and returns d2 in added if there is
 // a change, s1 in removed if d2 is nil. count will be 1 if there was a change.
 func diffDates(dt1, dt2 *timestamppb.Timestamp) (added, removed *timestamppb.Timestamp, count int) {
 	var d1, d2 *time.Time
@@ -282,10 +282,33 @@ func diffIntStrMap(map1, map2 map[int32]string) (added, removed map[int32]string
 	return added, removed, count
 }
 
-// diffStrSlice compares two
+// diffStrSlice compares two string slices and returns what was added and removed
 func diffStrSlice(arr1, arr2 []string) (added, removed []string, count int) {
 	added = []string{}
 	removed = []string{}
+
+	for _, s := range arr2 {
+		if !slices.Contains(arr1, s) {
+			added = append(added, s)
+		}
+	}
+
+	for _, s := range arr1 {
+		if !slices.Contains(arr2, s) {
+			removed = append(removed, s)
+		}
+	}
+
+	if len(added) > 0 || len(removed) > 0 {
+		count = 1
+	}
+	return added, removed, count
+}
+
+// diffPurposeSlice is a copy of diffString but handles lists of purposes instead of strings
+func diffPurposeSlice(arr1, arr2 []Purpose) (added, removed []Purpose, count int) {
+	added = []Purpose{}
+	removed = []Purpose{}
 
 	for _, s := range arr2 {
 		if !slices.Contains(arr1, s) {

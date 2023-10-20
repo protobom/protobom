@@ -53,7 +53,7 @@ func (n *Node) Update(n2 *Node) {
 	if n2.SourceInfo != "" {
 		n.SourceInfo = n2.SourceInfo
 	}
-	if n2.PrimaryPurpose != "" {
+	if len(n2.PrimaryPurpose) > 0 {
 		n.PrimaryPurpose = n2.PrimaryPurpose
 	}
 	if n2.Comment != "" {
@@ -130,7 +130,7 @@ func (n *Node) Augment(n2 *Node) {
 	if n.SourceInfo == "" && n2.SourceInfo != "" {
 		n.SourceInfo = n2.SourceInfo
 	}
-	if n.PrimaryPurpose == "" && n2.PrimaryPurpose != "" {
+	if len(n.PrimaryPurpose) == 0 && len(n2.PrimaryPurpose) > 0 {
 		n.PrimaryPurpose = n2.PrimaryPurpose
 	}
 	if n.Comment == "" && n2.Comment != "" {
@@ -277,7 +277,8 @@ func (n *Node) flatString() string {
 			pairs = append(pairs, string(fd.FullName())+":"+flatStringMap(v.Map()))
 		case "bomsquad.protobom.Node.licenses",
 			"bomsquad.protobom.Node.attribution",
-			"bomsquad.protobom.Node.file_types":
+			"bomsquad.protobom.Node.file_types",
+			"bomsquad.protobom.Node.primary_purpose":
 			pairs = append(pairs, flatStringStrSlice(fd.FullName(), v.List()))
 
 		default:

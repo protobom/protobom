@@ -217,8 +217,8 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			PackageComment:            node.Comment,
 			PackageExternalReferences: []*v2_3.PackageExternalReference{},
 			PackageAttributionTexts:   node.Attribution,
-			PrimaryPackagePurpose:     node.PrimaryPurpose,
-			Annotations:               []v2_3.Annotation{},
+			// PrimaryPackagePurpose:     node.PrimaryPurpose,
+			Annotations: []v2_3.Annotation{},
 
 			// The files field may never be used... Or should it?
 			// We are mirroring the protbom graph in the SPDX relationship
@@ -229,6 +229,53 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 			// at some point we may need to think of supporting this as an
 			// option.
 			// Files:                       []*v2_3.File{},
+		}
+
+		if len(node.PrimaryPurpose) > 0 && (node.PrimaryPurpose[0] != sbom.Purpose_UNKNOWN_PURPOSE) {
+			// Allowed values: APPLICATION, FRAMEWORK, LIBRARY, CONTAINER, OPERATING-SYSTEM, DEVICE, FIRMWARE, SOURCE, ARCHIVE, FILE, INSTALL, OTHER
+
+			if len(node.PrimaryPurpose) > 1 {
+				// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but spdx.Package only allows single PrimaryPackagePurpose so we are using the first
+				if true { // temp workaround in favor of adding a lint tag
+					break
+				}
+			}
+
+			switch node.PrimaryPurpose[0] {
+			case sbom.Purpose_APPLICATION, sbom.Purpose_EXECUTABLE:
+				p.PrimaryPackagePurpose = "APPLICATION"
+			case sbom.Purpose_FRAMEWORK:
+				p.PrimaryPackagePurpose = "FRAMEWORK"
+			case sbom.Purpose_LIBRARY, sbom.Purpose_MODULE:
+				p.PrimaryPackagePurpose = "LIBRARY"
+			case sbom.Purpose_CONTAINER:
+				p.PrimaryPackagePurpose = "CONTAINER"
+			case sbom.Purpose_OPERATING_SYSTEM:
+				p.PrimaryPackagePurpose = "OPERATING-SYSTEM"
+			case sbom.Purpose_DEVICE, sbom.Purpose_DEVICE_DRIVER:
+				p.PrimaryPackagePurpose = "DEVICE"
+			case sbom.Purpose_FIRMWARE:
+				p.PrimaryPackagePurpose = "FIRMWARE"
+			case sbom.Purpose_SOURCE, sbom.Purpose_PATCH:
+				p.PrimaryPackagePurpose = "SOURCE"
+			case sbom.Purpose_ARCHIVE:
+				p.PrimaryPackagePurpose = "ARCHIVE"
+			case sbom.Purpose_FILE:
+				p.PrimaryPackagePurpose = "FILE"
+			case sbom.Purpose_INSTALL:
+				p.PrimaryPackagePurpose = "INSTALL"
+			case sbom.Purpose_OTHER, sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST:
+				p.PrimaryPackagePurpose = "OTHER"
+			case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
+				p.PrimaryPackagePurpose = "OTHER"
+			case sbom.Purpose_PLATFORM:
+				p.PrimaryPackagePurpose = "OTHER"
+			default:
+				// TODO(degradation): Non-matching primary purpose to component type mapping
+				if true { // temp workaround in favor of adding a lint tag
+					break
+				}
+			}
 		}
 
 		if node.ReleaseDate != nil {

@@ -30,7 +30,9 @@ message Node {
     // map<string,string> hashes = 12;
 
     string source_info = 13;     // any relevant background information or additional comments about the origin
-    string primary_purpose = 14; // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
+    // field 14 was the old string primary_purpose.
+    // Removed, see https://github.com/bom-squad/protobom/issues/124
+    // string primary_purpose = 14; // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
 
     string comment = 15;
     string summary = 16;      // Short package description
@@ -53,6 +55,7 @@ message Node {
     repeated string file_types = 27; // File types
     map<int32,string> identifiers = 28;  // Software identifiers
     map<int32,string> hashes = 29;
+    repeated Purpose primary_purpose = 30;
 
     enum NodeType {
         PACKAGE = 0;
@@ -204,4 +207,36 @@ enum SoftwareIdentifierType {
     CPE22 = 2;
     CPE23 = 3;
     GITOID = 4;
+}
+
+enum Purpose {
+    UNKNOWN_PURPOSE = 0;
+    APPLICATION = 1;  			// SPDX2.3, CDX1.5, SPDX3.0
+    ARCHIVE = 2; 				// SPDX2.3, SPDX3.0
+    BOM = 3;  					// SPDX3.0
+    CONFIGURATION = 4;  		// SPDX3.0
+    CONTAINER = 5;  			// SPDX2.3, CDX1.5, SPDX3.0
+    DATA = 6; 					// CDX1.5, SPDX3.0
+    DEVICE = 7;  				// SPDX2.3, CDX1.5, SPDX3.0
+    DEVICE_DRIVER = 8; 			// CDX1.5, SPDX3.0
+    DOCUMENTATION = 9; 			// SPDX3.0
+    EVIDENCE = 10; 				// SPDX3.0
+    EXECUTABLE = 11; 			// SPDX3.0
+    FILE = 12;					// SPDX2.3, CDX1.5, SPDX3.0
+    FIRMWARE = 13;				// SPDX2.3, CDX1.5, SPDX3.0
+    FRAMEWORK = 14;			    // SPDX2.3, CDX1.5, SPDX3.0
+    INSTALL = 15;				// SPDX2.3, SPDX3.0
+    LIBRARY = 16;				// SPDX2.3, CDX1.5, SPDX3.0
+    MACHINE_LEARNING_MODEL = 17;	// CDX1.5
+    MANIFEST = 18; 				// SPDX3.0
+    MODEL = 19;				    // SPDX3.0
+    MODULE = 20;				// SPDX3.0
+    OPERATING_SYSTEM = 21;		// SPDX2.3, CDX1.5, SPDX3.0
+    OTHER = 22;				    // SPDX2.3, SPDX3.0
+    PATCH = 23;					// SPDX3.0
+    PLATFORM = 24;				// SPDX2.3, CDX1.5, SPDX3.0
+    REQUIREMENT = 25;			// SPDX3.0
+    SOURCE = 26;				// SPDX2.3, SPDX3.0
+    SPECIFICATION = 27;			// SPDX3.0
+    TEST = 28; 					// SPDX3.0
 }

@@ -63,10 +63,10 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	if err != nil {
 		return nil, fmt.Errorf("generating SBOM root component: %w", err)
 	}
-
 	if rootComponent != nil {
 		doc.Metadata.Component = rootComponent
 	}
+
 	if err := s.componentsMaps(ctx, bom); err != nil {
 		return nil, err
 	}
@@ -210,9 +210,7 @@ func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, err
 
 			// TODO(degradation): Here we would document other root level elements
 			// are not added to to document
-			if true { // temp workaround in favor of adding a lint tag
-				break
-			}
+			noop() // temp workaround in favor of adding a lint tag
 		}
 	}
 
@@ -290,6 +288,8 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 	return dependencies, nil
 }
 
+func noop() {}
+
 // nodeToComponent converts a node in protobuf to a CycloneDX component
 func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n == nil {
@@ -305,35 +305,40 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
 	} else {
-		switch strings.ToLower(n.PrimaryPurpose) {
-		case "application":
-			c.Type = cdx.ComponentTypeApplication
-		case "container":
-			c.Type = cdx.ComponentTypeContainer
-		case "data":
-			c.Type = cdx.ComponentTypeData
-		case "device":
-			c.Type = cdx.ComponentTypeDevice
-		case "device-driver":
-			c.Type = cdx.ComponentTypeDeviceDriver
-		case "file":
-			c.Type = cdx.ComponentTypeFile
-		case "firmware":
-			c.Type = cdx.ComponentTypeFirmware
-		case "framework":
-			c.Type = cdx.ComponentTypeFramework
-		case "library":
-			c.Type = cdx.ComponentTypeLibrary
-		case "machine-learning-model":
-			c.Type = cdx.ComponentTypeMachineLearningModel
-		case "operating-system":
-			c.Type = cdx.ComponentTypeOS
-		case "platform":
-			c.Type = cdx.ComponentTypePlatform
-		case "":
-			// no node PrimaryPurpose set
-		default:
-			// TODO(degradation): Non-matching primary purpose to component type mapping
+		if len(n.PrimaryPurpose) > 1 {
+			// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but cdx.Component only allows single Type so we are using the first
+			noop() // temp workaround in favor of adding a lint tag
+		}
+		if len(n.PrimaryPurpose) > 0 {
+			switch n.PrimaryPurpose[0] {
+			case sbom.Purpose_APPLICATION, sbom.Purpose_EXECUTABLE, sbom.Purpose_INSTALL:
+				c.Type = cdx.ComponentTypeApplication
+			case sbom.Purpose_CONTAINER:
+				c.Type = cdx.ComponentTypeContainer
+			case sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST, sbom.Purpose_OTHER:
+				c.Type = cdx.ComponentTypeData
+			case sbom.Purpose_DEVICE:
+				c.Type = cdx.ComponentTypeDevice
+			case sbom.Purpose_DEVICE_DRIVER:
+				c.Type = cdx.ComponentTypeDeviceDriver
+			case sbom.Purpose_FILE, sbom.Purpose_PATCH, sbom.Purpose_SOURCE, sbom.Purpose_ARCHIVE:
+				c.Type = cdx.ComponentTypeFile
+			case sbom.Purpose_FIRMWARE:
+				c.Type = cdx.ComponentTypeFirmware
+			case sbom.Purpose_FRAMEWORK:
+				c.Type = cdx.ComponentTypeFramework
+			case sbom.Purpose_LIBRARY, sbom.Purpose_MODULE:
+				c.Type = cdx.ComponentTypeLibrary
+			case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
+				c.Type = cdx.ComponentTypeMachineLearningModel
+			case sbom.Purpose_OPERATING_SYSTEM:
+				c.Type = cdx.ComponentTypeOS
+			case sbom.Purpose_PLATFORM:
+				c.Type = cdx.ComponentTypePlatform
+			default:
+				// TODO(degradation): Non-matching primary purpose to component type mapping
+				noop() // temp workaround in favor of adding a lint tag
+			}
 		}
 	}
 

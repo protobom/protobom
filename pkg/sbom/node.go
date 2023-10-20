@@ -295,20 +295,9 @@ func (n *Node) flatString() string {
 func flatStringStrSlice(name protoreflect.FullName, protoSlice protoreflect.List) string {
 	vals := []string{}
 	for i := 0; i < protoSlice.Len(); i++ {
-		value := protoSlice.Get(i)
-
-		// Check if the name is for a Purpose enum so we can purpose name not number
-		// Use string values so tests continue to work even if enum numbers change in future
-		if name == "bomsquad.protobom.Node.primary_purpose" {
-			enumVal := int32(value.Interface().(protoreflect.EnumNumber))
-			vals = append(vals, Purpose_name[enumVal])
-		} else {
-			// Default behavior for other types
-			vals = append(vals, value.String())
-		}
+		vals = append(vals, protoSlice.Get(i).String())
 	}
-
-	sort.Strings(vals)
+	slices.Sort(vals)
 	ret := ""
 	for i, s := range vals {
 		ret += fmt.Sprintf("%s[%d]:%s", name, i, s)

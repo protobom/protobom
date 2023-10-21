@@ -110,7 +110,7 @@ func main() {
 	// Create a node to represent the application:
 	appNode := &sbom.Node{
 		Id:               "pkg:generic/my-software@v1.0.0",
-		PrimaryPurpose:   "application",
+		PrimaryPurpose:   []sbom.Purpose{sbom.Purpose_APPLICATION},
 		Name:             "My Software Name",
 		Version:          "v1.0.0",
 		Licenses:         []string{"Apache-2.0"},
@@ -119,9 +119,7 @@ func main() {
 	}
 
 	// Add the application node to the document's nodelist:
-	document.NodeList.AddNode(appNode)
-	// ... and to the document's root elements:
-	document.NodeList.RootElements = append(document.NodeList.RootElements, appNode.Id)
+	document.NodeList.AddRootNode(appNode)
 
 	// Create two nodes to describe files in the application
 
@@ -134,11 +132,9 @@ func main() {
 		Description: "Software Lib",
 	}
 
-	node1.Hashes = map[int32]string{
-		int32(sbom.HashAlgorithm_SHA1):   "f3ae11065cafc14e27a1410ae8be28e600bb8336",
-		int32(sbom.HashAlgorithm_SHA256): "4f232eeb99e1663d07f0af1af6ea262bf594934b694228e71fd8f159f9a19f32",
-		int32(sbom.HashAlgorithm_SHA512): "8044d0df34242699ad73bfe99b9ac3d6bbdaa4f8ebce1e23ee5c7f9fe59db8ad7b01fe94e886941793aee802008a35b05a30bc51426db796aa21e5e91b7ed9be",
-	}
+	node1.AddHash(sbom.HashAlgorithm_SHA1, "f3ae11065cafc14e27a1410ae8be28e600bb8336")
+	node1.AddHash(sbom.HashAlgorithm_SHA256, "4f232eeb99e1663d07f0af1af6ea262bf594934b694228e71fd8f159f9a19f32")
+	node1.AddHash(sbom.HashAlgorithm_SHA512, "8044d0df34242699ad73bfe99b9ac3d6bbdaa4f8ebce1e23ee5c7f9fe59db8ad7b01fe94e886941793aee802008a35b05a30bc51426db796aa21e5e91b7ed9be")
 
 	document.NodeList.AddNode(node1)
 
@@ -146,27 +142,19 @@ func main() {
 		Id:          "File--usr-bin-software",
 		Type:        sbom.Node_FILE,
 		Name:        "/usr/bin/software",
-		Version:     "1",
+		Version:     "1.0",
 		Copyright:   "Copyright 2023 The ACME Corporation",
 		Description: "Software binary",
 	}
 
-	node2.Hashes = map[int32]string{
-		int32(sbom.HashAlgorithm_SHA1):   "defee82004d22fc92ab81c0c952a62a2172bda8c",
-		int32(sbom.HashAlgorithm_SHA256): "ad291c9572af8fc2ec8fd78d295adf7132c60ad3d10488fb63d120fc967a4132",
-		int32(sbom.HashAlgorithm_SHA512): "5940d8647907831e77ec00d81b318ca06655dbb0fd36d112684b03947412f0f98ea85b32548bc0877f3d7ce8f4de9b2c964062df44742b98c8e9bd851faecce9",
-	}
+	node2.AddHash(sbom.HashAlgorithm_SHA1, "defee82004d22fc92ab81c0c952a62a2172bda8c")
+	node2.AddHash(sbom.HashAlgorithm_SHA256, "ad291c9572af8fc2ec8fd78d295adf7132c60ad3d10488fb63d120fc967a4132")
+	node2.AddHash(sbom.HashAlgorithm_SHA512,  "5940d8647907831e77ec00d81b318ca06655dbb0fd36d112684b03947412f0f98ea85b32548bc0877f3d7ce8f4de9b2c964062df44742b98c8e9bd851faecce9")
 
-	document.NodeList.AddNode(node2)
-
-	// Relate the application package and the files:
-	edge := &sbom.Edge{
-		Type: sbom.Edge_contains,
-		From: appNode.Id,
-		To:   []string{node1.Id, node2.Id},
-	}
-
-	document.NodeList.Edges = append(document.NodeList.Edges, edge)
+	// Relate the application package and the files. This adds the nodes to 
+	// the document graph:
+	document.RelateNodeAtID(node1, appNode.Id, sbom.Edge_contains)
+	document.RelateNodeAtID(node2, appNode.Id, sbom.Edge_contains)
 
 	// Now render the document to STDOUT:
 	w := writer.New()

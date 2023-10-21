@@ -1210,3 +1210,68 @@ func TestNodeGraph(t *testing.T) {
 		})
 	}
 }
+
+func TestRelateNodeAtId(t *testing.T) {
+	sutId := "nodeA"
+	nodeId := "nodeB"
+	testNode := &Node{Id: nodeId}
+	for _, tc := range []struct {
+		name        string
+		sut         *NodeList
+		node        *Node
+		expected    *NodeList
+		shouldError bool
+	}{
+		{
+			name: "relate to node",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}},
+			},
+			node: testNode,
+			expected: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+				Edges: []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_UNKNOWN}},
+			},
+		},
+		{
+			name: "non existent node",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId + "other"}},
+			},
+			node:        testNode,
+			shouldError: true,
+		},
+		{
+			name: "relate to existing edge",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: "node2"}},
+				Edges: []*Edge{{From: sutId, To: []string{"node2"}, Type: Edge_UNKNOWN}},
+			},
+			node: testNode,
+			expected: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: "node2"}, {Id: nodeId}},
+				Edges: []*Edge{{From: sutId, To: []string{"node2", nodeId}, Type: Edge_UNKNOWN}},
+			},
+		},
+		{
+			name: "relate existing node",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+			},
+			node: testNode,
+			expected: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+				Edges: []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_UNKNOWN}},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.sut.RelateNodeAtID(tc.node, sutId, Edge_UNKNOWN)
+			if tc.shouldError {
+				require.Error(t, err)
+				return
+			}
+			require.True(t, tc.sut.Equal(tc.expected))
+		})
+	}
+}

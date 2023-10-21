@@ -29,6 +29,14 @@ type purlIndex map[PackageURL][]*Node
 
 var ErrorMoreThanOneMatch = fmt.Errorf("More than one node matches")
 
+func NewNodeList() *NodeList {
+	return &NodeList{
+		Nodes:        []*Node{},
+		Edges:        []*Edge{},
+		RootElements: []string{},
+	}
+}
+
 // indexNodes returns an inverse dictionary with the IDs of the nodes
 func (nl *NodeList) indexNodes() nodeIndex {
 	ret := nodeIndex{}
@@ -151,6 +159,25 @@ func (nl *NodeList) cleanEdges() {
 
 func (nl *NodeList) AddEdge(e *Edge) {
 	nl.Edges = append(nl.Edges, e)
+}
+
+// AddRootNode adds a node to the nodelist and alos registers it to the
+// RootElements list.
+func (nl *NodeList) AddRootNode(n *Node) {
+	if n.Id == "" {
+		// TODO warn here
+		return
+	}
+
+	for _, id := range nl.RootElements {
+		if id == n.Id {
+			// TODO warn here
+			return
+		}
+	}
+
+	nl.AddNode(n)
+	nl.RootElements = append(nl.RootElements, n.Id)
 }
 
 func (nl *NodeList) AddNode(n *Node) {
@@ -539,6 +566,46 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 	return cmp.Equal(nlNodes, nl2Nodes)
 }
 
+// RelateNodeAtID creates a relationship between Node n and an existing node
+// in the NodeList specified by nodeID. If the node (as looked up by ID) does not
+// not exist in the NodeList it will be added. If NodeID does not exist an error
+// will be returned.
+func (nl *NodeList) RelateNodeAtID(n *Node, nodeID string, edgeType Edge_Type) error {
+	// Check the node exists
+	nlIndex := nl.indexNodes()
+	nlEdges := nl.indexEdges()
+
+	if _, ok := nlIndex[nodeID]; !ok {
+		return fmt.Errorf("node with ID %s not found", nodeID)
+	}
+
+	// Check if we have edges matching
+	var edge *Edge
+	if _, ok := nlEdges[nodeID]; ok {
+		if _, ok2 := nlEdges[nodeID][edgeType]; ok2 {
+			edge = nlEdges[nodeID][edgeType][0]
+		}
+	}
+
+	if edge == nil {
+		edge = &Edge{
+			Type: edgeType,
+			From: nodeID,
+			To:   []string{n.Id},
+		}
+		nl.Edges = append(nl.Edges, edge)
+	} else {
+		// Perhaps we should filter these
+		edge.To = append(edge.To, n.Id)
+	}
+
+	// It the node does not exist in the nodelist, return
+	if _, ok := nlIndex[n.Id]; !ok {
+		nl.AddNode(n)
+	}
+	return nil
+}
+
 // RelateNodeListAtID relates the top level nodes in nl2 to the node with ID
 // nodeID using a relationship of type edgeType. Returns an error if nodeID cannot
 // be found in the graph. This function assumes that nodes in nl and nl2 having
@@ -748,4 +815,78 @@ func (nl *NodeList) NodeSiblings(id string) *NodeList {
 	nodelist.cleanEdges()
 
 	return nodelist
+}
+
+// NodeDescendants traverses the NodeList graph starting at the node specified
+// by id and returns a new node list with elements related at a maximal distance
+// of maxDepth levels. If the specified id is not found, the NodeList will be
+// empty. Traversing the graph will stop if any of the related nodes is a RootNode.
+func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
+	rootIdx := nl.indexRootElements()
+	edgeIdx := nl.indexEdges()
+	startNode := nl.GetNodeByID(id)
+	if startNode == nil {
+		return &NodeList{}
+	}
+
+	nl2 := NodeList{
+		Nodes:        []*Node{},
+		Edges:        nl.Edges,
+		RootElements: []string{startNode.Id},
+	}
+
+	siblings := nodeIndex{}
+
+	var loopNodes []*Node
+	newLoopNodes := []*Node{}
+
+	for i := 0; i < maxDepth; i++ {
+		if i == 0 {
+			loopNodes = []*Node{startNode}
+		} else {
+			loopNodes = newLoopNodes
+		}
+		newLoopNodes = []*Node{}
+		for _, n := range loopNodes {
+			// If we've seen it, we're done
+			if _, ok := siblings[n.Id]; ok {
+				continue
+			}
+
+			siblings[n.Id] = n
+
+			// If node has no relationships, we're done
+			if _, ok := edgeIdx[n.Id]; !ok {
+				continue
+			}
+
+			// If node is a root node, we're done
+			if _, ok := rootIdx[n.Id]; ok && n.Id != id {
+				continue
+			}
+
+			for et := range edgeIdx[n.Id] {
+				for j := range edgeIdx[n.Id][et] {
+					for _, siblingID := range edgeIdx[n.Id][et][j].To {
+						if _, ok := siblings[siblingID]; ok {
+							continue
+						}
+
+						sibling := nl.GetNodeByID(siblingID)
+						if sibling != nil {
+							newLoopNodes = append(newLoopNodes, sibling)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Assign found nodes to nodelist
+	for _, n := range siblings {
+		nl2.AddNode(n)
+	}
+
+	nl2.cleanEdges()
+	return &nl2
 }

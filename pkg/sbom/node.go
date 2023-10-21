@@ -16,6 +16,19 @@ import (
 // updates to the node proto should also be reflected in most of these
 // functions as they operate on the Node's fields
 
+func NewNode() *Node {
+	return &Node{
+		Licenses:           []string{},
+		Attribution:        []string{},
+		Suppliers:          []*Person{},
+		Originators:        []*Person{},
+		ExternalReferences: []*ExternalReference{},
+		FileTypes:          []string{},
+		Identifiers:        map[int32]string{},
+		Hashes:             map[int32]string{},
+	}
+}
+
 // Update updates a node's fields with information from the second node
 // Any fields in n2 which are not null (empty string, lists longer than 0 or not nill
 // pointers will overwrite fields in Node n.
@@ -369,4 +382,16 @@ func (n *Node) HashesMatch(th map[int32]string) bool {
 		atLeastOneMatch = true
 	}
 	return atLeastOneMatch
+}
+
+// AddHash adds a new hash of algorithm algo to the node. If the node
+// already has a hash of the same algorithm it will get silently replaced.
+func (n *Node) AddHash(algo HashAlgorithm, value string) {
+	if value == "" {
+		return
+	}
+	if n.Hashes == nil {
+		n.Hashes = map[int32]string{}
+	}
+	n.Hashes[int32(algo)] = value
 }

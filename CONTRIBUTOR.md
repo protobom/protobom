@@ -1,4 +1,4 @@
-# Contributing to Protobom
+# Contributing To Protobom
 
 We welcome contributions to the protobom project! By participating in this project, you agree to abide by the [Code of Conduct](code-of-conduct.md).
 
@@ -40,12 +40,8 @@ We highly encourage writing tests for new features and bug fixes. This ensures t
 ### Conformance Testing
 The purpose of conformance testing is to ensure that the system or software meets the requirements set forth by the relevant standards or specifications. Reference [README.md](test/conformance/README.md) for more details about conformance testing.
 
-### Unit Testing
-The purpose of unit testing is to ensure that each unit of code functions correctly and performs as intended. Reference [README.md](test/unit_testing/README.md) for more details about unit testing.
-
-
-### Integration Testing
-The purpose of integration testing is to verify that different components or modules of a system work together correctly and produce the expected outputs when integrated. Reference [README.md](test/integration_testing/README.md) for more details about integration testing.
+### Unit & Integration Testing
+ we strive to keep our test coverage high so please add tests to any functions you introduce by your contributions. 
 
 ## Issue Tracker
 

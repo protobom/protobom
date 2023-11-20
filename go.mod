@@ -11,12 +11,12 @@ require (
 	github.com/spdx/tools-golang v0.5.3
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/protobuf v1.31.0
-	sigs.k8s.io/release-utils v0.7.6
+	sigs.k8s.io/release-utils v0.7.7
 )
 
 require (
 	github.com/kr/text v0.1.0 // indirect
-	github.com/spf13/cobra v1.7.0 // indirect
+	github.com/spf13/cobra v1.8.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/tools v0.12.0 // indirect
 )

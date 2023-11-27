@@ -29,10 +29,12 @@ func main() {
 	r := reader.New()
 	testDataDir := os.Args[1]
 	for _, format := range formats.List {
+		logrus.Infof("Generating tests for %s-%s (%s)", format.Type(), format.Version(), format.Encoding())
 		dataDir := filepath.Join(testDataDir, format.Type(), format.Version(), format.Encoding())
 		files, err := os.ReadDir(dataDir)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
+				logrus.Warnf("No conformance data available for %s", string(format))
 				continue
 			}
 			logrus.Fatalf("error reading dir %s: %s", dataDir, err)

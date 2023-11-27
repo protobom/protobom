@@ -31,6 +31,7 @@ func TestUnserializeFormats(t *testing.T) {
 					testNodes(t, golden, sut)
 					testEqualNodeList(t, golden, sut)
 					testEdges(t, golden, sut)
+					testDocument(t, golden, sut)
 				},
 			)
 		}
@@ -76,6 +77,11 @@ func testEdges(t *testing.T, golden, sut *sbom.Document) {
 	require.Equal(t, len(golden.NodeList.Edges), len(sut.NodeList.Edges), "number of nodes")
 }
 
+// TODO(puerco): Implement comparison methods in the document metadata
 func testDocument(t *testing.T, golden, sut *sbom.Document) {
-	require.Equal(t, golden.Metadata, sut.Metadata)
+	require.Equal(t, golden.Metadata.Comment, sut.Metadata.Comment)
+	require.Equal(t, golden.Metadata.Date, sut.Metadata.Date)
+	require.Equal(t, golden.Metadata.Id, sut.Metadata.Id)
+	require.Equal(t, golden.Metadata.DocumentTypes, sut.Metadata.DocumentTypes)
+	require.Equal(t, golden.Metadata.Version, sut.Metadata.Version)
 }

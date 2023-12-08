@@ -169,8 +169,7 @@ func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 			}
 
 			// If it is a software identifier, catch it and continue:
-			// TODO(puerco): The sbom.Soft.. func below should live in this package
-			idType := sbom.SoftwareIdentifierTypeFromSPDXExtRefType(r.RefType)
+			idType := u.extRefTypeToIdentifierType(r.RefType)
 			if idType != sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE {
 				n.Identifiers[int32(idType)] = r.Locator
 				continue
@@ -313,5 +312,22 @@ func (*SPDX23) extRefToProtobomEnum(extref *spdx.PackageExternalReference) (sbom
 		}
 	default:
 		return sbom.ExternalReference_OTHER, false, nil
+	}
+}
+
+// extRefTypeToIdentifierType converts an SPDX software identifier type
+// to the corresponding type
+func (*SPDX23) extRefTypeToIdentifierType(spdxType string) sbom.SoftwareIdentifierType {
+	switch spdxType {
+	case spdx.PackageManagerPURL:
+		return sbom.SoftwareIdentifierType_PURL
+	case spdx.SecurityCPE22Type:
+		return sbom.SoftwareIdentifierType_CPE22
+	case spdx.SecurityCPE23Type:
+		return sbom.SoftwareIdentifierType_CPE23
+	case spdx.TypePersistentIdGitoid:
+		return sbom.SoftwareIdentifierType_GITOID
+	default:
+		return sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE
 	}
 }

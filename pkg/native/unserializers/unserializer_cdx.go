@@ -159,35 +159,12 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 		FileTypes:          []string{},
 	}
 
-	// CycloneDX 1.5 types: "application", "framework", "library", "container", "platform", "operating-system", "device", "device-driver", "firmware", "file", "machine-learning-model", "data"
-	switch c.Type {
-	case cdx.ComponentTypeApplication:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_APPLICATION}
-	case cdx.ComponentTypeFramework:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FRAMEWORK}
-	case cdx.ComponentTypeLibrary:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY}
-	case cdx.ComponentTypeContainer:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_CONTAINER}
-	case cdx.ComponentTypePlatform:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_PLATFORM}
-	case cdx.ComponentTypeOS:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_OPERATING_SYSTEM}
-	case cdx.ComponentTypeDevice:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DEVICE}
-	case cdx.ComponentTypeDeviceDriver:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DEVICE_DRIVER}
-	case cdx.ComponentTypeFirmware:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FIRMWARE}
-	case cdx.ComponentTypeFile:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FILE}
+	node.PrimaryPurpose = []sbom.Purpose{u.componentTypeToPurpose(c.Type)}
+
+	// Protobom recognizes files in CycloneDX SBOMs when a component is of
+	// type file. In that case we flip the type bit:
+	if u.componentTypeToPurpose(c.Type) == sbom.Purpose_FILE {
 		node.Type = sbom.Node_FILE
-	case cdx.ComponentTypeMachineLearningModel:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_MACHINE_LEARNING_MODEL}
-	case cdx.ComponentTypeData:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DATA}
-	default:
-		// TODO(degradation): unknown ComponentType not preserved in protobom struct
 	}
 
 	// External references
@@ -316,5 +293,41 @@ func (u *CDX) phaseToSBOMType(ph *cdx.LifecyclePhase) *sbom.DocumentType_SBOMTyp
 		return sbom.DocumentType_ANALYZED.Enum()
 	default:
 		return nil
+	}
+}
+
+// componentTypeToPurpose converts the protobom catalog of purposes to the cyclonedx
+// component type.
+func (u *CDX) componentTypeToPurpose(cType cdx.ComponentType) sbom.Purpose {
+	// CycloneDX 1.5 types: "application", "framework", "library", "container",
+	// "platform", "operating-system", "device", "device-driver", "firmware",
+	// "file", "machine-learning-model", "data"
+	switch cType {
+	case cdx.ComponentTypeApplication:
+		return sbom.Purpose_APPLICATION
+	case cdx.ComponentTypeFramework:
+		return sbom.Purpose_FRAMEWORK
+	case cdx.ComponentTypeLibrary:
+		return sbom.Purpose_LIBRARY
+	case cdx.ComponentTypeContainer:
+		return sbom.Purpose_CONTAINER
+	case cdx.ComponentTypePlatform:
+		return sbom.Purpose_PLATFORM
+	case cdx.ComponentTypeOS:
+		return sbom.Purpose_OPERATING_SYSTEM
+	case cdx.ComponentTypeDevice:
+		return sbom.Purpose_DEVICE
+	case cdx.ComponentTypeDeviceDriver:
+		return sbom.Purpose_DEVICE_DRIVER
+	case cdx.ComponentTypeFirmware:
+		return sbom.Purpose_FIRMWARE
+	case cdx.ComponentTypeFile:
+		return sbom.Purpose_FILE
+	case cdx.ComponentTypeMachineLearningModel:
+		return sbom.Purpose_MACHINE_LEARNING_MODEL
+	case cdx.ComponentTypeData:
+		return sbom.Purpose_DATA
+	default:
+		return sbom.Purpose_UNKNOWN_PURPOSE
 	}
 }

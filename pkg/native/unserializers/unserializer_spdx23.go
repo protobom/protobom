@@ -1,6 +1,7 @@
 package unserializers
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	spdxjson "github.com/spdx/tools-golang/json"
+	"github.com/spdx/tools-golang/spdx"
 	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 )
 
@@ -150,19 +152,29 @@ func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	if len(p.PackageExternalReferences) > 0 {
 		n.ExternalReferences = []*sbom.ExternalReference{}
 		for _, r := range p.PackageExternalReferences {
+			extRefType, isIdentifier, err := u.extRefToProtobomEnum(r)
+			if err != nil {
+				// TODO(degradation): Invalid external reference
+				continue
+			}
+
+			if !isIdentifier {
+				// Else, it goes into the external references
+				n.ExternalReferences = append(n.ExternalReferences, &sbom.ExternalReference{
+					Url:     r.Locator,
+					Type:    extRefType,
+					Comment: r.ExternalRefComment,
+				})
+				continue
+			}
+
 			// If it is a software identifier, catch it and continue:
+			// TODO(puerco): The sbom.Soft.. func below should live in this package
 			idType := sbom.SoftwareIdentifierTypeFromSPDXExtRefType(r.RefType)
 			if idType != sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE {
 				n.Identifiers[int32(idType)] = r.Locator
 				continue
 			}
-
-			// Else, it goes into the external references
-			n.ExternalReferences = append(n.ExternalReferences, &sbom.ExternalReference{
-				Url:     r.Locator,
-				Type:    r.RefType,
-				Comment: r.ExternalRefComment,
-			})
 		}
 	}
 
@@ -251,4 +263,55 @@ func (*SPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
 		To:   []string{string(r.RefB.ElementRefID)},
 	}
 	return e
+}
+
+// extRefToProtobomEnum converts the SPDX external reference to the corresponding
+// enumerated type. If the type is a software identifier, the function will return
+// -1 and the isIdentifier will be set to true.
+func (*SPDX23) extRefToProtobomEnum(extref *spdx.PackageExternalReference) (sbom.ExternalReference_ExternalReferenceType, bool, error) {
+	switch extref.Category {
+	case spdx.CategoryPackageManager:
+		switch extref.RefType {
+		case spdx.PackageManagerBower:
+			return sbom.ExternalReference_BOWER, false, nil
+		case spdx.PackageManagerMavenCentral:
+			return sbom.ExternalReference_MAVEN_CENTRAL, false, nil
+		case spdx.PackageManagerNpm:
+			return sbom.ExternalReference_NPM, false, nil
+		case spdx.PackageManagerNuGet:
+			return sbom.ExternalReference_NUGET, false, nil
+		case spdx.PackageManagerPURL:
+			// Software identifiers will be captured and set into the software id field
+			return -1, true, nil
+		default:
+			return -1, false, errors.New("invalid package manager type")
+		}
+	case spdx.CategorySecurity:
+		switch extref.RefType {
+		case spdx.SecurityAdvisory:
+			return sbom.ExternalReference_SECURITY_ADVISORY, false, nil
+		case spdx.SecurityFix:
+			return sbom.ExternalReference_SECURITY_FIX, false, nil
+		case spdx.SecuritySwid:
+			return sbom.ExternalReference_SECURITY_SWID, false, nil
+		case spdx.SecurityUrl:
+			return sbom.ExternalReference_SECURITY_OTHER, false, nil
+		case spdx.SecurityCPE22Type, spdx.SecurityCPE23Type:
+			// Software identifiers will be captured and set into the software id field
+			return -1, true, nil
+		default:
+			return -1, false, errors.New("invalid security type")
+		}
+	case spdx.CategoryPersistentId:
+		// Persistent IDs are software IDs so we don't read them into
+		// external references but still we check they are valid
+		switch extref.RefType {
+		case spdx.TypePersistentIdGitoid, spdx.TypePersistentIdSwh:
+			return -1, true, nil
+		default:
+			return -1, false, errors.New("invalid persistent id")
+		}
+	default:
+		return sbom.ExternalReference_OTHER, false, nil
+	}
 }

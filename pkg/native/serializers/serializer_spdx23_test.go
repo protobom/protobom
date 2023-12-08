@@ -20,10 +20,11 @@ func TestExtRefCategoryFromProtobomExtRef(t *testing.T) {
 			case sbom.ExternalReference_BOWER, sbom.ExternalReference_MAVEN_CENTRAL,
 				sbom.ExternalReference_NPM, sbom.ExternalReference_NUGET:
 				require.Equal(t, spdx.CategoryPackageManager, res)
-			case sbom.ExternalReference_SECURITY_ADVISORY, sbom.ExternalReference_SECURITY_FIX:
+			case sbom.ExternalReference_SECURITY_ADVISORY, sbom.ExternalReference_SECURITY_FIX,
+				sbom.ExternalReference_SECURITY_OTHER:
 				require.Equal(t, spdx.CategorySecurity, res)
 			default:
-				require.Equal(t, "other", res)
+				require.Equal(t, spdxOther, res)
 			}
 		})
 	}
@@ -34,7 +35,7 @@ func TestExtRefTypeFromProtobomExtRef(t *testing.T) {
 	for extRefType, name := range sbom.ExternalReference_ExternalReferenceType_name {
 		t.Run(name, func(t *testing.T) {
 			extRefType := extRefType
-			res := s23.extRefCategoryFromProtobomExtRef(&sbom.ExternalReference{
+			res := s23.extRefTypeFromProtobomExtRef(&sbom.ExternalReference{
 				Type: sbom.ExternalReference_ExternalReferenceType(extRefType),
 			})
 

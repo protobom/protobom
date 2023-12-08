@@ -197,7 +197,7 @@ func TestNodeDiff(t *testing.T) {
 					ExternalReferences: []*ExternalReference{
 						{
 							Url:     "http://github.com/protobom",
-							Type:    ExternalReference_WEBSITE,
+							Type:    ExternalReference_VCS,
 							Comment: "Organization Repo",
 						},
 					},

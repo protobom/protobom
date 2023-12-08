@@ -44,7 +44,7 @@ func TestAugment(t *testing.T) {
 		ExternalReferences: []*ExternalReference{
 			{
 				Url:  "git+https://github.com/example/example",
-				Type: "VCS",
+				Type: ExternalReference_VCS,
 			},
 		},
 		Identifiers: map[int32]string{int32(SoftwareIdentifierType_PURL): "pkg:/apk/wolfi/glibc@12.0.0"},
@@ -223,7 +223,7 @@ func TestNodeFlatString(t *testing.T) {
 				ExternalReferences: []*ExternalReference{
 					{
 						Url:       "http://github.com/external",
-						Type:      "VCS",
+						Type:      ExternalReference_VCS,
 						Comment:   "GitHub Link",
 						Authority: "",
 						Hashes:    map[int32]string{},

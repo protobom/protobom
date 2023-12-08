@@ -43,7 +43,7 @@ func TestNodeDiff(t *testing.T) {
 		ExternalReferences: []*ExternalReference{
 			{
 				Url:     "http://github.com/protobom",
-				Type:    "URL",
+				Type:    ExternalReference_VCS,
 				Comment: "Organization Repo",
 			},
 		},
@@ -181,14 +181,14 @@ func TestNodeDiff(t *testing.T) {
 		{
 			name: "change external reference",
 			prepare: func(sutNode, newNode *Node) {
-				newNode.ExternalReferences[0].Type = "HOMEPAGE"
+				newNode.ExternalReferences[0].Type = ExternalReference_WEBSITE
 			},
 			expected: &NodeDiff{
 				Added: &Node{
 					ExternalReferences: []*ExternalReference{
 						{
 							Url:     "http://github.com/protobom",
-							Type:    "HOMEPAGE",
+							Type:    ExternalReference_WEBSITE,
 							Comment: "Organization Repo",
 						},
 					},
@@ -197,7 +197,7 @@ func TestNodeDiff(t *testing.T) {
 					ExternalReferences: []*ExternalReference{
 						{
 							Url:     "http://github.com/protobom",
-							Type:    "URL",
+							Type:    ExternalReference_WEBSITE,
 							Comment: "Organization Repo",
 						},
 					},
@@ -447,15 +447,15 @@ func TestDiffPersonList(t *testing.T) {
 func TestDiffExtRefList(t *testing.T) {
 	er1 := &ExternalReference{
 		Url:  "https://example.com/",
-		Type: "URL",
+		Type: ExternalReference_VCS,
 	}
 	er2 := &ExternalReference{
 		Url:  "https://example.net/",
-		Type: "URL",
+		Type: ExternalReference_VCS,
 	}
 	er3 := &ExternalReference{
 		Url:  "https://example.org/",
-		Type: "URL",
+		Type: ExternalReference_VCS,
 	}
 	//nolint:dupl
 	for _, tc := range []struct {

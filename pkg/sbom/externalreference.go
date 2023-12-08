@@ -30,10 +30,8 @@ func (e *ExternalReference) ToSPDX2Type() string {
 
 // flatString returns a deterministic string that can be used to hash the external reference
 func (e *ExternalReference) flatString() string {
-	ret := ""
-	if e.Type != "" {
-		ret += fmt.Sprintf("(t)%s", e.Type)
-	}
+	ret := fmt.Sprintf("(t)%d", e.Type)
+
 	if e.Url != "" {
 		ret += fmt.Sprintf("(u)%s", e.Url)
 	}

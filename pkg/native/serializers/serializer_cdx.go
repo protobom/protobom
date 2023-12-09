@@ -46,26 +46,46 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
 	ver, err := strconv.Atoi(bom.Metadata.Version)
+	// TODO(deprecation): If varsion does not parse to int, data loos
 	if err == nil {
 		doc.Version = ver
 	}
 
 	metadata := cdx.Metadata{
-		Component: &cdx.Component{},
+		Component:  &cdx.Component{},
+		Lifecycles: &[]cdx.Lifecycle{},
 	}
 
 	doc.Metadata = &metadata
-	doc.Metadata.Lifecycles = &[]cdx.Lifecycle{}
 	doc.Components = &[]cdx.Component{}
 	doc.Dependencies = &[]cdx.Dependency{}
 
-	rootComponent, err := s.root(ctx, bom)
-	if err != nil {
-		return nil, fmt.Errorf("generating SBOM root component: %w", err)
+	// Check if the protobom has no root elements:
+	if bom.NodeList.RootElements == nil || len(bom.NodeList.RootElements) == 0 {
+		// Empty (nodeless) document
+		if len(bom.NodeList.Nodes) == 0 {
+			return doc, nil
+		}
+		// If we have nodes but no roots, then we error as the graph
+		// cannot be traversed
+		return nil, fmt.Errorf("unable to build cyclonedx document, no root nodes found")
 	}
-	if rootComponent != nil {
-		doc.Metadata.Component = rootComponent
+
+	// .. or has too many root elements:
+
+	// TODO(deprecation): If there are more root nodes we need to hack them
+	// into the CycloneDX graph or error
+	if l := len(bom.NodeList.RootElements); l > 1 {
+		return nil, fmt.Errorf("unable to serialize multiroot cyclonedx, document has %d root nodes", l)
 	}
+
+	rootNode := bom.NodeList.GetNodeByID(bom.NodeList.RootElements[0])
+	if rootNode == nil {
+		return nil, fmt.Errorf("integrity error: root node %q not found", bom.NodeList.RootElements[0])
+	}
+
+	doc.Metadata.Component = s.nodeToComponent(rootNode)
+	state.addedDict[rootNode.Id] = struct{}{}
 
 	if err := s.componentsMaps(ctx, bom); err != nil {
 		return nil, err
@@ -187,34 +207,6 @@ func (s *CDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
 		state.componentsDict[comp.BOMRef] = comp
 	}
 	return nil
-}
-
-func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, error) {
-	var rootComp *cdx.Component
-	// First, assign the top level nodes
-	state, err := getCDXState(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("reading state: %w", err)
-	}
-
-	// 2DO Use GetRootNodes() https://github.com/bom-squad/protobom/pull/20
-	if bom.NodeList.RootElements != nil && len(bom.NodeList.RootElements) > 0 {
-		for _, id := range bom.NodeList.RootElements {
-			// Search for the node and add it
-			for _, n := range bom.NodeList.Nodes {
-				if n.Id == id {
-					rootComp = s.nodeToComponent(n)
-					state.addedDict[id] = struct{}{}
-				}
-			}
-
-			// TODO(degradation): Here we would document other root level elements
-			// are not added to to document
-			noop() // temp workaround in favor of adding a lint tag
-		}
-	}
-
-	return rootComp, nil
 }
 
 // NOTE dependencies function modifies the components dictionary

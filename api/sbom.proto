@@ -130,12 +130,79 @@ message Edge {
 // ExternalReference is an entry linking an element to a resource defined outside the SBOM standard
 message ExternalReference {
     string url = 1;
-    string type = 2;
+    // Field 2 was the old string type. Replaced by ExternalReferenceType
+    // see https://github.com/bom-squad/protobom/issues/148
+    // string type = 2;
     string comment = 3;
     string authority = 4;
     // Field 5 was the old string map.
     // Removed, see https://github.com/bom-squad/protobom/issues/89
     map<int32,string> hashes = 6;
+    ExternalReferenceType type = 7;
+
+    enum ExternalReferenceType {
+        UNKNOWN = 0;
+        ATTESTATION = 1;
+        BINARY = 2;
+        BOM = 3;
+        BOWER = 4;
+        BUILD_META = 5;
+        BUILD_SYSTEM = 6;
+        CERTIFICATION_REPORT = 7;
+        CHAT = 8;
+        CODIFIED_INFRASTRUCTURE = 9;
+        COMPONENT_ANALYSIS_REPORT = 10;
+        CONFIGURATION = 11;
+        DISTRIBUTION_INTAKE = 12;
+        DOCUMENTATION = 13;
+        DOWNLOAD = 14;
+        DYNAMIC_ANALYSIS_REPORT = 15;
+        EOL_NOTICE = 16;
+        EVIDENCE = 17;
+        EXPORT_CONTROL_ASSESSMENT = 18;
+        FORMULATION = 19;
+        FUNDING = 20;
+        ISSUE_TRACKER = 21;
+        LICENSE = 22;
+        LOG = 23;
+        MAILING_LIST = 24;
+        MATURITY_REPORT = 25;
+        MAVEN_CENTRAL = 26;
+        METRICS = 27;
+        MODEL_CARD = 28;
+        NPM = 29;
+        NUGET = 30;
+        OTHER = 31;
+        POAM = 32;
+        PRIVACY_ASSESSMENT = 33;
+        PRODUCT_METADATA = 34;
+        PURCHASE_ORDER = 35;
+        QUALITY_ASSESSMENT_REPORT = 36;
+        QUALITY_METRICS = 37;
+        RELEASE_HISTORY = 38;
+        RELEASE_NOTES = 39;
+        RISK_ASSESSMENT = 40;
+        RUNTIME_ANALYSIS_REPORT = 41;
+        SECURE_SOFTWARE_ATTESTATION = 42;
+        SECURITY_ADVERSARY_MODEL = 43;
+        SECURITY_ADVISORY = 44;
+        SECURITY_CONTACT = 45;
+        SECURITY_FIX = 46;
+        SECURITY_OTHER = 47;
+        SECURITY_PENTEST_REPORT = 48;
+        SECURITY_POLICY = 49;
+        SECURITY_SWID = 50;
+        SECURITY_THREAT_MODEL = 51;
+        SOCIAL = 52;
+        SOURCE_ARTIFACT = 53;
+        STATIC_ANALYSIS_REPORT = 54;
+        SUPPORT = 55;
+        VCS = 56;
+        VULNERABILITY_ASSERTION = 57;
+        VULNERABILITY_DISCLOSURE_REPORT = 58;
+        VULNERABILITY_EXPLOITABILITY_ASSESSMENT = 59;
+        WEBSITE = 60;
+    }
 }
 
 message Person {

@@ -25,8 +25,8 @@ func SoftwareIdentifierTypeFromString(queryString string) SoftwareIdentifierType
 	}
 }
 
-// SoftwareIdentifierTypeFromSPDXExtRefType returns an identifier type from one
-// of the SPDX2's external reference types:
+// Deprecated: SoftwareIdentifierTypeFromSPDXExtRefType is deprecated and will
+// be removed in an upcoming version.
 func SoftwareIdentifierTypeFromSPDXExtRefType(spdxType string) SoftwareIdentifierType {
 	switch spdxType {
 	case spdx.ExtRefTypePurl:

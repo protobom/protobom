@@ -217,7 +217,7 @@ func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 	for _, ei := range n.ExternalReferences {
 		p.ExternalReferences = append(p.ExternalReferences, externalReference{
 			Type:                  "ExternalReference",
-			ExternalReferenceType: ei.Type,
+			ExternalReferenceType: spdx3.extRefTypeFromProtobomExtRef(ei),
 			Locator:               []string{ei.Url},
 		})
 	}
@@ -320,4 +320,103 @@ func purposeStringsFromPurpose(purposes []sbom.Purpose) []string {
 	}
 
 	return returnstrings
+}
+
+// extRefTypeFromProtobomExtRef returns the SPDX3 external reference type from the
+// corresponding protobom enumeration
+func (spdx3 *SPDX3) extRefTypeFromProtobomExtRef(extRef *sbom.ExternalReference) string {
+	switch extRef.Type {
+	case sbom.ExternalReference_BINARY:
+		return "binaryArtifact"
+	case sbom.ExternalReference_BOWER:
+		return "bower"
+	case sbom.ExternalReference_BUILD_META:
+		return "buildMeta"
+	case sbom.ExternalReference_BUILD_SYSTEM:
+		return "buildSystem"
+	case sbom.ExternalReference_CERTIFICATION_REPORT:
+		return "certificationReport"
+	case sbom.ExternalReference_CHAT:
+		return "chat"
+	case sbom.ExternalReference_COMPONENT_ANALYSIS_REPORT:
+		return "componentAnalysisReport"
+	case sbom.ExternalReference_DOCUMENTATION:
+		return "documentation"
+	case sbom.ExternalReference_DOWNLOAD:
+		return "altDownloadLocation"
+	case sbom.ExternalReference_DYNAMIC_ANALYSIS_REPORT:
+		return "dynamicAnalysisReport"
+	case sbom.ExternalReference_EOL_NOTICE:
+		return "eolNotice"
+	case sbom.ExternalReference_EXPORT_CONTROL_ASSESSMENT:
+		return "exportControlAssessment"
+	case sbom.ExternalReference_FUNDING:
+		return "funding"
+	case sbom.ExternalReference_ISSUE_TRACKER:
+		return "issueTracker"
+	case sbom.ExternalReference_LICENSE:
+		return "license"
+	case sbom.ExternalReference_MAILING_LIST:
+		return "mailingList"
+	case sbom.ExternalReference_MAVEN_CENTRAL:
+		return "mavenCentral"
+	case sbom.ExternalReference_METRICS:
+		return "metrics"
+	case sbom.ExternalReference_NPM:
+		return "npm"
+	case sbom.ExternalReference_NUGET:
+		return "nuget"
+	case sbom.ExternalReference_OTHER:
+		return "other"
+	case sbom.ExternalReference_PRIVACY_ASSESSMENT:
+		return "privacyAssessment"
+	case sbom.ExternalReference_PRODUCT_METADATA:
+		return "productMetadata"
+	case sbom.ExternalReference_PURCHASE_ORDER:
+		return "purchaseOrder"
+	case sbom.ExternalReference_QUALITY_ASSESSMENT_REPORT:
+		return "qualityAssessmentReport"
+	case sbom.ExternalReference_RELEASE_HISTORY:
+		return "releaseHistory"
+	case sbom.ExternalReference_RELEASE_NOTES:
+		return "releaseNotes"
+	case sbom.ExternalReference_RISK_ASSESSMENT:
+		return "riskAssessment"
+	case sbom.ExternalReference_RUNTIME_ANALYSIS_REPORT:
+		return "runtimeAnalysisReport"
+	case sbom.ExternalReference_SECURE_SOFTWARE_ATTESTATION:
+		return "secureSoftwareAttestation"
+	case sbom.ExternalReference_SECURITY_ADVERSARY_MODEL:
+		return "securityAdversaryModel"
+	case sbom.ExternalReference_SECURITY_ADVISORY:
+		return "securityAdvisory"
+	case sbom.ExternalReference_SECURITY_FIX:
+		return "securityFix"
+	case sbom.ExternalReference_SECURITY_OTHER:
+		return "securityOther"
+	case sbom.ExternalReference_SECURITY_PENTEST_REPORT:
+		return "securityPenTestReport"
+	case sbom.ExternalReference_SECURITY_POLICY:
+		return "securityPolicy"
+	case sbom.ExternalReference_SECURITY_THREAT_MODEL:
+		return "securityThreatModel"
+	case sbom.ExternalReference_SOCIAL:
+		return "socialMedia"
+	case sbom.ExternalReference_SOURCE_ARTIFACT:
+		return "sourceArtifact"
+	case sbom.ExternalReference_STATIC_ANALYSIS_REPORT:
+		return "staticAnalysisReport"
+	case sbom.ExternalReference_SUPPORT:
+		return "support"
+	case sbom.ExternalReference_VCS:
+		return "vcs"
+	case sbom.ExternalReference_VULNERABILITY_DISCLOSURE_REPORT:
+		return "vulnerabilityDisclosureReport"
+	case sbom.ExternalReference_VULNERABILITY_EXPLOITABILITY_ASSESSMENT:
+		return "vulnerabilityExploitabilityAssessment"
+	case sbom.ExternalReference_WEBSITE:
+		return "altWebPage"
+	default:
+		return "other"
+	}
 }

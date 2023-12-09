@@ -25,6 +25,8 @@ type SPDX3Options struct {
 	Indent int
 }
 
+const spdxOther = "OTHER"
+
 func NewSPDX23() *SPDX23 {
 	return &SPDX23{}
 }
@@ -91,7 +93,7 @@ func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ int
 		})
 	}
 
-	packages, err := buildPackages(bom)
+	packages, err := s.buildPackages(bom)
 	if err != nil {
 		return nil, fmt.Errorf("building SPDX packages: %s", err)
 	}
@@ -185,7 +187,7 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 	return files, nil
 }
 
-func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unparam
+func (s *SPDX23) buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unparam
 	packages := []*spdx.Package{}
 	for _, node := range bom.NodeList.Nodes {
 		if node.Type == sbom.Node_FILE {
@@ -310,13 +312,15 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 		}
 
 		for _, e := range node.ExternalReferences {
-			if e.ToSPDX2Type() == "" || e.Url == "" {
+			category := s.extRefCategoryFromProtobomExtRef(e)
+
+			if e.Url == "" {
 				// TODO(degradation): Handle incomplete external references
 				continue
 			}
 			p.PackageExternalReferences = append(p.PackageExternalReferences, &v2_3.PackageExternalReference{
-				Category:           e.ToSPDX2Category(),
-				RefType:            e.ToSPDX2Type(),
+				Category:           category,
+				RefType:            s.extRefTypeFromProtobomExtRef(e),
 				Locator:            e.Url,
 				ExternalRefComment: e.Comment,
 			})
@@ -352,4 +356,54 @@ func buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unpar
 		packages = append(packages, &p)
 	}
 	return packages, nil
+}
+
+// ExtRefCategoryFromProtobomExtRef reads a protobom external reference struct and returns a
+// string with the corresponding category
+func (s *SPDX23) extRefCategoryFromProtobomExtRef(extref *sbom.ExternalReference) string {
+	switch extref.Type {
+	case sbom.ExternalReference_BOWER, sbom.ExternalReference_MAVEN_CENTRAL,
+		sbom.ExternalReference_NPM, sbom.ExternalReference_NUGET:
+		return spdx.CategoryPackageManager
+	case sbom.ExternalReference_SECURITY_ADVISORY, sbom.ExternalReference_SECURITY_FIX:
+		return spdx.CategorySecurity
+	case sbom.ExternalReference_SECURITY_OTHER:
+		// This is mapped...
+		return spdx.CategorySecurity
+
+	// ... the other security* are data loss hacks
+	// TODO(degradation): all the security type could be dumped
+	// as security+url but aplications need to opt in
+	//
+	// if hack then
+	// case sbom.ExternalReference_SECURITY_*:
+	// return spdx.CategorySecurity
+	default:
+		return spdxOther
+	}
+}
+
+// extRefTypeFromProtobomExtRef returns the spdx external reference type
+// from a protobom external reference
+func (s *SPDX23) extRefTypeFromProtobomExtRef(extref *sbom.ExternalReference) string {
+	switch extref.Type {
+	case sbom.ExternalReference_BOWER:
+		return spdx.PackageManagerBower
+	case sbom.ExternalReference_MAVEN_CENTRAL:
+		return spdx.PackageManagerMavenCentral
+	case sbom.ExternalReference_NPM:
+		return spdx.PackageManagerNpm
+	case sbom.ExternalReference_NUGET:
+		return spdx.PackageManagerNuGet
+	case sbom.ExternalReference_OTHER:
+		return spdxOther
+	case sbom.ExternalReference_SECURITY_ADVISORY:
+		return spdx.SecurityAdvisory
+	case sbom.ExternalReference_SECURITY_FIX:
+		return spdx.SecurityFix
+	case sbom.ExternalReference_SECURITY_OTHER:
+		return spdx.SecurityUrl
+	default:
+		return spdxOther
+	}
 }

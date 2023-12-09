@@ -21,8 +21,6 @@ type CDX struct {
 	encoding string
 }
 
-type componentCounter int
-
 func NewCDX(version, encoding string) *CDX {
 	return &CDX{
 		version:  version,
@@ -57,7 +55,6 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		NodeList: &sbom.NodeList{},
 	}
 
-	// var cc componentCounter
 	cc := 0
 
 	if bom.Metadata != nil {

@@ -121,3 +121,57 @@ func TestCdxExtRefTypeToProtobomType(t *testing.T) {
 		require.Equal(t, protoType, res)
 	}
 }
+
+func TestDeterministicIds(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	for _, tc := range []struct {
+		name     string
+		sut      *cdx.Component
+		expected []string
+		len      int
+		mustErr  bool
+	}{
+		{
+			name: "3 components",
+			sut: &cdx.Component{
+				Type: "application",
+				Components: &[]cdx.Component{
+					{Type: "library"},
+					{Type: "library"},
+				},
+			},
+			expected: []string{"protobom-auto--000000001", "protobom-auto--000000002", "protobom-auto--000000003"},
+			len:      3,
+			mustErr:  false,
+		},
+		{
+			name: "3 components plus one with id",
+			sut: &cdx.Component{
+				Type: "application",
+				Components: &[]cdx.Component{
+					{BOMRef: "i-got-id", Type: "library"},
+					{Type: "library"},
+				},
+			},
+			expected: []string{"protobom-auto--000000001", "i-got-id", "protobom-auto--000000003"},
+			len:      3,
+			mustErr:  false,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cc := 0
+			nodelist, err := cdxu.componentToNodeList(tc.sut, &cc)
+			if tc.mustErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			names := []string{}
+			require.Len(t, nodelist.Nodes, tc.len)
+			for i := range nodelist.Nodes {
+				names = append(names, nodelist.Nodes[i].Id)
+			}
+			require.Equal(t, tc.expected, names)
+		})
+	}
+}

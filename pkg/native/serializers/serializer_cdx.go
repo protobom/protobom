@@ -379,7 +379,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 			}
 
 			*c.ExternalReferences = append(*c.ExternalReferences, cdx.ExternalReference{
-				Type: cdx.ExternalReferenceType(er.Type), // Fix to make it valid
+				Type: s.protobomExtRefTypeToCdxType(er.Type),
 				URL:  er.Url,
 			})
 		}
@@ -490,4 +490,91 @@ func getCDXState(ctx context.Context) (*serializerCDXState, error) {
 		return nil, errors.New("unable to cast serializer state from context")
 	}
 	return dm, nil
+}
+
+// protobomExtRefTypeToCdxType translates between the protobom external reference
+// identiers and the cycloneDX equivalent types.
+func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference_ExternalReferenceType) cdx.ExternalReferenceType {
+	switch protoExtRefType {
+	case sbom.ExternalReference_ATTESTATION:
+		return cdx.ERTypeAttestation
+	case sbom.ExternalReference_BOM:
+		return cdx.ERTypeBOM
+	case sbom.ExternalReference_BUILD_META:
+		return cdx.ERTypeBuildMeta
+	case sbom.ExternalReference_BUILD_SYSTEM:
+		return cdx.ERTypeBuildSystem
+	case sbom.ExternalReference_CERTIFICATION_REPORT:
+		return cdx.ERTypeCertificationReport
+	case sbom.ExternalReference_CHAT:
+		return cdx.ERTypeChat
+	case sbom.ExternalReference_CODIFIED_INFRASTRUCTURE:
+		return cdx.ERTypeCodifiedInfrastructure
+	case sbom.ExternalReference_COMPONENT_ANALYSIS_REPORT:
+		return cdx.ERTypeComponentAnalysisReport
+	case sbom.ExternalReference_CONFIGURATION:
+		return cdx.ExternalReferenceType("configuration")
+	case sbom.ExternalReference_DISTRIBUTION_INTAKE:
+		return cdx.ERTypeDistributionIntake
+	case sbom.ExternalReference_DOWNLOAD:
+		return cdx.ERTypeDistribution
+	case sbom.ExternalReference_DOCUMENTATION:
+		return cdx.ERTypeDocumentation
+	case sbom.ExternalReference_DYNAMIC_ANALYSIS_REPORT:
+		return cdx.ERTypeDynamicAnalysisReport
+	case sbom.ExternalReference_EVIDENCE:
+		return cdx.ExternalReferenceType("evidence")
+	case sbom.ExternalReference_FORMULATION:
+		return cdx.ExternalReferenceType("formulation")
+	case sbom.ExternalReference_ISSUE_TRACKER:
+		return cdx.ERTypeIssueTracker
+	case sbom.ExternalReference_LICENSE:
+		return cdx.ERTypeLicense
+	case sbom.ExternalReference_LOG:
+		return cdx.ExternalReferenceType("log")
+	case sbom.ExternalReference_MAILING_LIST:
+		return cdx.ERTypeMailingList
+	case sbom.ExternalReference_MATURITY_REPORT:
+		return cdx.ERTypeMaturityReport
+	case sbom.ExternalReference_MODEL_CARD:
+		return cdx.ExternalReferenceType("model-card")
+	case sbom.ExternalReference_OTHER:
+		return cdx.ERTypeOther
+	case sbom.ExternalReference_POAM:
+		return cdx.ExternalReferenceType("poam")
+	case sbom.ExternalReference_QUALITY_METRICS:
+		return cdx.ERTypeQualityMetrics
+	case sbom.ExternalReference_RELEASE_NOTES:
+		return cdx.ERTypeReleaseNotes
+	case sbom.ExternalReference_RISK_ASSESSMENT:
+		return cdx.ERTypeRiskAssessment
+	case sbom.ExternalReference_RUNTIME_ANALYSIS_REPORT:
+		return cdx.ERTypeRuntimeAnalysisReport
+	case sbom.ExternalReference_SECURITY_ADVERSARY_MODEL:
+		return cdx.ERTypeAdversaryModel
+	case sbom.ExternalReference_SECURITY_ADVISORY:
+		return cdx.ERTypeAdvisories
+	case sbom.ExternalReference_SECURITY_CONTACT:
+		return cdx.ERTypeSecurityContact
+	case sbom.ExternalReference_SECURITY_PENTEST_REPORT:
+		return cdx.ERTypePentestReport
+	case sbom.ExternalReference_SECURITY_THREAT_MODEL:
+		return cdx.ERTypeThreatModel
+	case sbom.ExternalReference_SOCIAL:
+		return cdx.ERTypeSocial
+	case sbom.ExternalReference_STATIC_ANALYSIS_REPORT:
+		return cdx.ERTypeStaticAnalysisReport
+	case sbom.ExternalReference_SUPPORT:
+		return cdx.ERTypeSupport
+	case sbom.ExternalReference_VCS:
+		return cdx.ERTypeVCS
+	case sbom.ExternalReference_VULNERABILITY_ASSERTION:
+		return cdx.ERTypeVulnerabilityAssertion
+	case sbom.ExternalReference_VULNERABILITY_EXPLOITABILITY_ASSESSMENT:
+		return cdx.ERTypeExploitabilityStatement
+	case sbom.ExternalReference_WEBSITE:
+		return cdx.ERTypeWebsite
+	default:
+		return cdx.ERTypeOther
+	}
 }

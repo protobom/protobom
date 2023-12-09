@@ -167,21 +167,7 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 		node.Type = sbom.Node_FILE
 	}
 
-	for _, extRef := range *c.ExternalReferences {
-		nref := &sbom.ExternalReference{
-			Url:     extRef.URL,
-			Comment: extRef.Comment,
-			Hashes:  map[int32]string{},
-			Type:    u.cdxExtRefTypeToProtobomType(extRef.Type),
-		}
-		for _, h := range *extRef.Hashes {
-			algo := int32(u.cdxHashAlgoToProtobomAlgo(h.Algorithm))
-			// TODO(degradation): Data loss happens if algorithm is repeated
-			// TODO(degradation): Data loss most likely when reading unknown algorithms
-			nref.Hashes[algo] = h.Value
-		}
-		node.ExternalReferences = append(node.ExternalReferences, nref)
-	}
+	node.ExternalReferences = u.unserializeExternalReferences(c.ExternalReferences)
 
 	// Named external references:
 	if c.CPE != "" {
@@ -218,6 +204,33 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 	}
 
 	return node, nil
+}
+
+// unserializeExternalReferences reads a slice of cyclonedx references and returns
+// tjeir protobom equivalents.
+func (u *CDX) unserializeExternalReferences(cdxReferences *[]cdx.ExternalReference) []*sbom.ExternalReference {
+	ret := []*sbom.ExternalReference{}
+	// If there are no ext references. Done.
+	if cdxReferences == nil {
+		return ret
+	}
+
+	for _, extRef := range *cdxReferences {
+		nref := &sbom.ExternalReference{
+			Url:     extRef.URL,
+			Comment: extRef.Comment,
+			Hashes:  map[int32]string{},
+			Type:    u.cdxExtRefTypeToProtobomType(extRef.Type),
+		}
+		for _, h := range *extRef.Hashes {
+			algo := int32(u.cdxHashAlgoToProtobomAlgo(h.Algorithm))
+			// TODO(degradation): Data loss happens if algorithm is repeated
+			// TODO(degradation): Data loss most likely when reading unknown algorithms
+			nref.Hashes[algo] = h.Value
+		}
+		ret = append(ret, nref)
+	}
+	return ret
 }
 
 // licenseChoicesToLicenseList returns a flat list of license strings combining

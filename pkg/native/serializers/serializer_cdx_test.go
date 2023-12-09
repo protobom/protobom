@@ -127,3 +127,27 @@ func TestProtobomExtRefTypeToCdxType(t *testing.T) {
 		require.Equal(t, protoType, res)
 	}
 }
+
+func TestProtoHashAlgoToCdxAlgo(t *testing.T) {
+	cdxs := NewCDX("1.5", "json")
+	for protoAlgo, cdxAlgo := range map[sbom.HashAlgorithm]cdx.HashAlgorithm{
+		sbom.HashAlgorithm_MD5:         cdx.HashAlgoMD5,
+		sbom.HashAlgorithm_SHA1:        cdx.HashAlgoSHA1,
+		sbom.HashAlgorithm_SHA256:      cdx.HashAlgoSHA256,
+		sbom.HashAlgorithm_SHA384:      cdx.HashAlgoSHA384,
+		sbom.HashAlgorithm_SHA512:      cdx.HashAlgoSHA512,
+		sbom.HashAlgorithm_SHA3_256:    cdx.HashAlgoSHA3_256,
+		sbom.HashAlgorithm_SHA3_384:    cdx.HashAlgoSHA3_384,
+		sbom.HashAlgorithm_SHA3_512:    cdx.HashAlgoSHA3_512,
+		sbom.HashAlgorithm_BLAKE2B_256: cdx.HashAlgoBlake2b_256,
+		sbom.HashAlgorithm_BLAKE2B_384: cdx.HashAlgoBlake2b_384,
+		sbom.HashAlgorithm_BLAKE2B_512: cdx.HashAlgoBlake2b_512,
+		sbom.HashAlgorithm_BLAKE3:      cdx.HashAlgoBlake3,
+	} {
+		res, _ := cdxs.protoHashAlgoToCdxAlgo(protoAlgo)
+		require.Equal(t, cdxAlgo, res)
+
+		_, err := cdxs.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(9999999))
+		require.Error(t, err)
+	}
+}

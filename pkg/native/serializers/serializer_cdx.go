@@ -168,7 +168,7 @@ func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
 	case sbom.DocumentType_OTHER:
 		return cdx.LifecyclePhase(strings.ToLower(*dt.Name)), nil
 	}
-
+	// TODO(option): Dont err but assign to type OTHER
 	return "", fmt.Errorf("unknown document type %s", *dt.Name)
 }
 
@@ -288,10 +288,12 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		return nil
 	}
 	c := &cdx.Component{
-		BOMRef:      n.Id,
-		Name:        n.Name,
-		Version:     n.Version,
-		Description: n.Description,
+		BOMRef:             n.Id,
+		Name:               n.Name,
+		Version:            n.Version,
+		Description:        n.Description,
+		Hashes:             &[]cdx.Hash{},
+		ExternalReferences: &[]cdx.ExternalReference{},
 	}
 
 	if n.Type == sbom.Node_FILE {
@@ -350,15 +352,14 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	if n.Hashes != nil && len(n.Hashes) > 0 {
-		c.Hashes = &[]cdx.Hash{}
 		for algo, hash := range n.Hashes {
-			ha := sbom.HashAlgorithm(algo)
-			if ha.ToCycloneDX() == "" {
+			cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(algo))
+			if err != nil {
 				// TODO(degradation): Algorithm not supported in CDX
 				continue
 			}
 			*c.Hashes = append(*c.Hashes, cdx.Hash{
-				Algorithm: ha.ToCycloneDX(),
+				Algorithm: cdxAlgo,
 				Value:     hash,
 			})
 		}
@@ -366,14 +367,27 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 
 	if n.ExternalReferences != nil {
 		for _, er := range n.ExternalReferences {
-			if c.ExternalReferences == nil {
-				c.ExternalReferences = &[]cdx.ExternalReference{}
+			cdxRef := cdx.ExternalReference{
+				URL:     er.Url,
+				Comment: er.Comment,
+				Type:    s.protobomExtRefTypeToCdxType(er.Type),
 			}
-
-			*c.ExternalReferences = append(*c.ExternalReferences, cdx.ExternalReference{
-				Type: s.protobomExtRefTypeToCdxType(er.Type),
-				URL:  er.Url,
-			})
+			hashList := []cdx.Hash{}
+			for protoAlgo, val := range er.Hashes {
+				cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(protoAlgo))
+				if err != nil {
+					// TODO(degradation): Hash not supported
+					continue
+				}
+				hashList = append(hashList, cdx.Hash{
+					Algorithm: cdxAlgo,
+					Value:     val,
+				})
+			}
+			if len(hashList) > 0 {
+				cdxRef.Hashes = &hashList
+			}
+			*c.ExternalReferences = append(*c.ExternalReferences, cdxRef)
 		}
 	}
 
@@ -385,7 +399,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 			case int32(sbom.SoftwareIdentifierType_CPE23):
 				c.CPE = n.Identifiers[idType]
 			case int32(sbom.SoftwareIdentifierType_CPE22):
-				// TODO(degradation): Only one CPE is supperted in CDX
+				// TODO(degradation): Only one CPE is supported in CDX
 				if c.CPE == "" {
 					c.CPE = n.Identifiers[idType]
 				}
@@ -569,4 +583,42 @@ func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference
 	default:
 		return cdx.ERTypeOther
 	}
+}
+
+// protoHashAlgoToCdxAlgo converts the protobom algorithm to the CDX
+// algorithm string.
+// TODO(degradation): The use of the following algorithms will result in
+// data loss when rendering to CycloneDX 1.4: ADLER32 MD4 MD6 SHA224
+// Also, HashAlgorithm_UNKNOWN also means data loss.
+func (s *CDX) protoHashAlgoToCdxAlgo(protoAlgo sbom.HashAlgorithm) (cdx.HashAlgorithm, error) {
+	switch protoAlgo {
+	case sbom.HashAlgorithm_MD5:
+		return cdx.HashAlgoMD5, nil
+	case sbom.HashAlgorithm_SHA1:
+		return cdx.HashAlgoSHA1, nil
+	case sbom.HashAlgorithm_SHA256:
+		return cdx.HashAlgoSHA256, nil
+	case sbom.HashAlgorithm_SHA384:
+		return cdx.HashAlgoSHA384, nil
+	case sbom.HashAlgorithm_SHA512:
+		return cdx.HashAlgoSHA512, nil
+	case sbom.HashAlgorithm_SHA3_256:
+		return cdx.HashAlgoSHA3_256, nil
+	case sbom.HashAlgorithm_SHA3_384:
+		return cdx.HashAlgoSHA3_384, nil
+	case sbom.HashAlgorithm_SHA3_512:
+		return cdx.HashAlgoSHA3_512, nil
+	case sbom.HashAlgorithm_BLAKE2B_256:
+		return cdx.HashAlgoBlake2b_256, nil
+	case sbom.HashAlgorithm_BLAKE2B_384:
+		return cdx.HashAlgoBlake2b_384, nil
+	case sbom.HashAlgorithm_BLAKE2B_512:
+		return cdx.HashAlgoBlake2b_512, nil
+	case sbom.HashAlgorithm_BLAKE3:
+		return cdx.HashAlgoBlake3, nil
+	}
+
+	// TODO(degradation): Unknow algorithms err here. We could silently not.
+	// TODO(options): Sink all unknows to UNKNOWN
+	return "", fmt.Errorf("hash algorithm %q not supported by cyclonedx", protoAlgo)
 }

@@ -46,7 +46,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
 	ver, err := strconv.Atoi(bom.Metadata.Version)
-	// TODO(deprecation): If varsion does not parse to int, data loos
+	// TODO(deprecation): If version does not parse to int, there's data loss here.
 	if err == nil {
 		doc.Version = ver
 	}
@@ -280,13 +280,12 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 	return dependencies, nil
 }
 
-func noop() {}
-
 // nodeToComponent converts a node in protobuf to a CycloneDX component
 func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n == nil {
 		return nil
 	}
+
 	c := &cdx.Component{
 		BOMRef:             n.Id,
 		Name:               n.Name,
@@ -298,42 +297,13 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 
 	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
-	} else {
-		if len(n.PrimaryPurpose) > 1 {
-			// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but cdx.Component only allows single Type so we are using the first
-			noop() // temp workaround in favor of adding a lint tag
+	} else if len(n.PrimaryPurpose) > 0 {
+		componentType, err := s.purposeToComponentType(n.PrimaryPurpose[0])
+		if err == nil {
+			c.Type = componentType
 		}
-		if len(n.PrimaryPurpose) > 0 {
-			switch n.PrimaryPurpose[0] {
-			case sbom.Purpose_APPLICATION, sbom.Purpose_EXECUTABLE, sbom.Purpose_INSTALL:
-				c.Type = cdx.ComponentTypeApplication
-			case sbom.Purpose_CONTAINER:
-				c.Type = cdx.ComponentTypeContainer
-			case sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST, sbom.Purpose_OTHER:
-				c.Type = cdx.ComponentTypeData
-			case sbom.Purpose_DEVICE:
-				c.Type = cdx.ComponentTypeDevice
-			case sbom.Purpose_DEVICE_DRIVER:
-				c.Type = cdx.ComponentTypeDeviceDriver
-			case sbom.Purpose_FILE, sbom.Purpose_PATCH, sbom.Purpose_SOURCE, sbom.Purpose_ARCHIVE:
-				c.Type = cdx.ComponentTypeFile
-			case sbom.Purpose_FIRMWARE:
-				c.Type = cdx.ComponentTypeFirmware
-			case sbom.Purpose_FRAMEWORK:
-				c.Type = cdx.ComponentTypeFramework
-			case sbom.Purpose_LIBRARY, sbom.Purpose_MODULE:
-				c.Type = cdx.ComponentTypeLibrary
-			case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
-				c.Type = cdx.ComponentTypeMachineLearningModel
-			case sbom.Purpose_OPERATING_SYSTEM:
-				c.Type = cdx.ComponentTypeOS
-			case sbom.Purpose_PLATFORM:
-				c.Type = cdx.ComponentTypePlatform
-			default:
-				// TODO(degradation): Non-matching primary purpose to component type mapping
-				noop() // temp workaround in favor of adding a lint tag
-			}
-		}
+		// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but
+		// cdx.Component only allows single Type so we are using the first
 	}
 
 	if n.Licenses != nil && len(n.Licenses) > 0 {
@@ -499,7 +469,7 @@ func getCDXState(ctx context.Context) (*serializerCDXState, error) {
 }
 
 // protobomExtRefTypeToCdxType translates between the protobom external reference
-// identiers and the cycloneDX equivalent types.
+// identifiers and the CycloneDX equivalent types.
 func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference_ExternalReferenceType) cdx.ExternalReferenceType {
 	switch protoExtRefType {
 	case sbom.ExternalReference_ATTESTATION:
@@ -621,4 +591,37 @@ func (s *CDX) protoHashAlgoToCdxAlgo(protoAlgo sbom.HashAlgorithm) (cdx.HashAlgo
 	// TODO(degradation): Unknow algorithms err here. We could silently not.
 	// TODO(options): Sink all unknows to UNKNOWN
 	return "", fmt.Errorf("hash algorithm %q not supported by cyclonedx", protoAlgo)
+}
+
+// purposeToComponentType converts from a protobom enumerated purpose to
+// a CycloneDC component type
+func (s *CDX) purposeToComponentType(purpose sbom.Purpose) (cdx.ComponentType, error) {
+	switch purpose {
+	case sbom.Purpose_APPLICATION, sbom.Purpose_EXECUTABLE, sbom.Purpose_INSTALL:
+		return cdx.ComponentTypeApplication, nil
+	case sbom.Purpose_CONTAINER:
+		return cdx.ComponentTypeContainer, nil
+	case sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST, sbom.Purpose_OTHER:
+		return cdx.ComponentTypeData, nil
+	case sbom.Purpose_DEVICE:
+		return cdx.ComponentTypeDevice, nil
+	case sbom.Purpose_DEVICE_DRIVER:
+		return cdx.ComponentTypeDeviceDriver, nil
+	case sbom.Purpose_FILE, sbom.Purpose_PATCH, sbom.Purpose_SOURCE, sbom.Purpose_ARCHIVE:
+		return cdx.ComponentTypeFile, nil
+	case sbom.Purpose_FIRMWARE:
+		return cdx.ComponentTypeFirmware, nil
+	case sbom.Purpose_FRAMEWORK:
+		return cdx.ComponentTypeFramework, nil
+	case sbom.Purpose_LIBRARY, sbom.Purpose_MODULE:
+		return cdx.ComponentTypeLibrary, nil
+	case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
+		return cdx.ComponentTypeMachineLearningModel, nil
+	case sbom.Purpose_OPERATING_SYSTEM:
+		return cdx.ComponentTypeOS, nil
+	case sbom.Purpose_PLATFORM:
+		return cdx.ComponentTypePlatform, nil
+	}
+
+	return "", fmt.Errorf("document purpose %q not supported", purpose)
 }

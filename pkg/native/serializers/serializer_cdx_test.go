@@ -144,10 +144,49 @@ func TestProtoHashAlgoToCdxAlgo(t *testing.T) {
 		sbom.HashAlgorithm_BLAKE2B_512: cdx.HashAlgoBlake2b_512,
 		sbom.HashAlgorithm_BLAKE3:      cdx.HashAlgoBlake3,
 	} {
-		res, _ := cdxs.protoHashAlgoToCdxAlgo(protoAlgo)
+		res, err := cdxs.protoHashAlgoToCdxAlgo(protoAlgo)
+		require.NoError(t, err)
 		require.Equal(t, cdxAlgo, res)
 
-		_, err := cdxs.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(9999999))
+		_, err = cdxs.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(9999999))
 		require.Error(t, err)
+	}
+}
+
+func TestPurposeToComponentType(t *testing.T) {
+	cdxs := NewCDX("1.5", "json")
+	for protoPupose, cdxType := range map[sbom.Purpose]cdx.ComponentType{
+		sbom.Purpose_APPLICATION:            cdx.ComponentTypeApplication,
+		sbom.Purpose_EXECUTABLE:             cdx.ComponentTypeApplication,
+		sbom.Purpose_INSTALL:                cdx.ComponentTypeApplication,
+		sbom.Purpose_CONTAINER:              cdx.ComponentTypeContainer,
+		sbom.Purpose_DATA:                   cdx.ComponentTypeData,
+		sbom.Purpose_BOM:                    cdx.ComponentTypeData,
+		sbom.Purpose_CONFIGURATION:          cdx.ComponentTypeData,
+		sbom.Purpose_DOCUMENTATION:          cdx.ComponentTypeData,
+		sbom.Purpose_EVIDENCE:               cdx.ComponentTypeData,
+		sbom.Purpose_MANIFEST:               cdx.ComponentTypeData,
+		sbom.Purpose_REQUIREMENT:            cdx.ComponentTypeData,
+		sbom.Purpose_SPECIFICATION:          cdx.ComponentTypeData,
+		sbom.Purpose_TEST:                   cdx.ComponentTypeData,
+		sbom.Purpose_OTHER:                  cdx.ComponentTypeData,
+		sbom.Purpose_DEVICE:                 cdx.ComponentTypeDevice,
+		sbom.Purpose_DEVICE_DRIVER:          cdx.ComponentTypeDeviceDriver,
+		sbom.Purpose_FILE:                   cdx.ComponentTypeFile,
+		sbom.Purpose_PATCH:                  cdx.ComponentTypeFile,
+		sbom.Purpose_SOURCE:                 cdx.ComponentTypeFile,
+		sbom.Purpose_ARCHIVE:                cdx.ComponentTypeFile,
+		sbom.Purpose_FIRMWARE:               cdx.ComponentTypeFirmware,
+		sbom.Purpose_FRAMEWORK:              cdx.ComponentTypeFramework,
+		sbom.Purpose_LIBRARY:                cdx.ComponentTypeLibrary,
+		sbom.Purpose_MODULE:                 cdx.ComponentTypeLibrary,
+		sbom.Purpose_MACHINE_LEARNING_MODEL: cdx.ComponentTypeMachineLearningModel,
+		sbom.Purpose_MODEL:                  cdx.ComponentTypeMachineLearningModel,
+		sbom.Purpose_OPERATING_SYSTEM:       cdx.ComponentTypeOS,
+		sbom.Purpose_PLATFORM:               cdx.ComponentTypePlatform,
+	} {
+		res, err := cdxs.purposeToComponentType(protoPupose)
+		require.NoError(t, err)
+		require.Equal(t, cdxType, res)
 	}
 }

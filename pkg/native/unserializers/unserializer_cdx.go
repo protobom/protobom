@@ -21,6 +21,8 @@ type CDX struct {
 	encoding string
 }
 
+type componentCounter int
+
 func NewCDX(version, encoding string) *CDX {
 	return &CDX{
 		version:  version,
@@ -45,11 +47,9 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	md := &sbom.Metadata{
 		Id:      bom.SerialNumber,
 		Version: fmt.Sprintf("%d", bom.Version),
-		// Name:    ,
-		Date:          &timestamppb.Timestamp{},
-		Tools:         []*sbom.Tool{},
-		Authors:       []*sbom.Person{},
-		DocumentTypes: []*sbom.DocumentType{},
+		Date:    &timestamppb.Timestamp{},
+		Tools:   []*sbom.Tool{},
+		Authors: []*sbom.Person{},
 	}
 
 	doc := &sbom.Document{
@@ -57,10 +57,12 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		NodeList: &sbom.NodeList{},
 	}
 
-	metadata := bom.Metadata
-	if metadata != nil {
-		if metadata.Lifecycles != nil {
-			for _, lc := range *metadata.Lifecycles {
+	// var cc componentCounter
+	cc := 0
+
+	if bom.Metadata != nil {
+		if bom.Metadata.Lifecycles != nil {
+			for _, lc := range *bom.Metadata.Lifecycles {
 				lc := lc
 				name := lc.Name
 				desc := lc.Description
@@ -76,8 +78,8 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				})
 			}
 		}
-		if metadata.Component != nil {
-			nl, err := u.componentToNodeList(metadata.Component)
+		if bom.Metadata.Component != nil {
+			nl, err := u.componentToNodeList(bom.Metadata.Component, &cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting main bom component to node: %w", err)
 			}
@@ -91,7 +93,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	// Cycle all components and get their graph fragments
 	if bom.Components != nil {
 		for i := range *bom.Components {
-			nl, err := u.componentToNodeList(&(*bom.Components)[i])
+			nl, err := u.componentToNodeList(&(*bom.Components)[i], &cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting component to node: %w", err)
 			}
@@ -111,8 +113,8 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 
 // componentToNodes takes a CycloneDX component and computes its graph fragment,
 // returning a nodelist
-func (u *CDX) componentToNodeList(component *cdx.Component) (*sbom.NodeList, error) {
-	node, err := u.componentToNode(component)
+func (u *CDX) componentToNodeList(component *cdx.Component, cc *int) (*sbom.NodeList, error) {
+	node, err := u.componentToNode(component, cc)
 	if err != nil {
 		return nil, fmt.Errorf("converting cdx component to node: %w", err)
 	}
@@ -125,7 +127,7 @@ func (u *CDX) componentToNodeList(component *cdx.Component) (*sbom.NodeList, err
 
 	if component.Components != nil {
 		for i := range *component.Components {
-			subList, err := u.componentToNodeList(&(*component.Components)[i])
+			subList, err := u.componentToNodeList(&(*component.Components)[i], cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting subcomponent to nodelist: %w", err)
 			}
@@ -138,7 +140,8 @@ func (u *CDX) componentToNodeList(component *cdx.Component) (*sbom.NodeList, err
 	return nl, nil
 }
 
-func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:unparam
+func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { //nolint:unparam
+	(*cc)++
 	node := &sbom.Node{
 		Id:      c.BOMRef,
 		Type:    sbom.Node_PACKAGE,
@@ -200,7 +203,7 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 
 	// Generate a new ID if none is set
 	if node.Id == "" {
-		node.Id = sbom.NewNodeIdentifier()
+		node.Id = sbom.NewNodeIdentifier("auto", fmt.Sprintf("%09d", *cc))
 	}
 
 	return node, nil

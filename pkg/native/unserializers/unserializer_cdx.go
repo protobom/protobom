@@ -167,9 +167,21 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 		node.Type = sbom.Node_FILE
 	}
 
-	// External references
-	// "vcs" "issue-tracker" "website"  "advisories" "bom" "mailing-list"  "social"  "chat" "documentation"
-	// "support" "distribution" "license" "build-meta" "build-system" "release-notes" "other"
+	for _, extRef := range *c.ExternalReferences {
+		nref := &sbom.ExternalReference{
+			Url:     extRef.URL,
+			Comment: extRef.Comment,
+			Hashes:  map[int32]string{},
+			Type:    u.cdxExtRefTypeToProtobomType(extRef.Type),
+		}
+		for _, h := range *extRef.Hashes {
+			algo := int32(u.cdxHashAlgoToProtobomAlgo(h.Algorithm))
+			// TODO(degradation): Data loss happens if algorithm is repeated
+			// TODO(degradation): Data loss most likely when reading unknown algorithms
+			nref.Hashes[algo] = h.Value
+		}
+		node.ExternalReferences = append(node.ExternalReferences, nref)
+	}
 
 	// Named external references:
 	if c.CPE != "" {
@@ -329,5 +341,128 @@ func (u *CDX) componentTypeToPurpose(cType cdx.ComponentType) sbom.Purpose {
 		return sbom.Purpose_DATA
 	default:
 		return sbom.Purpose_UNKNOWN_PURPOSE
+	}
+}
+
+// cdxHashAlgoToProtobomAlgo returns a protobom algorithm constant from a
+// cyclonedx algorithm string
+func (u *CDX) cdxHashAlgoToProtobomAlgo(cdxAlgo cdx.HashAlgorithm) sbom.HashAlgorithm {
+	switch cdxAlgo {
+	case cdx.HashAlgoMD5:
+		return sbom.HashAlgorithm_MD5
+	case cdx.HashAlgoSHA1:
+		return sbom.HashAlgorithm_SHA1
+	case cdx.HashAlgoSHA256:
+		return sbom.HashAlgorithm_SHA256
+	case cdx.HashAlgoSHA384:
+		return sbom.HashAlgorithm_SHA384
+	case cdx.HashAlgoSHA512:
+		return sbom.HashAlgorithm_SHA512
+	case cdx.HashAlgoSHA3_256:
+		return sbom.HashAlgorithm_SHA3_256
+	case cdx.HashAlgoSHA3_384:
+		return sbom.HashAlgorithm_SHA3_384
+	case cdx.HashAlgoSHA3_512:
+		return sbom.HashAlgorithm_SHA3_512
+	case cdx.HashAlgoBlake2b_256:
+		return sbom.HashAlgorithm_BLAKE2B_256
+	case cdx.HashAlgoBlake2b_384:
+		return sbom.HashAlgorithm_BLAKE2B_384
+	case cdx.HashAlgoBlake2b_512:
+		return sbom.HashAlgorithm_BLAKE2B_512
+	case cdx.HashAlgoBlake3:
+		return sbom.HashAlgorithm_BLAKE3
+	default:
+		return sbom.HashAlgorithm_UNKNOWN
+	}
+}
+
+// cdxExtRefTypeToProtobomType converts the cyclonedx references to our protobom
+// enumarated values.
+//
+// Some values are missing in the CDX library that's why I'm creating them here.
+// (I opened https://github.com/CycloneDX/cyclonedx-go/pull/129 to fix it)
+func (u *CDX) cdxExtRefTypeToProtobomType(cdxExtRefType cdx.ExternalReferenceType) sbom.ExternalReference_ExternalReferenceType {
+	switch cdxExtRefType {
+	case cdx.ERTypeAttestation:
+		return sbom.ExternalReference_ATTESTATION
+	case cdx.ERTypeBOM:
+		return sbom.ExternalReference_BOM
+	case cdx.ERTypeBuildMeta:
+		return sbom.ExternalReference_BUILD_META
+	case cdx.ERTypeBuildSystem:
+		return sbom.ExternalReference_BUILD_SYSTEM
+	case cdx.ERTypeCertificationReport:
+		return sbom.ExternalReference_CERTIFICATION_REPORT
+	case cdx.ERTypeChat:
+		return sbom.ExternalReference_CHAT
+	case cdx.ERTypeCodifiedInfrastructure:
+		return sbom.ExternalReference_CODIFIED_INFRASTRUCTURE
+	case cdx.ERTypeComponentAnalysisReport:
+		return sbom.ExternalReference_COMPONENT_ANALYSIS_REPORT
+	case cdx.ExternalReferenceType("configuration"):
+		return sbom.ExternalReference_CONFIGURATION
+	case cdx.ERTypeDistributionIntake:
+		return sbom.ExternalReference_DISTRIBUTION_INTAKE
+	case cdx.ERTypeDistribution:
+		return sbom.ExternalReference_DOWNLOAD
+	case cdx.ERTypeDocumentation:
+		return sbom.ExternalReference_DOCUMENTATION
+	case cdx.ERTypeDynamicAnalysisReport:
+		return sbom.ExternalReference_DYNAMIC_ANALYSIS_REPORT
+	case cdx.ExternalReferenceType("evidence"):
+		return sbom.ExternalReference_EVIDENCE
+	case cdx.ExternalReferenceType("formulation"):
+		return sbom.ExternalReference_FORMULATION
+	case cdx.ERTypeIssueTracker:
+		return sbom.ExternalReference_ISSUE_TRACKER
+	case cdx.ERTypeLicense:
+		return sbom.ExternalReference_LICENSE
+	case cdx.ExternalReferenceType("log"):
+		return sbom.ExternalReference_LOG
+	case cdx.ERTypeMailingList:
+		return sbom.ExternalReference_MAILING_LIST
+	case cdx.ERTypeMaturityReport:
+		return sbom.ExternalReference_MATURITY_REPORT
+	case cdx.ExternalReferenceType("model-card"):
+		return sbom.ExternalReference_MODEL_CARD
+	case cdx.ERTypeOther:
+		return sbom.ExternalReference_OTHER
+	case cdx.ExternalReferenceType("poam"):
+		return sbom.ExternalReference_POAM
+	case cdx.ERTypeQualityMetrics:
+		return sbom.ExternalReference_QUALITY_METRICS
+	case cdx.ERTypeReleaseNotes:
+		return sbom.ExternalReference_RELEASE_NOTES
+	case cdx.ERTypeRiskAssessment:
+		return sbom.ExternalReference_RISK_ASSESSMENT
+	case cdx.ERTypeRuntimeAnalysisReport:
+		return sbom.ExternalReference_RUNTIME_ANALYSIS_REPORT
+	case cdx.ERTypeAdversaryModel:
+		return sbom.ExternalReference_SECURITY_ADVERSARY_MODEL
+	case cdx.ERTypeAdvisories:
+		return sbom.ExternalReference_SECURITY_ADVISORY
+	case cdx.ERTypeSecurityContact:
+		return sbom.ExternalReference_SECURITY_CONTACT
+	case cdx.ERTypePentestReport:
+		return sbom.ExternalReference_SECURITY_PENTEST_REPORT
+	case cdx.ERTypeThreatModel:
+		return sbom.ExternalReference_SECURITY_THREAT_MODEL
+	case cdx.ERTypeSocial:
+		return sbom.ExternalReference_SOCIAL
+	case cdx.ERTypeStaticAnalysisReport:
+		return sbom.ExternalReference_STATIC_ANALYSIS_REPORT
+	case cdx.ERTypeSupport:
+		return sbom.ExternalReference_SUPPORT
+	case cdx.ERTypeVCS:
+		return sbom.ExternalReference_VCS
+	case cdx.ERTypeVulnerabilityAssertion:
+		return sbom.ExternalReference_VULNERABILITY_ASSERTION
+	case cdx.ERTypeExploitabilityStatement:
+		return sbom.ExternalReference_VULNERABILITY_EXPLOITABILITY_ASSESSMENT
+	case cdx.ERTypeWebsite:
+		return sbom.ExternalReference_WEBSITE
+	default:
+		return sbom.ExternalReference_OTHER
 	}
 }

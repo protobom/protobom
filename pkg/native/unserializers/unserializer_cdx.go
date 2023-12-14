@@ -45,11 +45,9 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	md := &sbom.Metadata{
 		Id:      bom.SerialNumber,
 		Version: fmt.Sprintf("%d", bom.Version),
-		// Name:    ,
-		Date:          &timestamppb.Timestamp{},
-		Tools:         []*sbom.Tool{},
-		Authors:       []*sbom.Person{},
-		DocumentTypes: []*sbom.DocumentType{},
+		Date:    &timestamppb.Timestamp{},
+		Tools:   []*sbom.Tool{},
+		Authors: []*sbom.Person{},
 	}
 
 	doc := &sbom.Document{
@@ -57,10 +55,11 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		NodeList: &sbom.NodeList{},
 	}
 
-	metadata := bom.Metadata
-	if metadata != nil {
-		if metadata.Lifecycles != nil {
-			for _, lc := range *metadata.Lifecycles {
+	cc := 0
+
+	if bom.Metadata != nil {
+		if bom.Metadata.Lifecycles != nil {
+			for _, lc := range *bom.Metadata.Lifecycles {
 				lc := lc
 				name := lc.Name
 				desc := lc.Description
@@ -76,8 +75,8 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				})
 			}
 		}
-		if metadata.Component != nil {
-			nl, err := u.componentToNodeList(metadata.Component)
+		if bom.Metadata.Component != nil {
+			nl, err := u.componentToNodeList(bom.Metadata.Component, &cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting main bom component to node: %w", err)
 			}
@@ -91,7 +90,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	// Cycle all components and get their graph fragments
 	if bom.Components != nil {
 		for i := range *bom.Components {
-			nl, err := u.componentToNodeList(&(*bom.Components)[i])
+			nl, err := u.componentToNodeList(&(*bom.Components)[i], &cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting component to node: %w", err)
 			}
@@ -111,8 +110,8 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 
 // componentToNodes takes a CycloneDX component and computes its graph fragment,
 // returning a nodelist
-func (u *CDX) componentToNodeList(component *cdx.Component) (*sbom.NodeList, error) {
-	node, err := u.componentToNode(component)
+func (u *CDX) componentToNodeList(component *cdx.Component, cc *int) (*sbom.NodeList, error) {
+	node, err := u.componentToNode(component, cc)
 	if err != nil {
 		return nil, fmt.Errorf("converting cdx component to node: %w", err)
 	}
@@ -125,7 +124,7 @@ func (u *CDX) componentToNodeList(component *cdx.Component) (*sbom.NodeList, err
 
 	if component.Components != nil {
 		for i := range *component.Components {
-			subList, err := u.componentToNodeList(&(*component.Components)[i])
+			subList, err := u.componentToNodeList(&(*component.Components)[i], cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting subcomponent to nodelist: %w", err)
 			}
@@ -138,7 +137,8 @@ func (u *CDX) componentToNodeList(component *cdx.Component) (*sbom.NodeList, err
 	return nl, nil
 }
 
-func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:unparam
+func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { //nolint:unparam
+	(*cc)++
 	node := &sbom.Node{
 		Id:      c.BOMRef,
 		Type:    sbom.Node_PACKAGE,
@@ -159,40 +159,15 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 		FileTypes:          []string{},
 	}
 
-	// CycloneDX 1.5 types: "application", "framework", "library", "container", "platform", "operating-system", "device", "device-driver", "firmware", "file", "machine-learning-model", "data"
-	switch c.Type {
-	case cdx.ComponentTypeApplication:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_APPLICATION}
-	case cdx.ComponentTypeFramework:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FRAMEWORK}
-	case cdx.ComponentTypeLibrary:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY}
-	case cdx.ComponentTypeContainer:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_CONTAINER}
-	case cdx.ComponentTypePlatform:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_PLATFORM}
-	case cdx.ComponentTypeOS:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_OPERATING_SYSTEM}
-	case cdx.ComponentTypeDevice:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DEVICE}
-	case cdx.ComponentTypeDeviceDriver:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DEVICE_DRIVER}
-	case cdx.ComponentTypeFirmware:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FIRMWARE}
-	case cdx.ComponentTypeFile:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FILE}
+	node.PrimaryPurpose = []sbom.Purpose{u.componentTypeToPurpose(c.Type)}
+
+	// Protobom recognizes files in CycloneDX SBOMs when a component is of
+	// type file. In that case we flip the type bit:
+	if u.componentTypeToPurpose(c.Type) == sbom.Purpose_FILE {
 		node.Type = sbom.Node_FILE
-	case cdx.ComponentTypeMachineLearningModel:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_MACHINE_LEARNING_MODEL}
-	case cdx.ComponentTypeData:
-		node.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_DATA}
-	default:
-		// TODO(degradation): unknown ComponentType not preserved in protobom struct
 	}
 
-	// External references
-	// "vcs" "issue-tracker" "website"  "advisories" "bom" "mailing-list"  "social"  "chat" "documentation"
-	// "support" "distribution" "license" "build-meta" "build-system" "release-notes" "other"
+	node.ExternalReferences = u.unserializeExternalReferences(c.ExternalReferences)
 
 	// Named external references:
 	if c.CPE != "" {
@@ -225,10 +200,37 @@ func (u *CDX) componentToNode(c *cdx.Component) (*sbom.Node, error) { //nolint:u
 
 	// Generate a new ID if none is set
 	if node.Id == "" {
-		node.Id = sbom.NewNodeIdentifier()
+		node.Id = sbom.NewNodeIdentifier("auto", fmt.Sprintf("%09d", *cc))
 	}
 
 	return node, nil
+}
+
+// unserializeExternalReferences reads a slice of cyclonedx references and returns
+// tjeir protobom equivalents.
+func (u *CDX) unserializeExternalReferences(cdxReferences *[]cdx.ExternalReference) []*sbom.ExternalReference {
+	ret := []*sbom.ExternalReference{}
+	// If there are no ext references. Done.
+	if cdxReferences == nil {
+		return ret
+	}
+
+	for _, extRef := range *cdxReferences {
+		nref := &sbom.ExternalReference{
+			Url:     extRef.URL,
+			Comment: extRef.Comment,
+			Hashes:  map[int32]string{},
+			Type:    u.cdxExtRefTypeToProtobomType(extRef.Type),
+		}
+		for _, h := range *extRef.Hashes {
+			algo := int32(u.cdxHashAlgoToProtobomAlgo(h.Algorithm))
+			// TODO(degradation): Data loss happens if algorithm is repeated
+			// TODO(degradation): Data loss most likely when reading unknown algorithms
+			nref.Hashes[algo] = h.Value
+		}
+		ret = append(ret, nref)
+	}
+	return ret
 }
 
 // licenseChoicesToLicenseList returns a flat list of license strings combining
@@ -316,5 +318,164 @@ func (u *CDX) phaseToSBOMType(ph *cdx.LifecyclePhase) *sbom.DocumentType_SBOMTyp
 		return sbom.DocumentType_ANALYZED.Enum()
 	default:
 		return nil
+	}
+}
+
+// componentTypeToPurpose converts the protobom catalog of purposes to the cyclonedx
+// component type.
+func (u *CDX) componentTypeToPurpose(cType cdx.ComponentType) sbom.Purpose {
+	// CycloneDX 1.5 types: "application", "framework", "library", "container",
+	// "platform", "operating-system", "device", "device-driver", "firmware",
+	// "file", "machine-learning-model", "data"
+	switch cType {
+	case cdx.ComponentTypeApplication:
+		return sbom.Purpose_APPLICATION
+	case cdx.ComponentTypeFramework:
+		return sbom.Purpose_FRAMEWORK
+	case cdx.ComponentTypeLibrary:
+		return sbom.Purpose_LIBRARY
+	case cdx.ComponentTypeContainer:
+		return sbom.Purpose_CONTAINER
+	case cdx.ComponentTypePlatform:
+		return sbom.Purpose_PLATFORM
+	case cdx.ComponentTypeOS:
+		return sbom.Purpose_OPERATING_SYSTEM
+	case cdx.ComponentTypeDevice:
+		return sbom.Purpose_DEVICE
+	case cdx.ComponentTypeDeviceDriver:
+		return sbom.Purpose_DEVICE_DRIVER
+	case cdx.ComponentTypeFirmware:
+		return sbom.Purpose_FIRMWARE
+	case cdx.ComponentTypeFile:
+		return sbom.Purpose_FILE
+	case cdx.ComponentTypeMachineLearningModel:
+		return sbom.Purpose_MACHINE_LEARNING_MODEL
+	case cdx.ComponentTypeData:
+		return sbom.Purpose_DATA
+	default:
+		return sbom.Purpose_UNKNOWN_PURPOSE
+	}
+}
+
+// cdxHashAlgoToProtobomAlgo returns a protobom algorithm constant from a
+// cyclonedx algorithm string
+func (u *CDX) cdxHashAlgoToProtobomAlgo(cdxAlgo cdx.HashAlgorithm) sbom.HashAlgorithm {
+	switch cdxAlgo {
+	case cdx.HashAlgoMD5:
+		return sbom.HashAlgorithm_MD5
+	case cdx.HashAlgoSHA1:
+		return sbom.HashAlgorithm_SHA1
+	case cdx.HashAlgoSHA256:
+		return sbom.HashAlgorithm_SHA256
+	case cdx.HashAlgoSHA384:
+		return sbom.HashAlgorithm_SHA384
+	case cdx.HashAlgoSHA512:
+		return sbom.HashAlgorithm_SHA512
+	case cdx.HashAlgoSHA3_256:
+		return sbom.HashAlgorithm_SHA3_256
+	case cdx.HashAlgoSHA3_384:
+		return sbom.HashAlgorithm_SHA3_384
+	case cdx.HashAlgoSHA3_512:
+		return sbom.HashAlgorithm_SHA3_512
+	case cdx.HashAlgoBlake2b_256:
+		return sbom.HashAlgorithm_BLAKE2B_256
+	case cdx.HashAlgoBlake2b_384:
+		return sbom.HashAlgorithm_BLAKE2B_384
+	case cdx.HashAlgoBlake2b_512:
+		return sbom.HashAlgorithm_BLAKE2B_512
+	case cdx.HashAlgoBlake3:
+		return sbom.HashAlgorithm_BLAKE3
+	default:
+		return sbom.HashAlgorithm_UNKNOWN
+	}
+}
+
+// cdxExtRefTypeToProtobomType converts the cyclonedx references to our protobom
+// enumarated values.
+//
+// Some values are missing in the CDX library that's why I'm creating them here.
+// (I opened https://github.com/CycloneDX/cyclonedx-go/pull/129 to fix it)
+func (u *CDX) cdxExtRefTypeToProtobomType(cdxExtRefType cdx.ExternalReferenceType) sbom.ExternalReference_ExternalReferenceType {
+	switch cdxExtRefType {
+	case cdx.ERTypeAttestation:
+		return sbom.ExternalReference_ATTESTATION
+	case cdx.ERTypeBOM:
+		return sbom.ExternalReference_BOM
+	case cdx.ERTypeBuildMeta:
+		return sbom.ExternalReference_BUILD_META
+	case cdx.ERTypeBuildSystem:
+		return sbom.ExternalReference_BUILD_SYSTEM
+	case cdx.ERTypeCertificationReport:
+		return sbom.ExternalReference_CERTIFICATION_REPORT
+	case cdx.ERTypeChat:
+		return sbom.ExternalReference_CHAT
+	case cdx.ERTypeCodifiedInfrastructure:
+		return sbom.ExternalReference_CODIFIED_INFRASTRUCTURE
+	case cdx.ERTypeComponentAnalysisReport:
+		return sbom.ExternalReference_COMPONENT_ANALYSIS_REPORT
+	case cdx.ExternalReferenceType("configuration"):
+		return sbom.ExternalReference_CONFIGURATION
+	case cdx.ERTypeDistributionIntake:
+		return sbom.ExternalReference_DISTRIBUTION_INTAKE
+	case cdx.ERTypeDistribution:
+		return sbom.ExternalReference_DOWNLOAD
+	case cdx.ERTypeDocumentation:
+		return sbom.ExternalReference_DOCUMENTATION
+	case cdx.ERTypeDynamicAnalysisReport:
+		return sbom.ExternalReference_DYNAMIC_ANALYSIS_REPORT
+	case cdx.ExternalReferenceType("evidence"):
+		return sbom.ExternalReference_EVIDENCE
+	case cdx.ExternalReferenceType("formulation"):
+		return sbom.ExternalReference_FORMULATION
+	case cdx.ERTypeIssueTracker:
+		return sbom.ExternalReference_ISSUE_TRACKER
+	case cdx.ERTypeLicense:
+		return sbom.ExternalReference_LICENSE
+	case cdx.ExternalReferenceType("log"):
+		return sbom.ExternalReference_LOG
+	case cdx.ERTypeMailingList:
+		return sbom.ExternalReference_MAILING_LIST
+	case cdx.ERTypeMaturityReport:
+		return sbom.ExternalReference_MATURITY_REPORT
+	case cdx.ExternalReferenceType("model-card"):
+		return sbom.ExternalReference_MODEL_CARD
+	case cdx.ERTypeOther:
+		return sbom.ExternalReference_OTHER
+	case cdx.ExternalReferenceType("poam"):
+		return sbom.ExternalReference_POAM
+	case cdx.ERTypeQualityMetrics:
+		return sbom.ExternalReference_QUALITY_METRICS
+	case cdx.ERTypeReleaseNotes:
+		return sbom.ExternalReference_RELEASE_NOTES
+	case cdx.ERTypeRiskAssessment:
+		return sbom.ExternalReference_RISK_ASSESSMENT
+	case cdx.ERTypeRuntimeAnalysisReport:
+		return sbom.ExternalReference_RUNTIME_ANALYSIS_REPORT
+	case cdx.ERTypeAdversaryModel:
+		return sbom.ExternalReference_SECURITY_ADVERSARY_MODEL
+	case cdx.ERTypeAdvisories:
+		return sbom.ExternalReference_SECURITY_ADVISORY
+	case cdx.ERTypeSecurityContact:
+		return sbom.ExternalReference_SECURITY_CONTACT
+	case cdx.ERTypePentestReport:
+		return sbom.ExternalReference_SECURITY_PENTEST_REPORT
+	case cdx.ERTypeThreatModel:
+		return sbom.ExternalReference_SECURITY_THREAT_MODEL
+	case cdx.ERTypeSocial:
+		return sbom.ExternalReference_SOCIAL
+	case cdx.ERTypeStaticAnalysisReport:
+		return sbom.ExternalReference_STATIC_ANALYSIS_REPORT
+	case cdx.ERTypeSupport:
+		return sbom.ExternalReference_SUPPORT
+	case cdx.ERTypeVCS:
+		return sbom.ExternalReference_VCS
+	case cdx.ERTypeVulnerabilityAssertion:
+		return sbom.ExternalReference_VULNERABILITY_ASSERTION
+	case cdx.ERTypeExploitabilityStatement:
+		return sbom.ExternalReference_VULNERABILITY_EXPLOITABILITY_ASSESSMENT
+	case cdx.ERTypeWebsite:
+		return sbom.ExternalReference_WEBSITE
+	default:
+		return sbom.ExternalReference_OTHER
 	}
 }

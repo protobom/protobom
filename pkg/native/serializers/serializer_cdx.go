@@ -46,26 +46,46 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
 	ver, err := strconv.Atoi(bom.Metadata.Version)
+	// TODO(deprecation): If version does not parse to int, there's data loss here.
 	if err == nil {
 		doc.Version = ver
 	}
 
 	metadata := cdx.Metadata{
-		Component: &cdx.Component{},
+		Component:  &cdx.Component{},
+		Lifecycles: &[]cdx.Lifecycle{},
 	}
 
 	doc.Metadata = &metadata
-	doc.Metadata.Lifecycles = &[]cdx.Lifecycle{}
 	doc.Components = &[]cdx.Component{}
 	doc.Dependencies = &[]cdx.Dependency{}
 
-	rootComponent, err := s.root(ctx, bom)
-	if err != nil {
-		return nil, fmt.Errorf("generating SBOM root component: %w", err)
+	// Check if the protobom has no root elements:
+	if bom.NodeList.RootElements == nil || len(bom.NodeList.RootElements) == 0 {
+		// Empty (nodeless) document
+		if len(bom.NodeList.Nodes) == 0 {
+			return doc, nil
+		}
+		// If we have nodes but no roots, then we error as the graph
+		// cannot be traversed
+		return nil, fmt.Errorf("unable to build cyclonedx document, no root nodes found")
 	}
-	if rootComponent != nil {
-		doc.Metadata.Component = rootComponent
+
+	// .. or has too many root elements:
+
+	// TODO(deprecation): If there are more root nodes we need to hack them
+	// into the CycloneDX graph or error
+	if l := len(bom.NodeList.RootElements); l > 1 {
+		return nil, fmt.Errorf("unable to serialize multiroot cyclonedx, document has %d root nodes", l)
 	}
+
+	rootNode := bom.NodeList.GetNodeByID(bom.NodeList.RootElements[0])
+	if rootNode == nil {
+		return nil, fmt.Errorf("integrity error: root node %q not found", bom.NodeList.RootElements[0])
+	}
+
+	doc.Metadata.Component = s.nodeToComponent(rootNode)
+	state.addedDict[rootNode.Id] = struct{}{}
 
 	if err := s.componentsMaps(ctx, bom); err != nil {
 		return nil, err
@@ -148,7 +168,7 @@ func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
 	case sbom.DocumentType_OTHER:
 		return cdx.LifecyclePhase(strings.ToLower(*dt.Name)), nil
 	}
-
+	// TODO(option): Dont err but assign to type OTHER
 	return "", fmt.Errorf("unknown document type %s", *dt.Name)
 }
 
@@ -187,34 +207,6 @@ func (s *CDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
 		state.componentsDict[comp.BOMRef] = comp
 	}
 	return nil
-}
-
-func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, error) {
-	var rootComp *cdx.Component
-	// First, assign the top level nodes
-	state, err := getCDXState(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("reading state: %w", err)
-	}
-
-	// 2DO Use GetRootNodes() https://github.com/bom-squad/protobom/pull/20
-	if bom.NodeList.RootElements != nil && len(bom.NodeList.RootElements) > 0 {
-		for _, id := range bom.NodeList.RootElements {
-			// Search for the node and add it
-			for _, n := range bom.NodeList.Nodes {
-				if n.Id == id {
-					rootComp = s.nodeToComponent(n)
-					state.addedDict[id] = struct{}{}
-				}
-			}
-
-			// TODO(degradation): Here we would document other root level elements
-			// are not added to to document
-			noop() // temp workaround in favor of adding a lint tag
-		}
-	}
-
-	return rootComp, nil
 }
 
 // NOTE dependencies function modifies the components dictionary
@@ -288,58 +280,30 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 	return dependencies, nil
 }
 
-func noop() {}
-
 // nodeToComponent converts a node in protobuf to a CycloneDX component
 func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	if n == nil {
 		return nil
 	}
+
 	c := &cdx.Component{
-		BOMRef:      n.Id,
-		Name:        n.Name,
-		Version:     n.Version,
-		Description: n.Description,
+		BOMRef:             n.Id,
+		Name:               n.Name,
+		Version:            n.Version,
+		Description:        n.Description,
+		Hashes:             &[]cdx.Hash{},
+		ExternalReferences: &[]cdx.ExternalReference{},
 	}
 
 	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
-	} else {
-		if len(n.PrimaryPurpose) > 1 {
-			// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but cdx.Component only allows single Type so we are using the first
-			noop() // temp workaround in favor of adding a lint tag
+	} else if len(n.PrimaryPurpose) > 0 {
+		componentType, err := s.purposeToComponentType(n.PrimaryPurpose[0])
+		if err == nil {
+			c.Type = componentType
 		}
-		if len(n.PrimaryPurpose) > 0 {
-			switch n.PrimaryPurpose[0] {
-			case sbom.Purpose_APPLICATION, sbom.Purpose_EXECUTABLE, sbom.Purpose_INSTALL:
-				c.Type = cdx.ComponentTypeApplication
-			case sbom.Purpose_CONTAINER:
-				c.Type = cdx.ComponentTypeContainer
-			case sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST, sbom.Purpose_OTHER:
-				c.Type = cdx.ComponentTypeData
-			case sbom.Purpose_DEVICE:
-				c.Type = cdx.ComponentTypeDevice
-			case sbom.Purpose_DEVICE_DRIVER:
-				c.Type = cdx.ComponentTypeDeviceDriver
-			case sbom.Purpose_FILE, sbom.Purpose_PATCH, sbom.Purpose_SOURCE, sbom.Purpose_ARCHIVE:
-				c.Type = cdx.ComponentTypeFile
-			case sbom.Purpose_FIRMWARE:
-				c.Type = cdx.ComponentTypeFirmware
-			case sbom.Purpose_FRAMEWORK:
-				c.Type = cdx.ComponentTypeFramework
-			case sbom.Purpose_LIBRARY, sbom.Purpose_MODULE:
-				c.Type = cdx.ComponentTypeLibrary
-			case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
-				c.Type = cdx.ComponentTypeMachineLearningModel
-			case sbom.Purpose_OPERATING_SYSTEM:
-				c.Type = cdx.ComponentTypeOS
-			case sbom.Purpose_PLATFORM:
-				c.Type = cdx.ComponentTypePlatform
-			default:
-				// TODO(degradation): Non-matching primary purpose to component type mapping
-				noop() // temp workaround in favor of adding a lint tag
-			}
-		}
+		// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but
+		// cdx.Component only allows single Type so we are using the first
 	}
 
 	if n.Licenses != nil && len(n.Licenses) > 0 {
@@ -358,15 +322,14 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	if n.Hashes != nil && len(n.Hashes) > 0 {
-		c.Hashes = &[]cdx.Hash{}
 		for algo, hash := range n.Hashes {
-			ha := sbom.HashAlgorithm(algo)
-			if ha.ToCycloneDX() == "" {
+			cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(algo))
+			if err != nil {
 				// TODO(degradation): Algorithm not supported in CDX
 				continue
 			}
 			*c.Hashes = append(*c.Hashes, cdx.Hash{
-				Algorithm: ha.ToCycloneDX(),
+				Algorithm: cdxAlgo,
 				Value:     hash,
 			})
 		}
@@ -374,14 +337,27 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 
 	if n.ExternalReferences != nil {
 		for _, er := range n.ExternalReferences {
-			if c.ExternalReferences == nil {
-				c.ExternalReferences = &[]cdx.ExternalReference{}
+			cdxRef := cdx.ExternalReference{
+				URL:     er.Url,
+				Comment: er.Comment,
+				Type:    s.protobomExtRefTypeToCdxType(er.Type),
 			}
-
-			*c.ExternalReferences = append(*c.ExternalReferences, cdx.ExternalReference{
-				Type: cdx.ExternalReferenceType(er.Type), // Fix to make it valid
-				URL:  er.Url,
-			})
+			hashList := []cdx.Hash{}
+			for protoAlgo, val := range er.Hashes {
+				cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(protoAlgo))
+				if err != nil {
+					// TODO(degradation): Hash not supported
+					continue
+				}
+				hashList = append(hashList, cdx.Hash{
+					Algorithm: cdxAlgo,
+					Value:     val,
+				})
+			}
+			if len(hashList) > 0 {
+				cdxRef.Hashes = &hashList
+			}
+			*c.ExternalReferences = append(*c.ExternalReferences, cdxRef)
 		}
 	}
 
@@ -393,7 +369,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 			case int32(sbom.SoftwareIdentifierType_CPE23):
 				c.CPE = n.Identifiers[idType]
 			case int32(sbom.SoftwareIdentifierType_CPE22):
-				// TODO(degradation): Only one CPE is supperted in CDX
+				// TODO(degradation): Only one CPE is supported in CDX
 				if c.CPE == "" {
 					c.CPE = n.Identifiers[idType]
 				}
@@ -490,4 +466,162 @@ func getCDXState(ctx context.Context) (*serializerCDXState, error) {
 		return nil, errors.New("unable to cast serializer state from context")
 	}
 	return dm, nil
+}
+
+// protobomExtRefTypeToCdxType translates between the protobom external reference
+// identifiers and the CycloneDX equivalent types.
+func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference_ExternalReferenceType) cdx.ExternalReferenceType {
+	switch protoExtRefType {
+	case sbom.ExternalReference_ATTESTATION:
+		return cdx.ERTypeAttestation
+	case sbom.ExternalReference_BOM:
+		return cdx.ERTypeBOM
+	case sbom.ExternalReference_BUILD_META:
+		return cdx.ERTypeBuildMeta
+	case sbom.ExternalReference_BUILD_SYSTEM:
+		return cdx.ERTypeBuildSystem
+	case sbom.ExternalReference_CERTIFICATION_REPORT:
+		return cdx.ERTypeCertificationReport
+	case sbom.ExternalReference_CHAT:
+		return cdx.ERTypeChat
+	case sbom.ExternalReference_CODIFIED_INFRASTRUCTURE:
+		return cdx.ERTypeCodifiedInfrastructure
+	case sbom.ExternalReference_COMPONENT_ANALYSIS_REPORT:
+		return cdx.ERTypeComponentAnalysisReport
+	case sbom.ExternalReference_CONFIGURATION:
+		return cdx.ExternalReferenceType("configuration")
+	case sbom.ExternalReference_DISTRIBUTION_INTAKE:
+		return cdx.ERTypeDistributionIntake
+	case sbom.ExternalReference_DOWNLOAD:
+		return cdx.ERTypeDistribution
+	case sbom.ExternalReference_DOCUMENTATION:
+		return cdx.ERTypeDocumentation
+	case sbom.ExternalReference_DYNAMIC_ANALYSIS_REPORT:
+		return cdx.ERTypeDynamicAnalysisReport
+	case sbom.ExternalReference_EVIDENCE:
+		return cdx.ExternalReferenceType("evidence")
+	case sbom.ExternalReference_FORMULATION:
+		return cdx.ExternalReferenceType("formulation")
+	case sbom.ExternalReference_ISSUE_TRACKER:
+		return cdx.ERTypeIssueTracker
+	case sbom.ExternalReference_LICENSE:
+		return cdx.ERTypeLicense
+	case sbom.ExternalReference_LOG:
+		return cdx.ExternalReferenceType("log")
+	case sbom.ExternalReference_MAILING_LIST:
+		return cdx.ERTypeMailingList
+	case sbom.ExternalReference_MATURITY_REPORT:
+		return cdx.ERTypeMaturityReport
+	case sbom.ExternalReference_MODEL_CARD:
+		return cdx.ExternalReferenceType("model-card")
+	case sbom.ExternalReference_OTHER:
+		return cdx.ERTypeOther
+	case sbom.ExternalReference_POAM:
+		return cdx.ExternalReferenceType("poam")
+	case sbom.ExternalReference_QUALITY_METRICS:
+		return cdx.ERTypeQualityMetrics
+	case sbom.ExternalReference_RELEASE_NOTES:
+		return cdx.ERTypeReleaseNotes
+	case sbom.ExternalReference_RISK_ASSESSMENT:
+		return cdx.ERTypeRiskAssessment
+	case sbom.ExternalReference_RUNTIME_ANALYSIS_REPORT:
+		return cdx.ERTypeRuntimeAnalysisReport
+	case sbom.ExternalReference_SECURITY_ADVERSARY_MODEL:
+		return cdx.ERTypeAdversaryModel
+	case sbom.ExternalReference_SECURITY_ADVISORY:
+		return cdx.ERTypeAdvisories
+	case sbom.ExternalReference_SECURITY_CONTACT:
+		return cdx.ERTypeSecurityContact
+	case sbom.ExternalReference_SECURITY_PENTEST_REPORT:
+		return cdx.ERTypePentestReport
+	case sbom.ExternalReference_SECURITY_THREAT_MODEL:
+		return cdx.ERTypeThreatModel
+	case sbom.ExternalReference_SOCIAL:
+		return cdx.ERTypeSocial
+	case sbom.ExternalReference_STATIC_ANALYSIS_REPORT:
+		return cdx.ERTypeStaticAnalysisReport
+	case sbom.ExternalReference_SUPPORT:
+		return cdx.ERTypeSupport
+	case sbom.ExternalReference_VCS:
+		return cdx.ERTypeVCS
+	case sbom.ExternalReference_VULNERABILITY_ASSERTION:
+		return cdx.ERTypeVulnerabilityAssertion
+	case sbom.ExternalReference_VULNERABILITY_EXPLOITABILITY_ASSESSMENT:
+		return cdx.ERTypeExploitabilityStatement
+	case sbom.ExternalReference_WEBSITE:
+		return cdx.ERTypeWebsite
+	default:
+		return cdx.ERTypeOther
+	}
+}
+
+// protoHashAlgoToCdxAlgo converts the protobom algorithm to the CDX
+// algorithm string.
+// TODO(degradation): The use of the following algorithms will result in
+// data loss when rendering to CycloneDX 1.4: ADLER32 MD4 MD6 SHA224
+// Also, HashAlgorithm_UNKNOWN also means data loss.
+func (s *CDX) protoHashAlgoToCdxAlgo(protoAlgo sbom.HashAlgorithm) (cdx.HashAlgorithm, error) {
+	switch protoAlgo {
+	case sbom.HashAlgorithm_MD5:
+		return cdx.HashAlgoMD5, nil
+	case sbom.HashAlgorithm_SHA1:
+		return cdx.HashAlgoSHA1, nil
+	case sbom.HashAlgorithm_SHA256:
+		return cdx.HashAlgoSHA256, nil
+	case sbom.HashAlgorithm_SHA384:
+		return cdx.HashAlgoSHA384, nil
+	case sbom.HashAlgorithm_SHA512:
+		return cdx.HashAlgoSHA512, nil
+	case sbom.HashAlgorithm_SHA3_256:
+		return cdx.HashAlgoSHA3_256, nil
+	case sbom.HashAlgorithm_SHA3_384:
+		return cdx.HashAlgoSHA3_384, nil
+	case sbom.HashAlgorithm_SHA3_512:
+		return cdx.HashAlgoSHA3_512, nil
+	case sbom.HashAlgorithm_BLAKE2B_256:
+		return cdx.HashAlgoBlake2b_256, nil
+	case sbom.HashAlgorithm_BLAKE2B_384:
+		return cdx.HashAlgoBlake2b_384, nil
+	case sbom.HashAlgorithm_BLAKE2B_512:
+		return cdx.HashAlgoBlake2b_512, nil
+	case sbom.HashAlgorithm_BLAKE3:
+		return cdx.HashAlgoBlake3, nil
+	}
+
+	// TODO(degradation): Unknow algorithms err here. We could silently not.
+	// TODO(options): Sink all unknows to UNKNOWN
+	return "", fmt.Errorf("hash algorithm %q not supported by cyclonedx", protoAlgo)
+}
+
+// purposeToComponentType converts from a protobom enumerated purpose to
+// a CycloneDC component type
+func (s *CDX) purposeToComponentType(purpose sbom.Purpose) (cdx.ComponentType, error) {
+	switch purpose {
+	case sbom.Purpose_APPLICATION, sbom.Purpose_EXECUTABLE, sbom.Purpose_INSTALL:
+		return cdx.ComponentTypeApplication, nil
+	case sbom.Purpose_CONTAINER:
+		return cdx.ComponentTypeContainer, nil
+	case sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST, sbom.Purpose_OTHER:
+		return cdx.ComponentTypeData, nil
+	case sbom.Purpose_DEVICE:
+		return cdx.ComponentTypeDevice, nil
+	case sbom.Purpose_DEVICE_DRIVER:
+		return cdx.ComponentTypeDeviceDriver, nil
+	case sbom.Purpose_FILE, sbom.Purpose_PATCH, sbom.Purpose_SOURCE, sbom.Purpose_ARCHIVE:
+		return cdx.ComponentTypeFile, nil
+	case sbom.Purpose_FIRMWARE:
+		return cdx.ComponentTypeFirmware, nil
+	case sbom.Purpose_FRAMEWORK:
+		return cdx.ComponentTypeFramework, nil
+	case sbom.Purpose_LIBRARY, sbom.Purpose_MODULE:
+		return cdx.ComponentTypeLibrary, nil
+	case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
+		return cdx.ComponentTypeMachineLearningModel, nil
+	case sbom.Purpose_OPERATING_SYSTEM:
+		return cdx.ComponentTypeOS, nil
+	case sbom.Purpose_PLATFORM:
+		return cdx.ComponentTypePlatform, nil
+	}
+
+	return "", fmt.Errorf("document purpose %q not supported", purpose)
 }

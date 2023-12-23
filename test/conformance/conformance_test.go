@@ -21,19 +21,21 @@ func TestUnserializeFormats(t *testing.T) {
 		files := findFiles(t, format)
 		r := reader.New()
 		for _, fname := range files {
-			sut, err := r.ParseFile(fname)
-			require.NoError(t, err)
-			golden := readProtobom(t, fname+".proto")
-			t.Logf("sut: %s golden: %s", fname, fname+".proto")
-			t.Run(
-				fmt.Sprintf("testNodes-%s-%s-%s", format.Type(), format.Version(), format.Encoding()),
-				func(t *testing.T) {
-					testNodes(t, golden, sut)
-					testEqualNodeList(t, golden, sut)
-					testEdges(t, golden, sut)
-					testDocument(t, golden, sut)
-				},
-			)
+			t.Run(fname, func(t *testing.T) {
+				sut, err := r.ParseFile(fname)
+				require.NoError(t, err)
+				golden := readProtobom(t, fname+".proto")
+				t.Logf("sut: %s golden: %s", fname, fname+".proto")
+				t.Run(
+					fmt.Sprintf("testNodes-%s-%s-%s", format.Type(), format.Version(), format.Encoding()),
+					func(t *testing.T) {
+						testNodes(t, golden, sut)
+						testEqualNodeList(t, golden, sut)
+						testEdges(t, golden, sut)
+						testDocument(t, golden, sut)
+					},
+				)
+			})
 		}
 	}
 }

@@ -120,15 +120,16 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	}
 
 	if bom.Metadata != nil && len(bom.GetMetadata().GetTools()) > 0 {
-		var tools []cdx.Tool
+		var tools []cdx.Tool //nolint:staticcheck
 		for _, bomtool := range bom.GetMetadata().GetTools() {
-			tools = append(tools, cdx.Tool{
-				Vendor:  bomtool.Vendor,
+			tools = append(tools, cdx.Tool{ //nolint:staticcheck // Tool is needed for older cdx versions
 				Name:    bomtool.Name,
 				Version: bomtool.Version,
 			})
 		}
-		metadata.Tools = &tools
+		metadata.Tools = &cdx.ToolsChoice{
+			Tools: &tools,
+		}
 	}
 
 	if bom.Metadata != nil && len(bom.GetMetadata().GetName()) > 0 {

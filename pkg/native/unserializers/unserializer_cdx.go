@@ -222,11 +222,13 @@ func (u *CDX) unserializeExternalReferences(cdxReferences *[]cdx.ExternalReferen
 			Hashes:  map[int32]string{},
 			Type:    u.cdxExtRefTypeToProtobomType(extRef.Type),
 		}
-		for _, h := range *extRef.Hashes {
-			algo := int32(u.cdxHashAlgoToProtobomAlgo(h.Algorithm))
-			// TODO(degradation): Data loss happens if algorithm is repeated
-			// TODO(degradation): Data loss most likely when reading unknown algorithms
-			nref.Hashes[algo] = h.Value
+		if extRef.Hashes != nil {
+			for _, h := range *extRef.Hashes {
+				algo := int32(u.cdxHashAlgoToProtobomAlgo(h.Algorithm))
+				// TODO(degradation): Data loss happens if algorithm is repeated
+				// TODO(degradation): Data loss most likely when reading unknown algorithms
+				nref.Hashes[algo] = h.Value
+			}
 		}
 		ret = append(ret, nref)
 	}

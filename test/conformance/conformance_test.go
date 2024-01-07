@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
@@ -57,6 +58,34 @@ func findFiles(t *testing.T, f formats.Format) []string {
 
 func testNodes(t *testing.T, golden, sut *sbom.Document) {
 	require.Equal(t, len(golden.NodeList.Nodes), len(sut.NodeList.Nodes), "number of nodes")
+
+	nl := golden.NodeList.Nodes
+	nl2 := sut.NodeList.Nodes
+	sort.Slice(nl[:], func(i, j int) bool {
+		return strings.Compare(nl[i].String(), nl[j].String()) <= 0
+	})
+	sort.Slice(nl2[:], func(i, j int) bool {
+		return strings.Compare(nl2[i].String(), nl2[j].String()) <= 0
+	})
+
+	nl2_index := 0
+	for _, n := range nl {
+		n2 := nl2[nl2_index]
+		nodeDiff := n.Diff(n2)
+		t.Logf("Source: %s", n.Id)
+		t.Logf("Destination: %s", n.Id)
+
+		if nodeDiff != nil && nodeDiff.Added != nil {
+			t.Logf("Should have %s:", nodeDiff.Added.String())
+		}
+
+		if nodeDiff != nil && nodeDiff.Removed != nil {
+			t.Logf("Missing %s", nodeDiff.Removed.String())
+		}
+
+		require.Nil(t, nodeDiff)
+		nl2_index = nl2_index + 1
+	}
 }
 
 func testEqualNodeList(t *testing.T, golden, sut *sbom.Document) {

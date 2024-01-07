@@ -61,10 +61,10 @@ func testNodes(t *testing.T, golden, sut *sbom.Document) {
 
 	nl := golden.NodeList.Nodes
 	nl2 := sut.NodeList.Nodes
-	sort.Slice(nl[:], func(i, j int) bool {
+	sort.Slice(nl, func(i, j int) bool {
 		return strings.Compare(nl[i].String(), nl[j].String()) <= 0
 	})
-	sort.Slice(nl2[:], func(i, j int) bool {
+	sort.Slice(nl2, func(i, j int) bool {
 		return strings.Compare(nl2[i].String(), nl2[j].String()) <= 0
 	})
 
@@ -84,7 +84,7 @@ func testNodes(t *testing.T, golden, sut *sbom.Document) {
 		}
 
 		require.Nil(t, nodeDiff)
-		nl2Index = nl2Index + 1
+		nl2Index++
 	}
 }
 

@@ -68,9 +68,9 @@ func testNodes(t *testing.T, golden, sut *sbom.Document) {
 		return strings.Compare(nl2[i].String(), nl2[j].String()) <= 0
 	})
 
-	nl2_index := 0
+	nl2Index := 0
 	for _, n := range nl {
-		n2 := nl2[nl2_index]
+		n2 := nl2[nl2Index]
 		nodeDiff := n.Diff(n2)
 		t.Logf("Source: %s", n.Id)
 		t.Logf("Destination: %s", n.Id)
@@ -84,7 +84,7 @@ func testNodes(t *testing.T, golden, sut *sbom.Document) {
 		}
 
 		require.Nil(t, nodeDiff)
-		nl2_index = nl2_index + 1
+		nl2Index = nl2Index + 1
 	}
 }
 

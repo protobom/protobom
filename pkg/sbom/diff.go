@@ -196,7 +196,7 @@ func diffList[T Flattenable](list1, list2 []T) (added, removed []T, count int) {
 	return added, removed, count
 }
 
-func diff[T comparable](v1, v2 T) (added T, removed T, count int) {
+func diff[T comparable](v1, v2 T) (added, removed T, count int) {
 	// Check if v1 and v2 are equal
 	if v1 == v2 {
 		var zero T // Initialize a zero value of type T

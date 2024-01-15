@@ -261,7 +261,7 @@ func TestDiffString(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			a, r, c := diffString(tc.sut1, tc.sut2)
+			a, r, c := diff(tc.sut1, tc.sut2)
 			require.Equal(t, tc.expectedAdded, a)
 			require.Equal(t, tc.expectedRemoved, r)
 			require.Equal(t, tc.expectedCount, c)
@@ -320,7 +320,7 @@ func TestDiffStrSlice(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			a, r, c := diffStrSlice(tc.sut1, tc.sut2)
+			a, r, c := diffSlice(tc.sut1, tc.sut2)
 			require.Equal(t, tc.expectedAdded, a)
 			require.Equal(t, tc.expectedRemoved, r)
 			require.Equal(t, tc.expectedCount, c)
@@ -436,7 +436,7 @@ func TestDiffPersonList(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			a, r, c := diffPersonList(tc.sut1, tc.sut2)
+			a, r, c := diffList(tc.sut1, tc.sut2)
 			require.Equal(t, tc.expectedAdded, a)
 			require.Equal(t, tc.expectedRemoved, r)
 			require.Equal(t, tc.expectedCount, c)
@@ -500,7 +500,7 @@ func TestDiffExtRefList(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			a, r, c := diffExtRefList(tc.sut1, tc.sut2)
+			a, r, c := diffList(tc.sut1, tc.sut2)
 			require.Equal(t, tc.expectedAdded, a)
 			require.Equal(t, tc.expectedRemoved, r)
 			require.Equal(t, tc.expectedCount, c)
@@ -572,7 +572,7 @@ func TestDiffIntStrMap(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			a, r, c := diffIntStrMap(tc.sut1, tc.sut2)
+			a, r, c := diffMap(tc.sut1, tc.sut2)
 			require.Equal(t, tc.expectedAdded, a)
 			require.Equal(t, tc.expectedRemoved, r)
 			require.Equal(t, tc.expectedCount, c)

@@ -1,7 +1,6 @@
 package sbom
 
 import (
-	"slices"
 	"time"
 
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -21,7 +20,7 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 		Removed: &Node{},
 	}
 
-	a, r, c := diffString(n.Id, n2.Id)
+	a, r, c := diff(n.Id, n2.Id)
 	nd.Added.Id = a
 	nd.Removed.Id = r
 	nd.DiffCount += c
@@ -31,67 +30,67 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 		nd.DiffCount++
 	}
 
-	a, r, c = diffString(n.Name, n2.Name)
+	a, r, c = diff(n.Name, n2.Name)
 	nd.Added.Name = a
 	nd.Removed.Name = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.Version, n2.Version)
+	a, r, c = diff(n.Version, n2.Version)
 	nd.Added.Version = a
 	nd.Removed.Version = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.FileName, n2.FileName)
+	a, r, c = diff(n.FileName, n2.FileName)
 	nd.Added.FileName = a
 	nd.Removed.FileName = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.UrlHome, n2.UrlHome)
+	a, r, c = diff(n.UrlHome, n2.UrlHome)
 	nd.Added.UrlHome = a
 	nd.Removed.UrlHome = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.UrlDownload, n2.UrlDownload)
+	a, r, c = diff(n.UrlDownload, n2.UrlDownload)
 	nd.Added.UrlDownload = a
 	nd.Removed.UrlDownload = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.LicenseConcluded, n2.LicenseConcluded)
+	a, r, c = diff(n.LicenseConcluded, n2.LicenseConcluded)
 	nd.Added.LicenseConcluded = a
 	nd.Removed.LicenseConcluded = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.LicenseComments, n2.LicenseComments)
+	a, r, c = diff(n.LicenseComments, n2.LicenseComments)
 	nd.Added.LicenseComments = a
 	nd.Removed.LicenseComments = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.Copyright, n2.Copyright)
+	a, r, c = diff(n.Copyright, n2.Copyright)
 	nd.Added.Copyright = a
 	nd.Removed.Copyright = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.SourceInfo, n2.SourceInfo)
+	a, r, c = diff(n.SourceInfo, n2.SourceInfo)
 	nd.Added.SourceInfo = a
 	nd.Removed.SourceInfo = r
 	nd.DiffCount += c
 
-	ap, rp, cp := diffPurposeSlice(n.PrimaryPurpose, n2.PrimaryPurpose)
+	ap, rp, cp := diffSlice(n.PrimaryPurpose, n2.PrimaryPurpose)
 	nd.Added.PrimaryPurpose = ap
 	nd.Removed.PrimaryPurpose = rp
 	nd.DiffCount += cp
 
-	a, r, c = diffString(n.Comment, n2.Comment)
+	a, r, c = diff(n.Comment, n2.Comment)
 	nd.Added.Comment = a
 	nd.Removed.Comment = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.Summary, n2.Summary)
+	a, r, c = diff(n.Summary, n2.Summary)
 	nd.Added.Summary = a
 	nd.Removed.Summary = r
 	nd.DiffCount += c
 
-	a, r, c = diffString(n.Description, n2.Description)
+	a, r, c = diff(n.Description, n2.Description)
 	nd.Added.Description = a
 	nd.Removed.Description = r
 	nd.DiffCount += c
@@ -111,42 +110,42 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 	nd.Removed.ValidUntilDate = removedD
 	nd.DiffCount += count
 
-	added, removed, count := diffStrSlice(n.Licenses, n2.Licenses)
+	added, removed, count := diffSlice(n.Licenses, n2.Licenses)
 	nd.Added.Licenses = added
 	nd.Removed.Licenses = removed
 	nd.DiffCount += count
 
-	added, removed, count = diffStrSlice(n.Attribution, n2.Attribution)
+	added, removed, count = diffSlice(n.Attribution, n2.Attribution)
 	nd.Added.Attribution = added
 	nd.Removed.Attribution = removed
 	nd.DiffCount += count
 
-	added, removed, count = diffStrSlice(n.FileTypes, n2.FileTypes)
+	added, removed, count = diffSlice(n.FileTypes, n2.FileTypes)
 	nd.Added.FileTypes = added
 	nd.Removed.FileTypes = removed
 	nd.DiffCount += count
 
-	addedP, removedP, count := diffPersonList(n.Suppliers, n2.Suppliers)
+	addedP, removedP, count := diffList(n.Suppliers, n2.Suppliers)
 	nd.Added.Suppliers = addedP
 	nd.Removed.Suppliers = removedP
 	nd.DiffCount += count
 
-	addedP, removedP, count = diffPersonList(n.Originators, n2.Originators)
+	addedP, removedP, count = diffList(n.Originators, n2.Originators)
 	nd.Added.Originators = addedP
 	nd.Removed.Originators = removedP
 	nd.DiffCount += count
 
-	addedER, removedER, count := diffExtRefList(n.ExternalReferences, n2.ExternalReferences)
+	addedER, removedER, count := diffList(n.ExternalReferences, n2.ExternalReferences)
 	nd.Added.ExternalReferences = addedER
 	nd.Removed.ExternalReferences = removedER
 	nd.DiffCount += count
 
-	addedM, removedM, count := diffIntStrMap(n.Identifiers, n2.Identifiers)
+	addedM, removedM, count := diffMap(n.Identifiers, n2.Identifiers)
 	nd.Added.Identifiers = addedM
 	nd.Removed.Identifiers = removedM
 	nd.DiffCount += count
 
-	addedM, removedM, count = diffIntStrMap(n.Hashes, n2.Hashes)
+	addedM, removedM, count = diffMap(n.Hashes, n2.Hashes)
 	nd.Added.Hashes = addedM
 	nd.Removed.Hashes = removedM
 	nd.DiffCount += count
@@ -157,18 +156,59 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 	return nil
 }
 
-// diffString compares s2 against s1. If they differ returns the value of
-// s2 in the removed return value. If s2 is blank, removed will have the original
-// value of s1. If the strings are different count will be 1, zero if not.
-func diffString(s1, s2 string) (added, removed string, count int) {
-	if s1 == s2 {
-		return "", "", 0
+type Flattenable interface {
+	flatString() string
+}
+
+func diffList[T Flattenable](list1, list2 []T) (added, removed []T, count int) {
+	added = []T{}
+	removed = []T{}
+
+	idx1 := map[string]T{}
+	idx2 := map[string]T{}
+
+	for _, el := range list1 {
+		flatStr := el.flatString()
+		idx1[flatStr] = el
+	}
+	for _, el := range list2 {
+		flatStr := el.flatString()
+		idx2[flatStr] = el
 	}
 
-	if s2 == "" {
-		return "", s1, 1
+	for _, el := range list2 {
+		flatStr := el.flatString()
+		if _, ok := idx1[flatStr]; !ok {
+			added = append(added, el)
+		}
 	}
-	return s2, "", 1
+
+	for _, el := range list1 {
+		flatStr := el.flatString()
+		if _, ok := idx2[flatStr]; !ok {
+			removed = append(removed, el)
+		}
+	}
+
+	if len(added) > 0 || len(removed) > 0 {
+		count = 1
+	}
+	return added, removed, count
+}
+
+func diff[T comparable](v1, v2 T) (added T, removed T, count int) {
+	// Check if v1 and v2 are equal
+	if v1 == v2 {
+		var zero T // Initialize a zero value of type T
+		return zero, zero, 0
+	}
+
+	// Check if v2 is a zero value
+	var zero T
+	if v2 == zero {
+		return zero, v1, 1
+	}
+	return v2, zero, 1
 }
 
 // diffDates takes two dates, compares them and returns d2 in added if there is
@@ -191,78 +231,14 @@ func diffDates(dt1, dt2 *timestamppb.Timestamp) (added, removed *timestamppb.Tim
 	return nil, nil, 0
 }
 
-func diffPersonList(list1, list2 []*Person) (added, removed []*Person, count int) {
-	added = []*Person{}
-	removed = []*Person{}
+// diffMap compares two maps and returns what was added and removed
+func diffMap[K comparable, V comparable](map1, map2 map[K]V) (added, removed map[K]V, count int) {
+	added = make(map[K]V)
+	removed = make(map[K]V)
 
-	// Index persons
-	idx1 := map[string]*Person{}
-	idx2 := map[string]*Person{}
-
-	for _, p := range list1 {
-		idx1[p.flatString()] = p
-	}
-	for _, p := range list2 {
-		idx2[p.flatString()] = p
-	}
-
-	for _, p := range list2 {
-		if _, ok := idx1[p.flatString()]; !ok {
-			added = append(added, p)
-		}
-	}
-
-	for _, p := range list1 {
-		if _, ok := idx2[p.flatString()]; !ok {
-			removed = append(removed, p)
-		}
-	}
-	if len(added) > 0 || len(removed) > 0 {
-		count = 1
-	}
-	return added, removed, count
-}
-
-func diffExtRefList(list1, list2 []*ExternalReference) (added, removed []*ExternalReference, count int) {
-	added = []*ExternalReference{}
-	removed = []*ExternalReference{}
-
-	// Index persons
-	idx1 := map[string]*ExternalReference{}
-	idx2 := map[string]*ExternalReference{}
-
-	for _, er := range list1 {
-		idx1[er.flatString()] = er
-	}
-	for _, er := range list2 {
-		idx2[er.flatString()] = er
-	}
-
-	for _, er := range list2 {
-		if _, ok := idx1[er.flatString()]; !ok {
-			added = append(added, er)
-		}
-	}
-
-	for _, er := range list1 {
-		if _, ok := idx2[er.flatString()]; !ok {
-			removed = append(removed, er)
-		}
-	}
-
-	if len(added) > 0 || len(removed) > 0 {
-		count = 1
-	}
-	return added, removed, count
-}
-
-// diffIntStrMap(map1, )
-func diffIntStrMap(map1, map2 map[int32]string) (added, removed map[int32]string, count int) {
-	added = map[int32]string{}
-	removed = map[int32]string{}
 	for k, v2 := range map2 {
 		if v1, ok := map1[k]; ok {
-			if v2 != v1 {
+			if v1 != v2 {
 				added[k] = v2
 			}
 		} else {
@@ -282,19 +258,19 @@ func diffIntStrMap(map1, map2 map[int32]string) (added, removed map[int32]string
 	return added, removed, count
 }
 
-// diffStrSlice compares two string slices and returns what was added and removed
-func diffStrSlice(arr1, arr2 []string) (added, removed []string, count int) {
-	added = []string{}
-	removed = []string{}
+// diffSlice compares two slices and returns what was added and removed
+func diffSlice[T comparable](arr1, arr2 []T) (added, removed []T, count int) {
+	added = []T{}
+	removed = []T{}
 
 	for _, s := range arr2 {
-		if !slices.Contains(arr1, s) {
+		if !contains(arr1, s) {
 			added = append(added, s)
 		}
 	}
 
 	for _, s := range arr1 {
-		if !slices.Contains(arr2, s) {
+		if !contains(arr2, s) {
 			removed = append(removed, s)
 		}
 	}
@@ -305,25 +281,12 @@ func diffStrSlice(arr1, arr2 []string) (added, removed []string, count int) {
 	return added, removed, count
 }
 
-// diffPurposeSlice is a copy of diffString but handles lists of purposes instead of strings
-func diffPurposeSlice(arr1, arr2 []Purpose) (added, removed []Purpose, count int) {
-	added = []Purpose{}
-	removed = []Purpose{}
-
-	for _, s := range arr2 {
-		if !slices.Contains(arr1, s) {
-			added = append(added, s)
+// contains checks if a slice contains a specific element
+func contains[T comparable](s []T, e T) bool {
+	for _, a := range s {
+		if a == e {
+			return true
 		}
 	}
-
-	for _, s := range arr1 {
-		if !slices.Contains(arr2, s) {
-			removed = append(removed, s)
-		}
-	}
-
-	if len(added) > 0 || len(removed) > 0 {
-		count = 1
-	}
-	return added, removed, count
+	return false
 }

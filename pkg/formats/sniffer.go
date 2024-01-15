@@ -12,8 +12,7 @@ import (
 type stateKey string
 
 const (
-	stateKeySuffix stateKey = "sniffer_state"
-	EmptyFormat             = Format("")
+	EmptyFormat = Format("")
 )
 
 var sniffFormats = []sniffFormat{
@@ -29,12 +28,21 @@ type sniffFormat interface {
 
 type Sniffer struct{}
 
-// SniffFile takes a path an return the format
+// SniffFile takes a path a return the format
 func (fs *Sniffer) SniffFile(path string) (Format, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return "", fmt.Errorf("getting info of path: %w", err)
+	}
+	if fileInfo.IsDir() {
+		return "", fmt.Errorf("path is a directory, not a file")
+	}
+
 	f, err := os.Open(path)
 	if err != nil {
 		return "", fmt.Errorf("opening path: %w", err)
 	}
+	defer f.Close()
 	return fs.SniffReader(f)
 }
 

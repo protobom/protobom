@@ -24,6 +24,13 @@ func TestSniffReader(t *testing.T) {
 			encoding:   "json",
 		},
 		{
+			filename:   "testdata",
+			mustError:  true,
+			version:    "2.2",
+			formatType: "spdx",
+			encoding:   "json",
+		},
+		{
 			filename:   "testdata/nginx.spdx",
 			mustError:  false,
 			version:    "2.2",

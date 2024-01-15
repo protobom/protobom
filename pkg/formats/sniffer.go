@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-type stateKey string
-
 const (
 	EmptyFormat = Format("")
 )

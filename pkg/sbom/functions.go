@@ -156,7 +156,6 @@ func EdgeTypeFromSPDX(spdxName string) Edge_Type {
 	}
 }
 
-// Deprecated: Use [unserializer.HashAlgorithmFromCDX] instead.
 // HashAlgorithmFromCDX converts a CycloneDX hash algorithm to its corresponding Hash Algorithm.
 func HashAlgorithmFromCDX(cdxAlgorithm cyclonedx.HashAlgorithm) HashAlgorithm {
 	switch cdxAlgorithm {

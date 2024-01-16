@@ -13,8 +13,8 @@
 // functions to locate and extract information.
 //
 // Protobom documents can be created programmatically or ingested using the
-// different unserializers that understand the native formats. Data from the 
-// neutral protobom representation can be rendered to native formats using 
+// different unserializers that understand the native formats. Data from the
+// neutral protobom representation can be rendered to native formats using
 // serialzers.
 package sbom
 

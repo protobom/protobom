@@ -7,7 +7,7 @@ import (
 )
 
 // SoftwareIdentifierTypeFromString resolves a string into one of our built-in
-// identifier types
+// identifier types.
 func SoftwareIdentifierTypeFromString(queryString string) SoftwareIdentifierType {
 	// If its an SPDX type, use it
 	if r := SoftwareIdentifierTypeFromSPDXExtRefType(queryString); r != SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE {
@@ -26,7 +26,8 @@ func SoftwareIdentifierTypeFromString(queryString string) SoftwareIdentifierType
 }
 
 // Deprecated: SoftwareIdentifierTypeFromSPDXExtRefType is deprecated and will
-// be removed in an upcoming version.
+// be removed in an upcoming version. Please use SoftwareIdentifierTypeFromString
+// for a unified approach to identifier resolution.
 func SoftwareIdentifierTypeFromSPDXExtRefType(spdxType string) SoftwareIdentifierType {
 	switch spdxType {
 	case spdx.ExtRefTypePurl:
@@ -42,8 +43,7 @@ func SoftwareIdentifierTypeFromSPDXExtRefType(spdxType string) SoftwareIdentifie
 	}
 }
 
-// ToSPDX2Category returns the type of the external reference in the
-// spdx 2.x vocabulary.
+// ToSPDX2Category converts the external reference type to its SPDX2 category.
 func (i SoftwareIdentifierType) ToSPDX2Category() string {
 	switch i.ToSPDX2Type() {
 	case spdx.ExtRefTypeCPE22, spdx.ExtRefTypeCPE23, "advisory", "fix", "url", "swid":
@@ -57,7 +57,7 @@ func (i SoftwareIdentifierType) ToSPDX2Category() string {
 	}
 }
 
-// ToSPDX2Type converts the external reference type to the SPDX 2.x equivalent.
+// ToSPDX2Type converts the external reference type to its SPDX2 equivalent.
 func (i SoftwareIdentifierType) ToSPDX2Type() string {
 	switch i {
 	case SoftwareIdentifierType_PURL:

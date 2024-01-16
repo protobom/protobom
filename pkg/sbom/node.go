@@ -16,6 +16,7 @@ import (
 // updates to the node proto should also be reflected in most of these
 // functions as they operate on the Node's fields
 
+// NewNode creates a new Node with default values.
 func NewNode() *Node {
 	return &Node{
 		Licenses:           []string{},
@@ -29,9 +30,9 @@ func NewNode() *Node {
 	}
 }
 
-// Update updates a node's fields with information from the second node
-// Any fields in n2 which are not null (empty string, lists longer than 0 or not nill
-// pointers will overwrite fields in Node n.
+// Update updates the node's fields with values from an external node (n2).
+// It skips empty, null, or zero-length lists in n2, preserving the existing values in the current Node (n).
+// All other fields in n are overwritten with values from n2.
 func (n *Node) Update(n2 *Node) {
 	if n2.Name != "" {
 		n.Name = n2.Name
@@ -184,7 +185,7 @@ func (n *Node) Augment(n2 *Node) {
 	}
 }
 
-// Copy returns a new node that is a copy of the node
+// Copy returns a duplicate of the Node.
 func (n *Node) Copy() *Node {
 	no := &Node{
 		Id:                 n.Id,
@@ -238,7 +239,7 @@ func (n *Node) Copy() *Node {
 	return no
 }
 
-// Equal compares Node n to n2 and returns true if they are the same
+// Equal compares the current Node to another (n2) and returns true if they are identical.
 func (n *Node) Equal(n2 *Node) bool {
 	if n2 == nil {
 		return false
@@ -246,8 +247,8 @@ func (n *Node) Equal(n2 *Node) bool {
 	return n.flatString() == n2.flatString()
 }
 
-// flatString returns a string representation of the node which can be used to
-// index the node or compare it against another
+// flatString returns a serialized representation of the node as a string,
+// suitable for indexing or comparison of the contents of the current node.
 func (n *Node) flatString() string {
 	pairs := []string{}
 	n.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
@@ -304,7 +305,8 @@ func (n *Node) flatString() string {
 	return strings.Join(pairs, ":")
 }
 
-// flatStringStrSlice returns a deterministic string representation of a slice of strings
+// flatStringStrSlice returns a deterministic string representation of a Protobuf List.
+// It returns a string composed of slice of strings shorted by values.
 func flatStringStrSlice(name protoreflect.FullName, protoSlice protoreflect.List) string {
 	vals := []string{}
 	for i := 0; i < protoSlice.Len(); i++ {
@@ -318,6 +320,8 @@ func flatStringStrSlice(name protoreflect.FullName, protoSlice protoreflect.List
 	return ret
 }
 
+// flatStringMap return a deterministic string representation of a Protobuf Map.
+// It returns a string composed of key-value pairs sorted by keys.
 func flatStringMap(protoMap protoreflect.Map) string {
 	keys := []string{}
 	values := map[string]string{}
@@ -342,9 +346,11 @@ func (n *Node) Checksum() string {
 	return fmt.Sprintf("%x", sum)
 }
 
+// PackageURL represents a Package URL (PURL) for identifying and locating software packages.
 type PackageURL string
 
-// Purl returns the node purl as a string
+// Purl returns the node's Package URL (PURL) as a string.
+// If the node is of type FILE empty PURL is returned.
 func (n *Node) Purl() PackageURL {
 	if n.Type == Node_FILE {
 		return ""
@@ -357,15 +363,13 @@ func (n *Node) Purl() PackageURL {
 	return ""
 }
 
-// HashesMatch takes a map of hashes th and returns a boolean indicating
-// if the test hashes match those of the node. The algorithm will only take
-// into account algorithms that are common to the node and test set.
+// HashesMatch checks if the provided test-hashes (th) match those of the node.
+// It only considers common algorithms between the node and the test hashes.
 //
-// In other words, if th has any hashes in algorithms without a peer in the
-// node, the function will ignore them and return true if others match,
-// silently ignoring those missing in the node.
+// If test-hashes contain hashes with algorithms not present in the node, those are ignored,
+// and the function returns true if the remaining hashes match.
 //
-// If either the node or the test hashes are empty, no match is assumed.
+// If either the node or the test-hashes is empty, no match is assumed.
 func (n *Node) HashesMatch(th map[int32]string) bool {
 	if len(n.Hashes) == 0 || len(th) == 0 {
 		return false
@@ -384,8 +388,9 @@ func (n *Node) HashesMatch(th map[int32]string) bool {
 	return atLeastOneMatch
 }
 
-// AddHash adds a new hash of algorithm algo to the node. If the node
-// already has a hash of the same algorithm it will get silently replaced.
+// AddHash adds a new hash with the specified algorithm (algo) to the node.
+// If the node already has a hash with the same algorithm, it is silently replaced.
+// The provided value must not be an empty string
 func (n *Node) AddHash(algo HashAlgorithm, value string) {
 	if value == "" {
 		return

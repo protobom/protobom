@@ -29,6 +29,7 @@ type purlIndex map[PackageURL][]*Node
 
 var ErrorMoreThanOneMatch = fmt.Errorf("More than one node matches")
 
+// NewNodeList returns a new NodeList with empty nodes, edges, and root elements.
 func NewNodeList() *NodeList {
 	return &NodeList{
 		Nodes:        []*Node{},
@@ -157,12 +158,13 @@ func (nl *NodeList) cleanEdges() {
 	nl.Edges = newEdges
 }
 
+// AddEdge adds a new edge to the Node List.
 func (nl *NodeList) AddEdge(e *Edge) {
 	nl.Edges = append(nl.Edges, e)
 }
 
-// AddRootNode adds a node to the nodelist and alos registers it to the
-// RootElements list.
+// AddRootNode adds a node to the NodeList and registers it as a Root Elements.
+// More than one root element can be added to the NodeList.
 func (nl *NodeList) AddRootNode(n *Node) {
 	if n.Id == "" {
 		// TODO warn here
@@ -180,12 +182,14 @@ func (nl *NodeList) AddRootNode(n *Node) {
 	nl.RootElements = append(nl.RootElements, n.Id)
 }
 
+// AddEdge adds a new node to the Node List.
 func (nl *NodeList) AddNode(n *Node) {
 	nl.Nodes = append(nl.Nodes, n)
 }
 
-// Add combines NodeList nl2 into nl. It is the equivalent to Union but
-// instead of returning a new NodeList it modifies nl.
+// Add combines the nodes and edges from NodeList (nl2) into the current NodeList (nl).
+// It modifies current NodeList (nl) by adding new roots, nodes and edges or updating existing ones.
+// It is the equivalent to the Union of both NodeLists, but it modifies the current NodeList (nl) in place.
 func (nl *NodeList) Add(nl2 *NodeList) {
 	existingNodes := nl.indexNodes()
 	for i := range nl2.Nodes {
@@ -222,7 +226,8 @@ func (nl *NodeList) Add(nl2 *NodeList) {
 	nl.cleanEdges()
 }
 
-// RemoveNodes removes a list of nodes and its edges from the nodelist
+// RemoveNodes removes nodes with specified IDs from the NodeList.
+// It also removes corresponding edges connected to the removed nodes.
 func (nl *NodeList) RemoveNodes(ids []string) {
 	// build an inverse dict of the IDs
 	idDict := map[string]struct{}{}
@@ -241,8 +246,8 @@ func (nl *NodeList) RemoveNodes(ids []string) {
 	nl.cleanEdges()
 }
 
-// GetEdgeByType returns a pointer to the first edge found from fromElement
-// of type t.
+// GetEdgeByType returns the first edge of the specified type (t) originating from the given node ID (fromElement).
+// If no such edge is found, it returns nil.
 func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
 	for _, e := range nl.Edges {
 		if e.From == fromElement && e.Type == t {
@@ -261,8 +266,9 @@ func copyEdgeList(original []*Edge) []*Edge {
 	return nodeCopy
 }
 
-// Intersect returns a new NodeList with nodes which are common in nl and nl2.
-// All common nodes will be copied from nl and then `Update`d with data from nl2
+// Intersect returns a new NodeList that represents the intersection
+// of nodes and their relationships between nl and nl2.
+// The resulting NodeList contains common nodes and edges copied from nl, and updates them with data from nl2.
 func (nl *NodeList) Intersect(nl2 *NodeList) *NodeList {
 	rootElements := nl.indexRootElements()
 	rootElements2 := nl2.indexRootElements()
@@ -320,9 +326,9 @@ func (nl *NodeList) Intersect(nl2 *NodeList) *NodeList {
 	return ret
 }
 
-// Union returns a new NodeList with all nodes from nl and nl2 joined together
-// any nodes common in nl also found in nl2 will be `Update`d from data from the
-// former.
+// Union returns a new NodeList representing the combination of nodes and their relationships
+// from nl and nl2.
+// The resulting NodeList contains common nodes and edges copied from nl, and updates them with data from nl2.
 func (nl *NodeList) Union(nl2 *NodeList) *NodeList {
 	ret := &NodeList{
 		Nodes:        []*Node{},
@@ -372,7 +378,7 @@ func (nl *NodeList) Union(nl2 *NodeList) *NodeList {
 	return ret
 }
 
-// GetNodesByName returns a list of node pointers whose name equals name
+// GetNodesByName returns a list of node with the specified name.
 func (nl *NodeList) GetNodesByName(name string) []*Node {
 	ret := []*Node{}
 	for i := range nl.Nodes {
@@ -394,14 +400,16 @@ func (nl *NodeList) GetNodeByID(id string) *Node {
 	return nil
 }
 
-// GetMatchingNode looks up a node in the NodeList that matches the piece of
-// software described by testNode. It will not match on ID but rather matching
-// is performed by hash then by purl.
+// GetMatchingNode looks up a node in the NodeList (nl) that matches the software described the provided.
+// Matching is performed based on hashes and, if necessary, by Package URL (PURL).
+// This function guarantees a single-node match. If more than one node matches, an ErrorMoreThanOneMatch is returned.
 //
-// This function is guaranteed to only return a node when there is a single node
-// match. If more than one node matches, an ErrorMoreThanOneMatch is returned.
+// If the target node has hashes, it first looks for nodes with matching hashes.
+// If exactly one node is found, the function returns it. If no nodes match by hash,
+// it attempts to match based on the purl. If more than one node matches by purl, an error is returned.
+// If multiple nodes match by hash, it looks for a single node where the purl also matches to break the ambiguity.
 //
-// See node.HashesMatch to understand how hashes are compared.
+// See [Node.HashesMatch] for details on how hashes are compared.
 func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
 	// If the target node has hashes, look for it
 	foundNodes := map[string]*Node{}
@@ -475,10 +483,10 @@ func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
 	return nil, nil
 }
 
-// GetNodesByIdentifier returns nodes that match an identifier of type t and
-// value v, for example t = "purl" v = "pkg:deb/debian/libpam-modules@1.4.0-9+deb11u1?arch=i386"
-// Not that this only does "dumb" string matching no assumptions are made on the
-// identifier type.
+// GetNodesByIdentifier returns a list of nodes that match the provided identifier type (t) and value (v).
+// For example, the identifier type (t) can be "purl," and its value (v) can be "pkg:deb/debian/libpam-modules@1.4.0-9+deb11u1?arch=i386".
+// The function may return an empty list if no nodes match the given identifier.
+// Matching is based on simple string comparison.
 func (nl *NodeList) GetNodesByIdentifier(t, v string) []*Node {
 	ret := []*Node{}
 	idType := SoftwareIdentifierTypeFromString(t)
@@ -494,7 +502,7 @@ func (nl *NodeList) GetNodesByIdentifier(t, v string) []*Node {
 	return ret
 }
 
-// GetRootNodes returns a list of pointers of the root nodes of the document
+// GetRootNodes returns a list of the document root nodes.
 func (nl *NodeList) GetRootNodes() []*Node {
 	ret := []*Node{}
 	index := rootElementsIndex{}
@@ -513,7 +521,7 @@ func (nl *NodeList) GetRootNodes() []*Node {
 	return ret
 }
 
-// Equal returns true if the NodeList nl is equal to nl2
+// Equal compares the current NodeList to another (n2) and returns true if they are identical.
 func (nl *NodeList) Equal(nl2 *NodeList) bool {
 	if nl2 == nil {
 		return false
@@ -566,10 +574,10 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 	return cmp.Equal(nlNodes, nl2Nodes)
 }
 
-// RelateNodeAtID creates a relationship between Node n and an existing node
-// in the NodeList specified by nodeID. If the node (as looked up by ID) does not
-// not exist in the NodeList it will be added. If NodeID does not exist an error
-// will be returned.
+// RelateNodeAtID creates a relationship between the provided Node (n) and an existing node
+// in the NodeList specified by ID (nodeID). If the targeted node (looked up by ID) does not
+// exist in the Node List, it is added. If the specified nodeID does not exist,
+// an error is returned.
 func (nl *NodeList) RelateNodeAtID(n *Node, nodeID string, edgeType Edge_Type) error {
 	// Check the node exists
 	nlIndex := nl.indexNodes()
@@ -606,10 +614,11 @@ func (nl *NodeList) RelateNodeAtID(n *Node, nodeID string, edgeType Edge_Type) e
 	return nil
 }
 
-// RelateNodeListAtID relates the top level nodes in nl2 to the node with ID
-// nodeID using a relationship of type edgeType. Returns an error if nodeID cannot
-// be found in the graph. This function assumes that nodes in nl and nl2 having
-// the same ID are equivalent and will be deduped.
+// RelateNodeListAtID relates nodes from the provided NodeList (nl2) at the top level to an existing node in this NodeList
+// with the specified ID (nodeID) using a relationship of the given type (edgeType).
+// It returns an error if ID cannot be found in the graph.
+// Nodes with the same ID in both the current (nl) and provided (nl2) Node Lists
+// are considered equivalent and will be deduplicated.
 func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Edge_Type) error {
 	// Check the node exists
 	nlIndex := nl.indexNodes()
@@ -649,8 +658,9 @@ func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Ed
 	return nil
 }
 
-// GetNodesByPurlType returns a nodelist containing all nodes that match
-// a purl (package url) type. An empty purlType returns a blank nodelist
+// GetNodesByPurlType retrieves nodes with a specific Package URL type (purlType) from the current NodeList (nl).
+// Returns a new NodeList with matching nodes and their relationships.
+// If no nodes match, an empty NodeList is returned.
 func (nl *NodeList) GetNodesByPurlType(purlType string) *NodeList {
 	ret := &NodeList{}
 	if nl == nil {
@@ -697,8 +707,10 @@ func (nl *NodeList) reconnectOrphanNodes() {
 	}
 }
 
-// NodeGraph looks for node id and returns a new NodeList with its full dependency
-// graph. NodeGraph will traverse the SBOM graph and add all nodes connected to id.
+// NodeGraph retruns a new NodeList representing the full dependency
+// graph of the node identified by the provided ID. The method traverses the SBOM graph,
+// adding all nodes connected to the specified ID.
+// If no nodes match, an empty NodeList is returned.
 func (nl *NodeList) NodeGraph(id string) *NodeList {
 	nodelist := &NodeList{
 		Nodes:        []*Node{},
@@ -773,8 +785,9 @@ func (nl *NodeList) connectedIndexRecursion(id string, boundaries *rootElementsI
 	}
 }
 
-// NodeSiblings takes a node identifier `id` and returns a NodeList with the node
-// at the top and the immediate siblings that are related to it.
+// NodeSiblings returns a new NodeList containing the specified node at the root
+// and a graph fragment with its immediate siblings with their edges preserved.
+// If no nodes match, an empty NodeList is returned.
 func (nl *NodeList) NodeSiblings(id string) *NodeList {
 	nodelist := &NodeList{}
 

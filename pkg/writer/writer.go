@@ -18,8 +18,7 @@ type Writer struct {
 }
 
 var (
-	regMtx         sync.RWMutex
-	serializers    = make(map[formats.Format]native.Serializer)
+	serializers    sync.Map
 	defaultOptions = &Options{
 		RenderOptions: &native.RenderOptions{
 			Indent: 4,
@@ -42,31 +41,25 @@ func New(opts ...WriterOption) *Writer {
 }
 
 func init() {
-	regMtx.Lock()
-	serializers[formats.CDX10JSON] = drivers.NewCDX("1.0", formats.JSON)
-	serializers[formats.CDX11JSON] = drivers.NewCDX("1.1", formats.JSON)
-	serializers[formats.CDX12JSON] = drivers.NewCDX("1.2", formats.JSON)
-	serializers[formats.CDX13JSON] = drivers.NewCDX("1.3", formats.JSON)
-	serializers[formats.CDX14JSON] = drivers.NewCDX("1.4", formats.JSON)
-	serializers[formats.CDX15JSON] = drivers.NewCDX("1.5", formats.JSON)
-	serializers[formats.SPDX23JSON] = drivers.NewSPDX23()
-	regMtx.Unlock()
+	serializers.LoadOrStore(formats.CDX10JSON, drivers.NewCDX("1.0", formats.JSON))
+	serializers.LoadOrStore(formats.CDX11JSON, drivers.NewCDX("1.1", formats.JSON))
+	serializers.LoadOrStore(formats.CDX12JSON, drivers.NewCDX("1.2", formats.JSON))
+	serializers.LoadOrStore(formats.CDX13JSON, drivers.NewCDX("1.3", formats.JSON))
+	serializers.LoadOrStore(formats.CDX14JSON, drivers.NewCDX("1.4", formats.JSON))
+	serializers.LoadOrStore(formats.CDX15JSON, drivers.NewCDX("1.5", formats.JSON))
+	serializers.LoadOrStore(formats.SPDX23JSON, drivers.NewSPDX23())
 }
 
 // RegisterSerializer registers a new serializer to handle writing serialized
 // SBOMs in a specific format. When registerring a new serializer it replaces
 // any other previously defined for the same format.
 func RegisterSerializer(format formats.Format, s native.Serializer) {
-	regMtx.Lock()
-	serializers[format] = s
-	regMtx.Unlock()
+	serializers.LoadOrStore(format, s)
 }
 
 // UnregisterSerializer removes a serializer from the list of available
 func UnregisterSerializer(format formats.Format) {
-	regMtx.Lock()
-	delete(serializers, format)
-	regMtx.Unlock()
+	serializers.Delete(format)
 }
 
 // GetFormatSerializer returns the registered serializer for a specific format. If
@@ -76,9 +69,14 @@ func GetFormatSerializer(format formats.Format) (native.Serializer, error) {
 	if format == "" {
 		return nil, errors.New("unable to find serializer, no format specified")
 	}
-	if _, ok := serializers[format]; ok {
-		return serializers[format], nil
+
+	value, ok := serializers.Load(format)
+	if ok {
+		if serializer, valid := value.(native.Serializer); valid {
+			return serializer, nil
+		}
 	}
+
 	return nil, fmt.Errorf("no serializer registered for %s", format)
 }
 

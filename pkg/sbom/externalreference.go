@@ -5,7 +5,8 @@ import (
 	"maps"
 )
 
-// flatString returns a deterministic string that can be used to hash the external reference
+// flatString returns a deterministic serialized representation of the external reference as a string.
+// The resulting string is suitable for indexing or generating a hash.
 func (e *ExternalReference) flatString() string {
 	ret := fmt.Sprintf("(t)%d", e.Type)
 
@@ -24,7 +25,7 @@ func (e *ExternalReference) flatString() string {
 	return ret
 }
 
-// Copy returns an exact copy of ExternalReference e.
+// Copy returns an exact duplicate of the external reference.
 func (e *ExternalReference) Copy() *ExternalReference {
 	return &ExternalReference{
 		Url:       e.Url,

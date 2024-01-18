@@ -21,28 +21,29 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// HashAlgorithm represents the hashing algorithms used within the Software Bill of Materials (SBOM) document.
+// It enumerates various hash algorithms that can be employed to generate checksums or unique identifiers for files or data.
 type HashAlgorithm int32
 
 const (
-	HashAlgorithm_UNKNOWN     HashAlgorithm = 0
-	HashAlgorithm_MD5         HashAlgorithm = 1
-	HashAlgorithm_SHA1        HashAlgorithm = 2
-	HashAlgorithm_SHA256      HashAlgorithm = 3
-	HashAlgorithm_SHA384      HashAlgorithm = 4
-	HashAlgorithm_SHA512      HashAlgorithm = 5
-	HashAlgorithm_SHA3_256    HashAlgorithm = 6
-	HashAlgorithm_SHA3_384    HashAlgorithm = 7
-	HashAlgorithm_SHA3_512    HashAlgorithm = 8
-	HashAlgorithm_BLAKE2B_256 HashAlgorithm = 9
-	HashAlgorithm_BLAKE2B_384 HashAlgorithm = 10
-	HashAlgorithm_BLAKE2B_512 HashAlgorithm = 11
-	HashAlgorithm_BLAKE3      HashAlgorithm = 12
-	// 2DO what should we do
-	HashAlgorithm_MD2     HashAlgorithm = 13 // Only supported by SPDX
-	HashAlgorithm_ADLER32 HashAlgorithm = 14 // Only supported by SPDX
-	HashAlgorithm_MD4     HashAlgorithm = 15 // Only supported by SPDX
-	HashAlgorithm_MD6     HashAlgorithm = 16 // Only supported by SPDX
-	HashAlgorithm_SHA224  HashAlgorithm = 17 // Only supported by SPDX
+	HashAlgorithm_UNKNOWN     HashAlgorithm = 0  // Unknown hash algorithm.
+	HashAlgorithm_MD5         HashAlgorithm = 1  // MD5 hash algorithm.
+	HashAlgorithm_SHA1        HashAlgorithm = 2  // SHA-1 hash algorithm.
+	HashAlgorithm_SHA256      HashAlgorithm = 3  // SHA-256 hash algorithm.
+	HashAlgorithm_SHA384      HashAlgorithm = 4  // SHA-384 hash algorithm.
+	HashAlgorithm_SHA512      HashAlgorithm = 5  // SHA-512 hash algorithm.
+	HashAlgorithm_SHA3_256    HashAlgorithm = 6  // SHA3-256 hash algorithm.
+	HashAlgorithm_SHA3_384    HashAlgorithm = 7  // SHA3-384 hash algorithm.
+	HashAlgorithm_SHA3_512    HashAlgorithm = 8  // SHA3-512 hash algorithm.
+	HashAlgorithm_BLAKE2B_256 HashAlgorithm = 9  // BLAKE2B-256 hash algorithm.
+	HashAlgorithm_BLAKE2B_384 HashAlgorithm = 10 // BLAKE2B-384 hash algorithm.
+	HashAlgorithm_BLAKE2B_512 HashAlgorithm = 11 // BLAKE2B-512 hash algorithm.
+	HashAlgorithm_BLAKE3      HashAlgorithm = 12 // BLAKE3 hash algorithm.
+	HashAlgorithm_MD2         HashAlgorithm = 13 // MD2 hash algorithm, not supported by SPDX formats.
+	HashAlgorithm_ADLER32     HashAlgorithm = 14 // Adler-32 hash algorithm, not supported by SPDX formats..
+	HashAlgorithm_MD4         HashAlgorithm = 15 // MD4 hash algorithm, not supported by SPDX formats..
+	HashAlgorithm_MD6         HashAlgorithm = 16 // MD6 hash algorithm, not supported by SPDX formats..
+	HashAlgorithm_SHA224      HashAlgorithm = 17 // SHA-224 hash algorithm, not supported by SPDX formats..
 )
 
 // Enum value maps for HashAlgorithm.
@@ -116,14 +117,15 @@ func (HashAlgorithm) EnumDescriptor() ([]byte, []int) {
 	return file_api_sbom_proto_rawDescGZIP(), []int{0}
 }
 
+// SoftwareIdentifierType represents different types of identifiers used for software entities within the Software Bill of Materials (SBOM).
 type SoftwareIdentifierType int32
 
 const (
-	SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE SoftwareIdentifierType = 0
-	SoftwareIdentifierType_PURL                    SoftwareIdentifierType = 1
-	SoftwareIdentifierType_CPE22                   SoftwareIdentifierType = 2
-	SoftwareIdentifierType_CPE23                   SoftwareIdentifierType = 3
-	SoftwareIdentifierType_GITOID                  SoftwareIdentifierType = 4
+	SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE SoftwareIdentifierType = 0 // Unknown software identifier type.
+	SoftwareIdentifierType_PURL                    SoftwareIdentifierType = 1 // Package URL (PURL) identifier type.
+	SoftwareIdentifierType_CPE22                   SoftwareIdentifierType = 2 // Common Platform Enumeration (CPE) version 2.2 identifier type.
+	SoftwareIdentifierType_CPE23                   SoftwareIdentifierType = 3 // Common Platform Enumeration (CPE) version 2.3 identifier type.
+	SoftwareIdentifierType_GITOID                  SoftwareIdentifierType = 4 // Git Object Identifier (OID) identifier type.
 )
 
 // Enum value maps for SoftwareIdentifierType.
@@ -171,38 +173,40 @@ func (SoftwareIdentifierType) EnumDescriptor() ([]byte, []int) {
 	return file_api_sbom_proto_rawDescGZIP(), []int{1}
 }
 
+// Purpose represents different purposes or roles assigned to software entities within the Software Bill of Materials (SBOM).
+// It categorizes the roles that software components can fulfill.
 type Purpose int32
 
 const (
-	Purpose_UNKNOWN_PURPOSE        Purpose = 0
-	Purpose_APPLICATION            Purpose = 1  // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_ARCHIVE                Purpose = 2  // SPDX2.3, SPDX3.0
-	Purpose_BOM                    Purpose = 3  // SPDX3.0
-	Purpose_CONFIGURATION          Purpose = 4  // SPDX3.0
-	Purpose_CONTAINER              Purpose = 5  // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_DATA                   Purpose = 6  // CDX1.5, SPDX3.0
-	Purpose_DEVICE                 Purpose = 7  // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_DEVICE_DRIVER          Purpose = 8  // CDX1.5, SPDX3.0
-	Purpose_DOCUMENTATION          Purpose = 9  // SPDX3.0
-	Purpose_EVIDENCE               Purpose = 10 // SPDX3.0
-	Purpose_EXECUTABLE             Purpose = 11 // SPDX3.0
-	Purpose_FILE                   Purpose = 12 // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_FIRMWARE               Purpose = 13 // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_FRAMEWORK              Purpose = 14 // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_INSTALL                Purpose = 15 // SPDX2.3, SPDX3.0
-	Purpose_LIBRARY                Purpose = 16 // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_MACHINE_LEARNING_MODEL Purpose = 17 // CDX1.5
-	Purpose_MANIFEST               Purpose = 18 // SPDX3.0
-	Purpose_MODEL                  Purpose = 19 // SPDX3.0
-	Purpose_MODULE                 Purpose = 20 // SPDX3.0
-	Purpose_OPERATING_SYSTEM       Purpose = 21 // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_OTHER                  Purpose = 22 // SPDX2.3, SPDX3.0
-	Purpose_PATCH                  Purpose = 23 // SPDX3.0
-	Purpose_PLATFORM               Purpose = 24 // SPDX2.3, CDX1.5, SPDX3.0
-	Purpose_REQUIREMENT            Purpose = 25 // SPDX3.0
-	Purpose_SOURCE                 Purpose = 26 // SPDX2.3, SPDX3.0
-	Purpose_SPECIFICATION          Purpose = 27 // SPDX3.0
-	Purpose_TEST                   Purpose = 28 // SPDX3.0
+	Purpose_UNKNOWN_PURPOSE        Purpose = 0  // Unknown purpose.
+	Purpose_APPLICATION            Purpose = 1  // Application purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_ARCHIVE                Purpose = 2  // Archive purpose. (SPDX2.3, SPDX3.0)
+	Purpose_BOM                    Purpose = 3  // BOM purpose. (SPDX3.0)
+	Purpose_CONFIGURATION          Purpose = 4  // Configuration purpose. (SPDX3.0)
+	Purpose_CONTAINER              Purpose = 5  // Container purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_DATA                   Purpose = 6  // Data purpose. (CDX1.5, SPDX3.0)
+	Purpose_DEVICE                 Purpose = 7  // Device purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_DEVICE_DRIVER          Purpose = 8  // Device Driver purpose. (CDX1.5, SPDX3.0)
+	Purpose_DOCUMENTATION          Purpose = 9  // Documentation purpose. (SPDX3.0)
+	Purpose_EVIDENCE               Purpose = 10 // Evidence purpose. (SPDX3.0)
+	Purpose_EXECUTABLE             Purpose = 11 // Executable purpose. (SPDX3.0)
+	Purpose_FILE                   Purpose = 12 // File purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_FIRMWARE               Purpose = 13 // Firmware purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_FRAMEWORK              Purpose = 14 // Framework purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_INSTALL                Purpose = 15 // Install purpose. (SPDX2.3, SPDX3.0)
+	Purpose_LIBRARY                Purpose = 16 // Library purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_MACHINE_LEARNING_MODEL Purpose = 17 // Machine Learning Model purpose. (CDX1.5)
+	Purpose_MANIFEST               Purpose = 18 // Manifest purpose. (SPDX3.0)
+	Purpose_MODEL                  Purpose = 19 // Model purpose. (SPDX3.0)
+	Purpose_MODULE                 Purpose = 20 // Module purpose. (SPDX3.0)
+	Purpose_OPERATING_SYSTEM       Purpose = 21 // Operating System purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_OTHER                  Purpose = 22 // Other purpose. (SPDX2.3, SPDX3.0)
+	Purpose_PATCH                  Purpose = 23 // Patch purpose. (SPDX3.0)
+	Purpose_PLATFORM               Purpose = 24 // Platform purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+	Purpose_REQUIREMENT            Purpose = 25 // Requirement purpose. (SPDX3.0)
+	Purpose_SOURCE                 Purpose = 26 // Source purpose. (SPDX2.3, SPDX3.0)
+	Purpose_SPECIFICATION          Purpose = 27 // Specification purpose. (SPDX3.0)
+	Purpose_TEST                   Purpose = 28 // Test purpose. (SPDX3.0)
 )
 
 // Enum value maps for Purpose.
@@ -298,11 +302,12 @@ func (Purpose) EnumDescriptor() ([]byte, []int) {
 	return file_api_sbom_proto_rawDescGZIP(), []int{2}
 }
 
+// Type of the software component.
 type Node_NodeType int32
 
 const (
-	Node_PACKAGE Node_NodeType = 0
-	Node_FILE    Node_NodeType = 1
+	Node_PACKAGE Node_NodeType = 0 // Software component type is a package.
+	Node_FILE    Node_NodeType = 1 // Software component type is a file.
 )
 
 // Enum value maps for Node_NodeType.
@@ -344,54 +349,55 @@ func (Node_NodeType) EnumDescriptor() ([]byte, []int) {
 	return file_api_sbom_proto_rawDescGZIP(), []int{1, 0}
 }
 
+// Type enumerator representing the node relationship.
 type Edge_Type int32
 
 const (
-	Edge_UNKNOWN              Edge_Type = 0
-	Edge_amends               Edge_Type = 1
-	Edge_ancestor             Edge_Type = 2
-	Edge_buildDependency      Edge_Type = 3
-	Edge_buildTool            Edge_Type = 4
-	Edge_contains             Edge_Type = 5
-	Edge_contained_by         Edge_Type = 6 // Not in SPDX3
-	Edge_copy                 Edge_Type = 7
-	Edge_dataFile             Edge_Type = 8
-	Edge_dependencyManifest   Edge_Type = 9
-	Edge_dependsOn            Edge_Type = 10
-	Edge_dependencyOf         Edge_Type = 11 // Not in SPDX3
-	Edge_descendant           Edge_Type = 12
-	Edge_describes            Edge_Type = 13
-	Edge_describedBy          Edge_Type = 14 // Not in SPDX3
-	Edge_devDependency        Edge_Type = 15
-	Edge_devTool              Edge_Type = 16
-	Edge_distributionArtifact Edge_Type = 17
-	Edge_documentation        Edge_Type = 18
-	Edge_dynamicLink          Edge_Type = 19
-	Edge_example              Edge_Type = 20
-	Edge_expandedFromArchive  Edge_Type = 21
-	Edge_fileAdded            Edge_Type = 22
-	Edge_fileDeleted          Edge_Type = 23
-	Edge_fileModified         Edge_Type = 24
-	Edge_generates            Edge_Type = 25
-	Edge_generatedFrom        Edge_Type = 26 // Not in SPDX3
-	Edge_metafile             Edge_Type = 27
-	Edge_optionalComponent    Edge_Type = 28
-	Edge_optionalDependency   Edge_Type = 29
-	Edge_other                Edge_Type = 30
-	Edge_packages             Edge_Type = 31
-	Edge_patch                Edge_Type = 32
-	Edge_prerequisite         Edge_Type = 33
-	Edge_prerequisiteFor      Edge_Type = 34 // Not in SPDX3
-	Edge_providedDependency   Edge_Type = 35
-	Edge_requirementFor       Edge_Type = 36
-	Edge_runtimeDependency    Edge_Type = 37
-	Edge_specificationFor     Edge_Type = 38
-	Edge_staticLink           Edge_Type = 39
-	Edge_test                 Edge_Type = 40
-	Edge_testCase             Edge_Type = 41
-	Edge_testDependency       Edge_Type = 42
-	Edge_testTool             Edge_Type = 43
-	Edge_variant              Edge_Type = 44
+	Edge_UNKNOWN              Edge_Type = 0  // Unknown type.
+	Edge_amends               Edge_Type = 1  // Amends relationship type.
+	Edge_ancestor             Edge_Type = 2  // Ancestor relationship type.
+	Edge_buildDependency      Edge_Type = 3  // Build dependency relationship type.
+	Edge_buildTool            Edge_Type = 4  // Build tool relationship type.
+	Edge_contains             Edge_Type = 5  // Contains relationship type.
+	Edge_contained_by         Edge_Type = 6  // Contained by relationship type. In SPDX 3.x, this field is not supported.
+	Edge_copy                 Edge_Type = 7  // Copy relationship type.
+	Edge_dataFile             Edge_Type = 8  // Data file relationship type.
+	Edge_dependencyManifest   Edge_Type = 9  // Dependency manifest relationship type.
+	Edge_dependsOn            Edge_Type = 10 // Depends on relationship type.
+	Edge_dependencyOf         Edge_Type = 11 // Dependency of relationship type. In SPDX 3.x, this field is not supported.
+	Edge_descendant           Edge_Type = 12 // Descendant relationship type.
+	Edge_describes            Edge_Type = 13 // Describes relationship type.
+	Edge_describedBy          Edge_Type = 14 // Described by relationship type. In SPDX 3.x, this field is not supported.
+	Edge_devDependency        Edge_Type = 15 // Development dependency relationship type.
+	Edge_devTool              Edge_Type = 16 // Development tool relationship type.
+	Edge_distributionArtifact Edge_Type = 17 // Distribution artifact relationship type.
+	Edge_documentation        Edge_Type = 18 // Documentation relationship type.
+	Edge_dynamicLink          Edge_Type = 19 // Dynamic link relationship type.
+	Edge_example              Edge_Type = 20 // Example relationship type.
+	Edge_expandedFromArchive  Edge_Type = 21 // Expanded from archive relationship type.
+	Edge_fileAdded            Edge_Type = 22 // File added relationship type.
+	Edge_fileDeleted          Edge_Type = 23 // File deleted relationship type.
+	Edge_fileModified         Edge_Type = 24 // File modified relationship type.
+	Edge_generates            Edge_Type = 25 // Generates relationship type.
+	Edge_generatedFrom        Edge_Type = 26 // Generated from relationship type. In SPDX 3.x, this field is not supported.
+	Edge_metafile             Edge_Type = 27 // Metafile relationship type.
+	Edge_optionalComponent    Edge_Type = 28 // Optional component relationship type.
+	Edge_optionalDependency   Edge_Type = 29 // Optional dependency relationship type.
+	Edge_other                Edge_Type = 30 // Other relationship type.
+	Edge_packages             Edge_Type = 31 // Packages relationship type.
+	Edge_patch                Edge_Type = 32 // Patch relationship type.
+	Edge_prerequisite         Edge_Type = 33 // Prerequisite relationship type.
+	Edge_prerequisiteFor      Edge_Type = 34 // Prerequisite for relationship type. In SPDX 3.x, this field is not supported.
+	Edge_providedDependency   Edge_Type = 35 // Provided dependency relationship type.
+	Edge_requirementFor       Edge_Type = 36 // Requirement for relationship type.
+	Edge_runtimeDependency    Edge_Type = 37 // Runtime dependency relationship type.
+	Edge_specificationFor     Edge_Type = 38 // Specification for relationship type.
+	Edge_staticLink           Edge_Type = 39 // Static link relationship type.
+	Edge_test                 Edge_Type = 40 // Test relationship type.
+	Edge_testCase             Edge_Type = 41 // Test case relationship type.
+	Edge_testDependency       Edge_Type = 42 // Test dependency relationship type.
+	Edge_testTool             Edge_Type = 43 // Test tool relationship type.
+	Edge_variant              Edge_Type = 44 // Variant relationship type.
 )
 
 // Enum value maps for Edge_Type.
@@ -519,70 +525,71 @@ func (Edge_Type) EnumDescriptor() ([]byte, []int) {
 	return file_api_sbom_proto_rawDescGZIP(), []int{3, 0}
 }
 
+// Type enumerator representing of the external reference.
 type ExternalReference_ExternalReferenceType int32
 
 const (
-	ExternalReference_UNKNOWN                                 ExternalReference_ExternalReferenceType = 0
-	ExternalReference_ATTESTATION                             ExternalReference_ExternalReferenceType = 1
-	ExternalReference_BINARY                                  ExternalReference_ExternalReferenceType = 2
-	ExternalReference_BOM                                     ExternalReference_ExternalReferenceType = 3
-	ExternalReference_BOWER                                   ExternalReference_ExternalReferenceType = 4
-	ExternalReference_BUILD_META                              ExternalReference_ExternalReferenceType = 5
-	ExternalReference_BUILD_SYSTEM                            ExternalReference_ExternalReferenceType = 6
-	ExternalReference_CERTIFICATION_REPORT                    ExternalReference_ExternalReferenceType = 7
-	ExternalReference_CHAT                                    ExternalReference_ExternalReferenceType = 8
-	ExternalReference_CODIFIED_INFRASTRUCTURE                 ExternalReference_ExternalReferenceType = 9
-	ExternalReference_COMPONENT_ANALYSIS_REPORT               ExternalReference_ExternalReferenceType = 10
-	ExternalReference_CONFIGURATION                           ExternalReference_ExternalReferenceType = 11
-	ExternalReference_DISTRIBUTION_INTAKE                     ExternalReference_ExternalReferenceType = 12
-	ExternalReference_DOCUMENTATION                           ExternalReference_ExternalReferenceType = 13
-	ExternalReference_DOWNLOAD                                ExternalReference_ExternalReferenceType = 14
-	ExternalReference_DYNAMIC_ANALYSIS_REPORT                 ExternalReference_ExternalReferenceType = 15
-	ExternalReference_EOL_NOTICE                              ExternalReference_ExternalReferenceType = 16
-	ExternalReference_EVIDENCE                                ExternalReference_ExternalReferenceType = 17
-	ExternalReference_EXPORT_CONTROL_ASSESSMENT               ExternalReference_ExternalReferenceType = 18
-	ExternalReference_FORMULATION                             ExternalReference_ExternalReferenceType = 19
-	ExternalReference_FUNDING                                 ExternalReference_ExternalReferenceType = 20
-	ExternalReference_ISSUE_TRACKER                           ExternalReference_ExternalReferenceType = 21
-	ExternalReference_LICENSE                                 ExternalReference_ExternalReferenceType = 22
-	ExternalReference_LOG                                     ExternalReference_ExternalReferenceType = 23
-	ExternalReference_MAILING_LIST                            ExternalReference_ExternalReferenceType = 24
-	ExternalReference_MATURITY_REPORT                         ExternalReference_ExternalReferenceType = 25
-	ExternalReference_MAVEN_CENTRAL                           ExternalReference_ExternalReferenceType = 26
-	ExternalReference_METRICS                                 ExternalReference_ExternalReferenceType = 27
-	ExternalReference_MODEL_CARD                              ExternalReference_ExternalReferenceType = 28
-	ExternalReference_NPM                                     ExternalReference_ExternalReferenceType = 29
-	ExternalReference_NUGET                                   ExternalReference_ExternalReferenceType = 30
-	ExternalReference_OTHER                                   ExternalReference_ExternalReferenceType = 31
-	ExternalReference_POAM                                    ExternalReference_ExternalReferenceType = 32
-	ExternalReference_PRIVACY_ASSESSMENT                      ExternalReference_ExternalReferenceType = 33
-	ExternalReference_PRODUCT_METADATA                        ExternalReference_ExternalReferenceType = 34
-	ExternalReference_PURCHASE_ORDER                          ExternalReference_ExternalReferenceType = 35
-	ExternalReference_QUALITY_ASSESSMENT_REPORT               ExternalReference_ExternalReferenceType = 36
-	ExternalReference_QUALITY_METRICS                         ExternalReference_ExternalReferenceType = 37
-	ExternalReference_RELEASE_HISTORY                         ExternalReference_ExternalReferenceType = 38
-	ExternalReference_RELEASE_NOTES                           ExternalReference_ExternalReferenceType = 39
-	ExternalReference_RISK_ASSESSMENT                         ExternalReference_ExternalReferenceType = 40
-	ExternalReference_RUNTIME_ANALYSIS_REPORT                 ExternalReference_ExternalReferenceType = 41
-	ExternalReference_SECURE_SOFTWARE_ATTESTATION             ExternalReference_ExternalReferenceType = 42
-	ExternalReference_SECURITY_ADVERSARY_MODEL                ExternalReference_ExternalReferenceType = 43
-	ExternalReference_SECURITY_ADVISORY                       ExternalReference_ExternalReferenceType = 44
-	ExternalReference_SECURITY_CONTACT                        ExternalReference_ExternalReferenceType = 45
-	ExternalReference_SECURITY_FIX                            ExternalReference_ExternalReferenceType = 46
-	ExternalReference_SECURITY_OTHER                          ExternalReference_ExternalReferenceType = 47
-	ExternalReference_SECURITY_PENTEST_REPORT                 ExternalReference_ExternalReferenceType = 48
-	ExternalReference_SECURITY_POLICY                         ExternalReference_ExternalReferenceType = 49
-	ExternalReference_SECURITY_SWID                           ExternalReference_ExternalReferenceType = 50
-	ExternalReference_SECURITY_THREAT_MODEL                   ExternalReference_ExternalReferenceType = 51
-	ExternalReference_SOCIAL                                  ExternalReference_ExternalReferenceType = 52
-	ExternalReference_SOURCE_ARTIFACT                         ExternalReference_ExternalReferenceType = 53
-	ExternalReference_STATIC_ANALYSIS_REPORT                  ExternalReference_ExternalReferenceType = 54
-	ExternalReference_SUPPORT                                 ExternalReference_ExternalReferenceType = 55
-	ExternalReference_VCS                                     ExternalReference_ExternalReferenceType = 56
-	ExternalReference_VULNERABILITY_ASSERTION                 ExternalReference_ExternalReferenceType = 57
-	ExternalReference_VULNERABILITY_DISCLOSURE_REPORT         ExternalReference_ExternalReferenceType = 58
-	ExternalReference_VULNERABILITY_EXPLOITABILITY_ASSESSMENT ExternalReference_ExternalReferenceType = 59
-	ExternalReference_WEBSITE                                 ExternalReference_ExternalReferenceType = 60
+	ExternalReference_UNKNOWN                                 ExternalReference_ExternalReferenceType = 0  // Unknown type.
+	ExternalReference_ATTESTATION                             ExternalReference_ExternalReferenceType = 1  // Attestation type.
+	ExternalReference_BINARY                                  ExternalReference_ExternalReferenceType = 2  // Binary type.
+	ExternalReference_BOM                                     ExternalReference_ExternalReferenceType = 3  // BOM type.
+	ExternalReference_BOWER                                   ExternalReference_ExternalReferenceType = 4  // Bower type.
+	ExternalReference_BUILD_META                              ExternalReference_ExternalReferenceType = 5  // Build meta type.
+	ExternalReference_BUILD_SYSTEM                            ExternalReference_ExternalReferenceType = 6  // Build system type.
+	ExternalReference_CERTIFICATION_REPORT                    ExternalReference_ExternalReferenceType = 7  // Certification report type.
+	ExternalReference_CHAT                                    ExternalReference_ExternalReferenceType = 8  // Chat type.
+	ExternalReference_CODIFIED_INFRASTRUCTURE                 ExternalReference_ExternalReferenceType = 9  // Codified infrastructure type.
+	ExternalReference_COMPONENT_ANALYSIS_REPORT               ExternalReference_ExternalReferenceType = 10 // Component analysis report type.
+	ExternalReference_CONFIGURATION                           ExternalReference_ExternalReferenceType = 11 // Configuration type.
+	ExternalReference_DISTRIBUTION_INTAKE                     ExternalReference_ExternalReferenceType = 12 // Distribution intake type.
+	ExternalReference_DOCUMENTATION                           ExternalReference_ExternalReferenceType = 13 // Documentation type.
+	ExternalReference_DOWNLOAD                                ExternalReference_ExternalReferenceType = 14 // Download type.
+	ExternalReference_DYNAMIC_ANALYSIS_REPORT                 ExternalReference_ExternalReferenceType = 15 // Dynamic analysis report type.
+	ExternalReference_EOL_NOTICE                              ExternalReference_ExternalReferenceType = 16 // End-of-life notice type.
+	ExternalReference_EVIDENCE                                ExternalReference_ExternalReferenceType = 17 // Evidence type.
+	ExternalReference_EXPORT_CONTROL_ASSESSMENT               ExternalReference_ExternalReferenceType = 18 // Export control assessment type.
+	ExternalReference_FORMULATION                             ExternalReference_ExternalReferenceType = 19 // Formulation type.
+	ExternalReference_FUNDING                                 ExternalReference_ExternalReferenceType = 20 // Funding type.
+	ExternalReference_ISSUE_TRACKER                           ExternalReference_ExternalReferenceType = 21 // Issue tracker type.
+	ExternalReference_LICENSE                                 ExternalReference_ExternalReferenceType = 22 // License type.
+	ExternalReference_LOG                                     ExternalReference_ExternalReferenceType = 23 // Log type.
+	ExternalReference_MAILING_LIST                            ExternalReference_ExternalReferenceType = 24 // Mailing list type.
+	ExternalReference_MATURITY_REPORT                         ExternalReference_ExternalReferenceType = 25 // Maturity report type.
+	ExternalReference_MAVEN_CENTRAL                           ExternalReference_ExternalReferenceType = 26 // Maven Central type.
+	ExternalReference_METRICS                                 ExternalReference_ExternalReferenceType = 27 // Metrics type.
+	ExternalReference_MODEL_CARD                              ExternalReference_ExternalReferenceType = 28 // Model card type.
+	ExternalReference_NPM                                     ExternalReference_ExternalReferenceType = 29 // NPM type.
+	ExternalReference_NUGET                                   ExternalReference_ExternalReferenceType = 30 // NuGet type.
+	ExternalReference_OTHER                                   ExternalReference_ExternalReferenceType = 31 // Other type.
+	ExternalReference_POAM                                    ExternalReference_ExternalReferenceType = 32 // POAM type.
+	ExternalReference_PRIVACY_ASSESSMENT                      ExternalReference_ExternalReferenceType = 33 // Privacy assessment type.
+	ExternalReference_PRODUCT_METADATA                        ExternalReference_ExternalReferenceType = 34 // Product metadata type.
+	ExternalReference_PURCHASE_ORDER                          ExternalReference_ExternalReferenceType = 35 // Purchase order type.
+	ExternalReference_QUALITY_ASSESSMENT_REPORT               ExternalReference_ExternalReferenceType = 36 // Quality assessment report type.
+	ExternalReference_QUALITY_METRICS                         ExternalReference_ExternalReferenceType = 37 // Quality metrics type.
+	ExternalReference_RELEASE_HISTORY                         ExternalReference_ExternalReferenceType = 38 // Release history type.
+	ExternalReference_RELEASE_NOTES                           ExternalReference_ExternalReferenceType = 39 // Release notes type.
+	ExternalReference_RISK_ASSESSMENT                         ExternalReference_ExternalReferenceType = 40 // Risk assessment type.
+	ExternalReference_RUNTIME_ANALYSIS_REPORT                 ExternalReference_ExternalReferenceType = 41 // Runtime analysis report type.
+	ExternalReference_SECURE_SOFTWARE_ATTESTATION             ExternalReference_ExternalReferenceType = 42 // Secure software attestation type.
+	ExternalReference_SECURITY_ADVERSARY_MODEL                ExternalReference_ExternalReferenceType = 43 // Security adversary model type.
+	ExternalReference_SECURITY_ADVISORY                       ExternalReference_ExternalReferenceType = 44 // Security advisory type.
+	ExternalReference_SECURITY_CONTACT                        ExternalReference_ExternalReferenceType = 45 // Security contact type.
+	ExternalReference_SECURITY_FIX                            ExternalReference_ExternalReferenceType = 46 // Security fix type.
+	ExternalReference_SECURITY_OTHER                          ExternalReference_ExternalReferenceType = 47 // Security other type.
+	ExternalReference_SECURITY_PENTEST_REPORT                 ExternalReference_ExternalReferenceType = 48 // Security pentest report type.
+	ExternalReference_SECURITY_POLICY                         ExternalReference_ExternalReferenceType = 49 // Security policy type.
+	ExternalReference_SECURITY_SWID                           ExternalReference_ExternalReferenceType = 50 // Security SWID type.
+	ExternalReference_SECURITY_THREAT_MODEL                   ExternalReference_ExternalReferenceType = 51 // Security threat model type.
+	ExternalReference_SOCIAL                                  ExternalReference_ExternalReferenceType = 52 // Social type.
+	ExternalReference_SOURCE_ARTIFACT                         ExternalReference_ExternalReferenceType = 53 // Source artifact type.
+	ExternalReference_STATIC_ANALYSIS_REPORT                  ExternalReference_ExternalReferenceType = 54 // Static analysis report type.
+	ExternalReference_SUPPORT                                 ExternalReference_ExternalReferenceType = 55 // Support type.
+	ExternalReference_VCS                                     ExternalReference_ExternalReferenceType = 56 // VCS type.
+	ExternalReference_VULNERABILITY_ASSERTION                 ExternalReference_ExternalReferenceType = 57 // Vulnerability assertion type.
+	ExternalReference_VULNERABILITY_DISCLOSURE_REPORT         ExternalReference_ExternalReferenceType = 58 // Vulnerability disclosure report type.
+	ExternalReference_VULNERABILITY_EXPLOITABILITY_ASSESSMENT ExternalReference_ExternalReferenceType = 59 // Vulnerability exploitability assessment type.
+	ExternalReference_WEBSITE                                 ExternalReference_ExternalReferenceType = 60 // Website type.
 )
 
 // Enum value maps for ExternalReference_ExternalReferenceType.
@@ -742,18 +749,19 @@ func (ExternalReference_ExternalReferenceType) EnumDescriptor() ([]byte, []int) 
 	return file_api_sbom_proto_rawDescGZIP(), []int{4, 0}
 }
 
+// Enumeration of SBOM document types.
 type DocumentType_SBOMType int32
 
 const (
-	DocumentType_OTHER       DocumentType_SBOMType = 0
-	DocumentType_DESIGN      DocumentType_SBOMType = 1 // CDX: design
-	DocumentType_SOURCE      DocumentType_SBOMType = 2 // CDX: pre-build
-	DocumentType_BUILD       DocumentType_SBOMType = 3 // CDX: build
-	DocumentType_ANALYZED    DocumentType_SBOMType = 4 // CDX: post-build
-	DocumentType_DEPLOYED    DocumentType_SBOMType = 5 // CDX: operations
-	DocumentType_RUNTIME     DocumentType_SBOMType = 6 // CDX: none
-	DocumentType_DISCOVERY   DocumentType_SBOMType = 7 // CDX Specific
-	DocumentType_DECOMISSION DocumentType_SBOMType = 8 // CDX Specific
+	DocumentType_OTHER       DocumentType_SBOMType = 0 // Other document type.
+	DocumentType_DESIGN      DocumentType_SBOMType = 1 // Design document type. (CDX: design)
+	DocumentType_SOURCE      DocumentType_SBOMType = 2 // Source document type. (CDX: pre-build)
+	DocumentType_BUILD       DocumentType_SBOMType = 3 // Build document type. (CDX: build)
+	DocumentType_ANALYZED    DocumentType_SBOMType = 4 // Analyzed document type. (CDX: post-build)
+	DocumentType_DEPLOYED    DocumentType_SBOMType = 5 // Deployed document type. (CDX: operations)
+	DocumentType_RUNTIME     DocumentType_SBOMType = 6 // Runtime document type. (CDX: none)
+	DocumentType_DISCOVERY   DocumentType_SBOMType = 7 // Discovery document type. (CDX Specific)
+	DocumentType_DECOMISSION DocumentType_SBOMType = 8 // Decommission document type. (CDX Specific)
 )
 
 // Enum value maps for DocumentType_SBOMType.
@@ -809,13 +817,16 @@ func (DocumentType_SBOMType) EnumDescriptor() ([]byte, []int) {
 	return file_api_sbom_proto_rawDescGZIP(), []int{7, 0}
 }
 
+// Document is the top-level structure representing the entire Software Bill of Materials (SBOM).
+// It serves as the core neutral ground for the SBOM translation process, encapsulating metadata,
+// components (nodes), and the graph structure (edges).
 type Document struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metadata *Metadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	NodeList *NodeList `protobuf:"bytes,2,opt,name=node_list,json=nodeList,proto3" json:"node_list,omitempty"`
+	Metadata *Metadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`                 // Metadata associated with the SBOM document
+	NodeList *NodeList `protobuf:"bytes,2,opt,name=node_list,json=nodeList,proto3" json:"node_list,omitempty"` // List of nodes and edges forming the SBOM graph
 }
 
 func (x *Document) Reset() {
@@ -864,37 +875,50 @@ func (x *Document) GetNodeList() *NodeList {
 	return nil
 }
 
+// Node represents a central element within the Software Bill of Materials (SBOM) graph,
+// serving as a vertex that captures vital information about a software component.
+// Each Node in the SBOM graph signifies a distinct software component, forming the vertices of the graph.
 type Node struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type               Node_NodeType          `protobuf:"varint,2,opt,name=type,proto3,enum=bomsquad.protobom.Node_NodeType" json:"type,omitempty"`
-	Name               string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Version            string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`                                           // Version string
-	FileName           string                 `protobuf:"bytes,5,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`                         // Package filename when there is one
-	UrlHome            string                 `protobuf:"bytes,6,opt,name=url_home,json=urlHome,proto3" json:"url_home,omitempty"`                            // Website of the packge
-	UrlDownload        string                 `protobuf:"bytes,7,opt,name=url_download,json=urlDownload,proto3" json:"url_download,omitempty"`                // Location to download the package
-	Licenses           []string               `protobuf:"bytes,8,rep,name=licenses,proto3" json:"licenses,omitempty"`                                         // Multiple for CDX 1.4, files in SPDX. Ideally license expressions
-	LicenseConcluded   string                 `protobuf:"bytes,9,opt,name=license_concluded,json=licenseConcluded,proto3" json:"license_concluded,omitempty"` // This is only in SPDX and it is just one
-	LicenseComments    string                 `protobuf:"bytes,10,opt,name=license_comments,json=licenseComments,proto3" json:"license_comments,omitempty"`
-	Copyright          string                 `protobuf:"bytes,11,opt,name=copyright,proto3" json:"copyright,omitempty"`
-	SourceInfo         string                 `protobuf:"bytes,13,opt,name=source_info,json=sourceInfo,proto3" json:"source_info,omitempty"` // any relevant background information or additional comments about the origin
-	Comment            string                 `protobuf:"bytes,15,opt,name=comment,proto3" json:"comment,omitempty"`
-	Summary            string                 `protobuf:"bytes,16,opt,name=summary,proto3" json:"summary,omitempty"`         // Short package description
-	Description        string                 `protobuf:"bytes,17,opt,name=description,proto3" json:"description,omitempty"` // Package description (full)
-	Attribution        []string               `protobuf:"bytes,18,rep,name=attribution,proto3" json:"attribution,omitempty"` // One or more attribution texts
-	Suppliers          []*Person              `protobuf:"bytes,19,rep,name=suppliers,proto3" json:"suppliers,omitempty"`
-	Originators        []*Person              `protobuf:"bytes,20,rep,name=originators,proto3" json:"originators,omitempty"`
-	ReleaseDate        *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=release_date,json=releaseDate,proto3" json:"release_date,omitempty"`
-	BuildDate          *timestamppb.Timestamp `protobuf:"bytes,22,opt,name=build_date,json=buildDate,proto3" json:"build_date,omitempty"`
-	ValidUntilDate     *timestamppb.Timestamp `protobuf:"bytes,23,opt,name=valid_until_date,json=validUntilDate,proto3" json:"valid_until_date,omitempty"`
-	ExternalReferences []*ExternalReference   `protobuf:"bytes,24,rep,name=external_references,json=externalReferences,proto3" json:"external_references,omitempty"`
-	FileTypes          []string               `protobuf:"bytes,27,rep,name=file_types,json=fileTypes,proto3" json:"file_types,omitempty"`                                                                             // File types
-	Identifiers        map[int32]string       `protobuf:"bytes,28,rep,name=identifiers,proto3" json:"identifiers,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // Software identifiers
-	Hashes             map[int32]string       `protobuf:"bytes,29,rep,name=hashes,proto3" json:"hashes,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	PrimaryPurpose     []Purpose              `protobuf:"varint,30,rep,packed,name=primary_purpose,json=primaryPurpose,proto3,enum=bomsquad.protobom.Purpose" json:"primary_purpose,omitempty"`
+	Id          string        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                           // Unique identifier for the node.
+	Type        Node_NodeType `protobuf:"varint,2,opt,name=type,proto3,enum=bomsquad.protobom.Node_NodeType" json:"type,omitempty"` // Type of the software component.
+	Name        string        `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`                                       // Name of the software component.
+	Version     string        `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`                                 // Version string of the software component.
+	FileName    string        `protobuf:"bytes,5,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`               // Package filename when there is one.
+	UrlHome     string        `protobuf:"bytes,6,opt,name=url_home,json=urlHome,proto3" json:"url_home,omitempty"`                  // Website of the package.
+	UrlDownload string        `protobuf:"bytes,7,opt,name=url_download,json=urlDownload,proto3" json:"url_download,omitempty"`      // Location to download the package.
+	// Multiple licenses applicable to the software component,
+	// Multiple licenses can be specified for CycloneDX 1.4 and files in SPDX.
+	Licenses []string `protobuf:"bytes,8,rep,name=licenses,proto3" json:"licenses,omitempty"`
+	// Concluded license applicable to the software component,
+	// This is only in SPDX and it is just one.
+	LicenseConcluded string `protobuf:"bytes,9,opt,name=license_concluded,json=licenseConcluded,proto3" json:"license_concluded,omitempty"`
+	LicenseComments  string `protobuf:"bytes,10,opt,name=license_comments,json=licenseComments,proto3" json:"license_comments,omitempty"` // Comments on the license.
+	Copyright        string `protobuf:"bytes,11,opt,name=copyright,proto3" json:"copyright,omitempty"`                                    // Copyright information applicable to the software component.
+	// This field is intended to capture details related to the source or origin of the software component.
+	// It may include any relevant background information or additional comments.
+	SourceInfo         string                 `protobuf:"bytes,13,opt,name=source_info,json=sourceInfo,proto3" json:"source_info,omitempty"`
+	Comment            string                 `protobuf:"bytes,15,opt,name=comment,proto3" json:"comment,omitempty"`                                                 // Comments on the software component.
+	Summary            string                 `protobuf:"bytes,16,opt,name=summary,proto3" json:"summary,omitempty"`                                                 // Concise description of the software component (short description).
+	Description        string                 `protobuf:"bytes,17,opt,name=description,proto3" json:"description,omitempty"`                                         // Detailed description of the software component (full description).
+	Attribution        []string               `protobuf:"bytes,18,rep,name=attribution,proto3" json:"attribution,omitempty"`                                         // One or more contributions or acknowledgments associated with the software component.
+	Suppliers          []*Person              `protobuf:"bytes,19,rep,name=suppliers,proto3" json:"suppliers,omitempty"`                                             // One or more entities providing the software component.
+	Originators        []*Person              `protobuf:"bytes,20,rep,name=originators,proto3" json:"originators,omitempty"`                                         // One or more entities involved in the creation or maintenance of the software component.
+	ReleaseDate        *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=release_date,json=releaseDate,proto3" json:"release_date,omitempty"`                      // Release date of the software component.
+	BuildDate          *timestamppb.Timestamp `protobuf:"bytes,22,opt,name=build_date,json=buildDate,proto3" json:"build_date,omitempty"`                            // Build date of the software component.
+	ValidUntilDate     *timestamppb.Timestamp `protobuf:"bytes,23,opt,name=valid_until_date,json=validUntilDate,proto3" json:"valid_until_date,omitempty"`           // Valid until date of the software component.
+	ExternalReferences []*ExternalReference   `protobuf:"bytes,24,rep,name=external_references,json=externalReferences,proto3" json:"external_references,omitempty"` // External references associated with the software component.
+	FileTypes          []string               `protobuf:"bytes,27,rep,name=file_types,json=fileTypes,proto3" json:"file_types,omitempty"`                            // File types associated with the component
+	// Software identifer map used by the component.
+	// Maps between the software identifier types and the identifier values.
+	Identifiers map[int32]string `protobuf:"bytes,28,rep,name=identifiers,proto3" json:"identifiers,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Hashes map associated with the software component.
+	// Maps between hash algorithms types and hash values.
+	Hashes         map[int32]string `protobuf:"bytes,29,rep,name=hashes,proto3" json:"hashes,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	PrimaryPurpose []Purpose        `protobuf:"varint,30,rep,packed,name=primary_purpose,json=primaryPurpose,proto3,enum=bomsquad.protobom.Purpose" json:"primary_purpose,omitempty"` // Primary purpose or role assigned to the software component.
 }
 
 func (x *Node) Reset() {
@@ -1111,19 +1135,22 @@ func (x *Node) GetPrimaryPurpose() []Purpose {
 	return nil
 }
 
+// Metadata encapsulates document-related details about the Software Bill of Materials (SBOM) document.
+// It includes information such as the document's identifier, version, authorship, creation date,
+// associated tools, and document types.
 type Metadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`           // Serial number in cyclone, SPDXID in spdx
-	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"` // Int in CDX, but lets string it to capture other possible schemes
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Date          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=date,proto3" json:"date,omitempty"` // created date in spdx
-	Tools         []*Tool                `protobuf:"bytes,5,rep,name=tools,proto3" json:"tools,omitempty"`
-	Authors       []*Person              `protobuf:"bytes,6,rep,name=authors,proto3" json:"authors,omitempty"`
-	Comment       string                 `protobuf:"bytes,7,opt,name=comment,proto3" json:"comment,omitempty"`
-	DocumentTypes []*DocumentType        `protobuf:"bytes,8,rep,name=documentTypes,proto3" json:"documentTypes,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                       // // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
+	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`             // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`                   // Name associated with the document.
+	Date          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=date,proto3" json:"date,omitempty"`                   // Created date of the Document. In SPDX formats mapped to the created date field.
+	Tools         []*Tool                `protobuf:"bytes,5,rep,name=tools,proto3" json:"tools,omitempty"`                 // Tools used in the creation or processing of the document.
+	Authors       []*Person              `protobuf:"bytes,6,rep,name=authors,proto3" json:"authors,omitempty"`             // Individuals or organizations involved in the creation or maintenance of the document.
+	Comment       string                 `protobuf:"bytes,7,opt,name=comment,proto3" json:"comment,omitempty"`             // Comments on the document.
+	DocumentTypes []*DocumentType        `protobuf:"bytes,8,rep,name=documentTypes,proto3" json:"documentTypes,omitempty"` // Types categorizing the document based on its purpose or stage in the software development lifecycle.
 }
 
 func (x *Metadata) Reset() {
@@ -1214,14 +1241,17 @@ func (x *Metadata) GetDocumentTypes() []*DocumentType {
 	return nil
 }
 
+// Edge represents relationships between nodes in the Software Bill of Materials (SBOM) graph.
+// Each Edge captures the type of relationship and the nodes involved, providing a structured
+// way to model dependencies and connections within the SBOM.
 type Edge struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Type Edge_Type `protobuf:"varint,1,opt,name=type,proto3,enum=bomsquad.protobom.Edge_Type" json:"type,omitempty"`
-	From string    `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
-	To   []string  `protobuf:"bytes,3,rep,name=to,proto3" json:"to,omitempty"`
+	Type Edge_Type `protobuf:"varint,1,opt,name=type,proto3,enum=bomsquad.protobom.Edge_Type" json:"type,omitempty"` // Type enumerator representing the node relationship.
+	From string    `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`                                   // Source node of the edge.
+	To   []string  `protobuf:"bytes,3,rep,name=to,proto3" json:"to,omitempty"`                                       // Target nodes of the edge.
 }
 
 func (x *Edge) Reset() {
@@ -1277,22 +1307,19 @@ func (x *Edge) GetTo() []string {
 	return nil
 }
 
-// ExternalReference is an entry linking an element to a resource defined outside the SBOM standard
+// ExternalReference is an entry linking an element to a resource defined outside the SBOM standard.
 type ExternalReference struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	// Field 2 was the old string type. Replaced by ExternalReferenceType
-	// see https://github.com/bom-squad/protobom/issues/148
-	// string type = 2;
-	Comment   string `protobuf:"bytes,3,opt,name=comment,proto3" json:"comment,omitempty"`
-	Authority string `protobuf:"bytes,4,opt,name=authority,proto3" json:"authority,omitempty"`
-	// Field 5 was the old string map.
-	// Removed, see https://github.com/bom-squad/protobom/issues/89
-	Hashes map[int32]string                        `protobuf:"bytes,6,rep,name=hashes,proto3" json:"hashes,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Type   ExternalReference_ExternalReferenceType `protobuf:"varint,7,opt,name=type,proto3,enum=bomsquad.protobom.ExternalReference_ExternalReferenceType" json:"type,omitempty"`
+	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"` // URL providing reference to an external resource.
+	// string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/bom-squad/protobom/issues/148..
+	Comment   string `protobuf:"bytes,3,opt,name=comment,proto3" json:"comment,omitempty"`     // Comments associated with the external reference.
+	Authority string `protobuf:"bytes,4,opt,name=authority,proto3" json:"authority,omitempty"` // Authority responsible for the external reference.
+	// string type = 5; // Deprecated (string map) use hashes field instead, see https://github.com/bom-squad/protobom/issues/89.
+	Hashes map[int32]string                        `protobuf:"bytes,6,rep,name=hashes,proto3" json:"hashes,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // Hashes associated with the external reference, Replaced field 5.
+	Type   ExternalReference_ExternalReferenceType `protobuf:"varint,7,opt,name=type,proto3,enum=bomsquad.protobom.ExternalReference_ExternalReferenceType" json:"type,omitempty"`                              // Type of the external reference, Replaced field 2.
 }
 
 func (x *ExternalReference) Reset() {
@@ -1362,17 +1389,19 @@ func (x *ExternalReference) GetType() ExternalReference_ExternalReferenceType {
 	return ExternalReference_UNKNOWN
 }
 
+// Person represents an individual or organization involved in the creation or maintenance
+// of the document or node.
 type Person struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name     string    `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	IsOrg    bool      `protobuf:"varint,2,opt,name=is_org,json=isOrg,proto3" json:"is_org,omitempty"`
-	Email    string    `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Url      string    `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
-	Phone    string    `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`       // CDX
-	Contacts []*Person `protobuf:"bytes,6,rep,name=contacts,proto3" json:"contacts,omitempty"` // CDX // Support?
+	Name     string    `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                 // Name of the person or organization.
+	IsOrg    bool      `protobuf:"varint,2,opt,name=is_org,json=isOrg,proto3" json:"is_org,omitempty"` // Indicates whether the entity is an organization (true) or an individual (false).
+	Email    string    `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`               // Email address of the person or organization.
+	Url      string    `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`                   // URL associated with the person or organization.
+	Phone    string    `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`               // Phone number associated with the person or organization.
+	Contacts []*Person `protobuf:"bytes,6,rep,name=contacts,proto3" json:"contacts,omitempty"`         // Contacts associated with the person or organization.
 }
 
 func (x *Person) Reset() {
@@ -1449,14 +1478,15 @@ func (x *Person) GetContacts() []*Person {
 	return nil
 }
 
+// Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.
 type Tool struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name    string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	Vendor  string `protobuf:"bytes,3,opt,name=vendor,proto3" json:"vendor,omitempty"`
+	Name    string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`       // Name of the software tool.
+	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"` // Version of the software tool.
+	Vendor  string `protobuf:"bytes,3,opt,name=vendor,proto3" json:"vendor,omitempty"`   // Vendor or creator of the software tool.
 }
 
 func (x *Tool) Reset() {
@@ -1512,14 +1542,16 @@ func (x *Tool) GetVendor() string {
 	return ""
 }
 
+// DocumentType represents the type of document in the Software Bill of Materials (SBOM) ecosystem.
+// It categorizes the SBOM document based on its purpose or stage in the software development lifecycle.
 type DocumentType struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Type        *DocumentType_SBOMType `protobuf:"varint,1,opt,name=type,proto3,enum=bomsquad.protobom.DocumentType_SBOMType,oneof" json:"type,omitempty"`
-	Name        *string                `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
-	Description *string                `protobuf:"bytes,3,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	Type        *DocumentType_SBOMType `protobuf:"varint,1,opt,name=type,proto3,enum=bomsquad.protobom.DocumentType_SBOMType,oneof" json:"type,omitempty"` // SBOM document type.
+	Name        *string                `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`                                               // Name associated with the document type.
+	Description *string                `protobuf:"bytes,3,opt,name=description,proto3,oneof" json:"description,omitempty"`                                 // Description of the document type.
 }
 
 func (x *DocumentType) Reset() {
@@ -1575,14 +1607,16 @@ func (x *DocumentType) GetDescription() string {
 	return ""
 }
 
+// NodeList represents a collection of nodes and edges forming the Software Bill of Materials (SBOM) graph.
+// It encapsulates the fundamental components of the SBOM, including software entities (nodes) and their relationships (edges).
 type NodeList struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Nodes        []*Node  `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
-	Edges        []*Edge  `protobuf:"bytes,2,rep,name=edges,proto3" json:"edges,omitempty"`
-	RootElements []string `protobuf:"bytes,3,rep,name=root_elements,json=rootElements,proto3" json:"root_elements,omitempty"`
+	Nodes        []*Node  `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`                                   // List of software components (nodes) in the SBOM graph.
+	Edges        []*Edge  `protobuf:"bytes,2,rep,name=edges,proto3" json:"edges,omitempty"`                                   // List of relationships (edges) between nodes in the SBOM graph.
+	RootElements []string `protobuf:"bytes,3,rep,name=root_elements,json=rootElements,proto3" json:"root_elements,omitempty"` // List of root elements in the SBOM graph.
 }
 
 func (x *NodeList) Reset() {

@@ -5,6 +5,9 @@ import (
 	"github.com/spdx/tools-golang/spdx/v2/common"
 )
 
+// Deprecated: HashAlgorithmFromCycloneDX is deprecated and will
+// be removed in an upcoming version, Please use HashAlgorithmFromCDX.
+// HashAlgorithmFromCycloneDX converts a CycloneDX hash algorithm to its corresponding Hash Algorithm.
 func HashAlgorithmFromCycloneDX(cdxAlgo cdx.HashAlgorithm) HashAlgorithm {
 	switch cdxAlgo {
 	case cdx.HashAlgoMD5:
@@ -36,7 +39,8 @@ func HashAlgorithmFromCycloneDX(cdxAlgo cdx.HashAlgorithm) HashAlgorithm {
 	}
 }
 
-// ToSPDX returns the SPDX label equivalent of the HashAlgorithm
+// ToSPDX2 converts the Hash Algorithm to its corresponding SPDX2 label.
+// It maps the neutral Hash Algorithm to its SPDX representation.
 func (ha HashAlgorithm) ToSPDX() common.ChecksumAlgorithm {
 	switch ha {
 	case HashAlgorithm_ADLER32:
@@ -76,6 +80,7 @@ func (ha HashAlgorithm) ToSPDX() common.ChecksumAlgorithm {
 	}
 }
 
+// HashAlgorithmFromSPDX converts a SPDX2 hash algorithm to its corresponding Hash Algorithm.
 func HashAlgorithmFromSPDX(spdxAlgo common.ChecksumAlgorithm) HashAlgorithm {
 	switch spdxAlgo {
 	case common.ADLER32:
@@ -115,9 +120,11 @@ func HashAlgorithmFromSPDX(spdxAlgo common.ChecksumAlgorithm) HashAlgorithm {
 	}
 }
 
-// ToSPDX3 converts the hash algorithm enumeration to an SPDX3 algorithm label.
-// As the SPDX3 spec is still changing these values could change at any moment
-// while we track changers to the vocabulary defined here:
+// ToSPDX3 converts the Hash Algorithm to its corresponding SPDX3 label.
+// It maps the neutral Hash Algorithm to its SPDX representation.
+//
+// Note: The SPDX-3.0 specification is subject to change, and the returned values
+// are based on the vocabulary defined by SPDX-3.0 for HashAlgorithm:
 // https://github.com/spdx/spdx-3-model/blob/main/model/Core/Vocabularies/HashAlgorithm.md
 func (ha HashAlgorithm) ToSPDX3() string {
 	switch ha {

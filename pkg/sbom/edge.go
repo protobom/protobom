@@ -5,13 +5,14 @@ import (
 	"strings"
 )
 
+// NewEdge creates and returns a new graph edge.
 func NewEdge() *Edge {
 	return &Edge{
 		To: []string{},
 	}
 }
 
-// Copy returns a new edge with copies of all edges
+// Copy returns a duplicate of the edge, including all connected graph edges.
 func (e *Edge) Copy() *Edge {
 	return &Edge{
 		Type: e.Type,
@@ -20,8 +21,8 @@ func (e *Edge) Copy() *Edge {
 	}
 }
 
-// PointsTo returns true if an edge points to a node, in other words if it has
-// id in its list of Tos
+// PointsTo returns true if the edge is directed towards a specific node.
+// It evaluates to true only if the edge includes the provided node ID in its list of To nodes.
 func (e *Edge) PointsTo(id string) bool {
 	for _, lid := range e.To {
 		if lid == id {
@@ -31,7 +32,8 @@ func (e *Edge) PointsTo(id string) bool {
 	return false
 }
 
-// ToSPDX2 converts the edge type to the corresponding SDPX2 label
+// ToSPDX2 converts the edge type to the corresponding SPDX2 label.
+// It maps the neutral edge type to its SPDX2 representation.
 func (et Edge_Type) ToSPDX2() string {
 	switch et {
 	case Edge_UNKNOWN:
@@ -129,6 +131,8 @@ func (et Edge_Type) ToSPDX2() string {
 	}
 }
 
+// EdgeTypeFromSPDX2 converts SPDX2 label in to the corresponding edge type.
+// It maps the SPDX2 representation in to neutral edge type to its SPDX2 representation.
 func EdgeTypeFromSPDX2(spdx2Type string) Edge_Type {
 	spdx2Type = strings.ToUpper(spdx2Type)
 
@@ -228,7 +232,8 @@ func EdgeTypeFromSPDX2(spdx2Type string) Edge_Type {
 	}
 }
 
-// Equal compares Edge e to e2 and returns true if they are the same
+// Equal compares the current edge to another (e2) and returns true if they are identical.
+// It checks if both edges have the same source, type, and destination nodes.
 func (e *Edge) Equal(e2 *Edge) bool {
 	if e2 == nil {
 		return false
@@ -236,8 +241,8 @@ func (e *Edge) Equal(e2 *Edge) bool {
 	return e.flatString() == e2.flatString()
 }
 
-// flatString returns the edge serialized into a string that can be used
-// to index or compare the contents of Edge e
+// flatString returns a serialized representation of the edge as a string,
+// suitable for indexing or comparison of the contents of the current edge.
 func (e *Edge) flatString() string {
 	tos := e.To
 	sort.Strings(tos)

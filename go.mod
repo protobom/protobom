@@ -1,10 +1,9 @@
-module github.com/jhoward-lm/protobom
+module github.com/bom-squad/protobom
 
 go 1.21
 
 require (
 	github.com/CycloneDX/cyclonedx-go v0.8.0
-	github.com/bom-squad/protobom v0.3.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.5.0
 	github.com/infobloxopen/atlas-app-toolkit v1.4.0
@@ -36,6 +35,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/lib/pq v1.3.1-0.20200116171513-9eb3fc897d6f // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect

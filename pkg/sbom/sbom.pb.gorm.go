@@ -623,13 +623,12 @@ type ExternalReferenceWithAfterToPB interface {
 }
 
 type PersonORM struct {
-	Contacts          []*PersonORM `gorm:"foreignkey:PersonEmail;association_foreignkey:Email"`
+	Contacts          []*PersonORM `gorm:"foreignkey:Name;association_foreignkey:Name;many2many:person_contacts;jointable_foreignkey:PersonName;association_jointable_foreignkey:ContactName"`
 	Email             string       `gorm:"type:text;primary_key"`
 	IsOrg             bool         `gorm:"type:integer;primary_key"`
 	MetadataId        *string
 	Name              string `gorm:"type:text;primary_key"`
 	OriginatorsNodeId *string
-	PersonEmail       *string
 	Phone             string `gorm:"type:text;primary_key"`
 	SuppliersNodeId   *string
 	Url               string `gorm:"type:text;primary_key"`
@@ -2581,17 +2580,17 @@ func DefaultDeleteExternalReferenceSet(ctx context.Context, in []*ExternalRefere
 		if err != nil {
 			return err
 		}
-		if ormObj.Url == "" {
+		if ormObj.Comment == "" {
 			return errors.EmptyIdError
 		}
-		keys = append(keys, ormObj.Url)
+		keys = append(keys, ormObj.Comment)
 	}
 	if hook, ok := (interface{}(&ExternalReferenceORM{})).(ExternalReferenceORMWithBeforeDeleteSet); ok {
 		if db, err = hook.BeforeDeleteSet(ctx, in, db); err != nil {
 			return err
 		}
 	}
-	err = db.Where("url in (?)", keys).Delete(&ExternalReferenceORM{}).Error
+	err = db.Where("comment in (?)", keys).Delete(&ExternalReferenceORM{}).Error
 	if err != nil {
 		return err
 	}
@@ -2618,7 +2617,7 @@ func DefaultStrictUpdateExternalReference(ctx context.Context, in *ExternalRefer
 		return nil, err
 	}
 	lockedRow := &ExternalReferenceORM{}
-	db.Model(&ormObj).Set("gorm:query_option", "FOR UPDATE").Where("authority=?", ormObj.Authority).First(lockedRow)
+	db.Model(&ormObj).Set("gorm:query_option", "FOR UPDATE").Where("url=?", ormObj.Url).First(lockedRow)
 	if hook, ok := interface{}(&ormObj).(ExternalReferenceORMWithBeforeStrictUpdateCleanup); ok {
 		if db, err = hook.BeforeStrictUpdateCleanup(ctx, db); err != nil {
 			return nil, err
@@ -2900,7 +2899,7 @@ func DefaultDeletePerson(ctx context.Context, in *Person, db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
-	if ormObj.IsOrg == false {
+	if ormObj.Name == "" {
 		return errors.EmptyIdError
 	}
 	if hook, ok := interface{}(&ormObj).(PersonORMWithBeforeDelete_); ok {
@@ -2973,21 +2972,16 @@ func DefaultStrictUpdatePerson(ctx context.Context, in *Person, db *gorm.DB) (*P
 		return nil, err
 	}
 	lockedRow := &PersonORM{}
-	db.Model(&ormObj).Set("gorm:query_option", "FOR UPDATE").Where("name=?", ormObj.Name).First(lockedRow)
+	db.Model(&ormObj).Set("gorm:query_option", "FOR UPDATE").Where("is_org=?", ormObj.IsOrg).First(lockedRow)
 	if hook, ok := interface{}(&ormObj).(PersonORMWithBeforeStrictUpdateCleanup); ok {
 		if db, err = hook.BeforeStrictUpdateCleanup(ctx, db); err != nil {
 			return nil, err
 		}
 	}
-	filterContacts := PersonORM{}
-	if ormObj.Email == "" {
-		return nil, errors.EmptyIdError
-	}
-	filterContacts.PersonEmail = new(string)
-	*filterContacts.PersonEmail = ormObj.Email
-	if err = db.Where(filterContacts).Delete(PersonORM{}).Error; err != nil {
+	if err = db.Model(&ormObj).Association("Contacts").Replace(ormObj.Contacts).Error; err != nil {
 		return nil, err
 	}
+	ormObj.Contacts = nil
 	if hook, ok := interface{}(&ormObj).(PersonORMWithBeforeStrictUpdateSave); ok {
 		if db, err = hook.BeforeStrictUpdateSave(ctx, db); err != nil {
 			return nil, err
@@ -3268,7 +3262,7 @@ func DefaultDeleteTool(ctx context.Context, in *Tool, db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
-	if ormObj.Vendor == "" {
+	if ormObj.Name == "" {
 		return errors.EmptyIdError
 	}
 	if hook, ok := interface{}(&ormObj).(ToolORMWithBeforeDelete_); ok {
@@ -3341,7 +3335,7 @@ func DefaultStrictUpdateTool(ctx context.Context, in *Tool, db *gorm.DB) (*Tool,
 		return nil, err
 	}
 	lockedRow := &ToolORM{}
-	db.Model(&ormObj).Set("gorm:query_option", "FOR UPDATE").Where("name=?", ormObj.Name).First(lockedRow)
+	db.Model(&ormObj).Set("gorm:query_option", "FOR UPDATE").Where("vendor=?", ormObj.Vendor).First(lockedRow)
 	if hook, ok := interface{}(&ormObj).(ToolORMWithBeforeStrictUpdateCleanup); ok {
 		if db, err = hook.BeforeStrictUpdateCleanup(ctx, db); err != nil {
 			return nil, err
@@ -3615,7 +3609,7 @@ func DefaultDeleteDocumentType(ctx context.Context, in *DocumentType, db *gorm.D
 	if err != nil {
 		return err
 	}
-	if ormObj.Description == "" {
+	if ormObj.Type == 0 {
 		return errors.EmptyIdError
 	}
 	if hook, ok := interface{}(&ormObj).(DocumentTypeORMWithBeforeDelete_); ok {
@@ -3645,23 +3639,23 @@ func DefaultDeleteDocumentTypeSet(ctx context.Context, in []*DocumentType, db *g
 		return errors.NilArgumentError
 	}
 	var err error
-	keys := []string{}
+	keys := []int32{}
 	for _, obj := range in {
 		ormObj, err := obj.ToORM(ctx)
 		if err != nil {
 			return err
 		}
-		if ormObj.Name == "" {
+		if ormObj.Type == 0 {
 			return errors.EmptyIdError
 		}
-		keys = append(keys, ormObj.Name)
+		keys = append(keys, ormObj.Type)
 	}
 	if hook, ok := (interface{}(&DocumentTypeORM{})).(DocumentTypeORMWithBeforeDeleteSet); ok {
 		if db, err = hook.BeforeDeleteSet(ctx, in, db); err != nil {
 			return err
 		}
 	}
-	err = db.Where("name in (?)", keys).Delete(&DocumentTypeORM{}).Error
+	err = db.Where("type in (?)", keys).Delete(&DocumentTypeORM{}).Error
 	if err != nil {
 		return err
 	}

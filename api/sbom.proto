@@ -254,7 +254,7 @@ message Person {
     string email  = 3 [(gorm.field).tag = {type: "text" primary_key: true}];  // Email address of the person or organization.
     string url = 4 [(gorm.field).tag = {type: "text" primary_key: true}];  // URL associated with the person or organization.
     string phone = 5 [(gorm.field).tag = {type: "text" primary_key: true}]; // Phone number associated with the person or organization.
-    repeated Person contacts = 6; // Contacts associated with the person or organization.
+    repeated Person contacts = 6 [(gorm.field).many_to_many = {}]; // Contacts associated with the person or organization.
 	// repeated PersonIdentifier identifiers // Support?
 }
 

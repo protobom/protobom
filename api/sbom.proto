@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
-import "options/gorm.proto";
+import "github.com/infobloxopen/protoc-gen-gorm@v1.1.2/proto/options/gorm.proto";
 
 option go_package = "sbom/";
 package bomsquad.protobom;
@@ -10,17 +10,18 @@ package bomsquad.protobom;
 // It serves as the core neutral ground for the SBOM translation process, encapsulating metadata,
 // components (nodes), and the graph structure (edges).
 message Document {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
     Metadata metadata = 1;  // Metadata associated with the SBOM document
     NodeList node_list = 2; // List of nodes and edges forming the SBOM graph
+    string id = 3 [(gorm.field).tag = {type: "text" primary_key: true}];
 }
 
 // Node represents a central element within the Software Bill of Materials (SBOM) graph,
 // serving as a vertex that captures vital information about a software component.
 // Each Node in the SBOM graph signifies a distinct software component, forming the vertices of the graph.
 message Node {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
     string id = 1 [(gorm.field).tag = {type: "text" primary_key: true}];
     NodeType type = 2;                // Type of the software component.
@@ -93,9 +94,9 @@ message Node {
 // It includes information such as the document's identifier, version, authorship, creation date,
 // associated tools, and document types.
 message Metadata {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
-    string id = 1; // // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
+    string id = 1 [(gorm.field).tag = {type: "text" primary_key: true}]; // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
     string version = 2; // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
     string name = 3; // Name associated with the document.
     google.protobuf.Timestamp date = 4; // Created date of the Document. In SPDX formats mapped to the created date field.
@@ -109,7 +110,7 @@ message Metadata {
 // Each Edge captures the type of relationship and the nodes involved, providing a structured
 // way to model dependencies and connections within the SBOM.
 message Edge {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
     Type type = 1; // Type enumerator representing the node relationship.
     string from = 2; // Source node of the edge.
@@ -167,7 +168,7 @@ message Edge {
 
 // ExternalReference is an entry linking an element to a resource defined outside the SBOM standard.
 message ExternalReference {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
     string url = 1 [(gorm.field).tag = {type: "text" primary_key: true}];
     // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/bom-squad/protobom/issues/148..
@@ -246,7 +247,7 @@ message ExternalReference {
 // Person represents an individual or organization involved in the creation or maintenance
 // of the document or node.
 message Person {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
     string name = 1 [(gorm.field).tag = {type: "text" primary_key: true}];  // Name of the person or organization.
     bool is_org = 2 [(gorm.field).tag = {type: "integer" primary_key: true}];  // Indicates whether the entity is an organization (true) or an individual (false).
@@ -259,7 +260,7 @@ message Person {
 
 // Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.
 message Tool {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
     string name = 1 [(gorm.field).tag = {type: "text" primary_key: true}]; // Name of the software tool.
     string version = 2 [(gorm.field).tag = {type: "text" primary_key: true}]; // Version of the software tool.
@@ -269,11 +270,16 @@ message Tool {
 // DocumentType represents the type of document in the Software Bill of Materials (SBOM) ecosystem.
 // It categorizes the SBOM document based on its purpose or stage in the software development lifecycle.
 message DocumentType {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
-    optional SBOMType type = 1 [(gorm.field).tag = {type: "integer" primary_key: true}]; // SBOM document type.
-    optional string name = 2 [(gorm.field).tag = {type: "text" primary_key: true}]; // Name associated with the document type.
-    optional string description = 3 [(gorm.field).tag = {type: "text" primary_key: true}]; // Description of the document type.
+    // Fields marked optional are not supported by protoc-gen-gorm.
+    // optional SBOMType type = 1; // SBOM document type.
+    // optional string name = 2; // Name associated with the document type.
+    // optional string description = 3; // Description of the document type.
+
+    SBOMType type = 4 [(gorm.field).tag = {type: "integer" primary_key: true}]; // SBOM document type.
+    string name = 5 [(gorm.field).tag = {type: "text" primary_key: true}]; // Name associated with the document type.
+    string description = 6 [(gorm.field).tag = {type: "text" primary_key: true}]; // Description of the document type.
 
     // Enumeration of SBOM document types.
     enum SBOMType {
@@ -292,11 +298,12 @@ message DocumentType {
 // NodeList represents a collection of nodes and edges forming the Software Bill of Materials (SBOM) graph.
 // It encapsulates the fundamental components of the SBOM, including software entities (nodes) and their relationships (edges).
 message NodeList {
-    option (gorm.opts) = {ormable: true};
+    option (gorm.opts).ormable = true;
 
-    repeated Node nodes = 1;  List of software components (nodes) in the SBOM graph.
+    repeated Node nodes = 1;  // List of software components (nodes) in the SBOM graph.
     repeated Edge edges = 2; // List of relationships (edges) between nodes in the SBOM graph.
     repeated string root_elements = 3; // List of root elements in the SBOM graph.
+    string id = 4 [(gorm.field).tag = {type: "text" primary_key: true}];
 }
 
 // HashAlgorithm represents the hashing algorithms used within the Software Bill of Materials (SBOM) document.

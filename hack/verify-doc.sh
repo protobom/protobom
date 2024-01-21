@@ -19,4 +19,4 @@ pushd api
 protoc --doc_out=../docs --doc_opt=markdown,protobom-ref.md sbom.proto 
 popd
 
-git diff --exit-code || exit_with_msg "The proto documentation are not up to date. Check the docs and run make proto"
+git diff --exit-code || exit_with_msg "The proto documentation are not up to date"

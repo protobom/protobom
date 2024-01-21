@@ -1,7 +1,7 @@
 syntax = "proto3";
 
+import "github.com/infobloxopen/protoc-gen-gorm@v1.1.3-0.20231122062459-d3024d4fa7c9/proto/options/gorm.proto";
 import "google/protobuf/timestamp.proto";
-import "github.com/infobloxopen/protoc-gen-gorm@v1.1.2/proto/options/gorm.proto";
 
 option go_package = "sbom/";
 package bomsquad.protobom;
@@ -94,12 +94,12 @@ message Node {
 // It includes information such as the document's identifier, version, authorship, creation date,
 // associated tools, and document types.
 message Metadata {
-    option (gorm.opts).ormable = true;
+    option (gorm.opts) = {ormable: true, include: [{type: "Time", name: "date", package: "time"}]};
 
     string id = 1 [(gorm.field).tag = {type: "text" primary_key: true}]; // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
     string version = 2; // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
     string name = 3; // Name associated with the document.
-    google.protobuf.Timestamp date = 4; // Created date of the Document. In SPDX formats mapped to the created date field.
+    google.protobuf.Timestamp date = 4 [(gorm.field).drop = true]; // Created date of the Document. In SPDX formats mapped to the created date field.
     repeated Tool tools = 5; // Tools used in the creation or processing of the document.
     repeated Person authors = 6; // Individuals or organizations involved in the creation or maintenance of the document.
     string comment = 7; // Comments on the document.
@@ -270,16 +270,11 @@ message Tool {
 // DocumentType represents the type of document in the Software Bill of Materials (SBOM) ecosystem.
 // It categorizes the SBOM document based on its purpose or stage in the software development lifecycle.
 message DocumentType {
-    option (gorm.opts).ormable = true;
+    option (gorm.opts) = {ormable: true, include: [{type: "int32", name: "type", tag: {unique_index: "idx_document_type"}}]};
 
-    // Fields marked optional are not supported by protoc-gen-gorm.
-    // optional SBOMType type = 1; // SBOM document type.
-    // optional string name = 2; // Name associated with the document type.
-    // optional string description = 3; // Description of the document type.
-
-    SBOMType type = 4 [(gorm.field).tag = {type: "integer" primary_key: true}]; // SBOM document type.
-    string name = 5 [(gorm.field).tag = {type: "text" primary_key: true}]; // Name associated with the document type.
-    string description = 6 [(gorm.field).tag = {type: "text" primary_key: true}]; // Description of the document type.
+    optional SBOMType type = 1 [(gorm.field).drop = true]; // SBOM document type.
+    optional string name = 2 [(gorm.field).tag = {unique_index: "idx_document_type"}]; // Name associated with the document type.
+    optional string description = 3 [(gorm.field).tag = {unique_index: "idx_document_type"}]; // Description of the document type.
 
     // Enumeration of SBOM document types.
     enum SBOMType {

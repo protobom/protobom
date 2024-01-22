@@ -34,7 +34,7 @@ func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 	for index1 < len(nlNodes) || index2 < len(nl2Nodes) {
 		if index1 < len(nlNodes) && index2 < len(nl2Nodes) {
 			n, n2 := nlNodes[index1], nl2Nodes[index2]
-			switch strings.Compare(n.Id, n2.Id) { //Use ID to decide if to compare
+			switch strings.Compare(n.Id, n2.Id) { // Use ID to decide if to compare
 			case 0: // Nodes are equal
 				index1++
 				index2++

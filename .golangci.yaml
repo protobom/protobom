@@ -11,6 +11,15 @@ issues:
         - golint
         - dupl
 
+    - path: .*\.pb\.go
+      linters:
+        - dupl
+        - gocritic
+        - gofumpt
+        - goimports
+        - gosimple
+        - govet
+
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
 

@@ -10,7 +10,7 @@ the [protobuf GitHub releases page](https://github.com/protocolbuffers/protobuf/
 Once installed, simply run:
 
 ```bash
-protoc --go_out=pkg api/sbom.proto
+protoc --go_out=pkg --gorm_out=pkg api/sbom.proto
 ```
 
 The main repository Makefile has a target to rebuild the libraries, you can

@@ -31,7 +31,6 @@ func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 		NodesDiff: nl.diffNodes(nl2),
 		EdgesDiff: nl.diffEdges(nl2),
 	}
-
 }
 
 func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {

@@ -32,7 +32,6 @@ func TestNodeListDiff(t *testing.T) {
 			node: &NodeList{},
 			expected: &NodeListDiff{
 				NodesDiff: NodeListDiffNodes{
-
 					Added: []*Node{
 						{
 							Id: "added",
@@ -120,7 +119,6 @@ func TestNodeListDiff(t *testing.T) {
 				require.Truef(t, result.NodesDiff.NodeDiff[i].Removed.Equal(diff.Removed), "comparing  node diff removed: %s %s", diff.Removed.flatString(), result.NodesDiff.NodeDiff[i].Removed)
 				require.Equal(t, result.NodesDiff.NodeDiff[i].DiffCount, diff.DiffCount)
 			}
-
 		})
 	}
 }
@@ -217,7 +215,6 @@ func TestNodeListDiffEdge(t *testing.T) {
 				require.GreaterOrEqual(t, len(result.EdgesDiff.Removed), i+1, "expected edge removed but not found %s", rem.flatString())
 				require.Equal(t, result.EdgesDiff.Removed[i].flatString(), rem.flatString())
 			}
-
 		})
 	}
 }

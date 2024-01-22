@@ -268,12 +268,7 @@ func copyEdgeList(original []*Edge) []*Edge {
 
 // Copy returns a duplicate of the NodeList.
 func (nl *NodeList) Copy() *NodeList {
-	nlo := &NodeList{
-		// 2DO not sure what to do.
-		// state:         nl.state,
-		// sizeCache:     nl.sizeCache,
-		// unknownFields: nl.unknownFields,
-	}
+	nlo := &NodeList{}
 
 	for _, n := range nl.Nodes {
 		nlo.Nodes = append(nlo.Nodes, n.Copy())

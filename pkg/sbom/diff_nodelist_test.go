@@ -24,7 +24,7 @@ func TestNodeListDiff(t *testing.T) {
 		{
 			name: "add node with new id",
 			prepare: func(sutNodeList *NodeList, newNodeList *NodeList) {
-				newNodeList.Nodes = append(newNodeList.Nodes, &Node{
+				newNodeList.Nodes = append(sutNodeList.Copy().Nodes, &Node{
 					Id: "added",
 				})
 			},
@@ -42,7 +42,7 @@ func TestNodeListDiff(t *testing.T) {
 			name: "remove node",
 			prepare: func(sutNodeList *NodeList, newNodeList *NodeList) {
 				tmpNodes := []*Node{}
-				for i, node := range newNodeList.Nodes {
+				for i, node := range sutNodeList.Copy().Nodes {
 					if i > 0 {
 						tmpNodes = append(tmpNodes, node.Copy())
 					}
@@ -55,6 +55,31 @@ func TestNodeListDiff(t *testing.T) {
 				Removed: []*Node{
 					{
 						Id: "node1",
+					},
+				},
+			},
+		},
+		{
+			name: "modified name",
+			prepare: func(sutNodeList *NodeList, newNodeList *NodeList) {
+				tmpNodes := sutNodeList.Copy().Nodes
+				for i, node := range tmpNodes {
+					if i == 0 {
+						node.Name = "modified"
+					}
+				}
+
+				newNodeList.Nodes = tmpNodes
+			},
+			sut:  &NodeList{},
+			node: &NodeList{},
+			expected: &NodeListDiff{
+				NodeDiff: []*NodeDiff{
+					{
+						Added: &Node{
+							Name: "modified",
+						},
+						DiffCount: 1,
 					},
 				},
 			},
@@ -76,19 +101,20 @@ func TestNodeListDiff(t *testing.T) {
 			require.NotNil(t, result)
 
 			for i, add := range tc.expected.Added {
-				require.GreaterOrEqual(t, len(result.Added), i+1, "expected added but not found", add.flatString())
-				// if len(result.Added) > i {
+				require.GreaterOrEqual(t, len(result.Added), i+1, "expected node added but not found %s", add.flatString())
 				require.Equal(t, result.Added[i].flatString(), add.flatString())
-				// }
 			}
 			for i, rem := range result.Removed {
-				require.GreaterOrEqual(t, len(result.Removed), i+1, "expected removed but not found", rem.flatString())
+				require.GreaterOrEqual(t, len(result.Removed), i+1, "expected node removed but not found %s", rem.flatString())
 				require.Equal(t, result.Removed[i].flatString(), rem.flatString())
 			}
-			// for i, diff := range result.NodeDiff {
-			// 	require.GreaterOrEqual(t, len(result.NodeDiff), i+1, "expected Diff but not found")
-			// require.Equal(t, result.Removed[i].flatString(), diff.flatString())
-			// }
+			for i, diff := range result.NodeDiff {
+				require.GreaterOrEqual(t, len(result.NodeDiff), i+1, "expected node diff but not found")
+				require.NotNil(t, diff)
+				require.Truef(t, tc.expected.NodeDiff[i].Added.Equal(diff.Added), "comparing node diff added: %s %s", diff.Added.flatString(), tc.expected.NodeDiff[i].Added)
+				require.Truef(t, tc.expected.NodeDiff[i].Removed.Equal(diff.Removed), "comparing  node diffremoved: %s %s", diff.Removed.flatString(), tc.expected.NodeDiff[i].Removed)
+				require.Equal(t, tc.expected.NodeDiff[i].DiffCount, diff.DiffCount)
+			}
 
 		})
 	}

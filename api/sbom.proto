@@ -14,7 +14,7 @@ message Document {
 
     Metadata metadata = 1;  // Metadata associated with the SBOM document
     NodeList node_list = 2; // List of nodes and edges forming the SBOM graph
-    string id = 3 [(gorm.field).tag = {type: "text" primary_key: true}];
+    string id = 3 [(gorm.field).tag = {primary_key: true}];
 }
 
 // Node represents a central element within the Software Bill of Materials (SBOM) graph,
@@ -23,7 +23,7 @@ message Document {
 message Node {
     option (gorm.opts).ormable = true;
 
-    string id = 1 [(gorm.field).tag = {type: "text" primary_key: true}];
+    string id = 1 [(gorm.field).tag = {primary_key: true}];
     NodeType type = 2;                // Type of the software component.
     string name = 3;                  // Name of the software component.
     string version = 4;               // Version string of the software component.
@@ -96,7 +96,7 @@ message Node {
 message Metadata {
     option (gorm.opts) = {ormable: true, include: [{type: "Time", name: "date", package: "time"}]};
 
-    string id = 1 [(gorm.field).tag = {type: "text" primary_key: true}]; // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
+    string id = 1 [(gorm.field).tag = {primary_key: true}]; // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
     string version = 2; // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
     string name = 3; // Name associated with the document.
     google.protobuf.Timestamp date = 4 [(gorm.field).drop = true]; // Created date of the Document. In SPDX formats mapped to the created date field.
@@ -170,10 +170,10 @@ message Edge {
 message ExternalReference {
     option (gorm.opts).ormable = true;
 
-    string url = 1 [(gorm.field).tag = {type: "text" primary_key: true}];
+    string url = 1 [(gorm.field).tag = {primary_key: true}];
     // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/bom-squad/protobom/issues/148..
-    string comment = 3 [(gorm.field).tag = {type: "text" primary_key: true}]; // Comments associated with the external reference.
-    string authority = 4 [(gorm.field).tag = {type: "text" primary_key: true}]; // Authority responsible for the external reference.
+    string comment = 3 [(gorm.field).tag = {primary_key: true}]; // Comments associated with the external reference.
+    string authority = 4 [(gorm.field).tag = {primary_key: true}]; // Authority responsible for the external reference.
     // string type = 5; // Deprecated (string map) use hashes field instead, see https://github.com/bom-squad/protobom/issues/89.
     map<int32,string> hashes = 6;  // Hashes associated with the external reference, Replaced field 5.
     ExternalReferenceType type = 7;  // Type of the external reference, Replaced field 2.
@@ -249,11 +249,11 @@ message ExternalReference {
 message Person {
     option (gorm.opts).ormable = true;
 
-    string name = 1 [(gorm.field).tag = {type: "text" primary_key: true}];  // Name of the person or organization.
-    bool is_org = 2 [(gorm.field).tag = {type: "integer" primary_key: true}];  // Indicates whether the entity is an organization (true) or an individual (false).
-    string email  = 3 [(gorm.field).tag = {type: "text" primary_key: true}];  // Email address of the person or organization.
-    string url = 4 [(gorm.field).tag = {type: "text" primary_key: true}];  // URL associated with the person or organization.
-    string phone = 5 [(gorm.field).tag = {type: "text" primary_key: true}]; // Phone number associated with the person or organization.
+    string name = 1 [(gorm.field).tag = {primary_key: true}];  // Name of the person or organization.
+    bool is_org = 2 [(gorm.field).tag = {type: "integer", primary_key: true}];  // Indicates whether the entity is an organization (true) or an individual (false).
+    string email  = 3 [(gorm.field).tag = {primary_key: true}];  // Email address of the person or organization.
+    string url = 4 [(gorm.field).tag = {primary_key: true}];  // URL associated with the person or organization.
+    string phone = 5 [(gorm.field).tag = {primary_key: true}]; // Phone number associated with the person or organization.
     repeated Person contacts = 6 [(gorm.field).many_to_many = {}]; // Contacts associated with the person or organization.
 	// repeated PersonIdentifier identifiers // Support?
 }
@@ -262,9 +262,9 @@ message Person {
 message Tool {
     option (gorm.opts).ormable = true;
 
-    string name = 1 [(gorm.field).tag = {type: "text" primary_key: true}]; // Name of the software tool.
-    string version = 2 [(gorm.field).tag = {type: "text" primary_key: true}]; // Version of the software tool.
-    string vendor = 3 [(gorm.field).tag = {type: "text" primary_key: true}]; // Vendor or creator of the software tool.
+    string name = 1 [(gorm.field).tag = {primary_key: true}]; // Name of the software tool.
+    string version = 2 [(gorm.field).tag = {primary_key: true}]; // Version of the software tool.
+    string vendor = 3 [(gorm.field).tag = {primary_key: true}]; // Vendor or creator of the software tool.
 }
 
 // DocumentType represents the type of document in the Software Bill of Materials (SBOM) ecosystem.

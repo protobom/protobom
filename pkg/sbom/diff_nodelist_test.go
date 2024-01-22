@@ -24,7 +24,7 @@ func TestNodeListDiff(t *testing.T) {
 		{
 			name: "add node with new id",
 			prepare: func(sutNodeList *NodeList, newNodeList *NodeList) {
-				newNodeList.Nodes = append(sutNodeList.Copy().Nodes, &Node{
+				newNodeList.Nodes = append(newNodeList.Nodes, &Node{
 					Id: "added",
 				})
 			},

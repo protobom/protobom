@@ -11,7 +11,7 @@ issues:
         - golint
         - dupl
 
-    - path: .*\.pb\.go
+    - path: .*(\.pb|\.gorm)\.go
       linters:
         - dupl
         - gocritic

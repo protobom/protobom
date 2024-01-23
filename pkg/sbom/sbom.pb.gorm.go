@@ -865,7 +865,7 @@ type DocumentTypeWithAfterToPB interface {
 type NodeListORM struct {
 	DocumentId *string
 	Edges      []*EdgeORM `gorm:"foreignKey:NodeListId;references:Id"`
-	Id         string     `gorm:"type:text;primaryKey"`
+	Id         string     `gorm:"primaryKey"`
 	Nodes      []*NodeORM `gorm:"foreignKey:NodeListId;references:Id"`
 }
 
@@ -907,7 +907,6 @@ func (m *NodeList) ToORM(ctx context.Context) (NodeListORM, error) {
 		}
 	}
 	// Repeated type string is not an ORMable message type
-	to.Id = m.Id
 	if posthook, ok := interface{}(m).(NodeListWithAfterToORM); ok {
 		err = posthook.AfterToORM(ctx, &to)
 	}
@@ -947,7 +946,6 @@ func (m *NodeListORM) ToPB(ctx context.Context) (NodeList, error) {
 		}
 	}
 	// Repeated type string is not an ORMable message type
-	to.Id = m.Id
 	if posthook, ok := interface{}(m).(NodeListWithAfterToPB); ok {
 		err = posthook.AfterToPB(ctx, &to)
 	}
@@ -3507,11 +3505,6 @@ func DefaultPatchNodeList(ctx context.Context, in *NodeList, updateMask *field_m
 			return nil, err
 		}
 	}
-	pbReadRes, err := DefaultReadNodeList(ctx, &NodeList{Id: in.GetId()}, db)
-	if err != nil {
-		return nil, err
-	}
-	pbObj = *pbReadRes
 	if hook, ok := interface{}(&pbObj).(NodeListWithBeforePatchApplyFieldMask); ok {
 		if db, err = hook.BeforePatchApplyFieldMask(ctx, in, updateMask, db); err != nil {
 			return nil, err
@@ -3588,10 +3581,6 @@ func DefaultApplyFieldMaskNodeList(ctx context.Context, patchee *NodeList, patch
 		}
 		if f == prefix+"RootElements" {
 			patchee.RootElements = patcher.RootElements
-			continue
-		}
-		if f == prefix+"Id" {
-			patchee.Id = patcher.Id
 			continue
 		}
 	}

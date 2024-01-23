@@ -246,13 +246,13 @@ message ExternalReference {
 // Person represents an individual or organization involved in the creation or maintenance
 // of the document or node.
 message Person {
-    option (gorm.opts).ormable = true;
+    option (gorm.opts) = {ormable: true, include: [{name: "id", type: "int32", tag: {primary_key: true}}]};
 
-    string name = 1 [(gorm.field).tag = {primary_key: true}];  // Name of the person or organization.
-    bool is_org = 2 [(gorm.field).tag = {type: "integer", primary_key: true}];  // Indicates whether the entity is an organization (true) or an individual (false).
-    string email  = 3 [(gorm.field).tag = {primary_key: true}];  // Email address of the person or organization.
-    string url = 4 [(gorm.field).tag = {primary_key: true}];  // URL associated with the person or organization.
-    string phone = 5 [(gorm.field).tag = {primary_key: true}]; // Phone number associated with the person or organization.
+    string name = 1;  // Name of the person or organization.
+    bool is_org = 2;  // Indicates whether the entity is an organization (true) or an individual (false).
+    string email  = 3;  // Email address of the person or organization.
+    string url = 4;  // URL associated with the person or organization.
+    string phone = 5; // Phone number associated with the person or organization.
     repeated Person contacts = 6 [(gorm.field).many_to_many = {}]; // Contacts associated with the person or organization.
 	// repeated PersonIdentifier identifiers // Support?
 }

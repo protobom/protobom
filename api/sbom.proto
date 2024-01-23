@@ -10,11 +10,10 @@ package bomsquad.protobom;
 // It serves as the core neutral ground for the SBOM translation process, encapsulating metadata,
 // components (nodes), and the graph structure (edges).
 message Document {
-    option (gorm.opts).ormable = true;
+    option (gorm.opts) = {ormable: true, include: [{name: "id", type: "string", tag: {primary_key: true}}]};
 
     Metadata metadata = 1;  // Metadata associated with the SBOM document
     NodeList node_list = 2; // List of nodes and edges forming the SBOM graph
-    string id = 3 [(gorm.field).tag = {primary_key: true}];
 }
 
 // Node represents a central element within the Software Bill of Materials (SBOM) graph,
@@ -96,7 +95,7 @@ message Node {
 message Metadata {
     option (gorm.opts) = {ormable: true, include: [{type: "Time", name: "date", package: "time"}]};
 
-    string id = 1 [(gorm.field).tag = {primary_key: true}]; // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
+    string id = 1 [(gorm.field).tag = {primary_key: true}]; // // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
     string version = 2; // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
     string name = 3; // Name associated with the document.
     google.protobuf.Timestamp date = 4 [(gorm.field).drop = true]; // Created date of the Document. In SPDX formats mapped to the created date field.
@@ -170,7 +169,7 @@ message Edge {
 message ExternalReference {
     option (gorm.opts).ormable = true;
 
-    string url = 1 [(gorm.field).tag = {primary_key: true}];
+    string url = 1 [(gorm.field).tag = {primary_key: true}]; // URL providing reference to an external resource.
     // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/bom-squad/protobom/issues/148..
     string comment = 3 [(gorm.field).tag = {primary_key: true}]; // Comments associated with the external reference.
     string authority = 4 [(gorm.field).tag = {primary_key: true}]; // Authority responsible for the external reference.
@@ -295,7 +294,7 @@ message DocumentType {
 message NodeList {
     option (gorm.opts).ormable = true;
 
-    repeated Node nodes = 1;  // List of software components (nodes) in the SBOM graph.
+    repeated Node nodes = 1; // List of software components (nodes) in the SBOM graph.
     repeated Edge edges = 2; // List of relationships (edges) between nodes in the SBOM graph.
     repeated string root_elements = 3; // List of root elements in the SBOM graph.
     string id = 4 [(gorm.field).tag = {type: "text" primary_key: true}];

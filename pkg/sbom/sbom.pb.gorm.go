@@ -47,7 +47,6 @@ func (m *Document) ToORM(ctx context.Context) (DocumentORM, error) {
 		}
 		to.NodeList = &tempNodeList
 	}
-	to.Id = m.Id
 	if posthook, ok := interface{}(m).(DocumentWithAfterToORM); ok {
 		err = posthook.AfterToORM(ctx, &to)
 	}
@@ -78,7 +77,6 @@ func (m *DocumentORM) ToPB(ctx context.Context) (Document, error) {
 		}
 		to.NodeList = &tempNodeList
 	}
-	to.Id = m.Id
 	if posthook, ok := interface{}(m).(DocumentWithAfterToPB); ok {
 		err = posthook.AfterToPB(ctx, &to)
 	}
@@ -616,7 +614,7 @@ type ExternalReferenceWithAfterToPB interface {
 }
 
 type PersonORM struct {
-	Contacts          []*PersonORM `gorm:"foreignKey:Url;references:Url;many2many:person_contacts;joinForeignKey:PersonUrl;joinReferences:ContactUrl"`
+	Contacts          []*PersonORM `gorm:"foreignKey:Name;references:Url;many2many:person_contacts;joinForeignKey:PersonName;joinReferences:ContactUrl"`
 	Email             string       `gorm:"primaryKey"`
 	IsOrg             bool         `gorm:"type:integer;primaryKey"`
 	MetadataId        *string
@@ -1202,11 +1200,6 @@ func DefaultPatchDocument(ctx context.Context, in *Document, updateMask *field_m
 			return nil, err
 		}
 	}
-	pbReadRes, err := DefaultReadDocument(ctx, &Document{Id: in.GetId()}, db)
-	if err != nil {
-		return nil, err
-	}
-	pbObj = *pbReadRes
 	if hook, ok := interface{}(&pbObj).(DocumentWithBeforePatchApplyFieldMask); ok {
 		if db, err = hook.BeforePatchApplyFieldMask(ctx, in, updateMask, db); err != nil {
 			return nil, err
@@ -1315,10 +1308,6 @@ func DefaultApplyFieldMaskDocument(ctx context.Context, patchee *Document, patch
 		if f == prefix+"NodeList" {
 			updatedNodeList = true
 			patchee.NodeList = patcher.NodeList
-			continue
-		}
-		if f == prefix+"Id" {
-			patchee.Id = patcher.Id
 			continue
 		}
 	}

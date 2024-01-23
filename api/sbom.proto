@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "github.com/infobloxopen/protoc-gen-gorm@v1.1.3-0.20231122062459-d3024d4fa7c9/proto/options/gorm.proto";
+import "gorm.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "sbom/";

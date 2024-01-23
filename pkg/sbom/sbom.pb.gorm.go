@@ -616,7 +616,7 @@ type ExternalReferenceWithAfterToPB interface {
 }
 
 type PersonORM struct {
-	Contacts          []*PersonORM `gorm:"foreignKey:Email;references:Url;many2many:person_contacts;joinForeignKey:PersonEmail;joinReferences:ContactUrl"`
+	Contacts          []*PersonORM `gorm:"foreignKey:Url;references:Url;many2many:person_contacts;joinForeignKey:PersonUrl;joinReferences:ContactUrl"`
 	Email             string       `gorm:"primaryKey"`
 	IsOrg             bool         `gorm:"type:integer;primaryKey"`
 	MetadataId        *string

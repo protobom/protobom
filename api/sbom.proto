@@ -93,12 +93,12 @@ message Node {
 // It includes information such as the document's identifier, version, authorship, creation date,
 // associated tools, and document types.
 message Metadata {
-    option (gorm.opts) = {ormable: true, include: [{type: "Time", name: "date", package: "time"}]};
+    option (gorm.opts).ormable = true;
 
     string id = 1 [(gorm.field).tag = {primary_key: true}]; // // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
     string version = 2; // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
     string name = 3; // Name associated with the document.
-    google.protobuf.Timestamp date = 4 [(gorm.field).drop = true]; // Created date of the Document. In SPDX formats mapped to the created date field.
+    google.protobuf.Timestamp date = 4; // Created date of the Document. In SPDX formats mapped to the created date field.
     repeated Tool tools = 5; // Tools used in the creation or processing of the document.
     repeated Person authors = 6; // Individuals or organizations involved in the creation or maintenance of the document.
     string comment = 7; // Comments on the document.
@@ -111,9 +111,9 @@ message Metadata {
 message Edge {
     option (gorm.opts).ormable = true;
 
-    Type type = 1; // Type enumerator representing the node relationship.
-    string from = 2; // Source node of the edge.
-    repeated string to = 3; // Target nodes of the edge.
+    Type type = 1 [(gorm.field).tag = {unique_index: "idx_edge"}]; // Type enumerator representing the node relationship.
+    string from = 2 [(gorm.field).tag = {unique_index: "idx_edge"}]; // Source node of the edge.
+    repeated string to = 3 [(gorm.field).tag = {unique_index: "idx_edge"}]; // Target nodes of the edge.
 
     // Type enumerator representing the node relationship.
     enum Type {
@@ -169,10 +169,10 @@ message Edge {
 message ExternalReference {
     option (gorm.opts).ormable = true;
 
-    string url = 1 [(gorm.field).tag = {primary_key: true}]; // URL providing reference to an external resource.
+    string url = 1 [(gorm.field).tag = {unique_index: "idx_external_reference"}]; // URL providing reference to an external resource.
     // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/bom-squad/protobom/issues/148..
-    string comment = 3 [(gorm.field).tag = {primary_key: true}]; // Comments associated with the external reference.
-    string authority = 4 [(gorm.field).tag = {primary_key: true}]; // Authority responsible for the external reference.
+    string comment = 3 [(gorm.field).tag = {unique_index: "idx_external_reference"}]; // Comments associated with the external reference.
+    string authority = 4 [(gorm.field).tag = {unique_index: "idx_external_reference"}]; // Authority responsible for the external reference.
     // string type = 5; // Deprecated (string map) use hashes field instead, see https://github.com/bom-squad/protobom/issues/89.
     map<int32,string> hashes = 6;  // Hashes associated with the external reference, Replaced field 5.
     ExternalReferenceType type = 7;  // Type of the external reference, Replaced field 2.
@@ -248,22 +248,22 @@ message ExternalReference {
 message Person {
     option (gorm.opts) = {ormable: true, include: [{name: "id", type: "int32", tag: {primary_key: true}}]};
 
-    string name = 1; // Name of the person or organization.
-    bool is_org = 2; // Indicates whether the entity is an organization (true) or an individual (false).
-    string email  = 3; // Email address of the person or organization.
-    string url = 4; // URL associated with the person or organization.
-    string phone = 5;  // Phone number associated with the person or organization.
+    string name = 1 [(gorm.field).tag = {unique_index: "idx_person"}]; // Name of the person or organization.
+    bool is_org = 2 [(gorm.field).tag = {unique_index: "idx_person"}]; // Indicates whether the entity is an organization (true) or an individual (false).
+    string email  = 3 [(gorm.field).tag = {unique_index: "idx_person"}]; // Email address of the person or organization.
+    string url = 4 [(gorm.field).tag = {unique_index: "idx_person"}]; // URL associated with the person or organization.
+    string phone = 5 [(gorm.field).tag = {unique_index: "idx_person"}];  // Phone number associated with the person or organization.
     repeated Person contacts = 6 [(gorm.field).many_to_many = {}]; // Contacts associated with the person or organization.
-	// repeated PersonIdentifier identifiers // Support?
+    // repeated PersonIdentifier identifiers // Support?
 }
 
 // Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.
 message Tool {
     option (gorm.opts).ormable = true;
 
-    string name = 1 [(gorm.field).tag = {primary_key: true}]; // Name of the software tool.
-    string version = 2 [(gorm.field).tag = {primary_key: true}]; // Version of the software tool.
-    string vendor = 3 [(gorm.field).tag = {primary_key: true}]; // Vendor or creator of the software tool.
+    string name = 1 [(gorm.field).tag = {unique_index: "idx_tool"}]; // Name of the software tool.
+    string version = 2 [(gorm.field).tag = {unique_index: "idx_tool"}]; // Version of the software tool.
+    string vendor = 3 [(gorm.field).tag = {unique_index: "idx_tool"}]; // Vendor or creator of the software tool.
 }
 
 // DocumentType represents the type of document in the Software Bill of Materials (SBOM) ecosystem.

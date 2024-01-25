@@ -1,4 +1,4 @@
-package sbom
+package beta
 
 import (
 	context "context"

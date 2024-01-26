@@ -23,8 +23,7 @@ curl -LO https://raw.githubusercontent.com/infobloxopen/protoc-gen-gorm/${PROTOC
 $HOME/.local/bin/protoc --proto_path=$HOME/.local/include --proto_path=. --go_out=pkg --gorm_out=pkg --gorm_opt=Mapi/sbom.proto=sbom/beta api/sbom.proto
 
 mkdir -p beta
-cp api/sbom.proto beta
-sed -i -E 's/^(package bomsquad\.protobom)/\1\.beta/' beta/sbom.proto
+sed -E 's/^(package bomsquad\.protobom)/\1\.beta/' api/sbom.proto > beta/sbom.proto
 
 $HOME/.local/bin/protoc --proto_path=$HOME/.local/include --proto_path=. \
 	--go_out=pkg --go_opt=M'beta/sbom.proto=sbom/beta;beta' \

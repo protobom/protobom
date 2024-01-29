@@ -20,16 +20,8 @@ go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOC_GO_VER}
 go install github.com/infobloxopen/protoc-gen-gorm@${PROTOC_GORM_VER}
 curl -LO https://raw.githubusercontent.com/infobloxopen/protoc-gen-gorm/${PROTOC_GORM_VER}/proto/options/gorm.proto
 
-$HOME/.local/bin/protoc --proto_path=$HOME/.local/include --proto_path=. --go_out=pkg --gorm_out=pkg --gorm_opt=Mapi/sbom.proto=sbom/beta api/sbom.proto
+$HOME/.local/bin/protoc --proto_path=$HOME/.local/include --proto_path=. --go_out=pkg ./api/sbom.proto
 
-mkdir -p beta
-sed -E 's/^(package bomsquad\.protobom)/\1\.beta/' api/sbom.proto > beta/sbom.proto
-
-$HOME/.local/bin/protoc --proto_path=$HOME/.local/include --proto_path=. \
-	--go_out=pkg --go_opt=M'beta/sbom.proto=sbom/beta;beta' \
-	--gorm_out=pkg --gorm_opt=M'beta/sbom.proto=sbom/beta;beta' \
-	beta/sbom.proto
-
-rm -r beta
+$HOME/.local/bin/protoc --proto_path=$HOME/.local/include --proto_path=. --gorm_out=pkg ./api/sbom.proto
 
 git diff --exit-code -- **/*.pb{,.gorm}.go || exit_with_msg "The protobuf definitions are not up to date. Check the docs and run make proto"

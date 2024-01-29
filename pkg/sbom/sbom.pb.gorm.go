@@ -1,4 +1,4 @@
-package beta
+package sbom
 
 import (
 	context "context"
@@ -13,7 +13,7 @@ import (
 )
 
 type DocumentORM struct {
-	Id       string       `gorm:"primaryKey"`
+	Id       uint32       `gorm:"primaryKey;autoIncrement"`
 	Metadata *MetadataORM `gorm:"foreignKey:DocumentId;references:Id"`
 	NodeList *NodeListORM `gorm:"foreignKey:DocumentId;references:Id"`
 }
@@ -117,7 +117,7 @@ type NodeORM struct {
 	LicenseComments    string
 	LicenseConcluded   string
 	Name               string
-	NodeListId         *string
+	NodeListId         *uint32
 	Originators        []*PersonORM `gorm:"foreignKey:OriginatorsNodeId;references:Id"`
 	ReleaseDate        *time.Time
 	SourceInfo         string
@@ -321,7 +321,7 @@ type MetadataORM struct {
 	Authors       []*PersonORM `gorm:"foreignKey:MetadataId;references:Id"`
 	Comment       string
 	Date          *time.Time
-	DocumentId    *string
+	DocumentId    *uint32
 	DocumentTypes []*DocumentTypeORM `gorm:"foreignKey:MetadataId;references:Id"`
 	Id            string             `gorm:"primaryKey"`
 	Name          string
@@ -472,7 +472,7 @@ type MetadataWithAfterToPB interface {
 
 type EdgeORM struct {
 	From       string `gorm:"uniqueIndex:idx_edge"`
-	NodeListId *string
+	NodeListId *uint32
 	Type       int32 `gorm:"uniqueIndex:idx_edge"`
 }
 
@@ -623,7 +623,7 @@ type ExternalReferenceWithAfterToPB interface {
 type PersonORM struct {
 	Contacts          []*PersonORM `gorm:"foreignKey:Id;references:Id;many2many:person_contacts;joinForeignKey:PersonId;joinReferences:ContactId"`
 	Email             string       `gorm:"uniqueIndex:idx_person"`
-	Id                int32        `gorm:"primaryKey"`
+	Id                uint32       `gorm:"primaryKey;autoIncrement"`
 	IsOrg             bool         `gorm:"uniqueIndex:idx_person"`
 	MetadataId        *string
 	Name              string `gorm:"uniqueIndex:idx_person"`
@@ -726,6 +726,7 @@ type PersonWithAfterToPB interface {
 }
 
 type ToolORM struct {
+	Id         uint32 `gorm:"primaryKey;autoIncrement"`
 	MetadataId *string
 	Name       string `gorm:"uniqueIndex:idx_tool"`
 	Vendor     string `gorm:"uniqueIndex:idx_tool"`
@@ -870,9 +871,9 @@ type DocumentTypeWithAfterToPB interface {
 }
 
 type NodeListORM struct {
-	DocumentId *string
+	DocumentId *uint32
 	Edges      []*EdgeORM `gorm:"foreignKey:NodeListId;references:Id"`
-	Id         string     `gorm:"primaryKey"`
+	Id         uint32     `gorm:"primaryKey;autoIncrement"`
 	Nodes      []*NodeORM `gorm:"foreignKey:NodeListId;references:Id"`
 }
 
@@ -1023,7 +1024,7 @@ func DefaultReadDocument(ctx context.Context, in *Document, db *gorm.DB) (*Docum
 	if err != nil {
 		return nil, err
 	}
-	if ormObj.Id == "" {
+	if ormObj.Id == 0 {
 		return nil, errors.EmptyIdError
 	}
 	if hook, ok := interface{}(&ormObj).(DocumentORMWithBeforeReadApplyQuery); ok {
@@ -1067,7 +1068,7 @@ func DefaultDeleteDocument(ctx context.Context, in *Document, db *gorm.DB) error
 	if err != nil {
 		return err
 	}
-	if ormObj.Id == "" {
+	if ormObj.Id == 0 {
 		return errors.EmptyIdError
 	}
 	if hook, ok := interface{}(&ormObj).(DocumentORMWithBeforeDelete_); ok {
@@ -1097,13 +1098,13 @@ func DefaultDeleteDocumentSet(ctx context.Context, in []*Document, db *gorm.DB) 
 		return errors.NilArgumentError
 	}
 	var err error
-	keys := []string{}
+	keys := []uint32{}
 	for _, obj := range in {
 		ormObj, err := obj.ToORM(ctx)
 		if err != nil {
 			return err
 		}
-		if ormObj.Id == "" {
+		if ormObj.Id == 0 {
 			return errors.EmptyIdError
 		}
 		keys = append(keys, ormObj.Id)
@@ -1147,19 +1148,19 @@ func DefaultStrictUpdateDocument(ctx context.Context, in *Document, db *gorm.DB)
 		}
 	}
 	filterMetadata := MetadataORM{}
-	if ormObj.Id == "" {
+	if ormObj.Id == 0 {
 		return nil, errors.EmptyIdError
 	}
-	filterMetadata.DocumentId = new(string)
+	filterMetadata.DocumentId = new(uint32)
 	*filterMetadata.DocumentId = ormObj.Id
 	if err = db.Where(filterMetadata).Delete(MetadataORM{}).Error; err != nil {
 		return nil, err
 	}
 	filterNodeList := NodeListORM{}
-	if ormObj.Id == "" {
+	if ormObj.Id == 0 {
 		return nil, errors.EmptyIdError
 	}
-	filterNodeList.DocumentId = new(string)
+	filterNodeList.DocumentId = new(uint32)
 	*filterNodeList.DocumentId = ormObj.Id
 	if err = db.Where(filterNodeList).Delete(NodeListORM{}).Error; err != nil {
 		return nil, err
@@ -2649,7 +2650,7 @@ func DefaultDeletePersonSet(ctx context.Context, in []*Person, db *gorm.DB) erro
 		return errors.NilArgumentError
 	}
 	var err error
-	keys := []int32{}
+	keys := []uint32{}
 	for _, obj := range in {
 		ormObj, err := obj.ToORM(ctx)
 		if err != nil {
@@ -2923,6 +2924,236 @@ type ToolORMWithAfterCreate_ interface {
 	AfterCreate_(context.Context, *gorm.DB) error
 }
 
+func DefaultReadTool(ctx context.Context, in *Tool, db *gorm.DB) (*Tool, error) {
+	if in == nil {
+		return nil, errors.NilArgumentError
+	}
+	ormObj, err := in.ToORM(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if ormObj.Id == 0 {
+		return nil, errors.EmptyIdError
+	}
+	if hook, ok := interface{}(&ormObj).(ToolORMWithBeforeReadApplyQuery); ok {
+		if db, err = hook.BeforeReadApplyQuery(ctx, db); err != nil {
+			return nil, err
+		}
+	}
+	if hook, ok := interface{}(&ormObj).(ToolORMWithBeforeReadFind); ok {
+		if db, err = hook.BeforeReadFind(ctx, db); err != nil {
+			return nil, err
+		}
+	}
+	ormResponse := ToolORM{}
+	if err = db.Where(&ormObj).First(&ormResponse).Error; err != nil {
+		return nil, err
+	}
+	if hook, ok := interface{}(&ormResponse).(ToolORMWithAfterReadFind); ok {
+		if err = hook.AfterReadFind(ctx, db); err != nil {
+			return nil, err
+		}
+	}
+	pbResponse, err := ormResponse.ToPB(ctx)
+	return &pbResponse, err
+}
+
+type ToolORMWithBeforeReadApplyQuery interface {
+	BeforeReadApplyQuery(context.Context, *gorm.DB) (*gorm.DB, error)
+}
+type ToolORMWithBeforeReadFind interface {
+	BeforeReadFind(context.Context, *gorm.DB) (*gorm.DB, error)
+}
+type ToolORMWithAfterReadFind interface {
+	AfterReadFind(context.Context, *gorm.DB) error
+}
+
+func DefaultDeleteTool(ctx context.Context, in *Tool, db *gorm.DB) error {
+	if in == nil {
+		return errors.NilArgumentError
+	}
+	ormObj, err := in.ToORM(ctx)
+	if err != nil {
+		return err
+	}
+	if ormObj.Id == 0 {
+		return errors.EmptyIdError
+	}
+	if hook, ok := interface{}(&ormObj).(ToolORMWithBeforeDelete_); ok {
+		if db, err = hook.BeforeDelete_(ctx, db); err != nil {
+			return err
+		}
+	}
+	err = db.Where(&ormObj).Delete(&ToolORM{}).Error
+	if err != nil {
+		return err
+	}
+	if hook, ok := interface{}(&ormObj).(ToolORMWithAfterDelete_); ok {
+		err = hook.AfterDelete_(ctx, db)
+	}
+	return err
+}
+
+type ToolORMWithBeforeDelete_ interface {
+	BeforeDelete_(context.Context, *gorm.DB) (*gorm.DB, error)
+}
+type ToolORMWithAfterDelete_ interface {
+	AfterDelete_(context.Context, *gorm.DB) error
+}
+
+func DefaultDeleteToolSet(ctx context.Context, in []*Tool, db *gorm.DB) error {
+	if in == nil {
+		return errors.NilArgumentError
+	}
+	var err error
+	keys := []uint32{}
+	for _, obj := range in {
+		ormObj, err := obj.ToORM(ctx)
+		if err != nil {
+			return err
+		}
+		if ormObj.Id == 0 {
+			return errors.EmptyIdError
+		}
+		keys = append(keys, ormObj.Id)
+	}
+	if hook, ok := (interface{}(&ToolORM{})).(ToolORMWithBeforeDeleteSet); ok {
+		if db, err = hook.BeforeDeleteSet(ctx, in, db); err != nil {
+			return err
+		}
+	}
+	err = db.Where("id in (?)", keys).Delete(&ToolORM{}).Error
+	if err != nil {
+		return err
+	}
+	if hook, ok := (interface{}(&ToolORM{})).(ToolORMWithAfterDeleteSet); ok {
+		err = hook.AfterDeleteSet(ctx, in, db)
+	}
+	return err
+}
+
+type ToolORMWithBeforeDeleteSet interface {
+	BeforeDeleteSet(context.Context, []*Tool, *gorm.DB) (*gorm.DB, error)
+}
+type ToolORMWithAfterDeleteSet interface {
+	AfterDeleteSet(context.Context, []*Tool, *gorm.DB) error
+}
+
+// DefaultStrictUpdateTool clears / replaces / appends first level 1:many children and then executes a gorm update call
+func DefaultStrictUpdateTool(ctx context.Context, in *Tool, db *gorm.DB) (*Tool, error) {
+	if in == nil {
+		return nil, fmt.Errorf("Nil argument to DefaultStrictUpdateTool")
+	}
+	ormObj, err := in.ToORM(ctx)
+	if err != nil {
+		return nil, err
+	}
+	lockedRow := &ToolORM{}
+	db.Model(&ormObj).Set("gorm:query_option", "FOR UPDATE").Where("id=?", ormObj.Id).First(lockedRow)
+	if hook, ok := interface{}(&ormObj).(ToolORMWithBeforeStrictUpdateCleanup); ok {
+		if db, err = hook.BeforeStrictUpdateCleanup(ctx, db); err != nil {
+			return nil, err
+		}
+	}
+	if hook, ok := interface{}(&ormObj).(ToolORMWithBeforeStrictUpdateSave); ok {
+		if db, err = hook.BeforeStrictUpdateSave(ctx, db); err != nil {
+			return nil, err
+		}
+	}
+	if err = db.Omit().Save(&ormObj).Error; err != nil {
+		return nil, err
+	}
+	if hook, ok := interface{}(&ormObj).(ToolORMWithAfterStrictUpdateSave); ok {
+		if err = hook.AfterStrictUpdateSave(ctx, db); err != nil {
+			return nil, err
+		}
+	}
+	pbResponse, err := ormObj.ToPB(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &pbResponse, err
+}
+
+type ToolORMWithBeforeStrictUpdateCleanup interface {
+	BeforeStrictUpdateCleanup(context.Context, *gorm.DB) (*gorm.DB, error)
+}
+type ToolORMWithBeforeStrictUpdateSave interface {
+	BeforeStrictUpdateSave(context.Context, *gorm.DB) (*gorm.DB, error)
+}
+type ToolORMWithAfterStrictUpdateSave interface {
+	AfterStrictUpdateSave(context.Context, *gorm.DB) error
+}
+
+// DefaultPatchTool executes a basic gorm update call with patch behavior
+func DefaultPatchTool(ctx context.Context, in *Tool, updateMask *field_mask.FieldMask, db *gorm.DB) (*Tool, error) {
+	if in == nil {
+		return nil, errors.NilArgumentError
+	}
+	var pbObj Tool
+	var err error
+	if hook, ok := interface{}(&pbObj).(ToolWithBeforePatchRead); ok {
+		if db, err = hook.BeforePatchRead(ctx, in, updateMask, db); err != nil {
+			return nil, err
+		}
+	}
+	if hook, ok := interface{}(&pbObj).(ToolWithBeforePatchApplyFieldMask); ok {
+		if db, err = hook.BeforePatchApplyFieldMask(ctx, in, updateMask, db); err != nil {
+			return nil, err
+		}
+	}
+	if _, err := DefaultApplyFieldMaskTool(ctx, &pbObj, in, updateMask, "", db); err != nil {
+		return nil, err
+	}
+	if hook, ok := interface{}(&pbObj).(ToolWithBeforePatchSave); ok {
+		if db, err = hook.BeforePatchSave(ctx, in, updateMask, db); err != nil {
+			return nil, err
+		}
+	}
+	pbResponse, err := DefaultStrictUpdateTool(ctx, &pbObj, db)
+	if err != nil {
+		return nil, err
+	}
+	if hook, ok := interface{}(pbResponse).(ToolWithAfterPatchSave); ok {
+		if err = hook.AfterPatchSave(ctx, in, updateMask, db); err != nil {
+			return nil, err
+		}
+	}
+	return pbResponse, nil
+}
+
+type ToolWithBeforePatchRead interface {
+	BeforePatchRead(context.Context, *Tool, *field_mask.FieldMask, *gorm.DB) (*gorm.DB, error)
+}
+type ToolWithBeforePatchApplyFieldMask interface {
+	BeforePatchApplyFieldMask(context.Context, *Tool, *field_mask.FieldMask, *gorm.DB) (*gorm.DB, error)
+}
+type ToolWithBeforePatchSave interface {
+	BeforePatchSave(context.Context, *Tool, *field_mask.FieldMask, *gorm.DB) (*gorm.DB, error)
+}
+type ToolWithAfterPatchSave interface {
+	AfterPatchSave(context.Context, *Tool, *field_mask.FieldMask, *gorm.DB) error
+}
+
+// DefaultPatchSetTool executes a bulk gorm update call with patch behavior
+func DefaultPatchSetTool(ctx context.Context, objects []*Tool, updateMasks []*field_mask.FieldMask, db *gorm.DB) ([]*Tool, error) {
+	if len(objects) != len(updateMasks) {
+		return nil, fmt.Errorf(errors.BadRepeatedFieldMaskTpl, len(updateMasks), len(objects))
+	}
+
+	results := make([]*Tool, 0, len(objects))
+	for i, patcher := range objects {
+		pbResponse, err := DefaultPatchTool(ctx, patcher, updateMasks[i], db)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, pbResponse)
+	}
+
+	return results, nil
+}
+
 // DefaultApplyFieldMaskTool patches an pbObject with patcher according to a field mask.
 func DefaultApplyFieldMaskTool(ctx context.Context, patchee *Tool, patcher *Tool, updateMask *field_mask.FieldMask, prefix string, db *gorm.DB) (*Tool, error) {
 	if patcher == nil {
@@ -2969,6 +3200,7 @@ func DefaultListTool(ctx context.Context, db *gorm.DB) ([]*Tool, error) {
 		}
 	}
 	db = db.Where(&ormObj)
+	db = db.Order("id")
 	ormResponse := []ToolORM{}
 	if err := db.Find(&ormResponse).Error; err != nil {
 		return nil, err
@@ -3149,7 +3381,7 @@ func DefaultReadNodeList(ctx context.Context, in *NodeList, db *gorm.DB) (*NodeL
 	if err != nil {
 		return nil, err
 	}
-	if ormObj.Id == "" {
+	if ormObj.Id == 0 {
 		return nil, errors.EmptyIdError
 	}
 	if hook, ok := interface{}(&ormObj).(NodeListORMWithBeforeReadApplyQuery); ok {
@@ -3193,7 +3425,7 @@ func DefaultDeleteNodeList(ctx context.Context, in *NodeList, db *gorm.DB) error
 	if err != nil {
 		return err
 	}
-	if ormObj.Id == "" {
+	if ormObj.Id == 0 {
 		return errors.EmptyIdError
 	}
 	if hook, ok := interface{}(&ormObj).(NodeListORMWithBeforeDelete_); ok {
@@ -3223,13 +3455,13 @@ func DefaultDeleteNodeListSet(ctx context.Context, in []*NodeList, db *gorm.DB) 
 		return errors.NilArgumentError
 	}
 	var err error
-	keys := []string{}
+	keys := []uint32{}
 	for _, obj := range in {
 		ormObj, err := obj.ToORM(ctx)
 		if err != nil {
 			return err
 		}
-		if ormObj.Id == "" {
+		if ormObj.Id == 0 {
 			return errors.EmptyIdError
 		}
 		keys = append(keys, ormObj.Id)
@@ -3273,19 +3505,19 @@ func DefaultStrictUpdateNodeList(ctx context.Context, in *NodeList, db *gorm.DB)
 		}
 	}
 	filterEdges := EdgeORM{}
-	if ormObj.Id == "" {
+	if ormObj.Id == 0 {
 		return nil, errors.EmptyIdError
 	}
-	filterEdges.NodeListId = new(string)
+	filterEdges.NodeListId = new(uint32)
 	*filterEdges.NodeListId = ormObj.Id
 	if err = db.Where(filterEdges).Delete(EdgeORM{}).Error; err != nil {
 		return nil, err
 	}
 	filterNodes := NodeORM{}
-	if ormObj.Id == "" {
+	if ormObj.Id == 0 {
 		return nil, errors.EmptyIdError
 	}
-	filterNodes.NodeListId = new(string)
+	filterNodes.NodeListId = new(uint32)
 	*filterNodes.NodeListId = ormObj.Id
 	if err = db.Where(filterNodes).Delete(NodeORM{}).Error; err != nil {
 		return nil, err

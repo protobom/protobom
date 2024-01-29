@@ -10,10 +10,13 @@ package bomsquad.protobom;
 // It serves as the core neutral ground for the SBOM translation process, encapsulating metadata,
 // components (nodes), and the graph structure (edges).
 message Document {
-    option (gorm.opts) = {ormable: true, include: [{name: "id", type: "string", tag: {primary_key: true}}]};
+    option (gorm.opts) = {
+        ormable: true,
+        include: [{type: "uint32", name: "id", tag: {primary_key: true, auto_increment: true}}]
+    };
 
-    Metadata metadata = 1;  // Metadata associated with the SBOM document
-    NodeList node_list = 2; // List of nodes and edges forming the SBOM graph
+    Metadata metadata = 1 [(gorm.field).has_one = {}];  // Metadata associated with the SBOM document
+    NodeList node_list = 2 [(gorm.field).has_one = {}]; // List of nodes and edges forming the SBOM graph
 }
 
 // Node represents a central element within the Software Bill of Materials (SBOM) graph,
@@ -246,7 +249,10 @@ message ExternalReference {
 // Person represents an individual or organization involved in the creation or maintenance
 // of the document or node.
 message Person {
-    option (gorm.opts) = {ormable: true, include: [{name: "id", type: "int32", tag: {primary_key: true}}]};
+    option (gorm.opts) = {
+        ormable: true,
+        include: [{type: "uint32", name: "id", tag: {primary_key: true, auto_increment: true}}]
+    };
 
     string name = 1 [(gorm.field).tag = {unique_index: "idx_person"}]; // Name of the person or organization.
     bool is_org = 2 [(gorm.field).tag = {unique_index: "idx_person"}]; // Indicates whether the entity is an organization (true) or an individual (false).
@@ -259,7 +265,10 @@ message Person {
 
 // Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.
 message Tool {
-    option (gorm.opts).ormable = true;
+    option (gorm.opts) = {
+        ormable: true,
+        include: [{type: "uint32", name: "id", tag: {primary_key: true, auto_increment: true}}]
+    };
 
     string name = 1 [(gorm.field).tag = {unique_index: "idx_tool"}]; // Name of the software tool.
     string version = 2 [(gorm.field).tag = {unique_index: "idx_tool"}]; // Version of the software tool.
@@ -294,7 +303,7 @@ message DocumentType {
 message NodeList {
     option (gorm.opts) = {
         ormable: true,
-        include: [{name: "id", type: "string", tag: {primary_key: true}}]
+        include: [{type: "uint32", name: "id", tag: {primary_key: true, auto_increment: true}}]
     };
 
     repeated Node nodes = 1; // List of software components (nodes) in the SBOM graph.

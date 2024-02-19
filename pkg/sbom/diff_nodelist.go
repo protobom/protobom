@@ -32,7 +32,7 @@ type NodeListRootElementDiff struct {
 }
 
 // Diff analyses a NodeList and returns a NodeList populated with all fields
-// that are different in nl2 from nl. If no changes are found, Diff returns nil
+// that are different in nl2 from nl.
 func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 	return NodeListDiff{
 		NodesDiff:         nl.diffNodes(nl2),

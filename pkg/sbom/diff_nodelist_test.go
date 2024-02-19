@@ -101,24 +101,9 @@ func TestNodeListDiff(t *testing.T) {
 				require.Nil(t, result)
 				return
 			}
-			v, e := json.MarshalIndent(result, "", " ")
-			t.Log(string(v), e)
-			require.NotNil(t, result)
 
-			for i, add := range tc.expected.NodesDiff.Added {
-				require.GreaterOrEqual(t, len(result.NodesDiff.Added), i+1, "expected node added but not found %s", add.flatString())
-				require.Equal(t, result.NodesDiff.Added[i].flatString(), add.flatString())
-			}
-			for i, rem := range tc.expected.NodesDiff.Removed {
-				require.GreaterOrEqual(t, len(result.NodesDiff.Removed), i+1, "expected node removed but not found %s", rem.flatString())
-				require.Equal(t, result.NodesDiff.Removed[i].flatString(), rem.flatString())
-			}
-			for i, diff := range tc.expected.NodesDiff.NodeDiff {
-				require.GreaterOrEqual(t, len(result.NodesDiff.NodeDiff), i+1, "expected node diff but not found")
-				require.Truef(t, result.NodesDiff.NodeDiff[i].Added.Equal(diff.Added), "comparing node diff added: %s %s", diff.Added.flatString(), result.NodesDiff.NodeDiff[i].Added)
-				require.Truef(t, result.NodesDiff.NodeDiff[i].Removed.Equal(diff.Removed), "comparing  node diff removed: %s %s", diff.Removed.flatString(), result.NodesDiff.NodeDiff[i].Removed)
-				require.Equal(t, result.NodesDiff.NodeDiff[i].DiffCount, diff.DiffCount)
-			}
+			require.NotNil(t, result)
+			compareNodeListDiff(t, tc.expected.NodesDiff, result.NodesDiff)
 		})
 	}
 }
@@ -207,14 +192,225 @@ func TestNodeListDiffEdge(t *testing.T) {
 			t.Log(string(v), e)
 			require.NotNil(t, result)
 
-			for i, add := range tc.expected.EdgesDiff.Added {
-				require.GreaterOrEqual(t, len(result.EdgesDiff.Added), i+1, "expected edge added but not found %s", add.flatString())
-				require.Equal(t, result.EdgesDiff.Added[i].flatString(), add.flatString())
-			}
-			for i, rem := range tc.expected.EdgesDiff.Removed {
-				require.GreaterOrEqual(t, len(result.EdgesDiff.Removed), i+1, "expected edge removed but not found %s", rem.flatString())
-				require.Equal(t, result.EdgesDiff.Removed[i].flatString(), rem.flatString())
-			}
+			compareEdgesDiff(t, tc.expected.EdgesDiff, result.EdgesDiff)
 		})
+	}
+}
+
+func TestNodeListDiffRootElements(t *testing.T) {
+	testNodeList := NodeList{
+		RootElements: []string{"root1", "root2", "root3"},
+	}
+
+	for _, tc := range []struct {
+		name     string
+		prepare  func(*NodeList, *NodeList)
+		sut      *NodeList
+		node     *NodeList
+		expected *NodeListDiff
+	}{
+		{
+			name: "add root element",
+			prepare: func(sutNodeList *NodeList, newNodeList *NodeList) {
+				newNodeList.RootElements = append(newNodeList.RootElements, "added")
+			},
+			sut: &NodeList{},
+			node: &NodeList{
+				RootElements: []string{"root1", "root2", "root3"},
+			},
+			expected: &NodeListDiff{
+				RootElmementsDiff: RootElementDiff{
+					Added: []string{"added"},
+				},
+			},
+		},
+		{
+			name: "remove root element",
+			prepare: func(sutNodeList *NodeList, newNodeList *NodeList) {
+				tmpRoots := []string{}
+				for i, root := range newNodeList.RootElements {
+					if i > 0 {
+						tmpRoots = append(tmpRoots, root)
+					}
+				}
+				newNodeList.RootElements = tmpRoots
+			},
+			sut: &NodeList{},
+			node: &NodeList{
+				RootElements: []string{"root1", "root2", "root3"},
+			},
+			expected: &NodeListDiff{
+				RootElmementsDiff: RootElementDiff{
+					Removed: []string{"root1"},
+				},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.sut = testNodeList.Copy()
+			tc.node = testNodeList.Copy()
+			tc.prepare(tc.sut, tc.node)
+			result := tc.sut.Diff(tc.node)
+			require.NotNil(t, result)
+
+			compareRootElementDiff(t, tc.expected.RootElmementsDiff, result.RootElmementsDiff)
+		})
+	}
+}
+
+func TestFullNodeListDiff(t *testing.T) {
+	testNodeList := NodeList{
+		Nodes: []*Node{
+			{Id: "node1", Name: "Node 1"},
+			{Id: "node2", Name: "Node 2"},
+			{Id: "node3", Name: "Node 3"},
+		},
+		Edges: []*Edge{
+			{From: "node1", Type: Edge_contains, To: []string{"node2"}},
+			{From: "node2", Type: Edge_dependsOn, To: []string{"node3"}},
+		},
+		RootElements: []string{"node1", "node2"},
+	}
+
+	for _, tc := range []struct {
+		name     string
+		prepare  func(*NodeList, *NodeList)
+		sut      *NodeList
+		node     *NodeList
+		expected *NodeListDiff
+	}{
+		{
+			name: "add node, edge, and root element",
+			prepare: func(sutNodeList, newNodeList *NodeList) {
+				newNodeList.Nodes = append(newNodeList.Nodes, &Node{Id: "node4", Name: "Node 4"})
+				newNodeList.Edges = append(newNodeList.Edges, &Edge{From: "node3", Type: Edge_contains, To: []string{"node4"}})
+				newNodeList.RootElements = append(newNodeList.RootElements, "node3")
+			},
+			sut: testNodeList.Copy(),
+			node: &NodeList{
+				Nodes:        []*Node{{Id: "node1", Name: "Node 1"}, {Id: "node2", Name: "Node 2"}, {Id: "node3", Name: "Node 3"}},
+				Edges:        []*Edge{{From: "node1", Type: Edge_contains, To: []string{"node2"}}, {From: "node2", Type: Edge_dependsOn, To: []string{"node3"}}},
+				RootElements: []string{"node1", "node2"},
+			},
+			expected: &NodeListDiff{
+				NodesDiff: NodeListDiffNodes{
+					Added: []*Node{{Id: "node4", Name: "Node 4"}},
+				},
+				EdgesDiff: NodeListDiffEdges{
+					Added: []*Edge{{From: "node3", Type: Edge_contains, To: []string{"node4"}}},
+				},
+				RootElmementsDiff: RootElementDiff{
+					Added: []string{"node3"},
+				},
+			},
+		},
+		{
+			name: "remove node, edge, and root element",
+			prepare: func(sutNodeList, newNodeList *NodeList) {
+			},
+			sut: testNodeList.Copy(),
+			node: &NodeList{
+				Nodes:        []*Node{{Id: "node1", Name: "Node 1"}},
+				Edges:        []*Edge{{From: "node1", Type: Edge_contains, To: []string{"node2"}}},
+				RootElements: []string{"node1"},
+			},
+			expected: &NodeListDiff{
+				NodesDiff: NodeListDiffNodes{
+					Removed: []*Node{{Id: "node2", Name: "Node 2"}, {Id: "node3", Name: "Node 3"}},
+				},
+				EdgesDiff: NodeListDiffEdges{
+					Removed: []*Edge{{From: "node2", Type: Edge_dependsOn, To: []string{"node3"}}},
+				},
+				RootElmementsDiff: RootElementDiff{
+					Removed: []string{"node2"},
+				},
+			},
+		},
+		{
+			name: "modify node,edge and root element",
+			prepare: func(sutNodeList, newNodeList *NodeList) {
+
+			},
+			sut: testNodeList.Copy(),
+			node: &NodeList{
+				Nodes:        []*Node{{Id: "node1", Name: "Modified Node 1"}, {Id: "node2", Name: "Node 2"}, {Id: "node3", Name: "Node 3"}},
+				Edges:        []*Edge{{From: "node1", Type: Edge_dependsOn, To: []string{"node2"}}, {From: "node2", Type: Edge_dependsOn, To: []string{"node3"}}},
+				RootElements: []string{"node3"},
+			},
+			expected: &NodeListDiff{
+				NodesDiff: NodeListDiffNodes{
+					NodeDiff: []*NodeDiff{
+						{
+							Removed:   &Node{},
+							Added:     &Node{Name: "Modified Node 1"},
+							DiffCount: 1,
+						},
+					},
+				},
+				EdgesDiff: NodeListDiffEdges{
+					Added: []*Edge{{From: "node1", Type: Edge_dependsOn, To: []string{"node2"}}},
+				},
+				RootElmementsDiff: RootElementDiff{
+					Added:   []string{"node3"},
+					Removed: []string{"node1", "node2"},
+				},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.prepare(tc.sut, tc.node)
+			result := tc.sut.Diff(tc.node)
+			if tc.expected == nil {
+				require.Nil(t, result)
+				return
+			}
+
+			v, e := json.MarshalIndent(result, "", " ")
+			t.Log(string(v), e)
+			require.NotNil(t, result)
+			compareDiff(t, *tc.expected, result)
+		})
+	}
+}
+
+func compareDiff(t *testing.T, expected, actual NodeListDiff) {
+	compareNodeListDiff(t, expected.NodesDiff, actual.NodesDiff)
+	compareEdgesDiff(t, expected.EdgesDiff, actual.EdgesDiff)
+	compareRootElementDiff(t, expected.RootElmementsDiff, actual.RootElmementsDiff)
+}
+
+func compareEdgesDiff(t *testing.T, expected, actual NodeListDiffEdges) {
+	compareEdgesDiffSlice(t, expected.Added, actual.Added, "added")
+	compareEdgesDiffSlice(t, expected.Removed, actual.Removed, "removed")
+}
+
+func compareEdgesDiffSlice(t *testing.T, expected, actual []*Edge, action string) {
+	for i, edge := range expected {
+		require.GreaterOrEqual(t, len(actual), i+1, "expected edge %s but not found %s", action, edge.flatString())
+		require.Equal(t, edge.flatString(), actual[i].flatString(), "edge mismatch for %s", action)
+	}
+}
+
+func compareRootElementDiff(t *testing.T, expected, actual RootElementDiff) {
+	require.ElementsMatch(t, expected.Added, actual.Added, "expected root elements added but not found")
+	require.ElementsMatch(t, expected.Removed, actual.Removed, "expected root elements removed but not found")
+}
+
+func compareNodeListDiff(t *testing.T, expected, actual NodeListDiffNodes) {
+	for i, add := range expected.Added {
+		require.GreaterOrEqual(t, len(actual.Added), i+1, "expected node added but not found %s", add.flatString())
+		require.Equal(t, actual.Added[i].flatString(), add.flatString())
+	}
+
+	for i, rem := range expected.Removed {
+		require.GreaterOrEqual(t, len(actual.Removed), i+1, "expected node removed but not found %s", rem.flatString())
+		require.Equal(t, actual.Removed[i].flatString(), rem.flatString(), "node missmatch")
+	}
+
+	for i, diff := range expected.NodeDiff {
+		require.GreaterOrEqual(t, len(actual.NodeDiff), i+1, "expected node diff but not found")
+		require.Truef(t, actual.NodeDiff[i].Added.Equal(diff.Added), "comparing node diff added: %s %s", diff.Added.flatString(), actual.NodeDiff[i].Added)
+		require.Truef(t, actual.NodeDiff[i].Removed.Equal(diff.Removed), "comparing  node diff removed: %s %s", diff.Removed.flatString(), actual.NodeDiff[i].Removed)
+		require.Equal(t, actual.NodeDiff[i].DiffCount, diff.DiffCount)
 	}
 }

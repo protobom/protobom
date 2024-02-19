@@ -7,30 +7,70 @@ import (
 
 // NodeListDiff represents the difference between two lists NodeLists.
 type NodeListDiff struct {
-	NodesDiff NodeListDiffNodes
-	EdgesDiff NodeListDiffEdges
+	NodesDiff         NodeListDiffNodes
+	EdgesDiff         NodeListDiffEdges
+	RootElmementsDiff RootElementDiff
 }
 
-// NodeListDiffNodes represents the differences between two Node lists.
+// NodeListDiffNodes represents the differences between two NodeList nodes.
 type NodeListDiffNodes struct {
 	Added    []*Node
 	Removed  []*Node
 	NodeDiff []*NodeDiff
 }
 
-// NodeListDiffEdges represents the differences between two Edge lists.
+// NodeListDiffEdges represents the differences between two NodeList edges.
 type NodeListDiffEdges struct {
 	Added   []*Edge
 	Removed []*Edge
+}
+
+// NodeListDiffNodes represents the differences between two NodeLists root elements.
+type RootElementDiff struct {
+	Added   []string
+	Removed []string
 }
 
 // Diff analyses a NodeList and returns a NodeList populated with all fields
 // that are different in nl2 from nl. If no changes are found, Diff returns nil
 func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 	return NodeListDiff{
-		NodesDiff: nl.diffNodes(nl2),
-		EdgesDiff: nl.diffEdges(nl2),
+		NodesDiff:         nl.diffNodes(nl2),
+		EdgesDiff:         nl.diffEdges(nl2),
+		RootElmementsDiff: nl.diffRootElements(nl2),
 	}
+}
+
+// diffRootElements computes the differences in root elements between two NodeLists.
+func (nl *NodeList) diffRootElements(nl2 *NodeList) RootElementDiff {
+	diff := RootElementDiff{}
+
+	nlRoots := make(map[string]struct{}) // map to store root elements of nl
+	for _, root := range nl.RootElements {
+		nlRoots[root] = struct{}{}
+	}
+
+	nl2Roots := make(map[string]struct{}) // map to store root elements of nl2
+	for _, root := range nl2.RootElements {
+		nl2Roots[root] = struct{}{}
+	}
+
+	// Compare root elements and populate the diff
+	for root := range nlRoots {
+		if _, exists := nl2Roots[root]; !exists {
+			diff.Removed = append(diff.Removed, root)
+		}
+	}
+	for root := range nl2Roots {
+		if _, exists := nlRoots[root]; !exists {
+			diff.Added = append(diff.Added, root)
+		}
+	}
+
+	sort.Strings(diff.Added)
+	sort.Strings(diff.Removed)
+
+	return diff
 }
 
 func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
@@ -81,8 +121,10 @@ func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 		return strings.Compare(diff.Added[i].Id, diff.Added[j].Id) <= 0
 	})
 	sort.Slice(diff.Removed, func(i, j int) bool {
-		return strings.Compare(diff.Removed[i].Id, diff.Added[j].Id) <= 0
+		return strings.Compare(diff.Removed[i].Id, diff.Removed[j].Id) <= 0
+
 	})
+
 	sort.Slice(diff.NodeDiff, func(i, j int) bool {
 		return strings.Compare(diff.NodeDiff[i].Added.flatString(), diff.NodeDiff[j].Added.flatString()) <= 0
 	})

@@ -329,7 +329,6 @@ func TestFullNodeListDiff(t *testing.T) {
 		{
 			name: "modify node,edge and root element",
 			prepare: func(sutNodeList, newNodeList *NodeList) {
-
 			},
 			sut: testNodeList.Copy(),
 			node: &NodeList{

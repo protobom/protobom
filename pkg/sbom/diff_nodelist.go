@@ -122,7 +122,6 @@ func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 	})
 	sort.Slice(diff.Removed, func(i, j int) bool {
 		return strings.Compare(diff.Removed[i].Id, diff.Removed[j].Id) <= 0
-
 	})
 
 	sort.Slice(diff.NodeDiff, func(i, j int) bool {

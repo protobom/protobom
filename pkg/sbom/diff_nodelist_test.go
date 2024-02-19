@@ -368,12 +368,12 @@ func TestFullNodeListDiff(t *testing.T) {
 			v, e := json.MarshalIndent(result, "", " ")
 			t.Log(string(v), e)
 			require.NotNil(t, result)
-			compareDiff(t, *tc.expected, result)
+			compareDiff(t, tc.expected, &result)
 		})
 	}
 }
 
-func compareDiff(t *testing.T, expected, actual NodeListDiff) {
+func compareDiff(t *testing.T, expected, actual *NodeListDiff) {
 	compareNodeListDiff(t, expected.NodesDiff, actual.NodesDiff)
 	compareEdgesDiff(t, expected.EdgesDiff, actual.EdgesDiff)
 	compareRootElementDiff(t, expected.RootElmementsDiff, actual.RootElmementsDiff)

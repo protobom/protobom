@@ -216,7 +216,7 @@ func TestNodeListDiffRootElements(t *testing.T) {
 				RootElements: []string{"root1", "root2", "root3"},
 			},
 			expected: &NodeListDiff{
-				RootElmementsDiff: RootElementDiff{
+				RootElmementsDiff: NodeListRootElementDiff{
 					Added: []string{"added"},
 				},
 			},
@@ -237,7 +237,7 @@ func TestNodeListDiffRootElements(t *testing.T) {
 				RootElements: []string{"root1", "root2", "root3"},
 			},
 			expected: &NodeListDiff{
-				RootElmementsDiff: RootElementDiff{
+				RootElmementsDiff: NodeListRootElementDiff{
 					Removed: []string{"root1"},
 				},
 			},
@@ -250,7 +250,7 @@ func TestNodeListDiffRootElements(t *testing.T) {
 			result := tc.sut.Diff(tc.node)
 			require.NotNil(t, result)
 
-			compareRootElementDiff(t, tc.expected.RootElmementsDiff, result.RootElmementsDiff)
+			compareNodeListRootElementDiff(t, tc.expected.RootElmementsDiff, result.RootElmementsDiff)
 		})
 	}
 }
@@ -296,7 +296,7 @@ func TestFullNodeListDiff(t *testing.T) {
 				EdgesDiff: NodeListDiffEdges{
 					Added: []*Edge{{From: "node3", Type: Edge_contains, To: []string{"node4"}}},
 				},
-				RootElmementsDiff: RootElementDiff{
+				RootElmementsDiff: NodeListRootElementDiff{
 					Added: []string{"node3"},
 				},
 			},
@@ -318,7 +318,7 @@ func TestFullNodeListDiff(t *testing.T) {
 				EdgesDiff: NodeListDiffEdges{
 					Removed: []*Edge{{From: "node2", Type: Edge_dependsOn, To: []string{"node3"}}},
 				},
-				RootElmementsDiff: RootElementDiff{
+				RootElmementsDiff: NodeListRootElementDiff{
 					Removed: []string{"node2"},
 				},
 			},
@@ -346,7 +346,7 @@ func TestFullNodeListDiff(t *testing.T) {
 				EdgesDiff: NodeListDiffEdges{
 					Added: []*Edge{{From: "node1", Type: Edge_dependsOn, To: []string{"node2"}}},
 				},
-				RootElmementsDiff: RootElementDiff{
+				RootElmementsDiff: NodeListRootElementDiff{
 					Added:   []string{"node3"},
 					Removed: []string{"node1", "node2"},
 				},
@@ -369,7 +369,7 @@ func TestFullNodeListDiff(t *testing.T) {
 func compareDiff(t *testing.T, expected, actual *NodeListDiff) {
 	compareNodeListDiff(t, expected.NodesDiff, actual.NodesDiff)
 	compareEdgesDiff(t, expected.EdgesDiff, actual.EdgesDiff)
-	compareRootElementDiff(t, expected.RootElmementsDiff, actual.RootElmementsDiff)
+	compareNodeListRootElementDiff(t, expected.RootElmementsDiff, actual.RootElmementsDiff)
 }
 
 func compareEdgesDiff(t *testing.T, expected, actual NodeListDiffEdges) {
@@ -384,7 +384,7 @@ func compareEdgesDiffSlice(t *testing.T, expected, actual []*Edge, action string
 	}
 }
 
-func compareRootElementDiff(t *testing.T, expected, actual RootElementDiff) {
+func compareNodeListRootElementDiff(t *testing.T, expected, actual NodeListRootElementDiff) {
 	require.ElementsMatch(t, expected.Added, actual.Added, "expected root elements added but not found")
 	require.ElementsMatch(t, expected.Removed, actual.Removed, "expected root elements removed but not found")
 }

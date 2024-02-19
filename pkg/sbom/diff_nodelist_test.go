@@ -1,7 +1,6 @@
 package sbom
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -188,8 +187,6 @@ func TestNodeListDiffEdge(t *testing.T) {
 				require.Nil(t, result)
 				return
 			}
-			v, e := json.MarshalIndent(result, "", " ")
-			t.Log(string(v), e)
 			require.NotNil(t, result)
 
 			compareEdgesDiff(t, tc.expected.EdgesDiff, result.EdgesDiff)
@@ -363,9 +360,6 @@ func TestFullNodeListDiff(t *testing.T) {
 				require.Nil(t, result)
 				return
 			}
-
-			v, e := json.MarshalIndent(result, "", " ")
-			t.Log(string(v), e)
 			require.NotNil(t, result)
 			compareDiff(t, tc.expected, &result)
 		})

@@ -151,7 +151,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 }
 
 func (s *CDX) roots(ctx context.Context, bom *sbom.Document) ([]cdx.Component, error) {
-	var rootsComp []cdx.Component
+	rootsComp := make([]cdx.Component, len(bom.NodeList.GetRootElements()))
 
 	// First, assign the top level nodes
 	state, err := getCDXState(ctx)

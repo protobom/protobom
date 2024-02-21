@@ -471,7 +471,7 @@ func Example_writerSelectRootByID() {
 }
 
 // Demonstrates adding a virtual node when selecting roots for serialization.
-func Example_writerWithSelectVritualRoot() {
+func Example_writerWithSelectVirtualRoot() {
 	virtualNode := &sbom.Node{
 		Id:               "pkg:generic/my-software@v1.0.0",
 		PrimaryPurpose:   []sbom.Purpose{sbom.Purpose_APPLICATION},

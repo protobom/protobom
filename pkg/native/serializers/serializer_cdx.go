@@ -75,15 +75,16 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 		return nil, fmt.Errorf("unable to build cyclonedx document, no root nodes found")
 	}
 
-	rootComps, err := s.roots(ctx, bom)
+	selectedRoots, err := selectRootsCdx(ctx, bom)
+	if err != nil {
+		return nil, err
+	}
+	bom.NodeList.RootElements = selectedRoots
+	root, err := s.root(ctx, bom)
 	if err != nil {
 		return nil, err
 	}
 
-	root, rootComp, rootDep, err := s.selectRoot(ctx, rootComps)
-	if err != nil {
-		return nil, err
-	}
 	doc.Metadata.Component = root
 
 	if err := s.componentsMaps(ctx, bom); err != nil {
@@ -139,60 +140,46 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	if err != nil {
 		return nil, err
 	}
-	deps = append(deps, rootDep...)
 	doc.Dependencies = &deps
 
 	components := state.components()
-	components = append(components, rootComp...)
 	clearAutoRefs(&components)
 	doc.Components = &components
 
 	return doc, nil
 }
 
-func (s *CDX) roots(ctx context.Context, bom *sbom.Document) ([]cdx.Component, error) {
-	rootsComp := make([]cdx.Component, len(bom.NodeList.GetRootElements()))
-
-	// First, assign the top level nodes
-	state, err := getCDXState(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("reading state: %w", err)
+func selectRootsCdx(ctx context.Context, bom *sbom.Document) ([]string, error) {
+	var selectedRoots []string
+	roots := bom.NodeList.GetRootElements()
+	switch len(roots) {
+	case 0:
+		return selectedRoots, fmt.Errorf("no root provided")
+	case 1:
+		selectedRoots = append(selectedRoots, roots[0])
+	default:
+		// Leave root empty will push all roots as components.
 	}
 
-	for _, id := range bom.NodeList.GetRootElements() {
-		// Search for the node and add it
+	return selectedRoots, nil
+}
+
+func (s *CDX) root(ctx context.Context, bom *sbom.Document) (*cdx.Component, error) {
+	if len(bom.NodeList.GetRootElements()) > 1 {
+		return nil, fmt.Errorf("CDX can only include a single root")
+	}
+
+	if len(bom.NodeList.GetRootElements()) > 0 {
+		id := bom.NodeList.GetRootElements()[0]
 		rootNode := bom.NodeList.GetNodeByID(id)
 		if rootNode == nil {
 			return nil, fmt.Errorf("integrity error: root node %q not found", bom.NodeList.RootElements[0])
 		}
-		rootsComp = append(rootsComp, *s.nodeToComponent(rootNode))
-		state.addedDict[id] = struct{}{}
-
+		rootsComp := s.nodeToComponent(rootNode)
+		return rootsComp, nil
+	} else {
+		return &emptyRoot, nil
 	}
-
-	return rootsComp, nil
-}
-
-func (s *CDX) selectRoot(ctx context.Context, rootsComp []cdx.Component) (*cdx.Component, []cdx.Component, []cdx.Dependency, error) {
-	var root *cdx.Component
-	var dependencies []cdx.Dependency
-	var metadataComponents, components []cdx.Component
-	// If only one root return it
-	switch len(rootsComp) {
-	case 0:
-		return root, components, dependencies, fmt.Errorf("no root provided")
-	case 1:
-		root = &rootsComp[0]
-	default:
-		components = append(components, rootsComp...)
-		root = &emptyRoot
-	}
-
-	if len(metadataComponents) > 0 {
-		root.Components = &metadataComponents
-	}
-
-	return root, components, dependencies, nil
 }
 
 // sbomTypeToPhase converts a SBOM document type to a CDX lifecycle phase
@@ -250,9 +237,9 @@ func (s *CDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
 			// Error? Warn?
 			continue
 		}
-
 		state.componentsDict[comp.BOMRef] = comp
 	}
+
 	return nil
 }
 

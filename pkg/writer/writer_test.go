@@ -2,6 +2,7 @@ package writer_test
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -438,4 +439,65 @@ func TestSerializerRegistry(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Demonstrates customizing the selection process for CDX where only one root component is allowed.
+// In this example, selection is done by ID.
+func Example_writerSelectRootByID() {
+	selectRootID := "my_root"
+
+	// Define serialization options with a custom root selection function
+	serializerOptions := native.SerializeOptions{
+		SelectRoots: func(ctx context.Context, bom *sbom.Document) ([]string, error) {
+			// If there's only one root element, return it
+			if len(bom.NodeList.GetRootElements()) == 1 {
+				return bom.NodeList.GetRootElements(), nil
+			}
+
+			// Otherwise, iterate through root elements to find the one with the specified ID
+			for _, root := range bom.NodeList.GetRootElements() {
+				if root == selectRootID {
+					return []string{root}, nil
+				}
+			}
+			return []string{}, nil
+		},
+	}
+
+	// Create a new writer with the customized serialization options
+	writer.New(
+		writer.WithSerializeOptions(&serializerOptions),
+	)
+}
+
+// Demonstrates adding a virtual node when selecting roots for serialization.
+func Example_writerWithSelectVritualRoot() {
+	virtualNode := &sbom.Node{
+		Id:               "pkg:generic/my-software@v1.0.0",
+		PrimaryPurpose:   []sbom.Purpose{sbom.Purpose_APPLICATION},
+		Name:             "My Software Name",
+		Version:          "v1.0.0",
+		Licenses:         []string{"Apache-2.0"},
+		LicenseConcluded: "Apache-2.0",
+		LicenseComments:  "Apache License",
+	}
+
+	// Define serialization options with a custom root selection function
+	serializerOptions := native.SerializeOptions{
+		SelectRoots: func(ctx context.Context, bom *sbom.Document) ([]string, error) {
+			// If there's only one root element, return it
+			if len(bom.NodeList.GetRootElements()) == 1 {
+				return bom.NodeList.GetRootElements(), nil
+			}
+
+			// Otherwise, add the virtual node and return its ID
+			bom.NodeList.AddNode(virtualNode)
+			return []string{virtualNode.Id}, nil
+		},
+	}
+
+	// Create a new writer with the customized serialization options
+	writer.New(
+		writer.WithSerializeOptions(&serializerOptions),
+	)
 }

@@ -40,7 +40,7 @@ func NewCDX(version, encoding string) *CDX {
 	}
 }
 
-func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interface{}) (interface{}, error) {
+func (s *CDX) Serialize(bom *sbom.Document, options *native.SerializeOptions, _ interface{}) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
@@ -75,7 +75,12 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 		return nil, fmt.Errorf("unable to build cyclonedx document, no root nodes found")
 	}
 
-	selectedRoots, err := selectRootsCdx(ctx, bom)
+	var selectedRoots []string
+	if options.SelectRoots != nil {
+		selectedRoots, err = options.SelectRoots(ctx, bom)
+	} else {
+		selectedRoots, err = selectRootsCdx(ctx, bom)
+	}
 	if err != nil {
 		return nil, err
 	}

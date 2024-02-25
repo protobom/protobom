@@ -1,6 +1,7 @@
 package sbom
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -10,6 +11,40 @@ type NodeListDiff struct {
 	NodesDiff         NodeListDiffNodes
 	EdgesDiff         NodeListDiffEdges
 	RootElmementsDiff NodeListRootElementDiff
+}
+
+func (nlDiff *NodeListDiff) AddedNodeList() *NodeList {
+	var addedNodeList NodeList
+	for _, addedNode := range nlDiff.NodesDiff.Added {
+		addedNodeList.AddNode(addedNode)
+	}
+	for _, addedEdge := range nlDiff.EdgesDiff.Added {
+		addedNodeList.AddEdge(addedEdge)
+	}
+	addedNodeList.RootElements = append(addedNodeList.RootElements, nlDiff.RootElmementsDiff.Added...)
+
+	for _, diffNodeAdded := range nlDiff.NodesDiff.NodeDiff {
+		addedNodeList.AddNode(diffNodeAdded.Added)
+	}
+
+	return &addedNodeList
+}
+
+func (nlDiff *NodeListDiff) RemovedNodeList() *NodeList {
+	var removedNodeList NodeList
+	for _, removedNode := range nlDiff.NodesDiff.Removed {
+		removedNodeList.AddNode(removedNode)
+	}
+	for _, removedEdge := range nlDiff.EdgesDiff.Removed {
+		removedNodeList.AddEdge(removedEdge)
+	}
+	removedNodeList.RootElements = append(removedNodeList.RootElements, nlDiff.RootElmementsDiff.Removed...)
+
+	for _, diffNodeRemoved := range nlDiff.NodesDiff.NodeDiff {
+		removedNodeList.AddNode(diffNodeRemoved.Removed)
+	}
+
+	return &removedNodeList
 }
 
 // NodeListDiffNodes represents the differences between two NodeList nodes.
@@ -35,7 +70,17 @@ type NodeListRootElementDiff struct {
 // that are different in nl2 from nl.
 func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 	return NodeListDiff{
-		NodesDiff:         nl.diffNodes(nl2),
+		NodesDiff:         nl.diffNodes(nl2, false),
+		EdgesDiff:         nl.diffEdges(nl2),
+		RootElmementsDiff: nl.diffRootElements(nl2),
+	}
+}
+
+// DiffWithStripQulifiers analyses a NodeList and returns a NodeList populated with all fields
+// that are different in nl2 from nl after stripping identifier Quilifiers.
+func (nl *NodeList) DiffWithStripQulifiers(nl2 *NodeList, strip bool) NodeListDiff {
+	return NodeListDiff{
+		NodesDiff:         nl.diffNodes(nl2, strip),
 		EdgesDiff:         nl.diffEdges(nl2),
 		RootElmementsDiff: nl.diffRootElements(nl2),
 	}
@@ -73,7 +118,24 @@ func (nl *NodeList) diffRootElements(nl2 *NodeList) NodeListRootElementDiff {
 	return diff
 }
 
-func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
+func stripQualifiers(url string) string {
+	// Define a regular expression pattern to match everything after "?"
+	pattern := regexp.MustCompile(`\?.*`)
+	// Substitute the matched pattern with an empty string to remove it
+	strippedURL := pattern.ReplaceAllString(url, "")
+	return strippedURL
+}
+
+func stripNodeQualifiers(n *Node) {
+	n.Id = stripQualifiers(n.Id)
+	newNIds := make(map[int32]string, len(n.Identifiers))
+	for u, id := range n.Identifiers {
+		newNIds[u] = stripQualifiers(id)
+	}
+	n.Identifiers = newNIds
+}
+
+func (nl *NodeList) diffNodes(nl2 *NodeList, strip bool) NodeListDiffNodes {
 	diff := NodeListDiffNodes{}
 
 	nlNodes := nl.Nodes
@@ -93,6 +155,10 @@ func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 	for index1 < len(nlNodes) || index2 < len(nl2Nodes) {
 		if index1 < len(nlNodes) && index2 < len(nl2Nodes) {
 			n, n2 := nlNodes[index1], nl2Nodes[index2]
+			if strip {
+				stripNodeQualifiers(n)
+				stripNodeQualifiers(n2)
+			}
 			switch strings.Compare(n.Id, n2.Id) { // Use ID to decide if to compare
 			case 0: // Nodes are equal
 				index1++
@@ -105,6 +171,7 @@ func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 				diff.Removed = append(diff.Removed, n)
 				index1++
 			case 1: // Node1 is greater than Node2
+
 				diff.Added = append(diff.Added, n2)
 				index2++
 			}

@@ -6,7 +6,7 @@ require (
 	github.com/CycloneDX/cyclonedx-go v0.8.0
 	github.com/glebarez/sqlite v1.10.0
 	github.com/google/go-cmp v0.6.0
-	github.com/google/uuid v1.5.0
+	github.com/google/uuid v1.6.0
 	github.com/infobloxopen/atlas-app-toolkit v1.2.2-0.20220721202134-28480c4993fc
 	github.com/infobloxopen/protoc-gen-gorm v1.1.3-0.20231122062459-d3024d4fa7c9
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1

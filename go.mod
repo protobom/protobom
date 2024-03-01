@@ -13,7 +13,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spdx/tools-golang v0.5.3
 	github.com/stretchr/testify v1.8.4
-	google.golang.org/genproto v0.0.0-20220722212130-b98a9ff5e252
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/protobuf v1.32.0
 	gorm.io/gorm v1.25.5
 	sigs.k8s.io/release-utils v0.7.7
@@ -32,7 +32,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -48,7 +48,7 @@ require (
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	google.golang.org/grpc v1.48.0 // indirect
+	google.golang.org/grpc v1.56.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.0.6 // indirect
 	gorm.io/driver/mysql v1.3.2 // indirect

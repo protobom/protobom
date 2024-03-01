@@ -266,6 +266,22 @@ func copyEdgeList(original []*Edge) []*Edge {
 	return nodeCopy
 }
 
+// Copy returns a duplicate of the NodeList.
+func (nl *NodeList) Copy() *NodeList {
+	nlo := &NodeList{}
+
+	for _, n := range nl.Nodes {
+		nlo.Nodes = append(nlo.Nodes, n.Copy())
+	}
+	for _, e := range nl.Edges {
+		nlo.Edges = append(nlo.Edges, e.Copy())
+	}
+
+	nlo.RootElements = append(nlo.RootElements, nl.RootElements...)
+
+	return nlo
+}
+
 // Intersect returns a new NodeList that represents the intersection
 // of nodes and their relationships between nl and nl2.
 // The resulting NodeList contains common nodes and edges copied from nl, and updates them with data from nl2.

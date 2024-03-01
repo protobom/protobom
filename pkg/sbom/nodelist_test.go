@@ -1275,3 +1275,43 @@ func TestRelateNodeAtId(t *testing.T) {
 		})
 	}
 }
+
+func TestNodeListCopy(t *testing.T) {
+	for _, tc := range []struct {
+		original *NodeList
+	}{
+		{
+			original: &NodeList{
+				Nodes: []*Node{
+					{Id: "test1"},
+					{Id: "test2"},
+				},
+				Edges: []*Edge{
+					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+				},
+			},
+		},
+		{
+			original: &NodeList{
+				Nodes: []*Node{
+					{Id: "root1"}, {Id: "root2"}, {Id: "descendant"},
+				},
+				Edges: []*Edge{
+					{From: "root2", To: []string{"descendant"}},
+					{From: "descendant", To: []string{"root1"}},
+				},
+				RootElements: []string{"root1", "root2"},
+			},
+		},
+		{
+			original: &NodeList{
+				Nodes:        []*Node{},
+				Edges:        []*Edge{},
+				RootElements: []string{"root1", "root2"},
+			},
+		},
+	} {
+		copied := tc.original.Copy()
+		require.True(t, tc.original.Equal(copied), "equal copied nodelist", tc.original, copied)
+	}
+}

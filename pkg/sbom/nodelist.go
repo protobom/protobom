@@ -279,8 +279,8 @@ func copyNodeSlice(original []*Node) []*Node {
 func (nl *NodeList) Copy() *NodeList {
 	nlo := &NodeList{}
 
-	copyNodeSlice(nl.Nodes)
-	copyEdgeList(nl.Edges)
+	nlo.Nodes = copyNodeSlice(nl.Nodes)
+	nlo.Edges = copyEdgeList(nl.Edges)
 
 	nlo.RootElements = append(nlo.RootElements, nl.RootElements...)
 

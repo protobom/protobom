@@ -16,6 +16,6 @@ if [ ! -f "protoc-${PROTOC_VER}-linux-x86_64.zip" ]; then
 fi 
 go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@${PROTOC_GEN_DOC_VER}
 
-$HOME/.local/bin/protoc  --proto_path=$HOME/.local/include --proto_path=. --doc_out=docs --doc_opt=markdown,protobom-ref.md  ./api/sbom.proto
+$HOME/.local/bin/protoc  --proto_path=$HOME/.local/include --proto_path=. --doc_out=docs --doc_opt=markdown,../protobom-ref.md  ./api/sbom.proto
 
 git diff --exit-code || exit_with_msg "The proto documentation are not up to date"

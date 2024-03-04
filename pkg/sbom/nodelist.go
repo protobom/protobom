@@ -259,9 +259,18 @@ func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
 
 // copyEdgeList is a utility function that deep copies a list of edges
 func copyEdgeList(original []*Edge) []*Edge {
-	nodeCopy := []*Edge{}
+	edgeCopy := []*Edge{}
 	for _, e := range original {
-		nodeCopy = append(nodeCopy, e.Copy())
+		edgeCopy = append(edgeCopy, e.Copy())
+	}
+	return edgeCopy
+}
+
+// copyNodeSlice is a utility function that deep copies a list of nodes
+func copyNodeSlice(original []*Node) []*Node {
+	nodeCopy := []*Node{}
+	for _, n := range original {
+		nodeCopy = append(nodeCopy, n.Copy())
 	}
 	return nodeCopy
 }
@@ -270,12 +279,8 @@ func copyEdgeList(original []*Edge) []*Edge {
 func (nl *NodeList) Copy() *NodeList {
 	nlo := &NodeList{}
 
-	for _, n := range nl.Nodes {
-		nlo.Nodes = append(nlo.Nodes, n.Copy())
-	}
-	for _, e := range nl.Edges {
-		nlo.Edges = append(nlo.Edges, e.Copy())
-	}
+	nlo.Nodes = copyNodeSlice(nl.Nodes)
+	nlo.Edges = copyEdgeList(nl.Edges)
 
 	nlo.RootElements = append(nlo.RootElements, nl.RootElements...)
 

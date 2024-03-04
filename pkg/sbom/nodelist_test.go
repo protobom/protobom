@@ -1312,6 +1312,6 @@ func TestNodeListCopy(t *testing.T) {
 		},
 	} {
 		copied := tc.original.Copy()
-		require.True(t, tc.original.Equal(copied), "equal copied nodelist", tc.original, copied)
+		require.True(t, tc.original.Equal(copied), "equal copied nodelist %s %s", tc.original, copied)
 	}
 }

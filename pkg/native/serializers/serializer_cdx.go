@@ -132,7 +132,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 		}
 	}
 
-	if bom.Metadata != nil && len(bom.GetMetadata().GetName()) > 0 {
+	if bom.Metadata != nil && bom.GetMetadata().GetName() != "" {
 		doc.Metadata.Component.Name = bom.GetMetadata().GetName()
 	}
 
@@ -400,7 +400,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		c.Supplier = &oe
 	}
 
-	if len(n.GetCopyright()) > 0 {
+	if n.GetCopyright() != "" {
 		c.Copyright = n.GetCopyright()
 	}
 

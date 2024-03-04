@@ -18,7 +18,7 @@ type nodeIndex map[string]*Node
 // edgeIndex is an index of edge pointers keyed by From elements and type
 type edgeIndex map[string]map[Edge_Type][]*Edge
 
-// rootElementsIndex is an index of the top levele elements by ID
+// rootElementsIndex is an index of the top level elements by ID
 type rootElementsIndex map[string]struct{}
 
 // hashIndex is a struct that indexes a NodeList by the hash values of its nodes
@@ -27,7 +27,7 @@ type hashIndex map[string][]*Node
 // purlIndex captures the SBOM nodelist ordered by package url
 type purlIndex map[PackageURL][]*Node
 
-var ErrorMoreThanOneMatch = fmt.Errorf("More than one node matches")
+var ErrorMoreThanOneMatch = fmt.Errorf("more than one node matches")
 
 // NewNodeList returns a new NodeList with empty nodes, edges, and root elements.
 func NewNodeList() *NodeList {
@@ -266,6 +266,22 @@ func copyEdgeList(original []*Edge) []*Edge {
 	return nodeCopy
 }
 
+// Copy returns a duplicate of the NodeList.
+func (nl *NodeList) Copy() *NodeList {
+	nlo := &NodeList{}
+
+	for _, n := range nl.Nodes {
+		nlo.Nodes = append(nlo.Nodes, n.Copy())
+	}
+	for _, e := range nl.Edges {
+		nlo.Edges = append(nlo.Edges, e.Copy())
+	}
+
+	nlo.RootElements = append(nlo.RootElements, nl.RootElements...)
+
+	return nlo
+}
+
 // Intersect returns a new NodeList that represents the intersection
 // of nodes and their relationships between nl and nl2.
 // The resulting NodeList contains common nodes and edges copied from nl, and updates them with data from nl2.
@@ -420,7 +436,7 @@ func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
 			if _, ok := hashIndex[fmt.Sprintf("%d:%s", algo, hashVal)]; !ok {
 				continue
 			}
-			// Collect all node where hashes match excactly
+			// Collect all node where hashes match exactly
 			for _, n := range hashIndex[fmt.Sprintf("%d:%s", algo, hashVal)] {
 				// Ignore if we've seen the node
 				if _, ok := foundNodes[n.Id]; ok {
@@ -437,7 +453,7 @@ func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
 
 	// Here, if we have exactly one node, then we have a match. If we have zero
 	// then we reindex and match on the purl. If more than one node matched on
-	// the hashes, we try to disabiguate by looking at the purl of the hash matches.
+	// the hashes, we try to disambiguate by looking at the purl of the hash matches.
 	testPurl := node.Purl()
 	switch len(foundNodes) {
 	case 1:
@@ -456,7 +472,7 @@ func (nl *NodeList) GetMatchingNode(node *Node) (*Node, error) {
 		if _, ok := pindex[testPurl]; !ok {
 			return nil, nil
 		}
-		// If there is more than one matching, its a tie. Error.
+		// If there is more than one matching, it's a tie. Error.
 		if len(pindex[testPurl]) == 1 {
 			return pindex[testPurl][0], nil
 		}
@@ -795,7 +811,7 @@ func (nl *NodeList) NodeSiblings(id string) *NodeList {
 		return nil
 	}
 
-	// Check that the node actually esists
+	// Check that the node actually exists
 	node := nl.GetNodeByID(id)
 	if node == nil {
 		return nodelist

@@ -8,7 +8,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.6.0
 	github.com/infobloxopen/atlas-app-toolkit v1.4.0
-	github.com/infobloxopen/protoc-gen-gorm v1.1.3-0.20231122062459-d3024d4fa7c9
+	github.com/infobloxopen/protoc-gen-gorm v1.1.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spdx/tools-golang v0.5.3
@@ -32,7 +32,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jinzhu/gorm v1.9.16 // indirect

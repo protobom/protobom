@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/CycloneDX/cyclonedx-go v0.8.0
-	github.com/glebarez/sqlite v1.10.0
+	github.com/glebarez/sqlite v1.11.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.6.0
 	github.com/infobloxopen/atlas-app-toolkit v1.4.0

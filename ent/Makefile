@@ -6,7 +6,7 @@ PROTOC_ENT_URL := https://raw.githubusercontent.com/ent/contrib/${PROTOC_ENT_VER
 .SILENT: generate-ent
 generate-ent: proto-ent ## Generate ent database types from schema
 	printf "Generating ${CYAN}ent${RESET} database types with ${CYAN}go generate${RESET}..."
-	go generate ./pkg/sbom/ent
+	go generate ${ENT_ROOT_DIR} 1>& /dev/null
 	printf "${GREEN}DONE${RESET}\n"
 
 .PHONY: describe-schemas
@@ -26,11 +26,6 @@ proto-ent: ${ENT_ROOT_DIR}/proto/options/opts.proto ## Compile protobufs with pr
 	  --ent_out=${ENT_ROOT_DIR} \
 	  --ent_opt=schemadir=${ENT_ROOT_DIR}/schema \
 	  ${ENT_ROOT_DIR}/proto/entpb/sbom.proto
-	printf "${GREEN}DONE${RESET}\n"
-
-	printf "Fixing generated package imports..."
-	sed -i 's|gorm.io/gen/field|entgo.io/ent/schema/field|' ${ENT_ROOT_DIR}/schema/*.go
-	sed -i 's|github.com/bom-squad/protobom/pkg/sbom/ent/edge|entgo.io/ent/schema/edge|' ${ENT_ROOT_DIR}/schema/*.go
 	printf "${GREEN}DONE${RESET}\n"
 
 	go fmt ${ENT_ROOT_DIR}/schema

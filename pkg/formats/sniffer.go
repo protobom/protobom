@@ -65,23 +65,25 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	err := decoder.Decode(&specversionjson)
 	if err == nil {
 		if strings.EqualFold(specversionjson.BomFormat, CDXFORMAT) {
-			if specversionjson.CDXSpecVersion == "1.3" {
+			switch specversionjson.CDXSpecVersion {
+			case "1.3":
 				return CDX13JSON, nil
-			} else if specversionjson.CDXSpecVersion == "1.4" {
+			case "1.4":
 				return CDX14JSON, nil
-			} else if specversionjson.CDXSpecVersion == "1.5" {
+			case "1.5":
 				return CDX15JSON, nil
-			} else {
+			default:
 				// JSON + BomFormat CycloneDX but specVersion not 1.3, 1.4, or 1.5
 				return "", fmt.Errorf("unknown SBOM format")
 			}
 		} else {
 			// JSON but not CycloneDX so assuming SPDX
-			if specversionjson.SPDXSpecVersion == "SPDX-2.2" {
+			switch specversionjson.SPDXSpecVersion {
+			case "SPDX-2.2":
 				return SPDX22JSON, nil
-			} else if specversionjson.SPDXSpecVersion == "SPDX-2.3" {
+			case "SPDX-2.3":
 				return SPDX23JSON, nil
-			} else {
+			default:
 				// JSON + not CycloneDX but spdxVersion not SPDX-2.2 or SPDX-2.3
 				return "", fmt.Errorf("unknown SBOM format")
 			}

@@ -29,34 +29,42 @@ func (du *DocumentUpdate) Where(ps ...predicate.Document) *DocumentUpdate {
 	return du
 }
 
-// AddMetadatumIDs adds the "metadata" edge to the Metadata entity by IDs.
-func (du *DocumentUpdate) AddMetadatumIDs(ids ...string) *DocumentUpdate {
-	du.mutation.AddMetadatumIDs(ids...)
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (du *DocumentUpdate) SetMetadataID(id string) *DocumentUpdate {
+	du.mutation.SetMetadataID(id)
 	return du
 }
 
-// AddMetadata adds the "metadata" edges to the Metadata entity.
-func (du *DocumentUpdate) AddMetadata(m ...*Metadata) *DocumentUpdate {
-	ids := make([]string, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (du *DocumentUpdate) SetNillableMetadataID(id *string) *DocumentUpdate {
+	if id != nil {
+		du = du.SetMetadataID(*id)
 	}
-	return du.AddMetadatumIDs(ids...)
-}
-
-// AddNodeListIDs adds the "node_list" edge to the NodeList entity by IDs.
-func (du *DocumentUpdate) AddNodeListIDs(ids ...int) *DocumentUpdate {
-	du.mutation.AddNodeListIDs(ids...)
 	return du
 }
 
-// AddNodeList adds the "node_list" edges to the NodeList entity.
-func (du *DocumentUpdate) AddNodeList(n ...*NodeList) *DocumentUpdate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (du *DocumentUpdate) SetMetadata(m *Metadata) *DocumentUpdate {
+	return du.SetMetadataID(m.ID)
+}
+
+// SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
+func (du *DocumentUpdate) SetNodeListID(id int) *DocumentUpdate {
+	du.mutation.SetNodeListID(id)
+	return du
+}
+
+// SetNillableNodeListID sets the "node_list" edge to the NodeList entity by ID if the given value is not nil.
+func (du *DocumentUpdate) SetNillableNodeListID(id *int) *DocumentUpdate {
+	if id != nil {
+		du = du.SetNodeListID(*id)
 	}
-	return du.AddNodeListIDs(ids...)
+	return du
+}
+
+// SetNodeList sets the "node_list" edge to the NodeList entity.
+func (du *DocumentUpdate) SetNodeList(n *NodeList) *DocumentUpdate {
+	return du.SetNodeListID(n.ID)
 }
 
 // Mutation returns the DocumentMutation object of the builder.
@@ -64,46 +72,16 @@ func (du *DocumentUpdate) Mutation() *DocumentMutation {
 	return du.mutation
 }
 
-// ClearMetadata clears all "metadata" edges to the Metadata entity.
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
 func (du *DocumentUpdate) ClearMetadata() *DocumentUpdate {
 	du.mutation.ClearMetadata()
 	return du
 }
 
-// RemoveMetadatumIDs removes the "metadata" edge to Metadata entities by IDs.
-func (du *DocumentUpdate) RemoveMetadatumIDs(ids ...string) *DocumentUpdate {
-	du.mutation.RemoveMetadatumIDs(ids...)
-	return du
-}
-
-// RemoveMetadata removes "metadata" edges to Metadata entities.
-func (du *DocumentUpdate) RemoveMetadata(m ...*Metadata) *DocumentUpdate {
-	ids := make([]string, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return du.RemoveMetadatumIDs(ids...)
-}
-
-// ClearNodeList clears all "node_list" edges to the NodeList entity.
+// ClearNodeList clears the "node_list" edge to the NodeList entity.
 func (du *DocumentUpdate) ClearNodeList() *DocumentUpdate {
 	du.mutation.ClearNodeList()
 	return du
-}
-
-// RemoveNodeListIDs removes the "node_list" edge to NodeList entities by IDs.
-func (du *DocumentUpdate) RemoveNodeListIDs(ids ...int) *DocumentUpdate {
-	du.mutation.RemoveNodeListIDs(ids...)
-	return du
-}
-
-// RemoveNodeList removes "node_list" edges to NodeList entities.
-func (du *DocumentUpdate) RemoveNodeList(n ...*NodeList) *DocumentUpdate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
-	}
-	return du.RemoveNodeListIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -144,7 +122,7 @@ func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if du.mutation.MetadataCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
@@ -152,28 +130,12 @@ func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := du.mutation.RemovedMetadataIDs(); len(nodes) > 0 && !du.mutation.MetadataCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   document.MetadataTable,
-			Columns: []string{document.MetadataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := du.mutation.MetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
@@ -189,7 +151,7 @@ func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if du.mutation.NodeListCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},
@@ -197,28 +159,12 @@ func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := du.mutation.RemovedNodeListIDs(); len(nodes) > 0 && !du.mutation.NodeListCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   document.NodeListTable,
-			Columns: []string{document.NodeListColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := du.mutation.NodeListIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},
@@ -252,34 +198,42 @@ type DocumentUpdateOne struct {
 	mutation *DocumentMutation
 }
 
-// AddMetadatumIDs adds the "metadata" edge to the Metadata entity by IDs.
-func (duo *DocumentUpdateOne) AddMetadatumIDs(ids ...string) *DocumentUpdateOne {
-	duo.mutation.AddMetadatumIDs(ids...)
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (duo *DocumentUpdateOne) SetMetadataID(id string) *DocumentUpdateOne {
+	duo.mutation.SetMetadataID(id)
 	return duo
 }
 
-// AddMetadata adds the "metadata" edges to the Metadata entity.
-func (duo *DocumentUpdateOne) AddMetadata(m ...*Metadata) *DocumentUpdateOne {
-	ids := make([]string, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (duo *DocumentUpdateOne) SetNillableMetadataID(id *string) *DocumentUpdateOne {
+	if id != nil {
+		duo = duo.SetMetadataID(*id)
 	}
-	return duo.AddMetadatumIDs(ids...)
-}
-
-// AddNodeListIDs adds the "node_list" edge to the NodeList entity by IDs.
-func (duo *DocumentUpdateOne) AddNodeListIDs(ids ...int) *DocumentUpdateOne {
-	duo.mutation.AddNodeListIDs(ids...)
 	return duo
 }
 
-// AddNodeList adds the "node_list" edges to the NodeList entity.
-func (duo *DocumentUpdateOne) AddNodeList(n ...*NodeList) *DocumentUpdateOne {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (duo *DocumentUpdateOne) SetMetadata(m *Metadata) *DocumentUpdateOne {
+	return duo.SetMetadataID(m.ID)
+}
+
+// SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
+func (duo *DocumentUpdateOne) SetNodeListID(id int) *DocumentUpdateOne {
+	duo.mutation.SetNodeListID(id)
+	return duo
+}
+
+// SetNillableNodeListID sets the "node_list" edge to the NodeList entity by ID if the given value is not nil.
+func (duo *DocumentUpdateOne) SetNillableNodeListID(id *int) *DocumentUpdateOne {
+	if id != nil {
+		duo = duo.SetNodeListID(*id)
 	}
-	return duo.AddNodeListIDs(ids...)
+	return duo
+}
+
+// SetNodeList sets the "node_list" edge to the NodeList entity.
+func (duo *DocumentUpdateOne) SetNodeList(n *NodeList) *DocumentUpdateOne {
+	return duo.SetNodeListID(n.ID)
 }
 
 // Mutation returns the DocumentMutation object of the builder.
@@ -287,46 +241,16 @@ func (duo *DocumentUpdateOne) Mutation() *DocumentMutation {
 	return duo.mutation
 }
 
-// ClearMetadata clears all "metadata" edges to the Metadata entity.
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
 func (duo *DocumentUpdateOne) ClearMetadata() *DocumentUpdateOne {
 	duo.mutation.ClearMetadata()
 	return duo
 }
 
-// RemoveMetadatumIDs removes the "metadata" edge to Metadata entities by IDs.
-func (duo *DocumentUpdateOne) RemoveMetadatumIDs(ids ...string) *DocumentUpdateOne {
-	duo.mutation.RemoveMetadatumIDs(ids...)
-	return duo
-}
-
-// RemoveMetadata removes "metadata" edges to Metadata entities.
-func (duo *DocumentUpdateOne) RemoveMetadata(m ...*Metadata) *DocumentUpdateOne {
-	ids := make([]string, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return duo.RemoveMetadatumIDs(ids...)
-}
-
-// ClearNodeList clears all "node_list" edges to the NodeList entity.
+// ClearNodeList clears the "node_list" edge to the NodeList entity.
 func (duo *DocumentUpdateOne) ClearNodeList() *DocumentUpdateOne {
 	duo.mutation.ClearNodeList()
 	return duo
-}
-
-// RemoveNodeListIDs removes the "node_list" edge to NodeList entities by IDs.
-func (duo *DocumentUpdateOne) RemoveNodeListIDs(ids ...int) *DocumentUpdateOne {
-	duo.mutation.RemoveNodeListIDs(ids...)
-	return duo
-}
-
-// RemoveNodeList removes "node_list" edges to NodeList entities.
-func (duo *DocumentUpdateOne) RemoveNodeList(n ...*NodeList) *DocumentUpdateOne {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
-	}
-	return duo.RemoveNodeListIDs(ids...)
 }
 
 // Where appends a list predicates to the DocumentUpdate builder.
@@ -397,7 +321,7 @@ func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err
 	}
 	if duo.mutation.MetadataCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
@@ -405,28 +329,12 @@ func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := duo.mutation.RemovedMetadataIDs(); len(nodes) > 0 && !duo.mutation.MetadataCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   document.MetadataTable,
-			Columns: []string{document.MetadataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := duo.mutation.MetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
@@ -442,7 +350,7 @@ func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err
 	}
 	if duo.mutation.NodeListCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},
@@ -450,28 +358,12 @@ func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := duo.mutation.RemovedNodeListIDs(); len(nodes) > 0 && !duo.mutation.NodeListCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   document.NodeListTable,
-			Columns: []string{document.NodeListColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := duo.mutation.NodeListIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},

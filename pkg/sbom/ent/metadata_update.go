@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/document"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/documenttype"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/person"
@@ -133,6 +134,17 @@ func (mu *MetadataUpdate) AddDate(t ...*Timestamp) *MetadataUpdate {
 	return mu.AddDateIDs(ids...)
 }
 
+// SetDocumentID sets the "document" edge to the Document entity by ID.
+func (mu *MetadataUpdate) SetDocumentID(id int) *MetadataUpdate {
+	mu.mutation.SetDocumentID(id)
+	return mu
+}
+
+// SetDocument sets the "document" edge to the Document entity.
+func (mu *MetadataUpdate) SetDocument(d *Document) *MetadataUpdate {
+	return mu.SetDocumentID(d.ID)
+}
+
 // Mutation returns the MetadataMutation object of the builder.
 func (mu *MetadataUpdate) Mutation() *MetadataMutation {
 	return mu.mutation
@@ -222,6 +234,12 @@ func (mu *MetadataUpdate) RemoveDate(t ...*Timestamp) *MetadataUpdate {
 	return mu.RemoveDateIDs(ids...)
 }
 
+// ClearDocument clears the "document" edge to the Document entity.
+func (mu *MetadataUpdate) ClearDocument() *MetadataUpdate {
+	mu.mutation.ClearDocument()
+	return mu
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (mu *MetadataUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks(ctx, mu.sqlSave, mu.mutation, mu.hooks)
@@ -249,7 +267,18 @@ func (mu *MetadataUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (mu *MetadataUpdate) check() error {
+	if _, ok := mu.mutation.DocumentID(); mu.mutation.DocumentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Metadata.document"`)
+	}
+	return nil
+}
+
 func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := mu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(metadata.Table, metadata.Columns, sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString))
 	if ps := mu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -447,6 +476,35 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if mu.mutation.DocumentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   metadata.DocumentTable,
+			Columns: []string{metadata.DocumentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.DocumentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   metadata.DocumentTable,
+			Columns: []string{metadata.DocumentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{metadata.Label}
@@ -569,6 +627,17 @@ func (muo *MetadataUpdateOne) AddDate(t ...*Timestamp) *MetadataUpdateOne {
 	return muo.AddDateIDs(ids...)
 }
 
+// SetDocumentID sets the "document" edge to the Document entity by ID.
+func (muo *MetadataUpdateOne) SetDocumentID(id int) *MetadataUpdateOne {
+	muo.mutation.SetDocumentID(id)
+	return muo
+}
+
+// SetDocument sets the "document" edge to the Document entity.
+func (muo *MetadataUpdateOne) SetDocument(d *Document) *MetadataUpdateOne {
+	return muo.SetDocumentID(d.ID)
+}
+
 // Mutation returns the MetadataMutation object of the builder.
 func (muo *MetadataUpdateOne) Mutation() *MetadataMutation {
 	return muo.mutation
@@ -658,6 +727,12 @@ func (muo *MetadataUpdateOne) RemoveDate(t ...*Timestamp) *MetadataUpdateOne {
 	return muo.RemoveDateIDs(ids...)
 }
 
+// ClearDocument clears the "document" edge to the Document entity.
+func (muo *MetadataUpdateOne) ClearDocument() *MetadataUpdateOne {
+	muo.mutation.ClearDocument()
+	return muo
+}
+
 // Where appends a list predicates to the MetadataUpdate builder.
 func (muo *MetadataUpdateOne) Where(ps ...predicate.Metadata) *MetadataUpdateOne {
 	muo.mutation.Where(ps...)
@@ -698,7 +773,18 @@ func (muo *MetadataUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (muo *MetadataUpdateOne) check() error {
+	if _, ok := muo.mutation.DocumentID(); muo.mutation.DocumentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Metadata.document"`)
+	}
+	return nil
+}
+
 func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err error) {
+	if err := muo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(metadata.Table, metadata.Columns, sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString))
 	id, ok := muo.mutation.ID()
 	if !ok {
@@ -906,6 +992,35 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.DocumentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   metadata.DocumentTable,
+			Columns: []string{metadata.DocumentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.DocumentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   metadata.DocumentTable,
+			Columns: []string{metadata.DocumentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

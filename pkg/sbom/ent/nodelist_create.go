@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/document"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/edge"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
@@ -57,6 +58,17 @@ func (nlc *NodeListCreate) AddEdges(e ...*Edge) *NodeListCreate {
 	return nlc.AddEdgeIDs(ids...)
 }
 
+// SetDocumentID sets the "document" edge to the Document entity by ID.
+func (nlc *NodeListCreate) SetDocumentID(id int) *NodeListCreate {
+	nlc.mutation.SetDocumentID(id)
+	return nlc
+}
+
+// SetDocument sets the "document" edge to the Document entity.
+func (nlc *NodeListCreate) SetDocument(d *Document) *NodeListCreate {
+	return nlc.SetDocumentID(d.ID)
+}
+
 // Mutation returns the NodeListMutation object of the builder.
 func (nlc *NodeListCreate) Mutation() *NodeListMutation {
 	return nlc.mutation
@@ -93,6 +105,9 @@ func (nlc *NodeListCreate) ExecX(ctx context.Context) {
 func (nlc *NodeListCreate) check() error {
 	if _, ok := nlc.mutation.RootElements(); !ok {
 		return &ValidationError{Name: "root_elements", err: errors.New(`ent: missing required field "NodeList.root_elements"`)}
+	}
+	if _, ok := nlc.mutation.DocumentID(); !ok {
+		return &ValidationError{Name: "document", err: errors.New(`ent: missing required edge "NodeList.document"`)}
 	}
 	return nil
 }
@@ -154,6 +169,23 @@ func (nlc *NodeListCreate) createSpec() (*NodeList, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := nlc.mutation.DocumentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   nodelist.DocumentTable,
+			Columns: []string{nodelist.DocumentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.document_node_list = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

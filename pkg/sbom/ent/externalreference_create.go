@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/externalreference"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/hashesentry"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 )
 
 // ExternalReferenceCreate is the builder for creating a ExternalReference entity.
@@ -57,6 +58,17 @@ func (erc *ExternalReferenceCreate) AddHashes(h ...*HashesEntry) *ExternalRefere
 		ids[i] = h[i].ID
 	}
 	return erc.AddHashIDs(ids...)
+}
+
+// SetNodesID sets the "nodes" edge to the Node entity by ID.
+func (erc *ExternalReferenceCreate) SetNodesID(id string) *ExternalReferenceCreate {
+	erc.mutation.SetNodesID(id)
+	return erc
+}
+
+// SetNodes sets the "nodes" edge to the Node entity.
+func (erc *ExternalReferenceCreate) SetNodes(n *Node) *ExternalReferenceCreate {
+	return erc.SetNodesID(n.ID)
 }
 
 // Mutation returns the ExternalReferenceMutation object of the builder.
@@ -110,6 +122,9 @@ func (erc *ExternalReferenceCreate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "ExternalReference.type": %w`, err)}
 		}
 	}
+	if _, ok := erc.mutation.NodesID(); !ok {
+		return &ValidationError{Name: "nodes", err: errors.New(`ent: missing required edge "ExternalReference.nodes"`)}
+	}
 	return nil
 }
 
@@ -154,10 +169,10 @@ func (erc *ExternalReferenceCreate) createSpec() (*ExternalReference, *sqlgraph.
 	}
 	if nodes := erc.mutation.HashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Columns: externalreference.HashesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -166,6 +181,23 @@ func (erc *ExternalReferenceCreate) createSpec() (*ExternalReference, *sqlgraph.
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := erc.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   externalreference.NodesTable,
+			Columns: []string{externalreference.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.node_external_references = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

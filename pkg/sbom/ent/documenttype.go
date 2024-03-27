@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/documenttype"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 )
 
 // DocumentType is the model entity for the DocumentType schema.
@@ -21,9 +22,34 @@ type DocumentType struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
-	Description             string `json:"description,omitempty"`
+	Description string `json:"description,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the DocumentTypeQuery when eager-loading is set.
+	Edges                   DocumentTypeEdges `json:"edges"`
 	metadata_document_types *string
 	selectValues            sql.SelectValues
+}
+
+// DocumentTypeEdges holds the relations/edges for other nodes in the graph.
+type DocumentTypeEdges struct {
+	// Metadata holds the value of the metadata edge.
+	Metadata *Metadata `json:"metadata,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// MetadataOrErr returns the Metadata value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DocumentTypeEdges) MetadataOrErr() (*Metadata, error) {
+	if e.loadedTypes[0] {
+		if e.Metadata == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: metadata.Label}
+		}
+		return e.Metadata, nil
+	}
+	return nil, &NotLoadedError{edge: "metadata"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -94,6 +120,11 @@ func (dt *DocumentType) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (dt *DocumentType) Value(name string) (ent.Value, error) {
 	return dt.selectValues.Get(name)
+}
+
+// QueryMetadata queries the "metadata" edge of the DocumentType entity.
+func (dt *DocumentType) QueryMetadata() *MetadataQuery {
+	return NewDocumentTypeClient(dt.config).QueryMetadata(dt)
 }
 
 // Update returns a builder for updating this DocumentType.

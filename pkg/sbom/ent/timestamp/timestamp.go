@@ -14,10 +14,19 @@ const (
 	FieldID = "id"
 	// EdgeDate holds the string denoting the date edge name in mutations.
 	EdgeDate = "date"
+	// EdgeMetadata holds the string denoting the metadata edge name in mutations.
+	EdgeMetadata = "metadata"
 	// Table holds the table name of the timestamp in the database.
 	Table = "timestamps"
 	// DateTable is the table that holds the date relation/edge. The primary key declared below.
 	DateTable = "timestamp_date"
+	// MetadataTable is the table that holds the metadata relation/edge.
+	MetadataTable = "timestamps"
+	// MetadataInverseTable is the table name for the Metadata entity.
+	// It exists in this package in order to avoid circular dependency with the "metadata" package.
+	MetadataInverseTable = "metadata"
+	// MetadataColumn is the table column denoting the metadata relation/edge.
+	MetadataColumn = "metadata_date"
 )
 
 // Columns holds all SQL columns for timestamp fields.
@@ -76,10 +85,24 @@ func ByDate(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newDateStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByMetadataField orders the results by metadata field.
+func ByMetadataField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMetadataStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newDateStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, DateTable, DatePrimaryKey...),
+	)
+}
+func newMetadataStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MetadataInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MetadataTable, MetadataColumn),
 	)
 }

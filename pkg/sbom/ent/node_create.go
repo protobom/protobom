@@ -13,6 +13,7 @@ import (
 	"github.com/bom-squad/protobom/pkg/sbom/ent/hashesentry"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/identifiersentry"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/person"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/timestamp"
 )
@@ -252,6 +253,17 @@ func (nc *NodeCreate) AddValidUntilDate(t ...*Timestamp) *NodeCreate {
 	return nc.AddValidUntilDateIDs(ids...)
 }
 
+// SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
+func (nc *NodeCreate) SetNodeListID(id int) *NodeCreate {
+	nc.mutation.SetNodeListID(id)
+	return nc
+}
+
+// SetNodeList sets the "node_list" edge to the NodeList entity.
+func (nc *NodeCreate) SetNodeList(n *NodeList) *NodeCreate {
+	return nc.SetNodeListID(n.ID)
+}
+
 // Mutation returns the NodeMutation object of the builder.
 func (nc *NodeCreate) Mutation() *NodeMutation {
 	return nc.mutation
@@ -346,6 +358,9 @@ func (nc *NodeCreate) check() error {
 		if err := node.PrimaryPurposeValidator(v); err != nil {
 			return &ValidationError{Name: "primary_purpose", err: fmt.Errorf(`ent: validator failed for field "Node.primary_purpose": %w`, err)}
 		}
+	}
+	if _, ok := nc.mutation.NodeListID(); !ok {
+		return &ValidationError{Name: "node_list", err: errors.New(`ent: missing required edge "Node.node_list"`)}
 	}
 	return nil
 }
@@ -500,10 +515,10 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 	}
 	if nodes := nc.mutation.IdentifiersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   node.IdentifiersTable,
-			Columns: []string{node.IdentifiersColumn},
+			Columns: node.IdentifiersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -516,10 +531,10 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 	}
 	if nodes := nc.mutation.HashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   node.HashesTable,
-			Columns: []string{node.HashesColumn},
+			Columns: node.HashesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -576,6 +591,23 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := nc.mutation.NodeListIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   node.NodeListTable,
+			Columns: []string{node.NodeListColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.node_list_nodes = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

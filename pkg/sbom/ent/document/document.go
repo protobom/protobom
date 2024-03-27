@@ -57,44 +57,30 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByMetadataCount orders the results by metadata count.
-func ByMetadataCount(opts ...sql.OrderTermOption) OrderOption {
+// ByMetadataField orders the results by metadata field.
+func ByMetadataField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newMetadataStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newMetadataStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByMetadata orders the results by metadata terms.
-func ByMetadata(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByNodeListField orders the results by node_list field.
+func ByNodeListField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newMetadataStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByNodeListCount orders the results by node_list count.
-func ByNodeListCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodeListStep(), opts...)
-	}
-}
-
-// ByNodeList orders the results by node_list terms.
-func ByNodeList(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeListStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newNodeListStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newMetadataStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MetadataInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, MetadataTable, MetadataColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, MetadataTable, MetadataColumn),
 	)
 }
 func newNodeListStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodeListInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, NodeListTable, NodeListColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, NodeListTable, NodeListColumn),
 	)
 }

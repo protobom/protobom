@@ -24,10 +24,37 @@ const (
 	FieldPhone = "phone"
 	// EdgeContacts holds the string denoting the contacts edge name in mutations.
 	EdgeContacts = "contacts"
+	// EdgeMetadata holds the string denoting the metadata edge name in mutations.
+	EdgeMetadata = "metadata"
+	// EdgeNodeSupplier holds the string denoting the node_supplier edge name in mutations.
+	EdgeNodeSupplier = "node_supplier"
+	// EdgeNodeOriginator holds the string denoting the node_originator edge name in mutations.
+	EdgeNodeOriginator = "node_originator"
 	// Table holds the table name of the person in the database.
 	Table = "persons"
 	// ContactsTable is the table that holds the contacts relation/edge. The primary key declared below.
 	ContactsTable = "person_contacts"
+	// MetadataTable is the table that holds the metadata relation/edge.
+	MetadataTable = "persons"
+	// MetadataInverseTable is the table name for the Metadata entity.
+	// It exists in this package in order to avoid circular dependency with the "metadata" package.
+	MetadataInverseTable = "metadata"
+	// MetadataColumn is the table column denoting the metadata relation/edge.
+	MetadataColumn = "metadata_authors"
+	// NodeSupplierTable is the table that holds the node_supplier relation/edge.
+	NodeSupplierTable = "persons"
+	// NodeSupplierInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	NodeSupplierInverseTable = "nodes"
+	// NodeSupplierColumn is the table column denoting the node_supplier relation/edge.
+	NodeSupplierColumn = "node_suppliers"
+	// NodeOriginatorTable is the table that holds the node_originator relation/edge.
+	NodeOriginatorTable = "persons"
+	// NodeOriginatorInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	NodeOriginatorInverseTable = "nodes"
+	// NodeOriginatorColumn is the table column denoting the node_originator relation/edge.
+	NodeOriginatorColumn = "node_originators"
 )
 
 // Columns holds all SQL columns for person fields.
@@ -115,10 +142,52 @@ func ByContacts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newContactsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByMetadataField orders the results by metadata field.
+func ByMetadataField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMetadataStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByNodeSupplierField orders the results by node_supplier field.
+func ByNodeSupplierField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodeSupplierStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByNodeOriginatorField orders the results by node_originator field.
+func ByNodeOriginatorField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodeOriginatorStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newContactsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, ContactsTable, ContactsPrimaryKey...),
+	)
+}
+func newMetadataStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MetadataInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MetadataTable, MetadataColumn),
+	)
+}
+func newNodeSupplierStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodeSupplierInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, NodeSupplierTable, NodeSupplierColumn),
+	)
+}
+func newNodeOriginatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodeOriginatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, NodeOriginatorTable, NodeOriginatorColumn),
 	)
 }

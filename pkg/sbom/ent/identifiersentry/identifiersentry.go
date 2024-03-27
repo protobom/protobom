@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,15 @@ const (
 	FieldSoftwareIdentifierType = "software_identifier_type"
 	// FieldSoftwareIdentifierValue holds the string denoting the software_identifier_value field in the database.
 	FieldSoftwareIdentifierValue = "software_identifier_value"
+	// EdgeNodes holds the string denoting the nodes edge name in mutations.
+	EdgeNodes = "nodes"
 	// Table holds the table name of the identifiersentry in the database.
 	Table = "identifiers_entries"
+	// NodesTable is the table that holds the nodes relation/edge. The primary key declared below.
+	NodesTable = "node_identifiers"
+	// NodesInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	NodesInverseTable = "nodes"
 )
 
 // Columns holds all SQL columns for identifiersentry fields.
@@ -28,21 +36,16 @@ var Columns = []string{
 	FieldSoftwareIdentifierValue,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "identifiers_entries"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"node_identifiers",
-}
+var (
+	// NodesPrimaryKey and NodesColumn2 are the table columns denoting the
+	// primary key for the nodes relation (M2M).
+	NodesPrimaryKey = []string{"node_id", "identifiers_entry_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -91,4 +94,25 @@ func BySoftwareIdentifierType(opts ...sql.OrderTermOption) OrderOption {
 // BySoftwareIdentifierValue orders the results by the software_identifier_value field.
 func BySoftwareIdentifierValue(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSoftwareIdentifierValue, opts...).ToFunc()
+}
+
+// ByNodesCount orders the results by nodes count.
+func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNodesStep(), opts...)
+	}
+}
+
+// ByNodes orders the results by nodes terms.
+func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newNodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, NodesTable, NodesPrimaryKey...),
+	)
 }

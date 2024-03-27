@@ -5,6 +5,7 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -15,9 +16,9 @@ type DocumentType struct {
 func (DocumentType) Fields() []ent.Field {
 	return []ent.Field{field.Enum("type").Optional().Values("OTHER", "DESIGN", "SOURCE", "BUILD", "ANALYZED", "DEPLOYED", "RUNTIME", "DISCOVERY", "DECOMISSION"), field.String("name").Optional(), field.String("description").Optional()}
 }
+
 func (DocumentType) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{edge.From("metadata", Metadata.Type).Ref("documentTypes").Unique()}
 }
-func (DocumentType) Annotations() []schema.Annotation {
-	return nil
-}
+
+func (DocumentType) Annotations() []schema.Annotation { return nil }

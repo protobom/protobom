@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/documenttype"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 )
 
 // DocumentTypeCreate is the builder for creating a DocumentType entity.
@@ -58,6 +59,25 @@ func (dtc *DocumentTypeCreate) SetNillableDescription(s *string) *DocumentTypeCr
 		dtc.SetDescription(*s)
 	}
 	return dtc
+}
+
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (dtc *DocumentTypeCreate) SetMetadataID(id string) *DocumentTypeCreate {
+	dtc.mutation.SetMetadataID(id)
+	return dtc
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (dtc *DocumentTypeCreate) SetNillableMetadataID(id *string) *DocumentTypeCreate {
+	if id != nil {
+		dtc = dtc.SetMetadataID(*id)
+	}
+	return dtc
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (dtc *DocumentTypeCreate) SetMetadata(m *Metadata) *DocumentTypeCreate {
+	return dtc.SetMetadataID(m.ID)
 }
 
 // Mutation returns the DocumentTypeMutation object of the builder.
@@ -136,6 +156,23 @@ func (dtc *DocumentTypeCreate) createSpec() (*DocumentType, *sqlgraph.CreateSpec
 	if value, ok := dtc.mutation.Description(); ok {
 		_spec.SetField(documenttype.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if nodes := dtc.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   documenttype.MetadataTable,
+			Columns: []string{documenttype.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.metadata_document_types = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

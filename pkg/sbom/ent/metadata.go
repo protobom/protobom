@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/document"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 )
 
@@ -39,9 +40,11 @@ type MetadataEdges struct {
 	DocumentTypes []*DocumentType `json:"documentTypes,omitempty"`
 	// Date holds the value of the date edge.
 	Date []*Timestamp `json:"date,omitempty"`
+	// Document holds the value of the document edge.
+	Document *Document `json:"document,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // ToolsOrErr returns the Tools value or an error if the edge
@@ -78,6 +81,19 @@ func (e MetadataEdges) DateOrErr() ([]*Timestamp, error) {
 		return e.Date, nil
 	}
 	return nil, &NotLoadedError{edge: "date"}
+}
+
+// DocumentOrErr returns the Document value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MetadataEdges) DocumentOrErr() (*Document, error) {
+	if e.loadedTypes[4] {
+		if e.Document == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: document.Label}
+		}
+		return e.Document, nil
+	}
+	return nil, &NotLoadedError{edge: "document"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -166,6 +182,11 @@ func (m *Metadata) QueryDocumentTypes() *DocumentTypeQuery {
 // QueryDate queries the "date" edge of the Metadata entity.
 func (m *Metadata) QueryDate() *TimestampQuery {
 	return NewMetadataClient(m.config).QueryDate(m)
+}
+
+// QueryDocument queries the "document" edge of the Metadata entity.
+func (m *Metadata) QueryDocument() *DocumentQuery {
+	return NewMetadataClient(m.config).QueryDocument(m)
 }
 
 // Update returns a builder for updating this Metadata.

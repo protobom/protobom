@@ -64,6 +64,8 @@ const (
 	EdgeBuildDate = "build_date"
 	// EdgeValidUntilDate holds the string denoting the valid_until_date edge name in mutations.
 	EdgeValidUntilDate = "valid_until_date"
+	// EdgeNodeList holds the string denoting the node_list edge name in mutations.
+	EdgeNodeList = "node_list"
 	// Table holds the table name of the node in the database.
 	Table = "nodes"
 	// SuppliersTable is the table that holds the suppliers relation/edge.
@@ -87,20 +89,16 @@ const (
 	ExternalReferencesInverseTable = "external_references"
 	// ExternalReferencesColumn is the table column denoting the external_references relation/edge.
 	ExternalReferencesColumn = "node_external_references"
-	// IdentifiersTable is the table that holds the identifiers relation/edge.
-	IdentifiersTable = "identifiers_entries"
+	// IdentifiersTable is the table that holds the identifiers relation/edge. The primary key declared below.
+	IdentifiersTable = "node_identifiers"
 	// IdentifiersInverseTable is the table name for the IdentifiersEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "identifiersentry" package.
 	IdentifiersInverseTable = "identifiers_entries"
-	// IdentifiersColumn is the table column denoting the identifiers relation/edge.
-	IdentifiersColumn = "node_identifiers"
-	// HashesTable is the table that holds the hashes relation/edge.
-	HashesTable = "hashes_entries"
+	// HashesTable is the table that holds the hashes relation/edge. The primary key declared below.
+	HashesTable = "node_hashes"
 	// HashesInverseTable is the table name for the HashesEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "hashesentry" package.
 	HashesInverseTable = "hashes_entries"
-	// HashesColumn is the table column denoting the hashes relation/edge.
-	HashesColumn = "node_hashes"
 	// ReleaseDateTable is the table that holds the release_date relation/edge.
 	ReleaseDateTable = "timestamps"
 	// ReleaseDateInverseTable is the table name for the Timestamp entity.
@@ -122,6 +120,13 @@ const (
 	ValidUntilDateInverseTable = "timestamps"
 	// ValidUntilDateColumn is the table column denoting the valid_until_date relation/edge.
 	ValidUntilDateColumn = "node_valid_until_date"
+	// NodeListTable is the table that holds the node_list relation/edge.
+	NodeListTable = "nodes"
+	// NodeListInverseTable is the table name for the NodeList entity.
+	// It exists in this package in order to avoid circular dependency with the "nodelist" package.
+	NodeListInverseTable = "node_lists"
+	// NodeListColumn is the table column denoting the node_list relation/edge.
+	NodeListColumn = "node_list_nodes"
 )
 
 // Columns holds all SQL columns for node fields.
@@ -151,6 +156,15 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"node_list_nodes",
 }
+
+var (
+	// IdentifiersPrimaryKey and IdentifiersColumn2 are the table columns denoting the
+	// primary key for the identifiers relation (M2M).
+	IdentifiersPrimaryKey = []string{"node_id", "identifiers_entry_id"}
+	// HashesPrimaryKey and HashesColumn2 are the table columns denoting the
+	// primary key for the hashes relation (M2M).
+	HashesPrimaryKey = []string{"node_id", "hashes_entry_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -444,6 +458,13 @@ func ByValidUntilDate(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newValidUntilDateStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByNodeListField orders the results by node_list field.
+func ByNodeListField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodeListStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newSuppliersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -469,14 +490,14 @@ func newIdentifiersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(IdentifiersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, IdentifiersTable, IdentifiersColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, IdentifiersTable, IdentifiersPrimaryKey...),
 	)
 }
 func newHashesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(HashesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, HashesTable, HashesPrimaryKey...),
 	)
 }
 func newReleaseDateStep() *sqlgraph.Step {
@@ -498,5 +519,12 @@ func newValidUntilDateStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ValidUntilDateInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ValidUntilDateTable, ValidUntilDateColumn),
+	)
+}
+func newNodeListStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodeListInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, NodeListTable, NodeListColumn),
 	)
 }

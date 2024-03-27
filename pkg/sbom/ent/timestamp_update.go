@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/timestamp"
 )
@@ -42,6 +43,25 @@ func (tu *TimestampUpdate) AddDate(t ...*Timestamp) *TimestampUpdate {
 	return tu.AddDateIDs(ids...)
 }
 
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (tu *TimestampUpdate) SetMetadataID(id string) *TimestampUpdate {
+	tu.mutation.SetMetadataID(id)
+	return tu
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (tu *TimestampUpdate) SetNillableMetadataID(id *string) *TimestampUpdate {
+	if id != nil {
+		tu = tu.SetMetadataID(*id)
+	}
+	return tu
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (tu *TimestampUpdate) SetMetadata(m *Metadata) *TimestampUpdate {
+	return tu.SetMetadataID(m.ID)
+}
+
 // Mutation returns the TimestampMutation object of the builder.
 func (tu *TimestampUpdate) Mutation() *TimestampMutation {
 	return tu.mutation
@@ -66,6 +86,12 @@ func (tu *TimestampUpdate) RemoveDate(t ...*Timestamp) *TimestampUpdate {
 		ids[i] = t[i].ID
 	}
 	return tu.RemoveDateIDs(ids...)
+}
+
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
+func (tu *TimestampUpdate) ClearMetadata() *TimestampUpdate {
+	tu.mutation.ClearMetadata()
+	return tu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -149,6 +175,35 @@ func (tu *TimestampUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.MetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   timestamp.MetadataTable,
+			Columns: []string{timestamp.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   timestamp.MetadataTable,
+			Columns: []string{timestamp.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{timestamp.Label}
@@ -184,6 +239,25 @@ func (tuo *TimestampUpdateOne) AddDate(t ...*Timestamp) *TimestampUpdateOne {
 	return tuo.AddDateIDs(ids...)
 }
 
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (tuo *TimestampUpdateOne) SetMetadataID(id string) *TimestampUpdateOne {
+	tuo.mutation.SetMetadataID(id)
+	return tuo
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (tuo *TimestampUpdateOne) SetNillableMetadataID(id *string) *TimestampUpdateOne {
+	if id != nil {
+		tuo = tuo.SetMetadataID(*id)
+	}
+	return tuo
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (tuo *TimestampUpdateOne) SetMetadata(m *Metadata) *TimestampUpdateOne {
+	return tuo.SetMetadataID(m.ID)
+}
+
 // Mutation returns the TimestampMutation object of the builder.
 func (tuo *TimestampUpdateOne) Mutation() *TimestampMutation {
 	return tuo.mutation
@@ -208,6 +282,12 @@ func (tuo *TimestampUpdateOne) RemoveDate(t ...*Timestamp) *TimestampUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return tuo.RemoveDateIDs(ids...)
+}
+
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
+func (tuo *TimestampUpdateOne) ClearMetadata() *TimestampUpdateOne {
+	tuo.mutation.ClearMetadata()
+	return tuo
 }
 
 // Where appends a list predicates to the TimestampUpdate builder.
@@ -314,6 +394,35 @@ func (tuo *TimestampUpdateOne) sqlSave(ctx context.Context) (_node *Timestamp, e
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.MetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   timestamp.MetadataTable,
+			Columns: []string{timestamp.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   timestamp.MetadataTable,
+			Columns: []string{timestamp.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -76,6 +76,29 @@ func HasDateWith(preds ...predicate.Timestamp) predicate.Timestamp {
 	})
 }
 
+// HasMetadata applies the HasEdge predicate on the "metadata" edge.
+func HasMetadata() predicate.Timestamp {
+	return predicate.Timestamp(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, MetadataTable, MetadataColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMetadataWith applies the HasEdge predicate on the "metadata" edge with a given conditions (other predicates).
+func HasMetadataWith(preds ...predicate.Metadata) predicate.Timestamp {
+	return predicate.Timestamp(func(s *sql.Selector) {
+		step := newMetadataStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Timestamp) predicate.Timestamp {
 	return predicate.Timestamp(sql.AndPredicates(predicates...))

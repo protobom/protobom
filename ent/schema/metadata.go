@@ -14,11 +14,11 @@ type Metadata struct {
 }
 
 func (Metadata) Fields() []ent.Field {
-	return []ent.Field{field.String("id"), field.String("version"), field.String("name"), field.String("comment")}
+	return []ent.Field{field.String("id").Unique().Immutable(), field.String("version"), field.String("name"), field.String("comment")}
 }
+
 func (Metadata) Edges() []ent.Edge {
-	return []ent.Edge{edge.To("tools", Tool.Type), edge.To("authors", Person.Type), edge.To("documentTypes", DocumentType.Type), edge.To("date", Timestamp.Type)}
+	return []ent.Edge{edge.To("tools", Tool.Type), edge.To("authors", Person.Type), edge.To("documentTypes", DocumentType.Type), edge.To("date", Timestamp.Type), edge.From("document", Document.Type).Ref("metadata").Required().Unique()}
 }
-func (Metadata) Annotations() []schema.Annotation {
-	return nil
-}
+
+func (Metadata) Annotations() []schema.Annotation { return nil }

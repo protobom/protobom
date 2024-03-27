@@ -11,17 +11,19 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/edge"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
 // EdgeQuery is the builder for querying Edge entities.
 type EdgeQuery struct {
 	config
-	ctx        *QueryContext
-	order      []edge.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Edge
-	withFKs    bool
+	ctx          *QueryContext
+	order        []edge.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Edge
+	withNodeList *NodeListQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +58,28 @@ func (eq *EdgeQuery) Unique(unique bool) *EdgeQuery {
 func (eq *EdgeQuery) Order(o ...edge.OrderOption) *EdgeQuery {
 	eq.order = append(eq.order, o...)
 	return eq
+}
+
+// QueryNodeList chains the current query on the "node_list" edge.
+func (eq *EdgeQuery) QueryNodeList() *NodeListQuery {
+	query := (&NodeListClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(edge.Table, edge.FieldID, selector),
+			sqlgraph.To(nodelist.Table, nodelist.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, edge.NodeListTable, edge.NodeListColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Edge entity from the query.
@@ -245,15 +269,27 @@ func (eq *EdgeQuery) Clone() *EdgeQuery {
 		return nil
 	}
 	return &EdgeQuery{
-		config:     eq.config,
-		ctx:        eq.ctx.Clone(),
-		order:      append([]edge.OrderOption{}, eq.order...),
-		inters:     append([]Interceptor{}, eq.inters...),
-		predicates: append([]predicate.Edge{}, eq.predicates...),
+		config:       eq.config,
+		ctx:          eq.ctx.Clone(),
+		order:        append([]edge.OrderOption{}, eq.order...),
+		inters:       append([]Interceptor{}, eq.inters...),
+		predicates:   append([]predicate.Edge{}, eq.predicates...),
+		withNodeList: eq.withNodeList.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
+}
+
+// WithNodeList tells the query-builder to eager-load the nodes that are connected to
+// the "node_list" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EdgeQuery) WithNodeList(opts ...func(*NodeListQuery)) *EdgeQuery {
+	query := (&NodeListClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withNodeList = query
+	return eq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,10 +368,16 @@ func (eq *EdgeQuery) prepareQuery(ctx context.Context) error {
 
 func (eq *EdgeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Edge, error) {
 	var (
-		nodes   = []*Edge{}
-		withFKs = eq.withFKs
-		_spec   = eq.querySpec()
+		nodes       = []*Edge{}
+		withFKs     = eq.withFKs
+		_spec       = eq.querySpec()
+		loadedTypes = [1]bool{
+			eq.withNodeList != nil,
+		}
 	)
+	if eq.withNodeList != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, edge.ForeignKeys...)
 	}
@@ -345,6 +387,7 @@ func (eq *EdgeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Edge, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Edge{config: eq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -356,7 +399,46 @@ func (eq *EdgeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Edge, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := eq.withNodeList; query != nil {
+		if err := eq.loadNodeList(ctx, query, nodes, nil,
+			func(n *Edge, e *NodeList) { n.Edges.NodeList = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (eq *EdgeQuery) loadNodeList(ctx context.Context, query *NodeListQuery, nodes []*Edge, init func(*Edge), assign func(*Edge, *NodeList)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Edge)
+	for i := range nodes {
+		if nodes[i].node_list_edges == nil {
+			continue
+		}
+		fk := *nodes[i].node_list_edges
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(nodelist.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "node_list_edges" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (eq *EdgeQuery) sqlCount(ctx context.Context) (int, error) {

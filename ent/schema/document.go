@@ -12,12 +12,10 @@ type Document struct {
 	ent.Schema
 }
 
-func (Document) Fields() []ent.Field {
-	return nil
-}
+func (Document) Fields() []ent.Field { return nil }
+
 func (Document) Edges() []ent.Edge {
-	return []ent.Edge{edge.To("metadata", Metadata.Type), edge.To("node_list", NodeList.Type)}
+	return []ent.Edge{edge.To("metadata", Metadata.Type).Unique(), edge.To("node_list", NodeList.Type).Unique()}
 }
-func (Document) Annotations() []schema.Annotation {
-	return nil
-}
+
+func (Document) Annotations() []schema.Annotation { return nil }

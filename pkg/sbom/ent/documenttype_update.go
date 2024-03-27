@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/documenttype"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
@@ -87,9 +88,34 @@ func (dtu *DocumentTypeUpdate) ClearDescription() *DocumentTypeUpdate {
 	return dtu
 }
 
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (dtu *DocumentTypeUpdate) SetMetadataID(id string) *DocumentTypeUpdate {
+	dtu.mutation.SetMetadataID(id)
+	return dtu
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (dtu *DocumentTypeUpdate) SetNillableMetadataID(id *string) *DocumentTypeUpdate {
+	if id != nil {
+		dtu = dtu.SetMetadataID(*id)
+	}
+	return dtu
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (dtu *DocumentTypeUpdate) SetMetadata(m *Metadata) *DocumentTypeUpdate {
+	return dtu.SetMetadataID(m.ID)
+}
+
 // Mutation returns the DocumentTypeMutation object of the builder.
 func (dtu *DocumentTypeUpdate) Mutation() *DocumentTypeMutation {
 	return dtu.mutation
+}
+
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
+func (dtu *DocumentTypeUpdate) ClearMetadata() *DocumentTypeUpdate {
+	dtu.mutation.ClearMetadata()
+	return dtu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -158,6 +184,35 @@ func (dtu *DocumentTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if dtu.mutation.DescriptionCleared() {
 		_spec.ClearField(documenttype.FieldDescription, field.TypeString)
+	}
+	if dtu.mutation.MetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   documenttype.MetadataTable,
+			Columns: []string{documenttype.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := dtu.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   documenttype.MetadataTable,
+			Columns: []string{documenttype.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, dtu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -239,9 +294,34 @@ func (dtuo *DocumentTypeUpdateOne) ClearDescription() *DocumentTypeUpdateOne {
 	return dtuo
 }
 
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (dtuo *DocumentTypeUpdateOne) SetMetadataID(id string) *DocumentTypeUpdateOne {
+	dtuo.mutation.SetMetadataID(id)
+	return dtuo
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (dtuo *DocumentTypeUpdateOne) SetNillableMetadataID(id *string) *DocumentTypeUpdateOne {
+	if id != nil {
+		dtuo = dtuo.SetMetadataID(*id)
+	}
+	return dtuo
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (dtuo *DocumentTypeUpdateOne) SetMetadata(m *Metadata) *DocumentTypeUpdateOne {
+	return dtuo.SetMetadataID(m.ID)
+}
+
 // Mutation returns the DocumentTypeMutation object of the builder.
 func (dtuo *DocumentTypeUpdateOne) Mutation() *DocumentTypeMutation {
 	return dtuo.mutation
+}
+
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
+func (dtuo *DocumentTypeUpdateOne) ClearMetadata() *DocumentTypeUpdateOne {
+	dtuo.mutation.ClearMetadata()
+	return dtuo
 }
 
 // Where appends a list predicates to the DocumentTypeUpdate builder.
@@ -340,6 +420,35 @@ func (dtuo *DocumentTypeUpdateOne) sqlSave(ctx context.Context) (_node *Document
 	}
 	if dtuo.mutation.DescriptionCleared() {
 		_spec.ClearField(documenttype.FieldDescription, field.TypeString)
+	}
+	if dtuo.mutation.MetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   documenttype.MetadataTable,
+			Columns: []string{documenttype.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := dtuo.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   documenttype.MetadataTable,
+			Columns: []string{documenttype.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &DocumentType{config: dtuo.config}
 	_spec.Assign = _node.assignValues

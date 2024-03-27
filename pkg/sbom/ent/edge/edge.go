@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -19,8 +20,17 @@ const (
 	FieldFrom = "from"
 	// FieldTo holds the string denoting the to field in the database.
 	FieldTo = "to"
+	// EdgeNodeList holds the string denoting the node_list edge name in mutations.
+	EdgeNodeList = "node_list"
 	// Table holds the table name of the edge in the database.
 	Table = "edges"
+	// NodeListTable is the table that holds the node_list relation/edge.
+	NodeListTable = "edges"
+	// NodeListInverseTable is the table name for the NodeList entity.
+	// It exists in this package in order to avoid circular dependency with the "nodelist" package.
+	NodeListInverseTable = "node_lists"
+	// NodeListColumn is the table column denoting the node_list relation/edge.
+	NodeListColumn = "node_list_edges"
 )
 
 // Columns holds all SQL columns for edge fields.
@@ -139,4 +149,18 @@ func ByFrom(opts ...sql.OrderTermOption) OrderOption {
 // ByTo orders the results by the to field.
 func ByTo(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTo, opts...).ToFunc()
+}
+
+// ByNodeListField orders the results by node_list field.
+func ByNodeListField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodeListStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newNodeListStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodeListInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, NodeListTable, NodeListColumn),
+	)
 }

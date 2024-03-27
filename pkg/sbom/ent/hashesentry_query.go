@@ -4,24 +4,28 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/externalreference"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/hashesentry"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
 // HashesEntryQuery is the builder for querying HashesEntry entities.
 type HashesEntryQuery struct {
 	config
-	ctx        *QueryContext
-	order      []hashesentry.OrderOption
-	inters     []Interceptor
-	predicates []predicate.HashesEntry
-	withFKs    bool
+	ctx                    *QueryContext
+	order                  []hashesentry.OrderOption
+	inters                 []Interceptor
+	predicates             []predicate.HashesEntry
+	withExternalReferences *ExternalReferenceQuery
+	withNodes              *NodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +60,50 @@ func (heq *HashesEntryQuery) Unique(unique bool) *HashesEntryQuery {
 func (heq *HashesEntryQuery) Order(o ...hashesentry.OrderOption) *HashesEntryQuery {
 	heq.order = append(heq.order, o...)
 	return heq
+}
+
+// QueryExternalReferences chains the current query on the "external_references" edge.
+func (heq *HashesEntryQuery) QueryExternalReferences() *ExternalReferenceQuery {
+	query := (&ExternalReferenceClient{config: heq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := heq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := heq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(hashesentry.Table, hashesentry.FieldID, selector),
+			sqlgraph.To(externalreference.Table, externalreference.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, hashesentry.ExternalReferencesTable, hashesentry.ExternalReferencesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(heq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNodes chains the current query on the "nodes" edge.
+func (heq *HashesEntryQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: heq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := heq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := heq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(hashesentry.Table, hashesentry.FieldID, selector),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, hashesentry.NodesTable, hashesentry.NodesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(heq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first HashesEntry entity from the query.
@@ -245,15 +293,39 @@ func (heq *HashesEntryQuery) Clone() *HashesEntryQuery {
 		return nil
 	}
 	return &HashesEntryQuery{
-		config:     heq.config,
-		ctx:        heq.ctx.Clone(),
-		order:      append([]hashesentry.OrderOption{}, heq.order...),
-		inters:     append([]Interceptor{}, heq.inters...),
-		predicates: append([]predicate.HashesEntry{}, heq.predicates...),
+		config:                 heq.config,
+		ctx:                    heq.ctx.Clone(),
+		order:                  append([]hashesentry.OrderOption{}, heq.order...),
+		inters:                 append([]Interceptor{}, heq.inters...),
+		predicates:             append([]predicate.HashesEntry{}, heq.predicates...),
+		withExternalReferences: heq.withExternalReferences.Clone(),
+		withNodes:              heq.withNodes.Clone(),
 		// clone intermediate query.
 		sql:  heq.sql.Clone(),
 		path: heq.path,
 	}
+}
+
+// WithExternalReferences tells the query-builder to eager-load the nodes that are connected to
+// the "external_references" edge. The optional arguments are used to configure the query builder of the edge.
+func (heq *HashesEntryQuery) WithExternalReferences(opts ...func(*ExternalReferenceQuery)) *HashesEntryQuery {
+	query := (&ExternalReferenceClient{config: heq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	heq.withExternalReferences = query
+	return heq
+}
+
+// WithNodes tells the query-builder to eager-load the nodes that are connected to
+// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (heq *HashesEntryQuery) WithNodes(opts ...func(*NodeQuery)) *HashesEntryQuery {
+	query := (&NodeClient{config: heq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	heq.withNodes = query
+	return heq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,19 +404,20 @@ func (heq *HashesEntryQuery) prepareQuery(ctx context.Context) error {
 
 func (heq *HashesEntryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*HashesEntry, error) {
 	var (
-		nodes   = []*HashesEntry{}
-		withFKs = heq.withFKs
-		_spec   = heq.querySpec()
+		nodes       = []*HashesEntry{}
+		_spec       = heq.querySpec()
+		loadedTypes = [2]bool{
+			heq.withExternalReferences != nil,
+			heq.withNodes != nil,
+		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, hashesentry.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*HashesEntry).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &HashesEntry{config: heq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -356,7 +429,146 @@ func (heq *HashesEntryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := heq.withExternalReferences; query != nil {
+		if err := heq.loadExternalReferences(ctx, query, nodes,
+			func(n *HashesEntry) { n.Edges.ExternalReferences = []*ExternalReference{} },
+			func(n *HashesEntry, e *ExternalReference) {
+				n.Edges.ExternalReferences = append(n.Edges.ExternalReferences, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := heq.withNodes; query != nil {
+		if err := heq.loadNodes(ctx, query, nodes,
+			func(n *HashesEntry) { n.Edges.Nodes = []*Node{} },
+			func(n *HashesEntry, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (heq *HashesEntryQuery) loadExternalReferences(ctx context.Context, query *ExternalReferenceQuery, nodes []*HashesEntry, init func(*HashesEntry), assign func(*HashesEntry, *ExternalReference)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*HashesEntry)
+	nids := make(map[int]map[*HashesEntry]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(hashesentry.ExternalReferencesTable)
+		s.Join(joinT).On(s.C(externalreference.FieldID), joinT.C(hashesentry.ExternalReferencesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(hashesentry.ExternalReferencesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(hashesentry.ExternalReferencesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*HashesEntry]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*ExternalReference](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "external_references" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (heq *HashesEntryQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*HashesEntry, init func(*HashesEntry), assign func(*HashesEntry, *Node)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*HashesEntry)
+	nids := make(map[string]map[*HashesEntry]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(hashesentry.NodesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(hashesentry.NodesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(hashesentry.NodesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(hashesentry.NodesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*HashesEntry]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Node](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "nodes" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
 }
 
 func (heq *HashesEntryQuery) sqlCount(ctx context.Context) (int, error) {

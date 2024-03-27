@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/edge"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
 )
 
 // EdgeCreate is the builder for creating a Edge entity.
@@ -35,6 +36,17 @@ func (ec *EdgeCreate) SetFrom(s string) *EdgeCreate {
 func (ec *EdgeCreate) SetTo(s string) *EdgeCreate {
 	ec.mutation.SetTo(s)
 	return ec
+}
+
+// SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
+func (ec *EdgeCreate) SetNodeListID(id int) *EdgeCreate {
+	ec.mutation.SetNodeListID(id)
+	return ec
+}
+
+// SetNodeList sets the "node_list" edge to the NodeList entity.
+func (ec *EdgeCreate) SetNodeList(n *NodeList) *EdgeCreate {
+	return ec.SetNodeListID(n.ID)
 }
 
 // Mutation returns the EdgeMutation object of the builder.
@@ -85,6 +97,9 @@ func (ec *EdgeCreate) check() error {
 	if _, ok := ec.mutation.To(); !ok {
 		return &ValidationError{Name: "to", err: errors.New(`ent: missing required field "Edge.to"`)}
 	}
+	if _, ok := ec.mutation.NodeListID(); !ok {
+		return &ValidationError{Name: "node_list", err: errors.New(`ent: missing required edge "Edge.node_list"`)}
+	}
 	return nil
 }
 
@@ -122,6 +137,23 @@ func (ec *EdgeCreate) createSpec() (*Edge, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.To(); ok {
 		_spec.SetField(edge.FieldTo, field.TypeString, value)
 		_node.To = value
+	}
+	if nodes := ec.mutation.NodeListIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   edge.NodeListTable,
+			Columns: []string{edge.NodeListColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.node_list_edges = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

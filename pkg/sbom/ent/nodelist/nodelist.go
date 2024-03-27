@@ -18,6 +18,8 @@ const (
 	EdgeNodes = "nodes"
 	// EdgeEdges holds the string denoting the edges edge name in mutations.
 	EdgeEdges = "edges"
+	// EdgeDocument holds the string denoting the document edge name in mutations.
+	EdgeDocument = "document"
 	// Table holds the table name of the nodelist in the database.
 	Table = "node_lists"
 	// NodesTable is the table that holds the nodes relation/edge.
@@ -34,6 +36,13 @@ const (
 	EdgesInverseTable = "edges"
 	// EdgesColumn is the table column denoting the edges relation/edge.
 	EdgesColumn = "node_list_edges"
+	// DocumentTable is the table that holds the document relation/edge.
+	DocumentTable = "node_lists"
+	// DocumentInverseTable is the table name for the Document entity.
+	// It exists in this package in order to avoid circular dependency with the "document" package.
+	DocumentInverseTable = "documents"
+	// DocumentColumn is the table column denoting the document relation/edge.
+	DocumentColumn = "document_node_list"
 )
 
 // Columns holds all SQL columns for nodelist fields.
@@ -103,6 +112,13 @@ func ByEdges(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEdgesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByDocumentField orders the results by document field.
+func ByDocumentField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDocumentStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newNodesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -115,5 +131,12 @@ func newEdgesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EdgesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EdgesTable, EdgesColumn),
+	)
+}
+func newDocumentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DocumentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, DocumentTable, DocumentColumn),
 	)
 }

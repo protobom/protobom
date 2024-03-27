@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
 )
 
 // Node is the model entity for the Node schema.
@@ -75,9 +76,11 @@ type NodeEdges struct {
 	BuildDate []*Timestamp `json:"build_date,omitempty"`
 	// ValidUntilDate holds the value of the valid_until_date edge.
 	ValidUntilDate []*Timestamp `json:"valid_until_date,omitempty"`
+	// NodeList holds the value of the node_list edge.
+	NodeList *NodeList `json:"node_list,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [9]bool
 }
 
 // SuppliersOrErr returns the Suppliers value or an error if the edge
@@ -150,6 +153,19 @@ func (e NodeEdges) ValidUntilDateOrErr() ([]*Timestamp, error) {
 		return e.ValidUntilDate, nil
 	}
 	return nil, &NotLoadedError{edge: "valid_until_date"}
+}
+
+// NodeListOrErr returns the NodeList value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NodeEdges) NodeListOrErr() (*NodeList, error) {
+	if e.loadedTypes[8] {
+		if e.NodeList == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: nodelist.Label}
+		}
+		return e.NodeList, nil
+	}
+	return nil, &NotLoadedError{edge: "node_list"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -342,6 +358,11 @@ func (n *Node) QueryBuildDate() *TimestampQuery {
 // QueryValidUntilDate queries the "valid_until_date" edge of the Node entity.
 func (n *Node) QueryValidUntilDate() *TimestampQuery {
 	return NewNodeClient(n.config).QueryValidUntilDate(n)
+}
+
+// QueryNodeList queries the "node_list" edge of the Node entity.
+func (n *Node) QueryNodeList() *NodeListQuery {
+	return NewNodeClient(n.config).QueryNodeList(n)
 }
 
 // Update returns a builder for updating this Node.

@@ -12,12 +12,10 @@ type Timestamp struct {
 	ent.Schema
 }
 
-func (Timestamp) Fields() []ent.Field {
-	return nil
-}
+func (Timestamp) Fields() []ent.Field { return nil }
+
 func (Timestamp) Edges() []ent.Edge {
-	return []ent.Edge{edge.To("date", Timestamp.Type)}
+	return []ent.Edge{edge.To("date", Timestamp.Type), edge.From("metadata", Metadata.Type).Ref("date").Unique()}
 }
-func (Timestamp) Annotations() []schema.Annotation {
-	return nil
-}
+
+func (Timestamp) Annotations() []schema.Annotation { return nil }

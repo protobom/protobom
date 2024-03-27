@@ -1227,7 +1227,7 @@ func HasIdentifiers() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, IdentifiersTable, IdentifiersColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, IdentifiersTable, IdentifiersPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1250,7 +1250,7 @@ func HasHashes() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, HashesTable, HashesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1329,6 +1329,29 @@ func HasValidUntilDate() predicate.Node {
 func HasValidUntilDateWith(preds ...predicate.Timestamp) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := newValidUntilDateStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasNodeList applies the HasEdge predicate on the "node_list" edge.
+func HasNodeList() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, NodeListTable, NodeListColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodeListWith applies the HasEdge predicate on the "node_list" edge with a given conditions (other predicates).
+func HasNodeListWith(preds ...predicate.NodeList) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newNodeListStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

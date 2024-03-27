@@ -4,6 +4,7 @@ package edge
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
@@ -210,6 +211,29 @@ func ToEqualFold(v string) predicate.Edge {
 // ToContainsFold applies the ContainsFold predicate on the "to" field.
 func ToContainsFold(v string) predicate.Edge {
 	return predicate.Edge(sql.FieldContainsFold(FieldTo, v))
+}
+
+// HasNodeList applies the HasEdge predicate on the "node_list" edge.
+func HasNodeList() predicate.Edge {
+	return predicate.Edge(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, NodeListTable, NodeListColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodeListWith applies the HasEdge predicate on the "node_list" edge with a given conditions (other predicates).
+func HasNodeListWith(preds ...predicate.NodeList) predicate.Edge {
+	return predicate.Edge(func(s *sql.Selector) {
+		step := newNodeListStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

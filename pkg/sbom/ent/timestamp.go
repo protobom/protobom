@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/timestamp"
 )
 
@@ -30,9 +31,11 @@ type Timestamp struct {
 type TimestampEdges struct {
 	// Date holds the value of the date edge.
 	Date []*Timestamp `json:"date,omitempty"`
+	// Metadata holds the value of the metadata edge.
+	Metadata *Metadata `json:"metadata,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // DateOrErr returns the Date value or an error if the edge
@@ -42,6 +45,19 @@ func (e TimestampEdges) DateOrErr() ([]*Timestamp, error) {
 		return e.Date, nil
 	}
 	return nil, &NotLoadedError{edge: "date"}
+}
+
+// MetadataOrErr returns the Metadata value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TimestampEdges) MetadataOrErr() (*Metadata, error) {
+	if e.loadedTypes[1] {
+		if e.Metadata == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: metadata.Label}
+		}
+		return e.Metadata, nil
+	}
+	return nil, &NotLoadedError{edge: "metadata"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -124,6 +140,11 @@ func (t *Timestamp) Value(name string) (ent.Value, error) {
 // QueryDate queries the "date" edge of the Timestamp entity.
 func (t *Timestamp) QueryDate() *TimestampQuery {
 	return NewTimestampClient(t.config).QueryDate(t)
+}
+
+// QueryMetadata queries the "metadata" edge of the Timestamp entity.
+func (t *Timestamp) QueryMetadata() *MetadataQuery {
+	return NewTimestampClient(t.config).QueryMetadata(t)
 }
 
 // Update returns a builder for updating this Timestamp.

@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/edge"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
 )
 
 // Edge is the model entity for the Edge schema.
@@ -21,9 +22,34 @@ type Edge struct {
 	// From holds the value of the "from" field.
 	From string `json:"from,omitempty"`
 	// To holds the value of the "to" field.
-	To              string `json:"to,omitempty"`
+	To string `json:"to,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the EdgeQuery when eager-loading is set.
+	Edges           EdgeEdges `json:"edges"`
 	node_list_edges *int
 	selectValues    sql.SelectValues
+}
+
+// EdgeEdges holds the relations/edges for other nodes in the graph.
+type EdgeEdges struct {
+	// NodeList holds the value of the node_list edge.
+	NodeList *NodeList `json:"node_list,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// NodeListOrErr returns the NodeList value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EdgeEdges) NodeListOrErr() (*NodeList, error) {
+	if e.loadedTypes[0] {
+		if e.NodeList == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: nodelist.Label}
+		}
+		return e.NodeList, nil
+	}
+	return nil, &NotLoadedError{edge: "node_list"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -94,6 +120,11 @@ func (e *Edge) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Edge) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
+}
+
+// QueryNodeList queries the "node_list" edge of the Edge entity.
+func (e *Edge) QueryNodeList() *NodeListQuery {
+	return NewEdgeClient(e.config).QueryNodeList(e)
 }
 
 // Update returns a builder for updating this Edge.

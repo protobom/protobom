@@ -16,9 +16,9 @@ type NodeList struct {
 func (NodeList) Fields() []ent.Field {
 	return []ent.Field{field.String("root_elements")}
 }
+
 func (NodeList) Edges() []ent.Edge {
-	return []ent.Edge{edge.To("nodes", Node.Type), edge.To("edges", Edge.Type)}
+	return []ent.Edge{edge.To("nodes", Node.Type), edge.To("edges", Edge.Type), edge.From("document", Document.Type).Ref("node_list").Required().Unique()}
 }
-func (NodeList) Annotations() []schema.Annotation {
-	return nil
-}
+
+func (NodeList) Annotations() []schema.Annotation { return nil }

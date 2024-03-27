@@ -20,34 +20,42 @@ type DocumentCreate struct {
 	hooks    []Hook
 }
 
-// AddMetadatumIDs adds the "metadata" edge to the Metadata entity by IDs.
-func (dc *DocumentCreate) AddMetadatumIDs(ids ...string) *DocumentCreate {
-	dc.mutation.AddMetadatumIDs(ids...)
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (dc *DocumentCreate) SetMetadataID(id string) *DocumentCreate {
+	dc.mutation.SetMetadataID(id)
 	return dc
 }
 
-// AddMetadata adds the "metadata" edges to the Metadata entity.
-func (dc *DocumentCreate) AddMetadata(m ...*Metadata) *DocumentCreate {
-	ids := make([]string, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (dc *DocumentCreate) SetNillableMetadataID(id *string) *DocumentCreate {
+	if id != nil {
+		dc = dc.SetMetadataID(*id)
 	}
-	return dc.AddMetadatumIDs(ids...)
-}
-
-// AddNodeListIDs adds the "node_list" edge to the NodeList entity by IDs.
-func (dc *DocumentCreate) AddNodeListIDs(ids ...int) *DocumentCreate {
-	dc.mutation.AddNodeListIDs(ids...)
 	return dc
 }
 
-// AddNodeList adds the "node_list" edges to the NodeList entity.
-func (dc *DocumentCreate) AddNodeList(n ...*NodeList) *DocumentCreate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (dc *DocumentCreate) SetMetadata(m *Metadata) *DocumentCreate {
+	return dc.SetMetadataID(m.ID)
+}
+
+// SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
+func (dc *DocumentCreate) SetNodeListID(id int) *DocumentCreate {
+	dc.mutation.SetNodeListID(id)
+	return dc
+}
+
+// SetNillableNodeListID sets the "node_list" edge to the NodeList entity by ID if the given value is not nil.
+func (dc *DocumentCreate) SetNillableNodeListID(id *int) *DocumentCreate {
+	if id != nil {
+		dc = dc.SetNodeListID(*id)
 	}
-	return dc.AddNodeListIDs(ids...)
+	return dc
+}
+
+// SetNodeList sets the "node_list" edge to the NodeList entity.
+func (dc *DocumentCreate) SetNodeList(n *NodeList) *DocumentCreate {
+	return dc.SetNodeListID(n.ID)
 }
 
 // Mutation returns the DocumentMutation object of the builder.
@@ -112,7 +120,7 @@ func (dc *DocumentCreate) createSpec() (*Document, *sqlgraph.CreateSpec) {
 	)
 	if nodes := dc.mutation.MetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
@@ -128,7 +136,7 @@ func (dc *DocumentCreate) createSpec() (*Document, *sqlgraph.CreateSpec) {
 	}
 	if nodes := dc.mutation.NodeListIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},

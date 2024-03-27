@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/timestamp"
 )
@@ -18,12 +19,13 @@ import (
 // TimestampQuery is the builder for querying Timestamp entities.
 type TimestampQuery struct {
 	config
-	ctx        *QueryContext
-	order      []timestamp.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Timestamp
-	withDate   *TimestampQuery
-	withFKs    bool
+	ctx          *QueryContext
+	order        []timestamp.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Timestamp
+	withDate     *TimestampQuery
+	withMetadata *MetadataQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,6 +77,28 @@ func (tq *TimestampQuery) QueryDate() *TimestampQuery {
 			sqlgraph.From(timestamp.Table, timestamp.FieldID, selector),
 			sqlgraph.To(timestamp.Table, timestamp.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, timestamp.DateTable, timestamp.DatePrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMetadata chains the current query on the "metadata" edge.
+func (tq *TimestampQuery) QueryMetadata() *MetadataQuery {
+	query := (&MetadataClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(timestamp.Table, timestamp.FieldID, selector),
+			sqlgraph.To(metadata.Table, metadata.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, timestamp.MetadataTable, timestamp.MetadataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,12 +293,13 @@ func (tq *TimestampQuery) Clone() *TimestampQuery {
 		return nil
 	}
 	return &TimestampQuery{
-		config:     tq.config,
-		ctx:        tq.ctx.Clone(),
-		order:      append([]timestamp.OrderOption{}, tq.order...),
-		inters:     append([]Interceptor{}, tq.inters...),
-		predicates: append([]predicate.Timestamp{}, tq.predicates...),
-		withDate:   tq.withDate.Clone(),
+		config:       tq.config,
+		ctx:          tq.ctx.Clone(),
+		order:        append([]timestamp.OrderOption{}, tq.order...),
+		inters:       append([]Interceptor{}, tq.inters...),
+		predicates:   append([]predicate.Timestamp{}, tq.predicates...),
+		withDate:     tq.withDate.Clone(),
+		withMetadata: tq.withMetadata.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -289,6 +314,17 @@ func (tq *TimestampQuery) WithDate(opts ...func(*TimestampQuery)) *TimestampQuer
 		opt(query)
 	}
 	tq.withDate = query
+	return tq
+}
+
+// WithMetadata tells the query-builder to eager-load the nodes that are connected to
+// the "metadata" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TimestampQuery) WithMetadata(opts ...func(*MetadataQuery)) *TimestampQuery {
+	query := (&MetadataClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withMetadata = query
 	return tq
 }
 
@@ -349,10 +385,14 @@ func (tq *TimestampQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ti
 		nodes       = []*Timestamp{}
 		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			tq.withDate != nil,
+			tq.withMetadata != nil,
 		}
 	)
+	if tq.withMetadata != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, timestamp.ForeignKeys...)
 	}
@@ -378,6 +418,12 @@ func (tq *TimestampQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ti
 		if err := tq.loadDate(ctx, query, nodes,
 			func(n *Timestamp) { n.Edges.Date = []*Timestamp{} },
 			func(n *Timestamp, e *Timestamp) { n.Edges.Date = append(n.Edges.Date, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withMetadata; query != nil {
+		if err := tq.loadMetadata(ctx, query, nodes, nil,
+			func(n *Timestamp, e *Metadata) { n.Edges.Metadata = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -441,6 +487,38 @@ func (tq *TimestampQuery) loadDate(ctx context.Context, query *TimestampQuery, n
 		}
 		for kn := range nodes {
 			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (tq *TimestampQuery) loadMetadata(ctx context.Context, query *MetadataQuery, nodes []*Timestamp, init func(*Timestamp), assign func(*Timestamp, *Metadata)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Timestamp)
+	for i := range nodes {
+		if nodes[i].metadata_date == nil {
+			continue
+		}
+		fk := *nodes[i].metadata_date
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(metadata.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "metadata_date" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
 		}
 	}
 	return nil

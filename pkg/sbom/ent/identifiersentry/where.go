@@ -4,6 +4,7 @@ package identifiersentry
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
@@ -140,6 +141,29 @@ func SoftwareIdentifierValueEqualFold(v string) predicate.IdentifiersEntry {
 // SoftwareIdentifierValueContainsFold applies the ContainsFold predicate on the "software_identifier_value" field.
 func SoftwareIdentifierValueContainsFold(v string) predicate.IdentifiersEntry {
 	return predicate.IdentifiersEntry(sql.FieldContainsFold(FieldSoftwareIdentifierValue, v))
+}
+
+// HasNodes applies the HasEdge predicate on the "nodes" edge.
+func HasNodes() predicate.IdentifiersEntry {
+	return predicate.IdentifiersEntry(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, NodesTable, NodesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodesWith applies the HasEdge predicate on the "nodes" edge with a given conditions (other predicates).
+func HasNodesWith(preds ...predicate.Node) predicate.IdentifiersEntry {
+	return predicate.IdentifiersEntry(func(s *sql.Selector) {
+		step := newNodesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

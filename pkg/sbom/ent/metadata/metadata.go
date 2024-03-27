@@ -26,6 +26,8 @@ const (
 	EdgeDocumentTypes = "documentTypes"
 	// EdgeDate holds the string denoting the date edge name in mutations.
 	EdgeDate = "date"
+	// EdgeDocument holds the string denoting the document edge name in mutations.
+	EdgeDocument = "document"
 	// Table holds the table name of the metadata in the database.
 	Table = "metadata"
 	// ToolsTable is the table that holds the tools relation/edge.
@@ -56,6 +58,13 @@ const (
 	DateInverseTable = "timestamps"
 	// DateColumn is the table column denoting the date relation/edge.
 	DateColumn = "metadata_date"
+	// DocumentTable is the table that holds the document relation/edge.
+	DocumentTable = "metadata"
+	// DocumentInverseTable is the table name for the Document entity.
+	// It exists in this package in order to avoid circular dependency with the "document" package.
+	DocumentInverseTable = "documents"
+	// DocumentColumn is the table column denoting the document relation/edge.
+	DocumentColumn = "document_metadata"
 )
 
 // Columns holds all SQL columns for metadata fields.
@@ -165,6 +174,13 @@ func ByDate(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newDateStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByDocumentField orders the results by document field.
+func ByDocumentField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDocumentStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newToolsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -191,5 +207,12 @@ func newDateStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DateInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, DateTable, DateColumn),
+	)
+}
+func newDocumentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DocumentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, DocumentTable, DocumentColumn),
 	)
 }

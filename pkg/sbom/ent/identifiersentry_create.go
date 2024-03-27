@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/identifiersentry"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 )
 
 // IdentifiersEntryCreate is the builder for creating a IdentifiersEntry entity.
@@ -29,6 +30,21 @@ func (iec *IdentifiersEntryCreate) SetSoftwareIdentifierType(iit identifiersentr
 func (iec *IdentifiersEntryCreate) SetSoftwareIdentifierValue(s string) *IdentifiersEntryCreate {
 	iec.mutation.SetSoftwareIdentifierValue(s)
 	return iec
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (iec *IdentifiersEntryCreate) AddNodeIDs(ids ...string) *IdentifiersEntryCreate {
+	iec.mutation.AddNodeIDs(ids...)
+	return iec
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (iec *IdentifiersEntryCreate) AddNodes(n ...*Node) *IdentifiersEntryCreate {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return iec.AddNodeIDs(ids...)
 }
 
 // Mutation returns the IdentifiersEntryMutation object of the builder.
@@ -109,6 +125,22 @@ func (iec *IdentifiersEntryCreate) createSpec() (*IdentifiersEntry, *sqlgraph.Cr
 	if value, ok := iec.mutation.SoftwareIdentifierValue(); ok {
 		_spec.SetField(identifiersentry.FieldSoftwareIdentifierValue, field.TypeString, value)
 		_node.SoftwareIdentifierValue = value
+	}
+	if nodes := iec.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   identifiersentry.NodesTable,
+			Columns: identifiersentry.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/person"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
@@ -18,12 +20,15 @@ import (
 // PersonQuery is the builder for querying Person entities.
 type PersonQuery struct {
 	config
-	ctx          *QueryContext
-	order        []person.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Person
-	withContacts *PersonQuery
-	withFKs      bool
+	ctx                *QueryContext
+	order              []person.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Person
+	withContacts       *PersonQuery
+	withMetadata       *MetadataQuery
+	withNodeSupplier   *NodeQuery
+	withNodeOriginator *NodeQuery
+	withFKs            bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,6 +80,72 @@ func (pq *PersonQuery) QueryContacts() *PersonQuery {
 			sqlgraph.From(person.Table, person.FieldID, selector),
 			sqlgraph.To(person.Table, person.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, person.ContactsTable, person.ContactsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMetadata chains the current query on the "metadata" edge.
+func (pq *PersonQuery) QueryMetadata() *MetadataQuery {
+	query := (&MetadataClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(person.Table, person.FieldID, selector),
+			sqlgraph.To(metadata.Table, metadata.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, person.MetadataTable, person.MetadataColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNodeSupplier chains the current query on the "node_supplier" edge.
+func (pq *PersonQuery) QueryNodeSupplier() *NodeQuery {
+	query := (&NodeClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(person.Table, person.FieldID, selector),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, person.NodeSupplierTable, person.NodeSupplierColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNodeOriginator chains the current query on the "node_originator" edge.
+func (pq *PersonQuery) QueryNodeOriginator() *NodeQuery {
+	query := (&NodeClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(person.Table, person.FieldID, selector),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, person.NodeOriginatorTable, person.NodeOriginatorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,12 +340,15 @@ func (pq *PersonQuery) Clone() *PersonQuery {
 		return nil
 	}
 	return &PersonQuery{
-		config:       pq.config,
-		ctx:          pq.ctx.Clone(),
-		order:        append([]person.OrderOption{}, pq.order...),
-		inters:       append([]Interceptor{}, pq.inters...),
-		predicates:   append([]predicate.Person{}, pq.predicates...),
-		withContacts: pq.withContacts.Clone(),
+		config:             pq.config,
+		ctx:                pq.ctx.Clone(),
+		order:              append([]person.OrderOption{}, pq.order...),
+		inters:             append([]Interceptor{}, pq.inters...),
+		predicates:         append([]predicate.Person{}, pq.predicates...),
+		withContacts:       pq.withContacts.Clone(),
+		withMetadata:       pq.withMetadata.Clone(),
+		withNodeSupplier:   pq.withNodeSupplier.Clone(),
+		withNodeOriginator: pq.withNodeOriginator.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -289,6 +363,39 @@ func (pq *PersonQuery) WithContacts(opts ...func(*PersonQuery)) *PersonQuery {
 		opt(query)
 	}
 	pq.withContacts = query
+	return pq
+}
+
+// WithMetadata tells the query-builder to eager-load the nodes that are connected to
+// the "metadata" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PersonQuery) WithMetadata(opts ...func(*MetadataQuery)) *PersonQuery {
+	query := (&MetadataClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withMetadata = query
+	return pq
+}
+
+// WithNodeSupplier tells the query-builder to eager-load the nodes that are connected to
+// the "node_supplier" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PersonQuery) WithNodeSupplier(opts ...func(*NodeQuery)) *PersonQuery {
+	query := (&NodeClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withNodeSupplier = query
+	return pq
+}
+
+// WithNodeOriginator tells the query-builder to eager-load the nodes that are connected to
+// the "node_originator" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PersonQuery) WithNodeOriginator(opts ...func(*NodeQuery)) *PersonQuery {
+	query := (&NodeClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withNodeOriginator = query
 	return pq
 }
 
@@ -371,10 +478,16 @@ func (pq *PersonQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Perso
 		nodes       = []*Person{}
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [4]bool{
 			pq.withContacts != nil,
+			pq.withMetadata != nil,
+			pq.withNodeSupplier != nil,
+			pq.withNodeOriginator != nil,
 		}
 	)
+	if pq.withMetadata != nil || pq.withNodeSupplier != nil || pq.withNodeOriginator != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, person.ForeignKeys...)
 	}
@@ -400,6 +513,24 @@ func (pq *PersonQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Perso
 		if err := pq.loadContacts(ctx, query, nodes,
 			func(n *Person) { n.Edges.Contacts = []*Person{} },
 			func(n *Person, e *Person) { n.Edges.Contacts = append(n.Edges.Contacts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withMetadata; query != nil {
+		if err := pq.loadMetadata(ctx, query, nodes, nil,
+			func(n *Person, e *Metadata) { n.Edges.Metadata = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withNodeSupplier; query != nil {
+		if err := pq.loadNodeSupplier(ctx, query, nodes, nil,
+			func(n *Person, e *Node) { n.Edges.NodeSupplier = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withNodeOriginator; query != nil {
+		if err := pq.loadNodeOriginator(ctx, query, nodes, nil,
+			func(n *Person, e *Node) { n.Edges.NodeOriginator = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -463,6 +594,102 @@ func (pq *PersonQuery) loadContacts(ctx context.Context, query *PersonQuery, nod
 		}
 		for kn := range nodes {
 			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (pq *PersonQuery) loadMetadata(ctx context.Context, query *MetadataQuery, nodes []*Person, init func(*Person), assign func(*Person, *Metadata)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Person)
+	for i := range nodes {
+		if nodes[i].metadata_authors == nil {
+			continue
+		}
+		fk := *nodes[i].metadata_authors
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(metadata.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "metadata_authors" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (pq *PersonQuery) loadNodeSupplier(ctx context.Context, query *NodeQuery, nodes []*Person, init func(*Person), assign func(*Person, *Node)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Person)
+	for i := range nodes {
+		if nodes[i].node_suppliers == nil {
+			continue
+		}
+		fk := *nodes[i].node_suppliers
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(node.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "node_suppliers" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (pq *PersonQuery) loadNodeOriginator(ctx context.Context, query *NodeQuery, nodes []*Person, init func(*Person), assign func(*Person, *Node)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Person)
+	for i := range nodes {
+		if nodes[i].node_originators == nil {
+			continue
+		}
+		fk := *nodes[i].node_originators
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(node.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "node_originators" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
 		}
 	}
 	return nil

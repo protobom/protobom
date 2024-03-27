@@ -169,6 +169,29 @@ func HasEdgesWith(preds ...predicate.Edge) predicate.NodeList {
 	})
 }
 
+// HasDocument applies the HasEdge predicate on the "document" edge.
+func HasDocument() predicate.NodeList {
+	return predicate.NodeList(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, DocumentTable, DocumentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDocumentWith applies the HasEdge predicate on the "document" edge with a given conditions (other predicates).
+func HasDocumentWith(preds ...predicate.Document) predicate.NodeList {
+	return predicate.NodeList(func(s *sql.Selector) {
+		step := newDocumentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.NodeList) predicate.NodeList {
 	return predicate.NodeList(sql.AndPredicates(predicates...))

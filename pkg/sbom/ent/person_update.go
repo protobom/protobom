@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/person"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
@@ -112,6 +114,63 @@ func (pu *PersonUpdate) AddContacts(p ...*Person) *PersonUpdate {
 	return pu.AddContactIDs(ids...)
 }
 
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (pu *PersonUpdate) SetMetadataID(id string) *PersonUpdate {
+	pu.mutation.SetMetadataID(id)
+	return pu
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (pu *PersonUpdate) SetNillableMetadataID(id *string) *PersonUpdate {
+	if id != nil {
+		pu = pu.SetMetadataID(*id)
+	}
+	return pu
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (pu *PersonUpdate) SetMetadata(m *Metadata) *PersonUpdate {
+	return pu.SetMetadataID(m.ID)
+}
+
+// SetNodeSupplierID sets the "node_supplier" edge to the Node entity by ID.
+func (pu *PersonUpdate) SetNodeSupplierID(id string) *PersonUpdate {
+	pu.mutation.SetNodeSupplierID(id)
+	return pu
+}
+
+// SetNillableNodeSupplierID sets the "node_supplier" edge to the Node entity by ID if the given value is not nil.
+func (pu *PersonUpdate) SetNillableNodeSupplierID(id *string) *PersonUpdate {
+	if id != nil {
+		pu = pu.SetNodeSupplierID(*id)
+	}
+	return pu
+}
+
+// SetNodeSupplier sets the "node_supplier" edge to the Node entity.
+func (pu *PersonUpdate) SetNodeSupplier(n *Node) *PersonUpdate {
+	return pu.SetNodeSupplierID(n.ID)
+}
+
+// SetNodeOriginatorID sets the "node_originator" edge to the Node entity by ID.
+func (pu *PersonUpdate) SetNodeOriginatorID(id string) *PersonUpdate {
+	pu.mutation.SetNodeOriginatorID(id)
+	return pu
+}
+
+// SetNillableNodeOriginatorID sets the "node_originator" edge to the Node entity by ID if the given value is not nil.
+func (pu *PersonUpdate) SetNillableNodeOriginatorID(id *string) *PersonUpdate {
+	if id != nil {
+		pu = pu.SetNodeOriginatorID(*id)
+	}
+	return pu
+}
+
+// SetNodeOriginator sets the "node_originator" edge to the Node entity.
+func (pu *PersonUpdate) SetNodeOriginator(n *Node) *PersonUpdate {
+	return pu.SetNodeOriginatorID(n.ID)
+}
+
 // Mutation returns the PersonMutation object of the builder.
 func (pu *PersonUpdate) Mutation() *PersonMutation {
 	return pu.mutation
@@ -136,6 +195,24 @@ func (pu *PersonUpdate) RemoveContacts(p ...*Person) *PersonUpdate {
 		ids[i] = p[i].ID
 	}
 	return pu.RemoveContactIDs(ids...)
+}
+
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
+func (pu *PersonUpdate) ClearMetadata() *PersonUpdate {
+	pu.mutation.ClearMetadata()
+	return pu
+}
+
+// ClearNodeSupplier clears the "node_supplier" edge to the Node entity.
+func (pu *PersonUpdate) ClearNodeSupplier() *PersonUpdate {
+	pu.mutation.ClearNodeSupplier()
+	return pu
+}
+
+// ClearNodeOriginator clears the "node_originator" edge to the Node entity.
+func (pu *PersonUpdate) ClearNodeOriginator() *PersonUpdate {
+	pu.mutation.ClearNodeOriginator()
+	return pu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -227,6 +304,93 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.MetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.MetadataTable,
+			Columns: []string{person.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.MetadataTable,
+			Columns: []string{person.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.NodeSupplierCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.NodeSupplierTable,
+			Columns: []string{person.NodeSupplierColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.NodeSupplierIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.NodeSupplierTable,
+			Columns: []string{person.NodeSupplierColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.NodeOriginatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.NodeOriginatorTable,
+			Columns: []string{person.NodeOriginatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.NodeOriginatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.NodeOriginatorTable,
+			Columns: []string{person.NodeOriginatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -339,6 +503,63 @@ func (puo *PersonUpdateOne) AddContacts(p ...*Person) *PersonUpdateOne {
 	return puo.AddContactIDs(ids...)
 }
 
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (puo *PersonUpdateOne) SetMetadataID(id string) *PersonUpdateOne {
+	puo.mutation.SetMetadataID(id)
+	return puo
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (puo *PersonUpdateOne) SetNillableMetadataID(id *string) *PersonUpdateOne {
+	if id != nil {
+		puo = puo.SetMetadataID(*id)
+	}
+	return puo
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (puo *PersonUpdateOne) SetMetadata(m *Metadata) *PersonUpdateOne {
+	return puo.SetMetadataID(m.ID)
+}
+
+// SetNodeSupplierID sets the "node_supplier" edge to the Node entity by ID.
+func (puo *PersonUpdateOne) SetNodeSupplierID(id string) *PersonUpdateOne {
+	puo.mutation.SetNodeSupplierID(id)
+	return puo
+}
+
+// SetNillableNodeSupplierID sets the "node_supplier" edge to the Node entity by ID if the given value is not nil.
+func (puo *PersonUpdateOne) SetNillableNodeSupplierID(id *string) *PersonUpdateOne {
+	if id != nil {
+		puo = puo.SetNodeSupplierID(*id)
+	}
+	return puo
+}
+
+// SetNodeSupplier sets the "node_supplier" edge to the Node entity.
+func (puo *PersonUpdateOne) SetNodeSupplier(n *Node) *PersonUpdateOne {
+	return puo.SetNodeSupplierID(n.ID)
+}
+
+// SetNodeOriginatorID sets the "node_originator" edge to the Node entity by ID.
+func (puo *PersonUpdateOne) SetNodeOriginatorID(id string) *PersonUpdateOne {
+	puo.mutation.SetNodeOriginatorID(id)
+	return puo
+}
+
+// SetNillableNodeOriginatorID sets the "node_originator" edge to the Node entity by ID if the given value is not nil.
+func (puo *PersonUpdateOne) SetNillableNodeOriginatorID(id *string) *PersonUpdateOne {
+	if id != nil {
+		puo = puo.SetNodeOriginatorID(*id)
+	}
+	return puo
+}
+
+// SetNodeOriginator sets the "node_originator" edge to the Node entity.
+func (puo *PersonUpdateOne) SetNodeOriginator(n *Node) *PersonUpdateOne {
+	return puo.SetNodeOriginatorID(n.ID)
+}
+
 // Mutation returns the PersonMutation object of the builder.
 func (puo *PersonUpdateOne) Mutation() *PersonMutation {
 	return puo.mutation
@@ -363,6 +584,24 @@ func (puo *PersonUpdateOne) RemoveContacts(p ...*Person) *PersonUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return puo.RemoveContactIDs(ids...)
+}
+
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
+func (puo *PersonUpdateOne) ClearMetadata() *PersonUpdateOne {
+	puo.mutation.ClearMetadata()
+	return puo
+}
+
+// ClearNodeSupplier clears the "node_supplier" edge to the Node entity.
+func (puo *PersonUpdateOne) ClearNodeSupplier() *PersonUpdateOne {
+	puo.mutation.ClearNodeSupplier()
+	return puo
+}
+
+// ClearNodeOriginator clears the "node_originator" edge to the Node entity.
+func (puo *PersonUpdateOne) ClearNodeOriginator() *PersonUpdateOne {
+	puo.mutation.ClearNodeOriginator()
+	return puo
 }
 
 // Where appends a list predicates to the PersonUpdate builder.
@@ -484,6 +723,93 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.MetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.MetadataTable,
+			Columns: []string{person.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.MetadataTable,
+			Columns: []string{person.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.NodeSupplierCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.NodeSupplierTable,
+			Columns: []string{person.NodeSupplierColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.NodeSupplierIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.NodeSupplierTable,
+			Columns: []string{person.NodeSupplierColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.NodeOriginatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.NodeOriginatorTable,
+			Columns: []string{person.NodeOriginatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.NodeOriginatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.NodeOriginatorTable,
+			Columns: []string{person.NodeOriginatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

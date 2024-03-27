@@ -9,6 +9,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/document"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
 )
 
 // Document is the model entity for the Document schema.
@@ -25,27 +27,35 @@ type Document struct {
 // DocumentEdges holds the relations/edges for other nodes in the graph.
 type DocumentEdges struct {
 	// Metadata holds the value of the metadata edge.
-	Metadata []*Metadata `json:"metadata,omitempty"`
+	Metadata *Metadata `json:"metadata,omitempty"`
 	// NodeList holds the value of the node_list edge.
-	NodeList []*NodeList `json:"node_list,omitempty"`
+	NodeList *NodeList `json:"node_list,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
 // MetadataOrErr returns the Metadata value or an error if the edge
-// was not loaded in eager-loading.
-func (e DocumentEdges) MetadataOrErr() ([]*Metadata, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DocumentEdges) MetadataOrErr() (*Metadata, error) {
 	if e.loadedTypes[0] {
+		if e.Metadata == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: metadata.Label}
+		}
 		return e.Metadata, nil
 	}
 	return nil, &NotLoadedError{edge: "metadata"}
 }
 
 // NodeListOrErr returns the NodeList value or an error if the edge
-// was not loaded in eager-loading.
-func (e DocumentEdges) NodeListOrErr() ([]*NodeList, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DocumentEdges) NodeListOrErr() (*NodeList, error) {
 	if e.loadedTypes[1] {
+		if e.NodeList == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: nodelist.Label}
+		}
 		return e.NodeList, nil
 	}
 	return nil, &NotLoadedError{edge: "node_list"}

@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/tool"
 )
 
@@ -21,9 +22,34 @@ type Tool struct {
 	// Version holds the value of the "version" field.
 	Version string `json:"version,omitempty"`
 	// Vendor holds the value of the "vendor" field.
-	Vendor         string `json:"vendor,omitempty"`
+	Vendor string `json:"vendor,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ToolQuery when eager-loading is set.
+	Edges          ToolEdges `json:"edges"`
 	metadata_tools *string
 	selectValues   sql.SelectValues
+}
+
+// ToolEdges holds the relations/edges for other nodes in the graph.
+type ToolEdges struct {
+	// Metadata holds the value of the metadata edge.
+	Metadata *Metadata `json:"metadata,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// MetadataOrErr returns the Metadata value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ToolEdges) MetadataOrErr() (*Metadata, error) {
+	if e.loadedTypes[0] {
+		if e.Metadata == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: metadata.Label}
+		}
+		return e.Metadata, nil
+	}
+	return nil, &NotLoadedError{edge: "metadata"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -94,6 +120,11 @@ func (t *Tool) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (t *Tool) Value(name string) (ent.Value, error) {
 	return t.selectValues.Get(name)
+}
+
+// QueryMetadata queries the "metadata" edge of the Tool entity.
+func (t *Tool) QueryMetadata() *MetadataQuery {
+	return NewToolClient(t.config).QueryMetadata(t)
 }
 
 // Update returns a builder for updating this Tool.

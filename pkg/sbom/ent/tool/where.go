@@ -4,6 +4,7 @@ package tool
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
@@ -260,6 +261,29 @@ func VendorEqualFold(v string) predicate.Tool {
 // VendorContainsFold applies the ContainsFold predicate on the "vendor" field.
 func VendorContainsFold(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldContainsFold(FieldVendor, v))
+}
+
+// HasMetadata applies the HasEdge predicate on the "metadata" edge.
+func HasMetadata() predicate.Tool {
+	return predicate.Tool(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, MetadataTable, MetadataColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMetadataWith applies the HasEdge predicate on the "metadata" edge with a given conditions (other predicates).
+func HasMetadataWith(preds ...predicate.Metadata) predicate.Tool {
+	return predicate.Tool(func(s *sql.Selector) {
+		step := newMetadataStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

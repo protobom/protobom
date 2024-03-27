@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/timestamp"
 )
 
@@ -31,6 +32,25 @@ func (tc *TimestampCreate) AddDate(t ...*Timestamp) *TimestampCreate {
 		ids[i] = t[i].ID
 	}
 	return tc.AddDateIDs(ids...)
+}
+
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (tc *TimestampCreate) SetMetadataID(id string) *TimestampCreate {
+	tc.mutation.SetMetadataID(id)
+	return tc
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (tc *TimestampCreate) SetNillableMetadataID(id *string) *TimestampCreate {
+	if id != nil {
+		tc = tc.SetMetadataID(*id)
+	}
+	return tc
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (tc *TimestampCreate) SetMetadata(m *Metadata) *TimestampCreate {
+	return tc.SetMetadataID(m.ID)
 }
 
 // Mutation returns the TimestampMutation object of the builder.
@@ -107,6 +127,23 @@ func (tc *TimestampCreate) createSpec() (*Timestamp, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   timestamp.MetadataTable,
+			Columns: []string{timestamp.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.metadata_date = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

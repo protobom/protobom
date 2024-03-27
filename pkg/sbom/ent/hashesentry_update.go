@@ -10,7 +10,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/externalreference"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/hashesentry"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
@@ -55,9 +57,81 @@ func (heu *HashesEntryUpdate) SetNillableHashData(s *string) *HashesEntryUpdate 
 	return heu
 }
 
+// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by IDs.
+func (heu *HashesEntryUpdate) AddExternalReferenceIDs(ids ...int) *HashesEntryUpdate {
+	heu.mutation.AddExternalReferenceIDs(ids...)
+	return heu
+}
+
+// AddExternalReferences adds the "external_references" edges to the ExternalReference entity.
+func (heu *HashesEntryUpdate) AddExternalReferences(e ...*ExternalReference) *HashesEntryUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return heu.AddExternalReferenceIDs(ids...)
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (heu *HashesEntryUpdate) AddNodeIDs(ids ...string) *HashesEntryUpdate {
+	heu.mutation.AddNodeIDs(ids...)
+	return heu
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (heu *HashesEntryUpdate) AddNodes(n ...*Node) *HashesEntryUpdate {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return heu.AddNodeIDs(ids...)
+}
+
 // Mutation returns the HashesEntryMutation object of the builder.
 func (heu *HashesEntryUpdate) Mutation() *HashesEntryMutation {
 	return heu.mutation
+}
+
+// ClearExternalReferences clears all "external_references" edges to the ExternalReference entity.
+func (heu *HashesEntryUpdate) ClearExternalReferences() *HashesEntryUpdate {
+	heu.mutation.ClearExternalReferences()
+	return heu
+}
+
+// RemoveExternalReferenceIDs removes the "external_references" edge to ExternalReference entities by IDs.
+func (heu *HashesEntryUpdate) RemoveExternalReferenceIDs(ids ...int) *HashesEntryUpdate {
+	heu.mutation.RemoveExternalReferenceIDs(ids...)
+	return heu
+}
+
+// RemoveExternalReferences removes "external_references" edges to ExternalReference entities.
+func (heu *HashesEntryUpdate) RemoveExternalReferences(e ...*ExternalReference) *HashesEntryUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return heu.RemoveExternalReferenceIDs(ids...)
+}
+
+// ClearNodes clears all "nodes" edges to the Node entity.
+func (heu *HashesEntryUpdate) ClearNodes() *HashesEntryUpdate {
+	heu.mutation.ClearNodes()
+	return heu
+}
+
+// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
+func (heu *HashesEntryUpdate) RemoveNodeIDs(ids ...string) *HashesEntryUpdate {
+	heu.mutation.RemoveNodeIDs(ids...)
+	return heu
+}
+
+// RemoveNodes removes "nodes" edges to Node entities.
+func (heu *HashesEntryUpdate) RemoveNodes(n ...*Node) *HashesEntryUpdate {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return heu.RemoveNodeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -115,6 +189,96 @@ func (heu *HashesEntryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := heu.mutation.HashData(); ok {
 		_spec.SetField(hashesentry.FieldHashData, field.TypeString, value)
 	}
+	if heu.mutation.ExternalReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.ExternalReferencesTable,
+			Columns: hashesentry.ExternalReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := heu.mutation.RemovedExternalReferencesIDs(); len(nodes) > 0 && !heu.mutation.ExternalReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.ExternalReferencesTable,
+			Columns: hashesentry.ExternalReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := heu.mutation.ExternalReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.ExternalReferencesTable,
+			Columns: hashesentry.ExternalReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if heu.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.NodesTable,
+			Columns: hashesentry.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := heu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !heu.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.NodesTable,
+			Columns: hashesentry.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := heu.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.NodesTable,
+			Columns: hashesentry.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, heu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{hashesentry.Label}
@@ -163,9 +327,81 @@ func (heuo *HashesEntryUpdateOne) SetNillableHashData(s *string) *HashesEntryUpd
 	return heuo
 }
 
+// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by IDs.
+func (heuo *HashesEntryUpdateOne) AddExternalReferenceIDs(ids ...int) *HashesEntryUpdateOne {
+	heuo.mutation.AddExternalReferenceIDs(ids...)
+	return heuo
+}
+
+// AddExternalReferences adds the "external_references" edges to the ExternalReference entity.
+func (heuo *HashesEntryUpdateOne) AddExternalReferences(e ...*ExternalReference) *HashesEntryUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return heuo.AddExternalReferenceIDs(ids...)
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (heuo *HashesEntryUpdateOne) AddNodeIDs(ids ...string) *HashesEntryUpdateOne {
+	heuo.mutation.AddNodeIDs(ids...)
+	return heuo
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (heuo *HashesEntryUpdateOne) AddNodes(n ...*Node) *HashesEntryUpdateOne {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return heuo.AddNodeIDs(ids...)
+}
+
 // Mutation returns the HashesEntryMutation object of the builder.
 func (heuo *HashesEntryUpdateOne) Mutation() *HashesEntryMutation {
 	return heuo.mutation
+}
+
+// ClearExternalReferences clears all "external_references" edges to the ExternalReference entity.
+func (heuo *HashesEntryUpdateOne) ClearExternalReferences() *HashesEntryUpdateOne {
+	heuo.mutation.ClearExternalReferences()
+	return heuo
+}
+
+// RemoveExternalReferenceIDs removes the "external_references" edge to ExternalReference entities by IDs.
+func (heuo *HashesEntryUpdateOne) RemoveExternalReferenceIDs(ids ...int) *HashesEntryUpdateOne {
+	heuo.mutation.RemoveExternalReferenceIDs(ids...)
+	return heuo
+}
+
+// RemoveExternalReferences removes "external_references" edges to ExternalReference entities.
+func (heuo *HashesEntryUpdateOne) RemoveExternalReferences(e ...*ExternalReference) *HashesEntryUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return heuo.RemoveExternalReferenceIDs(ids...)
+}
+
+// ClearNodes clears all "nodes" edges to the Node entity.
+func (heuo *HashesEntryUpdateOne) ClearNodes() *HashesEntryUpdateOne {
+	heuo.mutation.ClearNodes()
+	return heuo
+}
+
+// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
+func (heuo *HashesEntryUpdateOne) RemoveNodeIDs(ids ...string) *HashesEntryUpdateOne {
+	heuo.mutation.RemoveNodeIDs(ids...)
+	return heuo
+}
+
+// RemoveNodes removes "nodes" edges to Node entities.
+func (heuo *HashesEntryUpdateOne) RemoveNodes(n ...*Node) *HashesEntryUpdateOne {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return heuo.RemoveNodeIDs(ids...)
 }
 
 // Where appends a list predicates to the HashesEntryUpdate builder.
@@ -252,6 +488,96 @@ func (heuo *HashesEntryUpdateOne) sqlSave(ctx context.Context) (_node *HashesEnt
 	}
 	if value, ok := heuo.mutation.HashData(); ok {
 		_spec.SetField(hashesentry.FieldHashData, field.TypeString, value)
+	}
+	if heuo.mutation.ExternalReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.ExternalReferencesTable,
+			Columns: hashesentry.ExternalReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := heuo.mutation.RemovedExternalReferencesIDs(); len(nodes) > 0 && !heuo.mutation.ExternalReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.ExternalReferencesTable,
+			Columns: hashesentry.ExternalReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := heuo.mutation.ExternalReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.ExternalReferencesTable,
+			Columns: hashesentry.ExternalReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if heuo.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.NodesTable,
+			Columns: hashesentry.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := heuo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !heuo.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.NodesTable,
+			Columns: hashesentry.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := heuo.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.NodesTable,
+			Columns: hashesentry.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &HashesEntry{config: heuo.config}
 	_spec.Assign = _node.assignValues

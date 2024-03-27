@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/externalreference"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/hashesentry"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
@@ -99,6 +100,17 @@ func (eru *ExternalReferenceUpdate) AddHashes(h ...*HashesEntry) *ExternalRefere
 	return eru.AddHashIDs(ids...)
 }
 
+// SetNodesID sets the "nodes" edge to the Node entity by ID.
+func (eru *ExternalReferenceUpdate) SetNodesID(id string) *ExternalReferenceUpdate {
+	eru.mutation.SetNodesID(id)
+	return eru
+}
+
+// SetNodes sets the "nodes" edge to the Node entity.
+func (eru *ExternalReferenceUpdate) SetNodes(n *Node) *ExternalReferenceUpdate {
+	return eru.SetNodesID(n.ID)
+}
+
 // Mutation returns the ExternalReferenceMutation object of the builder.
 func (eru *ExternalReferenceUpdate) Mutation() *ExternalReferenceMutation {
 	return eru.mutation
@@ -123,6 +135,12 @@ func (eru *ExternalReferenceUpdate) RemoveHashes(h ...*HashesEntry) *ExternalRef
 		ids[i] = h[i].ID
 	}
 	return eru.RemoveHashIDs(ids...)
+}
+
+// ClearNodes clears the "nodes" edge to the Node entity.
+func (eru *ExternalReferenceUpdate) ClearNodes() *ExternalReferenceUpdate {
+	eru.mutation.ClearNodes()
+	return eru
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -159,6 +177,9 @@ func (eru *ExternalReferenceUpdate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "ExternalReference.type": %w`, err)}
 		}
 	}
+	if _, ok := eru.mutation.NodesID(); eru.mutation.NodesCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ExternalReference.nodes"`)
+	}
 	return nil
 }
 
@@ -188,10 +209,10 @@ func (eru *ExternalReferenceUpdate) sqlSave(ctx context.Context) (n int, err err
 	}
 	if eru.mutation.HashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Columns: externalreference.HashesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -201,10 +222,10 @@ func (eru *ExternalReferenceUpdate) sqlSave(ctx context.Context) (n int, err err
 	}
 	if nodes := eru.mutation.RemovedHashesIDs(); len(nodes) > 0 && !eru.mutation.HashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Columns: externalreference.HashesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -217,13 +238,42 @@ func (eru *ExternalReferenceUpdate) sqlSave(ctx context.Context) (n int, err err
 	}
 	if nodes := eru.mutation.HashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Columns: externalreference.HashesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eru.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   externalreference.NodesTable,
+			Columns: []string{externalreference.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eru.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   externalreference.NodesTable,
+			Columns: []string{externalreference.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -322,6 +372,17 @@ func (eruo *ExternalReferenceUpdateOne) AddHashes(h ...*HashesEntry) *ExternalRe
 	return eruo.AddHashIDs(ids...)
 }
 
+// SetNodesID sets the "nodes" edge to the Node entity by ID.
+func (eruo *ExternalReferenceUpdateOne) SetNodesID(id string) *ExternalReferenceUpdateOne {
+	eruo.mutation.SetNodesID(id)
+	return eruo
+}
+
+// SetNodes sets the "nodes" edge to the Node entity.
+func (eruo *ExternalReferenceUpdateOne) SetNodes(n *Node) *ExternalReferenceUpdateOne {
+	return eruo.SetNodesID(n.ID)
+}
+
 // Mutation returns the ExternalReferenceMutation object of the builder.
 func (eruo *ExternalReferenceUpdateOne) Mutation() *ExternalReferenceMutation {
 	return eruo.mutation
@@ -346,6 +407,12 @@ func (eruo *ExternalReferenceUpdateOne) RemoveHashes(h ...*HashesEntry) *Externa
 		ids[i] = h[i].ID
 	}
 	return eruo.RemoveHashIDs(ids...)
+}
+
+// ClearNodes clears the "nodes" edge to the Node entity.
+func (eruo *ExternalReferenceUpdateOne) ClearNodes() *ExternalReferenceUpdateOne {
+	eruo.mutation.ClearNodes()
+	return eruo
 }
 
 // Where appends a list predicates to the ExternalReferenceUpdate builder.
@@ -395,6 +462,9 @@ func (eruo *ExternalReferenceUpdateOne) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "ExternalReference.type": %w`, err)}
 		}
 	}
+	if _, ok := eruo.mutation.NodesID(); eruo.mutation.NodesCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ExternalReference.nodes"`)
+	}
 	return nil
 }
 
@@ -441,10 +511,10 @@ func (eruo *ExternalReferenceUpdateOne) sqlSave(ctx context.Context) (_node *Ext
 	}
 	if eruo.mutation.HashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Columns: externalreference.HashesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -454,10 +524,10 @@ func (eruo *ExternalReferenceUpdateOne) sqlSave(ctx context.Context) (_node *Ext
 	}
 	if nodes := eruo.mutation.RemovedHashesIDs(); len(nodes) > 0 && !eruo.mutation.HashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Columns: externalreference.HashesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -470,13 +540,42 @@ func (eruo *ExternalReferenceUpdateOne) sqlSave(ctx context.Context) (_node *Ext
 	}
 	if nodes := eruo.mutation.HashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Columns: externalreference.HashesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eruo.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   externalreference.NodesTable,
+			Columns: []string{externalreference.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eruo.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   externalreference.NodesTable,
+			Columns: []string{externalreference.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

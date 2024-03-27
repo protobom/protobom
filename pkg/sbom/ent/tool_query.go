@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/tool"
 )
@@ -17,11 +18,12 @@ import (
 // ToolQuery is the builder for querying Tool entities.
 type ToolQuery struct {
 	config
-	ctx        *QueryContext
-	order      []tool.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Tool
-	withFKs    bool
+	ctx          *QueryContext
+	order        []tool.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Tool
+	withMetadata *MetadataQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +58,28 @@ func (tq *ToolQuery) Unique(unique bool) *ToolQuery {
 func (tq *ToolQuery) Order(o ...tool.OrderOption) *ToolQuery {
 	tq.order = append(tq.order, o...)
 	return tq
+}
+
+// QueryMetadata chains the current query on the "metadata" edge.
+func (tq *ToolQuery) QueryMetadata() *MetadataQuery {
+	query := (&MetadataClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tool.Table, tool.FieldID, selector),
+			sqlgraph.To(metadata.Table, metadata.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, tool.MetadataTable, tool.MetadataColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Tool entity from the query.
@@ -245,15 +269,27 @@ func (tq *ToolQuery) Clone() *ToolQuery {
 		return nil
 	}
 	return &ToolQuery{
-		config:     tq.config,
-		ctx:        tq.ctx.Clone(),
-		order:      append([]tool.OrderOption{}, tq.order...),
-		inters:     append([]Interceptor{}, tq.inters...),
-		predicates: append([]predicate.Tool{}, tq.predicates...),
+		config:       tq.config,
+		ctx:          tq.ctx.Clone(),
+		order:        append([]tool.OrderOption{}, tq.order...),
+		inters:       append([]Interceptor{}, tq.inters...),
+		predicates:   append([]predicate.Tool{}, tq.predicates...),
+		withMetadata: tq.withMetadata.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
 	}
+}
+
+// WithMetadata tells the query-builder to eager-load the nodes that are connected to
+// the "metadata" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *ToolQuery) WithMetadata(opts ...func(*MetadataQuery)) *ToolQuery {
+	query := (&MetadataClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withMetadata = query
+	return tq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,10 +368,16 @@ func (tq *ToolQuery) prepareQuery(ctx context.Context) error {
 
 func (tq *ToolQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tool, error) {
 	var (
-		nodes   = []*Tool{}
-		withFKs = tq.withFKs
-		_spec   = tq.querySpec()
+		nodes       = []*Tool{}
+		withFKs     = tq.withFKs
+		_spec       = tq.querySpec()
+		loadedTypes = [1]bool{
+			tq.withMetadata != nil,
+		}
 	)
+	if tq.withMetadata != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, tool.ForeignKeys...)
 	}
@@ -345,6 +387,7 @@ func (tq *ToolQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tool, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Tool{config: tq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -356,7 +399,46 @@ func (tq *ToolQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tool, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := tq.withMetadata; query != nil {
+		if err := tq.loadMetadata(ctx, query, nodes, nil,
+			func(n *Tool, e *Metadata) { n.Edges.Metadata = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (tq *ToolQuery) loadMetadata(ctx context.Context, query *MetadataQuery, nodes []*Tool, init func(*Tool), assign func(*Tool, *Metadata)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Tool)
+	for i := range nodes {
+		if nodes[i].metadata_tools == nil {
+			continue
+		}
+		fk := *nodes[i].metadata_tools
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(metadata.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "metadata_tools" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (tq *ToolQuery) sqlCount(ctx context.Context) (int, error) {

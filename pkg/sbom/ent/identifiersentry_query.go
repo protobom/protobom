@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/identifiersentry"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
@@ -21,7 +23,7 @@ type IdentifiersEntryQuery struct {
 	order      []identifiersentry.OrderOption
 	inters     []Interceptor
 	predicates []predicate.IdentifiersEntry
-	withFKs    bool
+	withNodes  *NodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +58,28 @@ func (ieq *IdentifiersEntryQuery) Unique(unique bool) *IdentifiersEntryQuery {
 func (ieq *IdentifiersEntryQuery) Order(o ...identifiersentry.OrderOption) *IdentifiersEntryQuery {
 	ieq.order = append(ieq.order, o...)
 	return ieq
+}
+
+// QueryNodes chains the current query on the "nodes" edge.
+func (ieq *IdentifiersEntryQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: ieq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ieq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ieq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(identifiersentry.Table, identifiersentry.FieldID, selector),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, identifiersentry.NodesTable, identifiersentry.NodesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(ieq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first IdentifiersEntry entity from the query.
@@ -250,10 +274,22 @@ func (ieq *IdentifiersEntryQuery) Clone() *IdentifiersEntryQuery {
 		order:      append([]identifiersentry.OrderOption{}, ieq.order...),
 		inters:     append([]Interceptor{}, ieq.inters...),
 		predicates: append([]predicate.IdentifiersEntry{}, ieq.predicates...),
+		withNodes:  ieq.withNodes.Clone(),
 		// clone intermediate query.
 		sql:  ieq.sql.Clone(),
 		path: ieq.path,
 	}
+}
+
+// WithNodes tells the query-builder to eager-load the nodes that are connected to
+// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (ieq *IdentifiersEntryQuery) WithNodes(opts ...func(*NodeQuery)) *IdentifiersEntryQuery {
+	query := (&NodeClient{config: ieq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	ieq.withNodes = query
+	return ieq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,19 +368,19 @@ func (ieq *IdentifiersEntryQuery) prepareQuery(ctx context.Context) error {
 
 func (ieq *IdentifiersEntryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*IdentifiersEntry, error) {
 	var (
-		nodes   = []*IdentifiersEntry{}
-		withFKs = ieq.withFKs
-		_spec   = ieq.querySpec()
+		nodes       = []*IdentifiersEntry{}
+		_spec       = ieq.querySpec()
+		loadedTypes = [1]bool{
+			ieq.withNodes != nil,
+		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, identifiersentry.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*IdentifiersEntry).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &IdentifiersEntry{config: ieq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -356,7 +392,76 @@ func (ieq *IdentifiersEntryQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := ieq.withNodes; query != nil {
+		if err := ieq.loadNodes(ctx, query, nodes,
+			func(n *IdentifiersEntry) { n.Edges.Nodes = []*Node{} },
+			func(n *IdentifiersEntry, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (ieq *IdentifiersEntryQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*IdentifiersEntry, init func(*IdentifiersEntry), assign func(*IdentifiersEntry, *Node)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*IdentifiersEntry)
+	nids := make(map[string]map[*IdentifiersEntry]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(identifiersentry.NodesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(identifiersentry.NodesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(identifiersentry.NodesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(identifiersentry.NodesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*IdentifiersEntry]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Node](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "nodes" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
 }
 
 func (ieq *IdentifiersEntryQuery) sqlCount(ctx context.Context) (int, error) {

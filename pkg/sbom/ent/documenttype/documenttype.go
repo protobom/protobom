@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -19,8 +20,17 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// EdgeMetadata holds the string denoting the metadata edge name in mutations.
+	EdgeMetadata = "metadata"
 	// Table holds the table name of the documenttype in the database.
 	Table = "document_types"
+	// MetadataTable is the table that holds the metadata relation/edge.
+	MetadataTable = "document_types"
+	// MetadataInverseTable is the table name for the Metadata entity.
+	// It exists in this package in order to avoid circular dependency with the "metadata" package.
+	MetadataInverseTable = "metadata"
+	// MetadataColumn is the table column denoting the metadata relation/edge.
+	MetadataColumn = "metadata_document_types"
 )
 
 // Columns holds all SQL columns for documenttype fields.
@@ -103,4 +113,18 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByMetadataField orders the results by metadata field.
+func ByMetadataField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMetadataStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newMetadataStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MetadataInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MetadataTable, MetadataColumn),
+	)
 }

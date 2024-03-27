@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/document"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/documenttype"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/person"
@@ -107,6 +108,17 @@ func (mc *MetadataCreate) AddDate(t ...*Timestamp) *MetadataCreate {
 	return mc.AddDateIDs(ids...)
 }
 
+// SetDocumentID sets the "document" edge to the Document entity by ID.
+func (mc *MetadataCreate) SetDocumentID(id int) *MetadataCreate {
+	mc.mutation.SetDocumentID(id)
+	return mc
+}
+
+// SetDocument sets the "document" edge to the Document entity.
+func (mc *MetadataCreate) SetDocument(d *Document) *MetadataCreate {
+	return mc.SetDocumentID(d.ID)
+}
+
 // Mutation returns the MetadataMutation object of the builder.
 func (mc *MetadataCreate) Mutation() *MetadataMutation {
 	return mc.mutation
@@ -149,6 +161,9 @@ func (mc *MetadataCreate) check() error {
 	}
 	if _, ok := mc.mutation.Comment(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "Metadata.comment"`)}
+	}
+	if _, ok := mc.mutation.DocumentID(); !ok {
+		return &ValidationError{Name: "document", err: errors.New(`ent: missing required edge "Metadata.document"`)}
 	}
 	return nil
 }
@@ -259,6 +274,23 @@ func (mc *MetadataCreate) createSpec() (*Metadata, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.DocumentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   metadata.DocumentTable,
+			Columns: []string{metadata.DocumentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.document_metadata = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

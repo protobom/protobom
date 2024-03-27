@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/tool"
 )
 
@@ -35,6 +36,25 @@ func (tc *ToolCreate) SetVersion(s string) *ToolCreate {
 func (tc *ToolCreate) SetVendor(s string) *ToolCreate {
 	tc.mutation.SetVendor(s)
 	return tc
+}
+
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (tc *ToolCreate) SetMetadataID(id string) *ToolCreate {
+	tc.mutation.SetMetadataID(id)
+	return tc
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (tc *ToolCreate) SetNillableMetadataID(id *string) *ToolCreate {
+	if id != nil {
+		tc = tc.SetMetadataID(*id)
+	}
+	return tc
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (tc *ToolCreate) SetMetadata(m *Metadata) *ToolCreate {
+	return tc.SetMetadataID(m.ID)
 }
 
 // Mutation returns the ToolMutation object of the builder.
@@ -117,6 +137,23 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.Vendor(); ok {
 		_spec.SetField(tool.FieldVendor, field.TypeString, value)
 		_node.Vendor = value
+	}
+	if nodes := tc.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tool.MetadataTable,
+			Columns: []string{tool.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.metadata_tools = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

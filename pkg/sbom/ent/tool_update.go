@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/tool"
 )
@@ -69,9 +70,34 @@ func (tu *ToolUpdate) SetNillableVendor(s *string) *ToolUpdate {
 	return tu
 }
 
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (tu *ToolUpdate) SetMetadataID(id string) *ToolUpdate {
+	tu.mutation.SetMetadataID(id)
+	return tu
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (tu *ToolUpdate) SetNillableMetadataID(id *string) *ToolUpdate {
+	if id != nil {
+		tu = tu.SetMetadataID(*id)
+	}
+	return tu
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (tu *ToolUpdate) SetMetadata(m *Metadata) *ToolUpdate {
+	return tu.SetMetadataID(m.ID)
+}
+
 // Mutation returns the ToolMutation object of the builder.
 func (tu *ToolUpdate) Mutation() *ToolMutation {
 	return tu.mutation
+}
+
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
+func (tu *ToolUpdate) ClearMetadata() *ToolUpdate {
+	tu.mutation.ClearMetadata()
+	return tu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -118,6 +144,35 @@ func (tu *ToolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.Vendor(); ok {
 		_spec.SetField(tool.FieldVendor, field.TypeString, value)
+	}
+	if tu.mutation.MetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tool.MetadataTable,
+			Columns: []string{tool.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tool.MetadataTable,
+			Columns: []string{tool.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -181,9 +236,34 @@ func (tuo *ToolUpdateOne) SetNillableVendor(s *string) *ToolUpdateOne {
 	return tuo
 }
 
+// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
+func (tuo *ToolUpdateOne) SetMetadataID(id string) *ToolUpdateOne {
+	tuo.mutation.SetMetadataID(id)
+	return tuo
+}
+
+// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
+func (tuo *ToolUpdateOne) SetNillableMetadataID(id *string) *ToolUpdateOne {
+	if id != nil {
+		tuo = tuo.SetMetadataID(*id)
+	}
+	return tuo
+}
+
+// SetMetadata sets the "metadata" edge to the Metadata entity.
+func (tuo *ToolUpdateOne) SetMetadata(m *Metadata) *ToolUpdateOne {
+	return tuo.SetMetadataID(m.ID)
+}
+
 // Mutation returns the ToolMutation object of the builder.
 func (tuo *ToolUpdateOne) Mutation() *ToolMutation {
 	return tuo.mutation
+}
+
+// ClearMetadata clears the "metadata" edge to the Metadata entity.
+func (tuo *ToolUpdateOne) ClearMetadata() *ToolUpdateOne {
+	tuo.mutation.ClearMetadata()
+	return tuo
 }
 
 // Where appends a list predicates to the ToolUpdate builder.
@@ -260,6 +340,35 @@ func (tuo *ToolUpdateOne) sqlSave(ctx context.Context) (_node *Tool, err error) 
 	}
 	if value, ok := tuo.mutation.Vendor(); ok {
 		_spec.SetField(tool.FieldVendor, field.TypeString, value)
+	}
+	if tuo.mutation.MetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tool.MetadataTable,
+			Columns: []string{tool.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.MetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   tool.MetadataTable,
+			Columns: []string{tool.MetadataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Tool{config: tuo.config}
 	_spec.Assign = _node.assignValues

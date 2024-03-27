@@ -365,6 +365,29 @@ func HasDateWith(preds ...predicate.Timestamp) predicate.Metadata {
 	})
 }
 
+// HasDocument applies the HasEdge predicate on the "document" edge.
+func HasDocument() predicate.Metadata {
+	return predicate.Metadata(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, DocumentTable, DocumentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDocumentWith applies the HasEdge predicate on the "document" edge with a given conditions (other predicates).
+func HasDocumentWith(preds ...predicate.Document) predicate.Metadata {
+	return predicate.Metadata(func(s *sql.Selector) {
+		step := newDocumentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Metadata) predicate.Metadata {
 	return predicate.Metadata(sql.AndPredicates(predicates...))

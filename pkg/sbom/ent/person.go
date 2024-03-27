@@ -8,6 +8,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/metadata"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/person"
 )
 
@@ -39,9 +41,15 @@ type Person struct {
 type PersonEdges struct {
 	// Contacts holds the value of the contacts edge.
 	Contacts []*Person `json:"contacts,omitempty"`
+	// Metadata holds the value of the metadata edge.
+	Metadata *Metadata `json:"metadata,omitempty"`
+	// NodeSupplier holds the value of the node_supplier edge.
+	NodeSupplier *Node `json:"node_supplier,omitempty"`
+	// NodeOriginator holds the value of the node_originator edge.
+	NodeOriginator *Node `json:"node_originator,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [4]bool
 }
 
 // ContactsOrErr returns the Contacts value or an error if the edge
@@ -51,6 +59,45 @@ func (e PersonEdges) ContactsOrErr() ([]*Person, error) {
 		return e.Contacts, nil
 	}
 	return nil, &NotLoadedError{edge: "contacts"}
+}
+
+// MetadataOrErr returns the Metadata value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PersonEdges) MetadataOrErr() (*Metadata, error) {
+	if e.loadedTypes[1] {
+		if e.Metadata == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: metadata.Label}
+		}
+		return e.Metadata, nil
+	}
+	return nil, &NotLoadedError{edge: "metadata"}
+}
+
+// NodeSupplierOrErr returns the NodeSupplier value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PersonEdges) NodeSupplierOrErr() (*Node, error) {
+	if e.loadedTypes[2] {
+		if e.NodeSupplier == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: node.Label}
+		}
+		return e.NodeSupplier, nil
+	}
+	return nil, &NotLoadedError{edge: "node_supplier"}
+}
+
+// NodeOriginatorOrErr returns the NodeOriginator value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PersonEdges) NodeOriginatorOrErr() (*Node, error) {
+	if e.loadedTypes[3] {
+		if e.NodeOriginator == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: node.Label}
+		}
+		return e.NodeOriginator, nil
+	}
+	return nil, &NotLoadedError{edge: "node_originator"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -158,6 +205,21 @@ func (pe *Person) Value(name string) (ent.Value, error) {
 // QueryContacts queries the "contacts" edge of the Person entity.
 func (pe *Person) QueryContacts() *PersonQuery {
 	return NewPersonClient(pe.config).QueryContacts(pe)
+}
+
+// QueryMetadata queries the "metadata" edge of the Person entity.
+func (pe *Person) QueryMetadata() *MetadataQuery {
+	return NewPersonClient(pe.config).QueryMetadata(pe)
+}
+
+// QueryNodeSupplier queries the "node_supplier" edge of the Person entity.
+func (pe *Person) QueryNodeSupplier() *NodeQuery {
+	return NewPersonClient(pe.config).QueryNodeSupplier(pe)
+}
+
+// QueryNodeOriginator queries the "node_originator" edge of the Person entity.
+func (pe *Person) QueryNodeOriginator() *NodeQuery {
+	return NewPersonClient(pe.config).QueryNodeOriginator(pe)
 }
 
 // Update returns a builder for updating this Person.

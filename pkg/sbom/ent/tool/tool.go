@@ -4,6 +4,7 @@ package tool
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,17 @@ const (
 	FieldVersion = "version"
 	// FieldVendor holds the string denoting the vendor field in the database.
 	FieldVendor = "vendor"
+	// EdgeMetadata holds the string denoting the metadata edge name in mutations.
+	EdgeMetadata = "metadata"
 	// Table holds the table name of the tool in the database.
 	Table = "tools"
+	// MetadataTable is the table that holds the metadata relation/edge.
+	MetadataTable = "tools"
+	// MetadataInverseTable is the table name for the Metadata entity.
+	// It exists in this package in order to avoid circular dependency with the "metadata" package.
+	MetadataInverseTable = "metadata"
+	// MetadataColumn is the table column denoting the metadata relation/edge.
+	MetadataColumn = "metadata_tools"
 )
 
 // Columns holds all SQL columns for tool fields.
@@ -71,4 +81,18 @@ func ByVersion(opts ...sql.OrderTermOption) OrderOption {
 // ByVendor orders the results by the vendor field.
 func ByVendor(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldVendor, opts...).ToFunc()
+}
+
+// ByMetadataField orders the results by metadata field.
+func ByMetadataField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMetadataStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newMetadataStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MetadataInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MetadataTable, MetadataColumn),
+	)
 }

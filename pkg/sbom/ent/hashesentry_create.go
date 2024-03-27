@@ -9,7 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/externalreference"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/hashesentry"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 )
 
 // HashesEntryCreate is the builder for creating a HashesEntry entity.
@@ -29,6 +31,36 @@ func (hec *HashesEntryCreate) SetHashAlgorithmType(hat hashesentry.HashAlgorithm
 func (hec *HashesEntryCreate) SetHashData(s string) *HashesEntryCreate {
 	hec.mutation.SetHashData(s)
 	return hec
+}
+
+// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by IDs.
+func (hec *HashesEntryCreate) AddExternalReferenceIDs(ids ...int) *HashesEntryCreate {
+	hec.mutation.AddExternalReferenceIDs(ids...)
+	return hec
+}
+
+// AddExternalReferences adds the "external_references" edges to the ExternalReference entity.
+func (hec *HashesEntryCreate) AddExternalReferences(e ...*ExternalReference) *HashesEntryCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return hec.AddExternalReferenceIDs(ids...)
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (hec *HashesEntryCreate) AddNodeIDs(ids ...string) *HashesEntryCreate {
+	hec.mutation.AddNodeIDs(ids...)
+	return hec
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (hec *HashesEntryCreate) AddNodes(n ...*Node) *HashesEntryCreate {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return hec.AddNodeIDs(ids...)
 }
 
 // Mutation returns the HashesEntryMutation object of the builder.
@@ -109,6 +141,38 @@ func (hec *HashesEntryCreate) createSpec() (*HashesEntry, *sqlgraph.CreateSpec) 
 	if value, ok := hec.mutation.HashData(); ok {
 		_spec.SetField(hashesentry.FieldHashData, field.TypeString, value)
 		_node.HashData = value
+	}
+	if nodes := hec.mutation.ExternalReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.ExternalReferencesTable,
+			Columns: hashesentry.ExternalReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := hec.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   hashesentry.NodesTable,
+			Columns: hashesentry.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

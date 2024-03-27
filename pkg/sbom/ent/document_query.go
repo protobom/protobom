@@ -76,7 +76,7 @@ func (dq *DocumentQuery) QueryMetadata() *MetadataQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(document.Table, document.FieldID, selector),
 			sqlgraph.To(metadata.Table, metadata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, document.MetadataTable, document.MetadataColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, document.MetadataTable, document.MetadataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -98,7 +98,7 @@ func (dq *DocumentQuery) QueryNodeList() *NodeListQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(document.Table, document.FieldID, selector),
 			sqlgraph.To(nodelist.Table, nodelist.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, document.NodeListTable, document.NodeListColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, document.NodeListTable, document.NodeListColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -408,16 +408,14 @@ func (dq *DocumentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Doc
 		return nodes, nil
 	}
 	if query := dq.withMetadata; query != nil {
-		if err := dq.loadMetadata(ctx, query, nodes,
-			func(n *Document) { n.Edges.Metadata = []*Metadata{} },
-			func(n *Document, e *Metadata) { n.Edges.Metadata = append(n.Edges.Metadata, e) }); err != nil {
+		if err := dq.loadMetadata(ctx, query, nodes, nil,
+			func(n *Document, e *Metadata) { n.Edges.Metadata = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := dq.withNodeList; query != nil {
-		if err := dq.loadNodeList(ctx, query, nodes,
-			func(n *Document) { n.Edges.NodeList = []*NodeList{} },
-			func(n *Document, e *NodeList) { n.Edges.NodeList = append(n.Edges.NodeList, e) }); err != nil {
+		if err := dq.loadNodeList(ctx, query, nodes, nil,
+			func(n *Document, e *NodeList) { n.Edges.NodeList = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -430,9 +428,6 @@ func (dq *DocumentQuery) loadMetadata(ctx context.Context, query *MetadataQuery,
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
 	query.Where(predicate.Metadata(func(s *sql.Selector) {
@@ -461,9 +456,6 @@ func (dq *DocumentQuery) loadNodeList(ctx context.Context, query *NodeListQuery,
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
 	query.Where(predicate.NodeList(func(s *sql.Selector) {

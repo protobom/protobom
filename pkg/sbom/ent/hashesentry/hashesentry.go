@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,22 @@ const (
 	FieldHashAlgorithmType = "hash_algorithm_type"
 	// FieldHashData holds the string denoting the hash_data field in the database.
 	FieldHashData = "hash_data"
+	// EdgeExternalReferences holds the string denoting the external_references edge name in mutations.
+	EdgeExternalReferences = "external_references"
+	// EdgeNodes holds the string denoting the nodes edge name in mutations.
+	EdgeNodes = "nodes"
 	// Table holds the table name of the hashesentry in the database.
 	Table = "hashes_entries"
+	// ExternalReferencesTable is the table that holds the external_references relation/edge. The primary key declared below.
+	ExternalReferencesTable = "external_reference_hashes"
+	// ExternalReferencesInverseTable is the table name for the ExternalReference entity.
+	// It exists in this package in order to avoid circular dependency with the "externalreference" package.
+	ExternalReferencesInverseTable = "external_references"
+	// NodesTable is the table that holds the nodes relation/edge. The primary key declared below.
+	NodesTable = "node_hashes"
+	// NodesInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	NodesInverseTable = "nodes"
 )
 
 // Columns holds all SQL columns for hashesentry fields.
@@ -28,22 +43,19 @@ var Columns = []string{
 	FieldHashData,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "hashes_entries"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"external_reference_hashes",
-	"node_hashes",
-}
+var (
+	// ExternalReferencesPrimaryKey and ExternalReferencesColumn2 are the table columns denoting the
+	// primary key for the external_references relation (M2M).
+	ExternalReferencesPrimaryKey = []string{"external_reference_id", "hashes_entry_id"}
+	// NodesPrimaryKey and NodesColumn2 are the table columns denoting the
+	// primary key for the nodes relation (M2M).
+	NodesPrimaryKey = []string{"node_id", "hashes_entry_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -105,4 +117,46 @@ func ByHashAlgorithmType(opts ...sql.OrderTermOption) OrderOption {
 // ByHashData orders the results by the hash_data field.
 func ByHashData(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldHashData, opts...).ToFunc()
+}
+
+// ByExternalReferencesCount orders the results by external_references count.
+func ByExternalReferencesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newExternalReferencesStep(), opts...)
+	}
+}
+
+// ByExternalReferences orders the results by external_references terms.
+func ByExternalReferences(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newExternalReferencesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByNodesCount orders the results by nodes count.
+func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNodesStep(), opts...)
+	}
+}
+
+// ByNodes orders the results by nodes terms.
+func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newExternalReferencesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ExternalReferencesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ExternalReferencesTable, ExternalReferencesPrimaryKey...),
+	)
+}
+func newNodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, NodesTable, NodesPrimaryKey...),
+	)
 }

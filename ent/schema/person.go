@@ -16,9 +16,9 @@ type Person struct {
 func (Person) Fields() []ent.Field {
 	return []ent.Field{field.String("name"), field.Bool("is_org"), field.String("email"), field.String("url"), field.String("phone")}
 }
+
 func (Person) Edges() []ent.Edge {
-	return []ent.Edge{edge.To("contacts", Person.Type)}
+	return []ent.Edge{edge.To("contacts", Person.Type), edge.From("metadata", Metadata.Type).Ref("authors").Unique(), edge.From("node_supplier", Node.Type).Ref("suppliers").Unique(), edge.From("node_originator", Node.Type).Ref("originators").Unique()}
 }
-func (Person) Annotations() []schema.Annotation {
-	return nil
-}
+
+func (Person) Annotations() []schema.Annotation { return nil }

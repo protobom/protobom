@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/document"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
 )
 
@@ -31,9 +32,11 @@ type NodeListEdges struct {
 	Nodes []*Node `json:"nodes,omitempty"`
 	// Edges holds the value of the edges edge.
 	Edges []*Edge `json:"edges,omitempty"`
+	// Document holds the value of the document edge.
+	Document *Document `json:"document,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // NodesOrErr returns the Nodes value or an error if the edge
@@ -52,6 +55,19 @@ func (e NodeListEdges) EdgesOrErr() ([]*Edge, error) {
 		return e.Edges, nil
 	}
 	return nil, &NotLoadedError{edge: "edges"}
+}
+
+// DocumentOrErr returns the Document value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NodeListEdges) DocumentOrErr() (*Document, error) {
+	if e.loadedTypes[2] {
+		if e.Document == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: document.Label}
+		}
+		return e.Document, nil
+	}
+	return nil, &NotLoadedError{edge: "document"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -120,6 +136,11 @@ func (nl *NodeList) QueryNodes() *NodeQuery {
 // QueryEdges queries the "edges" edge of the NodeList entity.
 func (nl *NodeList) QueryEdges() *EdgeQuery {
 	return NewNodeListClient(nl.config).QueryEdges(nl)
+}
+
+// QueryDocument queries the "document" edge of the NodeList entity.
+func (nl *NodeList) QueryDocument() *DocumentQuery {
+	return NewNodeListClient(nl.config).QueryDocument(nl)
 }
 
 // Update returns a builder for updating this NodeList.

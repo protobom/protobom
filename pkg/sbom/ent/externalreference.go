@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/externalreference"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/node"
 )
 
 // ExternalReference is the model entity for the ExternalReference schema.
@@ -35,9 +36,11 @@ type ExternalReference struct {
 type ExternalReferenceEdges struct {
 	// Hashes holds the value of the hashes edge.
 	Hashes []*HashesEntry `json:"hashes,omitempty"`
+	// Nodes holds the value of the nodes edge.
+	Nodes *Node `json:"nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // HashesOrErr returns the Hashes value or an error if the edge
@@ -47,6 +50,19 @@ func (e ExternalReferenceEdges) HashesOrErr() ([]*HashesEntry, error) {
 		return e.Hashes, nil
 	}
 	return nil, &NotLoadedError{edge: "hashes"}
+}
+
+// NodesOrErr returns the Nodes value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ExternalReferenceEdges) NodesOrErr() (*Node, error) {
+	if e.loadedTypes[1] {
+		if e.Nodes == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: node.Label}
+		}
+		return e.Nodes, nil
+	}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -128,6 +144,11 @@ func (er *ExternalReference) Value(name string) (ent.Value, error) {
 // QueryHashes queries the "hashes" edge of the ExternalReference entity.
 func (er *ExternalReference) QueryHashes() *HashesEntryQuery {
 	return NewExternalReferenceClient(er.config).QueryHashes(er)
+}
+
+// QueryNodes queries the "nodes" edge of the ExternalReference entity.
+func (er *ExternalReference) QueryNodes() *NodeQuery {
+	return NewExternalReferenceClient(er.config).QueryNodes(er)
 }
 
 // Update returns a builder for updating this ExternalReference.

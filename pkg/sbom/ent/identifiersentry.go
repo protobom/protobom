@@ -20,8 +20,28 @@ type IdentifiersEntry struct {
 	SoftwareIdentifierType identifiersentry.SoftwareIdentifierType `json:"software_identifier_type,omitempty"`
 	// SoftwareIdentifierValue holds the value of the "software_identifier_value" field.
 	SoftwareIdentifierValue string `json:"software_identifier_value,omitempty"`
-	node_identifiers        *string
-	selectValues            sql.SelectValues
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the IdentifiersEntryQuery when eager-loading is set.
+	Edges        IdentifiersEntryEdges `json:"edges"`
+	selectValues sql.SelectValues
+}
+
+// IdentifiersEntryEdges holds the relations/edges for other nodes in the graph.
+type IdentifiersEntryEdges struct {
+	// Nodes holds the value of the nodes edge.
+	Nodes []*Node `json:"nodes,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// NodesOrErr returns the Nodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e IdentifiersEntryEdges) NodesOrErr() ([]*Node, error) {
+	if e.loadedTypes[0] {
+		return e.Nodes, nil
+	}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,8 +52,6 @@ func (*IdentifiersEntry) scanValues(columns []string) ([]any, error) {
 		case identifiersentry.FieldID:
 			values[i] = new(sql.NullInt64)
 		case identifiersentry.FieldSoftwareIdentifierType, identifiersentry.FieldSoftwareIdentifierValue:
-			values[i] = new(sql.NullString)
-		case identifiersentry.ForeignKeys[0]: // node_identifiers
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -68,13 +86,6 @@ func (ie *IdentifiersEntry) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ie.SoftwareIdentifierValue = value.String
 			}
-		case identifiersentry.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field node_identifiers", values[i])
-			} else if value.Valid {
-				ie.node_identifiers = new(string)
-				*ie.node_identifiers = value.String
-			}
 		default:
 			ie.selectValues.Set(columns[i], values[i])
 		}
@@ -86,6 +97,11 @@ func (ie *IdentifiersEntry) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (ie *IdentifiersEntry) Value(name string) (ent.Value, error) {
 	return ie.selectValues.Get(name)
+}
+
+// QueryNodes queries the "nodes" edge of the IdentifiersEntry entity.
+func (ie *IdentifiersEntry) QueryNodes() *NodeQuery {
+	return NewIdentifiersEntryClient(ie.config).QueryNodes(ie)
 }
 
 // Update returns a builder for updating this IdentifiersEntry.

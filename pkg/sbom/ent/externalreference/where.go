@@ -288,7 +288,7 @@ func HasHashes() predicate.ExternalReference {
 	return predicate.ExternalReference(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, HashesTable, HashesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -298,6 +298,29 @@ func HasHashes() predicate.ExternalReference {
 func HasHashesWith(preds ...predicate.HashesEntry) predicate.ExternalReference {
 	return predicate.ExternalReference(func(s *sql.Selector) {
 		step := newHashesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasNodes applies the HasEdge predicate on the "nodes" edge.
+func HasNodes() predicate.ExternalReference {
+	return predicate.ExternalReference(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, NodesTable, NodesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodesWith applies the HasEdge predicate on the "nodes" edge with a given conditions (other predicates).
+func HasNodesWith(preds ...predicate.Node) predicate.ExternalReference {
+	return predicate.ExternalReference(func(s *sql.Selector) {
+		step := newNodesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

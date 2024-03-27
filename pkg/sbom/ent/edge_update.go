@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/edge"
+	"github.com/bom-squad/protobom/pkg/sbom/ent/nodelist"
 	"github.com/bom-squad/protobom/pkg/sbom/ent/predicate"
 )
 
@@ -69,9 +70,26 @@ func (eu *EdgeUpdate) SetNillableTo(s *string) *EdgeUpdate {
 	return eu
 }
 
+// SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
+func (eu *EdgeUpdate) SetNodeListID(id int) *EdgeUpdate {
+	eu.mutation.SetNodeListID(id)
+	return eu
+}
+
+// SetNodeList sets the "node_list" edge to the NodeList entity.
+func (eu *EdgeUpdate) SetNodeList(n *NodeList) *EdgeUpdate {
+	return eu.SetNodeListID(n.ID)
+}
+
 // Mutation returns the EdgeMutation object of the builder.
 func (eu *EdgeUpdate) Mutation() *EdgeMutation {
 	return eu.mutation
+}
+
+// ClearNodeList clears the "node_list" edge to the NodeList entity.
+func (eu *EdgeUpdate) ClearNodeList() *EdgeUpdate {
+	eu.mutation.ClearNodeList()
+	return eu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -108,6 +126,9 @@ func (eu *EdgeUpdate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Edge.type": %w`, err)}
 		}
 	}
+	if _, ok := eu.mutation.NodeListID(); eu.mutation.NodeListCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Edge.node_list"`)
+	}
 	return nil
 }
 
@@ -131,6 +152,35 @@ func (eu *EdgeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.To(); ok {
 		_spec.SetField(edge.FieldTo, field.TypeString, value)
+	}
+	if eu.mutation.NodeListCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   edge.NodeListTable,
+			Columns: []string{edge.NodeListColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.NodeListIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   edge.NodeListTable,
+			Columns: []string{edge.NodeListColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -194,9 +244,26 @@ func (euo *EdgeUpdateOne) SetNillableTo(s *string) *EdgeUpdateOne {
 	return euo
 }
 
+// SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
+func (euo *EdgeUpdateOne) SetNodeListID(id int) *EdgeUpdateOne {
+	euo.mutation.SetNodeListID(id)
+	return euo
+}
+
+// SetNodeList sets the "node_list" edge to the NodeList entity.
+func (euo *EdgeUpdateOne) SetNodeList(n *NodeList) *EdgeUpdateOne {
+	return euo.SetNodeListID(n.ID)
+}
+
 // Mutation returns the EdgeMutation object of the builder.
 func (euo *EdgeUpdateOne) Mutation() *EdgeMutation {
 	return euo.mutation
+}
+
+// ClearNodeList clears the "node_list" edge to the NodeList entity.
+func (euo *EdgeUpdateOne) ClearNodeList() *EdgeUpdateOne {
+	euo.mutation.ClearNodeList()
+	return euo
 }
 
 // Where appends a list predicates to the EdgeUpdate builder.
@@ -246,6 +313,9 @@ func (euo *EdgeUpdateOne) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Edge.type": %w`, err)}
 		}
 	}
+	if _, ok := euo.mutation.NodeListID(); euo.mutation.NodeListCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Edge.node_list"`)
+	}
 	return nil
 }
 
@@ -286,6 +356,35 @@ func (euo *EdgeUpdateOne) sqlSave(ctx context.Context) (_node *Edge, err error) 
 	}
 	if value, ok := euo.mutation.To(); ok {
 		_spec.SetField(edge.FieldTo, field.TypeString, value)
+	}
+	if euo.mutation.NodeListCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   edge.NodeListTable,
+			Columns: []string{edge.NodeListColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.NodeListIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   edge.NodeListTable,
+			Columns: []string{edge.NodeListColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Edge{config: euo.config}
 	_spec.Assign = _node.assignValues

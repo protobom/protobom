@@ -133,7 +133,7 @@ message Timestamp {
   google.protobuf.Timestamp date = 1 [(ent.edge) = {}];
 
   // Edge back-reference definitions
-  Metadata metadata = 2 [(ent.edge) = {ref: "date", unique: true}];
+  Metadata metadata = 2 [(ent.edge) = {ref: "date", unique: true, required: true}];
 }
 
 // Metadata encapsulates document-related details about the Software Bill of Materials (SBOM) document.
@@ -330,6 +330,7 @@ message Person {
   Metadata metadata = 7 [(ent.edge) = {ref: "authors", unique: true}];
   Node node_supplier = 8 [(ent.edge) = {ref: "suppliers", unique: true}];
   Node node_originator = 9 [(ent.edge) = {ref: "originators", unique: true}];
+  Person person_contact = 10 [(ent.edge) = {ref: "contacts", unique: true}];
 }
 
 // Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.

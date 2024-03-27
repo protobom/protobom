@@ -6537,6 +6537,8 @@ type PersonMutation struct {
 	clearednode_supplier   bool
 	node_originator        *string
 	clearednode_originator bool
+	person_contact         *int
+	clearedperson_contact  bool
 	done                   bool
 	oldValue               func(context.Context) (*Person, error)
 	predicates             []predicate.Person
@@ -6991,6 +6993,45 @@ func (m *PersonMutation) ResetNodeOriginator() {
 	m.clearednode_originator = false
 }
 
+// SetPersonContactID sets the "person_contact" edge to the Person entity by id.
+func (m *PersonMutation) SetPersonContactID(id int) {
+	m.person_contact = &id
+}
+
+// ClearPersonContact clears the "person_contact" edge to the Person entity.
+func (m *PersonMutation) ClearPersonContact() {
+	m.clearedperson_contact = true
+}
+
+// PersonContactCleared reports if the "person_contact" edge to the Person entity was cleared.
+func (m *PersonMutation) PersonContactCleared() bool {
+	return m.clearedperson_contact
+}
+
+// PersonContactID returns the "person_contact" edge ID in the mutation.
+func (m *PersonMutation) PersonContactID() (id int, exists bool) {
+	if m.person_contact != nil {
+		return *m.person_contact, true
+	}
+	return
+}
+
+// PersonContactIDs returns the "person_contact" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PersonContactID instead. It exists only for internal usage by the builders.
+func (m *PersonMutation) PersonContactIDs() (ids []int) {
+	if id := m.person_contact; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPersonContact resets all changes to the "person_contact" edge.
+func (m *PersonMutation) ResetPersonContact() {
+	m.person_contact = nil
+	m.clearedperson_contact = false
+}
+
 // Where appends a list predicates to the PersonMutation builder.
 func (m *PersonMutation) Where(ps ...predicate.Person) {
 	m.predicates = append(m.predicates, ps...)
@@ -7192,7 +7233,7 @@ func (m *PersonMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PersonMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.contacts != nil {
 		edges = append(edges, person.EdgeContacts)
 	}
@@ -7204,6 +7245,9 @@ func (m *PersonMutation) AddedEdges() []string {
 	}
 	if m.node_originator != nil {
 		edges = append(edges, person.EdgeNodeOriginator)
+	}
+	if m.person_contact != nil {
+		edges = append(edges, person.EdgePersonContact)
 	}
 	return edges
 }
@@ -7230,13 +7274,17 @@ func (m *PersonMutation) AddedIDs(name string) []ent.Value {
 		if id := m.node_originator; id != nil {
 			return []ent.Value{*id}
 		}
+	case person.EdgePersonContact:
+		if id := m.person_contact; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PersonMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedcontacts != nil {
 		edges = append(edges, person.EdgeContacts)
 	}
@@ -7259,7 +7307,7 @@ func (m *PersonMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PersonMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedcontacts {
 		edges = append(edges, person.EdgeContacts)
 	}
@@ -7271,6 +7319,9 @@ func (m *PersonMutation) ClearedEdges() []string {
 	}
 	if m.clearednode_originator {
 		edges = append(edges, person.EdgeNodeOriginator)
+	}
+	if m.clearedperson_contact {
+		edges = append(edges, person.EdgePersonContact)
 	}
 	return edges
 }
@@ -7287,6 +7338,8 @@ func (m *PersonMutation) EdgeCleared(name string) bool {
 		return m.clearednode_supplier
 	case person.EdgeNodeOriginator:
 		return m.clearednode_originator
+	case person.EdgePersonContact:
+		return m.clearedperson_contact
 	}
 	return false
 }
@@ -7303,6 +7356,9 @@ func (m *PersonMutation) ClearEdge(name string) error {
 		return nil
 	case person.EdgeNodeOriginator:
 		m.ClearNodeOriginator()
+		return nil
+	case person.EdgePersonContact:
+		m.ClearPersonContact()
 		return nil
 	}
 	return fmt.Errorf("unknown Person unique edge %s", name)
@@ -7323,6 +7379,9 @@ func (m *PersonMutation) ResetEdge(name string) error {
 		return nil
 	case person.EdgeNodeOriginator:
 		m.ResetNodeOriginator()
+		return nil
+	case person.EdgePersonContact:
+		m.ResetPersonContact()
 		return nil
 	}
 	return fmt.Errorf("unknown Person edge %s", name)

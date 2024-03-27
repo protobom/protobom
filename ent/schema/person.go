@@ -46,6 +46,7 @@ func (Person) Edges() []ent.Edge {
 		edge.From("metadata", Metadata.Type).Ref("authors").Unique(),
 		edge.From("node_supplier", Node.Type).Ref("suppliers").Unique(),
 		edge.From("node_originator", Node.Type).Ref("originators").Unique(),
+		edge.From("person_contact", Person.Type).Ref("contacts").Unique(),
 	}
 }
 

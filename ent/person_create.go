@@ -141,6 +141,25 @@ func (pc *PersonCreate) SetNodeOriginator(n *Node) *PersonCreate {
 	return pc.SetNodeOriginatorID(n.ID)
 }
 
+// SetPersonContactID sets the "person_contact" edge to the Person entity by ID.
+func (pc *PersonCreate) SetPersonContactID(id int) *PersonCreate {
+	pc.mutation.SetPersonContactID(id)
+	return pc
+}
+
+// SetNillablePersonContactID sets the "person_contact" edge to the Person entity by ID if the given value is not nil.
+func (pc *PersonCreate) SetNillablePersonContactID(id *int) *PersonCreate {
+	if id != nil {
+		pc = pc.SetPersonContactID(*id)
+	}
+	return pc
+}
+
+// SetPersonContact sets the "person_contact" edge to the Person entity.
+func (pc *PersonCreate) SetPersonContact(p *Person) *PersonCreate {
+	return pc.SetPersonContactID(p.ID)
+}
+
 // Mutation returns the PersonMutation object of the builder.
 func (pc *PersonCreate) Mutation() *PersonMutation {
 	return pc.mutation
@@ -239,10 +258,10 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 	}
 	if nodes := pc.mutation.ContactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
-			Columns: person.ContactsPrimaryKey,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -302,6 +321,23 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.node_originators = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.PersonContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.PersonContactTable,
+			Columns: []string{person.PersonContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.person_contacts = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

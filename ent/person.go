@@ -50,6 +50,7 @@ type Person struct {
 	metadata_authors *string
 	node_suppliers   *string
 	node_originators *string
+	person_contacts  *int
 	selectValues     sql.SelectValues
 }
 
@@ -63,9 +64,11 @@ type PersonEdges struct {
 	NodeSupplier *Node `json:"node_supplier,omitempty"`
 	// NodeOriginator holds the value of the node_originator edge.
 	NodeOriginator *Node `json:"node_originator,omitempty"`
+	// PersonContact holds the value of the person_contact edge.
+	PersonContact *Person `json:"person_contact,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // ContactsOrErr returns the Contacts value or an error if the edge
@@ -116,6 +119,19 @@ func (e PersonEdges) NodeOriginatorOrErr() (*Node, error) {
 	return nil, &NotLoadedError{edge: "node_originator"}
 }
 
+// PersonContactOrErr returns the PersonContact value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PersonEdges) PersonContactOrErr() (*Person, error) {
+	if e.loadedTypes[4] {
+		if e.PersonContact == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: person.Label}
+		}
+		return e.PersonContact, nil
+	}
+	return nil, &NotLoadedError{edge: "person_contact"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Person) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -133,6 +149,8 @@ func (*Person) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case person.ForeignKeys[2]: // node_originators
 			values[i] = new(sql.NullString)
+		case person.ForeignKeys[3]: // person_contacts
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -205,6 +223,13 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 				pe.node_originators = new(string)
 				*pe.node_originators = value.String
 			}
+		case person.ForeignKeys[3]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field person_contacts", value)
+			} else if value.Valid {
+				pe.person_contacts = new(int)
+				*pe.person_contacts = int(value.Int64)
+			}
 		default:
 			pe.selectValues.Set(columns[i], values[i])
 		}
@@ -236,6 +261,11 @@ func (pe *Person) QueryNodeSupplier() *NodeQuery {
 // QueryNodeOriginator queries the "node_originator" edge of the Person entity.
 func (pe *Person) QueryNodeOriginator() *NodeQuery {
 	return NewPersonClient(pe.config).QueryNodeOriginator(pe)
+}
+
+// QueryPersonContact queries the "person_contact" edge of the Person entity.
+func (pe *Person) QueryPersonContact() *PersonQuery {
+	return NewPersonClient(pe.config).QueryPersonContact(pe)
 }
 
 // Update returns a builder for updating this Person.

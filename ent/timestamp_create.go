@@ -59,14 +59,6 @@ func (tc *TimestampCreate) SetMetadataID(id string) *TimestampCreate {
 	return tc
 }
 
-// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
-func (tc *TimestampCreate) SetNillableMetadataID(id *string) *TimestampCreate {
-	if id != nil {
-		tc = tc.SetMetadataID(*id)
-	}
-	return tc
-}
-
 // SetMetadata sets the "metadata" edge to the Metadata entity.
 func (tc *TimestampCreate) SetMetadata(m *Metadata) *TimestampCreate {
 	return tc.SetMetadataID(m.ID)
@@ -106,6 +98,9 @@ func (tc *TimestampCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *TimestampCreate) check() error {
+	if _, ok := tc.mutation.MetadataID(); !ok {
+		return &ValidationError{Name: "metadata", err: errors.New(`ent: missing required edge "Timestamp.metadata"`)}
+	}
 	return nil
 }
 

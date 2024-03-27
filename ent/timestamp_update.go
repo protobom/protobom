@@ -65,14 +65,6 @@ func (tu *TimestampUpdate) SetMetadataID(id string) *TimestampUpdate {
 	return tu
 }
 
-// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
-func (tu *TimestampUpdate) SetNillableMetadataID(id *string) *TimestampUpdate {
-	if id != nil {
-		tu = tu.SetMetadataID(*id)
-	}
-	return tu
-}
-
 // SetMetadata sets the "metadata" edge to the Metadata entity.
 func (tu *TimestampUpdate) SetMetadata(m *Metadata) *TimestampUpdate {
 	return tu.SetMetadataID(m.ID)
@@ -137,7 +129,18 @@ func (tu *TimestampUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tu *TimestampUpdate) check() error {
+	if _, ok := tu.mutation.MetadataID(); tu.mutation.MetadataCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Timestamp.metadata"`)
+	}
+	return nil
+}
+
 func (tu *TimestampUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := tu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(timestamp.Table, timestamp.Columns, sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt))
 	if ps := tu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -261,14 +264,6 @@ func (tuo *TimestampUpdateOne) SetMetadataID(id string) *TimestampUpdateOne {
 	return tuo
 }
 
-// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
-func (tuo *TimestampUpdateOne) SetNillableMetadataID(id *string) *TimestampUpdateOne {
-	if id != nil {
-		tuo = tuo.SetMetadataID(*id)
-	}
-	return tuo
-}
-
 // SetMetadata sets the "metadata" edge to the Metadata entity.
 func (tuo *TimestampUpdateOne) SetMetadata(m *Metadata) *TimestampUpdateOne {
 	return tuo.SetMetadataID(m.ID)
@@ -346,7 +341,18 @@ func (tuo *TimestampUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tuo *TimestampUpdateOne) check() error {
+	if _, ok := tuo.mutation.MetadataID(); tuo.mutation.MetadataCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Timestamp.metadata"`)
+	}
+	return nil
+}
+
 func (tuo *TimestampUpdateOne) sqlSave(ctx context.Context) (_node *Timestamp, err error) {
+	if err := tuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(timestamp.Table, timestamp.Columns, sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt))
 	id, ok := tuo.mutation.ID()
 	if !ok {

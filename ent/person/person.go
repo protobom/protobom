@@ -47,10 +47,14 @@ const (
 	EdgeNodeSupplier = "node_supplier"
 	// EdgeNodeOriginator holds the string denoting the node_originator edge name in mutations.
 	EdgeNodeOriginator = "node_originator"
+	// EdgePersonContact holds the string denoting the person_contact edge name in mutations.
+	EdgePersonContact = "person_contact"
 	// Table holds the table name of the person in the database.
 	Table = "persons"
-	// ContactsTable is the table that holds the contacts relation/edge. The primary key declared below.
-	ContactsTable = "person_contacts"
+	// ContactsTable is the table that holds the contacts relation/edge.
+	ContactsTable = "persons"
+	// ContactsColumn is the table column denoting the contacts relation/edge.
+	ContactsColumn = "person_contacts"
 	// MetadataTable is the table that holds the metadata relation/edge.
 	MetadataTable = "persons"
 	// MetadataInverseTable is the table name for the Metadata entity.
@@ -72,6 +76,10 @@ const (
 	NodeOriginatorInverseTable = "nodes"
 	// NodeOriginatorColumn is the table column denoting the node_originator relation/edge.
 	NodeOriginatorColumn = "node_originators"
+	// PersonContactTable is the table that holds the person_contact relation/edge.
+	PersonContactTable = "persons"
+	// PersonContactColumn is the table column denoting the person_contact relation/edge.
+	PersonContactColumn = "person_contacts"
 )
 
 // Columns holds all SQL columns for person fields.
@@ -90,13 +98,8 @@ var ForeignKeys = []string{
 	"metadata_authors",
 	"node_suppliers",
 	"node_originators",
+	"person_contacts",
 }
-
-var (
-	// ContactsPrimaryKey and ContactsColumn2 are the table columns denoting the
-	// primary key for the contacts relation (M2M).
-	ContactsPrimaryKey = []string{"person_id", "contact_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -180,11 +183,18 @@ func ByNodeOriginatorField(field string, opts ...sql.OrderTermOption) OrderOptio
 		sqlgraph.OrderByNeighborTerms(s, newNodeOriginatorStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByPersonContactField orders the results by person_contact field.
+func ByPersonContactField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPersonContactStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newContactsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ContactsTable, ContactsPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, ContactsTable, ContactsColumn),
 	)
 }
 func newMetadataStep() *sqlgraph.Step {
@@ -206,5 +216,12 @@ func newNodeOriginatorStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodeOriginatorInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, NodeOriginatorTable, NodeOriginatorColumn),
+	)
+}
+func newPersonContactStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, PersonContactTable, PersonContactColumn),
 	)
 }

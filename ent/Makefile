@@ -1,12 +1,13 @@
 ENT_ROOT_DIR   := ${abspath ${patsubst %/,%,${dir ${lastword ${MAKEFILE_LIST}}}}}
-PROTOC_ENT_VER := eff33e4dca0b84429e6127dc0ec30d866d28895c
+PROTOC_ENT_VER := e03f38664cb77a2cee57a1a014133052f79478e6
 PROTOC_ENT_URL := https://raw.githubusercontent.com/ent/contrib/${PROTOC_ENT_VER}/entproto/cmd/protoc-gen-ent/options/ent/opts.proto
 
 .PHONY: generate-ent
 .SILENT: generate-ent
 generate-ent: proto-ent ## Generate ent database types from schema
 	printf "Generating ${CYAN}ent${RESET} database types with ${CYAN}go generate${RESET}..."
-	go generate ${ENT_ROOT_DIR} 1>& /dev/null
+	go get -d github.com/segmentio/golines mvdan.cc/gofumpt &> /dev/null
+	go generate ${ENT_ROOT_DIR}
 	printf "${GREEN}DONE${RESET}\n"
 
 .PHONY: describe-schemas

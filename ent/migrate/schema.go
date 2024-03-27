@@ -215,6 +215,7 @@ var (
 		{Name: "metadata_authors", Type: field.TypeString, Nullable: true},
 		{Name: "node_suppliers", Type: field.TypeString, Nullable: true},
 		{Name: "node_originators", Type: field.TypeString, Nullable: true},
+		{Name: "person_contacts", Type: field.TypeInt, Nullable: true},
 	}
 	// PersonsTable holds the schema information for the "persons" table.
 	PersonsTable = &schema.Table{
@@ -240,12 +241,18 @@ var (
 				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
+			{
+				Symbol:     "persons_persons_contacts",
+				Columns:    []*schema.Column{PersonsColumns[9]},
+				RefColumns: []*schema.Column{PersonsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
 		},
 	}
 	// TimestampsColumns holds the columns for the "timestamps" table.
 	TimestampsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "metadata_date", Type: field.TypeString, Nullable: true},
+		{Name: "metadata_date", Type: field.TypeString},
 		{Name: "node_release_date", Type: field.TypeString, Nullable: true},
 		{Name: "node_build_date", Type: field.TypeString, Nullable: true},
 		{Name: "node_valid_until_date", Type: field.TypeString, Nullable: true},
@@ -260,7 +267,7 @@ var (
 				Symbol:     "timestamps_metadata_date",
 				Columns:    []*schema.Column{TimestampsColumns[1]},
 				RefColumns: []*schema.Column{MetadataColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "timestamps_nodes_release_date",
@@ -379,31 +386,6 @@ var (
 			},
 		},
 	}
-	// PersonContactsColumns holds the columns for the "person_contacts" table.
-	PersonContactsColumns = []*schema.Column{
-		{Name: "person_id", Type: field.TypeInt},
-		{Name: "contact_id", Type: field.TypeInt},
-	}
-	// PersonContactsTable holds the schema information for the "person_contacts" table.
-	PersonContactsTable = &schema.Table{
-		Name:       "person_contacts",
-		Columns:    PersonContactsColumns,
-		PrimaryKey: []*schema.Column{PersonContactsColumns[0], PersonContactsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "person_contacts_person_id",
-				Columns:    []*schema.Column{PersonContactsColumns[0]},
-				RefColumns: []*schema.Column{PersonsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "person_contacts_contact_id",
-				Columns:    []*schema.Column{PersonContactsColumns[1]},
-				RefColumns: []*schema.Column{PersonsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// TimestampDateColumns holds the columns for the "timestamp_date" table.
 	TimestampDateColumns = []*schema.Column{
 		{Name: "timestamp_id", Type: field.TypeInt},
@@ -446,7 +428,6 @@ var (
 		ExternalReferenceHashesTable,
 		NodeIdentifiersTable,
 		NodeHashesTable,
-		PersonContactsTable,
 		TimestampDateTable,
 	}
 )
@@ -461,6 +442,7 @@ func init() {
 	PersonsTable.ForeignKeys[0].RefTable = MetadataTable
 	PersonsTable.ForeignKeys[1].RefTable = NodesTable
 	PersonsTable.ForeignKeys[2].RefTable = NodesTable
+	PersonsTable.ForeignKeys[3].RefTable = PersonsTable
 	TimestampsTable.ForeignKeys[0].RefTable = MetadataTable
 	TimestampsTable.ForeignKeys[1].RefTable = NodesTable
 	TimestampsTable.ForeignKeys[2].RefTable = NodesTable
@@ -472,8 +454,6 @@ func init() {
 	NodeIdentifiersTable.ForeignKeys[1].RefTable = IdentifiersEntriesTable
 	NodeHashesTable.ForeignKeys[0].RefTable = NodesTable
 	NodeHashesTable.ForeignKeys[1].RefTable = HashesEntriesTable
-	PersonContactsTable.ForeignKeys[0].RefTable = PersonsTable
-	PersonContactsTable.ForeignKeys[1].RefTable = PersonsTable
 	TimestampDateTable.ForeignKeys[0].RefTable = TimestampsTable
 	TimestampDateTable.ForeignKeys[1].RefTable = TimestampsTable
 }

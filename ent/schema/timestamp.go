@@ -34,7 +34,7 @@ func (Timestamp) Fields() []ent.Field { return nil }
 func (Timestamp) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("date", Timestamp.Type),
-		edge.From("metadata", Metadata.Type).Ref("date").Unique(),
+		edge.From("metadata", Metadata.Type).Ref("date").Required().Unique(),
 	}
 }
 

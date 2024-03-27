@@ -187,6 +187,25 @@ func (pu *PersonUpdate) SetNodeOriginator(n *Node) *PersonUpdate {
 	return pu.SetNodeOriginatorID(n.ID)
 }
 
+// SetPersonContactID sets the "person_contact" edge to the Person entity by ID.
+func (pu *PersonUpdate) SetPersonContactID(id int) *PersonUpdate {
+	pu.mutation.SetPersonContactID(id)
+	return pu
+}
+
+// SetNillablePersonContactID sets the "person_contact" edge to the Person entity by ID if the given value is not nil.
+func (pu *PersonUpdate) SetNillablePersonContactID(id *int) *PersonUpdate {
+	if id != nil {
+		pu = pu.SetPersonContactID(*id)
+	}
+	return pu
+}
+
+// SetPersonContact sets the "person_contact" edge to the Person entity.
+func (pu *PersonUpdate) SetPersonContact(p *Person) *PersonUpdate {
+	return pu.SetPersonContactID(p.ID)
+}
+
 // Mutation returns the PersonMutation object of the builder.
 func (pu *PersonUpdate) Mutation() *PersonMutation {
 	return pu.mutation
@@ -228,6 +247,12 @@ func (pu *PersonUpdate) ClearNodeSupplier() *PersonUpdate {
 // ClearNodeOriginator clears the "node_originator" edge to the Node entity.
 func (pu *PersonUpdate) ClearNodeOriginator() *PersonUpdate {
 	pu.mutation.ClearNodeOriginator()
+	return pu
+}
+
+// ClearPersonContact clears the "person_contact" edge to the Person entity.
+func (pu *PersonUpdate) ClearPersonContact() *PersonUpdate {
+	pu.mutation.ClearPersonContact()
 	return pu
 }
 
@@ -284,10 +309,10 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pu.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
-			Columns: person.ContactsPrimaryKey,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -297,10 +322,10 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := pu.mutation.RemovedContactsIDs(); len(nodes) > 0 && !pu.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
-			Columns: person.ContactsPrimaryKey,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -313,10 +338,10 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := pu.mutation.ContactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
-			Columns: person.ContactsPrimaryKey,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -407,6 +432,35 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.PersonContactCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.PersonContactTable,
+			Columns: []string{person.PersonContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.PersonContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.PersonContactTable,
+			Columns: []string{person.PersonContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -576,6 +630,25 @@ func (puo *PersonUpdateOne) SetNodeOriginator(n *Node) *PersonUpdateOne {
 	return puo.SetNodeOriginatorID(n.ID)
 }
 
+// SetPersonContactID sets the "person_contact" edge to the Person entity by ID.
+func (puo *PersonUpdateOne) SetPersonContactID(id int) *PersonUpdateOne {
+	puo.mutation.SetPersonContactID(id)
+	return puo
+}
+
+// SetNillablePersonContactID sets the "person_contact" edge to the Person entity by ID if the given value is not nil.
+func (puo *PersonUpdateOne) SetNillablePersonContactID(id *int) *PersonUpdateOne {
+	if id != nil {
+		puo = puo.SetPersonContactID(*id)
+	}
+	return puo
+}
+
+// SetPersonContact sets the "person_contact" edge to the Person entity.
+func (puo *PersonUpdateOne) SetPersonContact(p *Person) *PersonUpdateOne {
+	return puo.SetPersonContactID(p.ID)
+}
+
 // Mutation returns the PersonMutation object of the builder.
 func (puo *PersonUpdateOne) Mutation() *PersonMutation {
 	return puo.mutation
@@ -617,6 +690,12 @@ func (puo *PersonUpdateOne) ClearNodeSupplier() *PersonUpdateOne {
 // ClearNodeOriginator clears the "node_originator" edge to the Node entity.
 func (puo *PersonUpdateOne) ClearNodeOriginator() *PersonUpdateOne {
 	puo.mutation.ClearNodeOriginator()
+	return puo
+}
+
+// ClearPersonContact clears the "person_contact" edge to the Person entity.
+func (puo *PersonUpdateOne) ClearPersonContact() *PersonUpdateOne {
+	puo.mutation.ClearPersonContact()
 	return puo
 }
 
@@ -703,10 +782,10 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 	}
 	if puo.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
-			Columns: person.ContactsPrimaryKey,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -716,10 +795,10 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 	}
 	if nodes := puo.mutation.RemovedContactsIDs(); len(nodes) > 0 && !puo.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
-			Columns: person.ContactsPrimaryKey,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -732,10 +811,10 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 	}
 	if nodes := puo.mutation.ContactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
-			Columns: person.ContactsPrimaryKey,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -826,6 +905,35 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.PersonContactCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.PersonContactTable,
+			Columns: []string{person.PersonContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.PersonContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.PersonContactTable,
+			Columns: []string{person.PersonContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/node_list.go
@@ -31,14 +30,14 @@ type NodeList struct {
 }
 
 func (NodeList) Fields() []ent.Field {
-	return []ent.Field{field.String("root_elements")}
+	return []ent.Field{field.Strings("root_elements")}
 }
 
 func (NodeList) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("nodes", Node.Type),
 		edge.To("edges", Edge.Type),
-		edge.From("document", Document.Type).Ref("node_list").Required().Unique(),
+		edge.To("document", Document.Type).Unique(),
 	}
 }
 

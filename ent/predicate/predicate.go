@@ -53,8 +53,8 @@ type NodeList func(*sql.Selector)
 // Person is the predicate function for person builders.
 type Person func(*sql.Selector)
 
-// Timestamp is the predicate function for timestamp builders.
-type Timestamp func(*sql.Selector)
+// Purpose is the predicate function for purpose builders.
+type Purpose func(*sql.Selector)
 
 // Tool is the predicate function for tool builders.
 type Tool func(*sql.Selector)

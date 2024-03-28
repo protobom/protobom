@@ -19,6 +19,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -34,12 +35,11 @@ type NodeList struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// RootElements holds the value of the "root_elements" field.
-	RootElements string `json:"root_elements,omitempty"`
+	RootElements []string `json:"root_elements,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NodeListQuery when eager-loading is set.
-	Edges              NodeListEdges `json:"edges"`
-	document_node_list *int
-	selectValues       sql.SelectValues
+	Edges        NodeListEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // NodeListEdges holds the relations/edges for other nodes in the graph.
@@ -91,11 +91,9 @@ func (*NodeList) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case nodelist.FieldID:
-			values[i] = new(sql.NullInt64)
 		case nodelist.FieldRootElements:
-			values[i] = new(sql.NullString)
-		case nodelist.ForeignKeys[0]: // document_node_list
+			values[i] = new([]byte)
+		case nodelist.FieldID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -119,17 +117,12 @@ func (nl *NodeList) assignValues(columns []string, values []any) error {
 			}
 			nl.ID = int(value.Int64)
 		case nodelist.FieldRootElements:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field root_elements", values[i])
-			} else if value.Valid {
-				nl.RootElements = value.String
-			}
-		case nodelist.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field document_node_list", value)
-			} else if value.Valid {
-				nl.document_node_list = new(int)
-				*nl.document_node_list = int(value.Int64)
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &nl.RootElements); err != nil {
+					return fmt.Errorf("unmarshal field root_elements: %w", err)
+				}
 			}
 		default:
 			nl.selectValues.Set(columns[i], values[i])
@@ -183,7 +176,7 @@ func (nl *NodeList) String() string {
 	builder.WriteString("NodeList(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", nl.ID))
 	builder.WriteString("root_elements=")
-	builder.WriteString(nl.RootElements)
+	builder.WriteString(fmt.Sprintf("%v", nl.RootElements))
 	builder.WriteByte(')')
 	return builder.String()
 }

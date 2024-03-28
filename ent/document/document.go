@@ -36,19 +36,19 @@ const (
 	// Table holds the table name of the document in the database.
 	Table = "documents"
 	// MetadataTable is the table that holds the metadata relation/edge.
-	MetadataTable = "metadata"
+	MetadataTable = "documents"
 	// MetadataInverseTable is the table name for the Metadata entity.
 	// It exists in this package in order to avoid circular dependency with the "metadata" package.
 	MetadataInverseTable = "metadata"
 	// MetadataColumn is the table column denoting the metadata relation/edge.
-	MetadataColumn = "document_metadata"
+	MetadataColumn = "metadata_document"
 	// NodeListTable is the table that holds the node_list relation/edge.
-	NodeListTable = "node_lists"
+	NodeListTable = "documents"
 	// NodeListInverseTable is the table name for the NodeList entity.
 	// It exists in this package in order to avoid circular dependency with the "nodelist" package.
 	NodeListInverseTable = "node_lists"
 	// NodeListColumn is the table column denoting the node_list relation/edge.
-	NodeListColumn = "document_node_list"
+	NodeListColumn = "node_list_document"
 )
 
 // Columns holds all SQL columns for document fields.
@@ -56,10 +56,22 @@ var Columns = []string{
 	FieldID,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "documents"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"metadata_document",
+	"node_list_document",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -91,13 +103,13 @@ func newMetadataStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MetadataInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, MetadataTable, MetadataColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, MetadataTable, MetadataColumn),
 	)
 }
 func newNodeListStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodeListInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, NodeListTable, NodeListColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, NodeListTable, NodeListColumn),
 	)
 }

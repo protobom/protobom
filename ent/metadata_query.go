@@ -32,7 +32,6 @@ import (
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/predicate"
-	"github.com/bom-squad/protobom/ent/timestamp"
 	"github.com/bom-squad/protobom/ent/tool"
 )
 
@@ -46,9 +45,7 @@ type MetadataQuery struct {
 	withTools         *ToolQuery
 	withAuthors       *PersonQuery
 	withDocumentTypes *DocumentTypeQuery
-	withDate          *TimestampQuery
 	withDocument      *DocumentQuery
-	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -129,7 +126,7 @@ func (mq *MetadataQuery) QueryAuthors() *PersonQuery {
 	return query
 }
 
-// QueryDocumentTypes chains the current query on the "documentTypes" edge.
+// QueryDocumentTypes chains the current query on the "document_types" edge.
 func (mq *MetadataQuery) QueryDocumentTypes() *DocumentTypeQuery {
 	query := (&DocumentTypeClient{config: mq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
@@ -151,28 +148,6 @@ func (mq *MetadataQuery) QueryDocumentTypes() *DocumentTypeQuery {
 	return query
 }
 
-// QueryDate chains the current query on the "date" edge.
-func (mq *MetadataQuery) QueryDate() *TimestampQuery {
-	query := (&TimestampClient{config: mq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := mq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(metadata.Table, metadata.FieldID, selector),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, metadata.DateTable, metadata.DateColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryDocument chains the current query on the "document" edge.
 func (mq *MetadataQuery) QueryDocument() *DocumentQuery {
 	query := (&DocumentClient{config: mq.config}).Query()
@@ -187,7 +162,7 @@ func (mq *MetadataQuery) QueryDocument() *DocumentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(metadata.Table, metadata.FieldID, selector),
 			sqlgraph.To(document.Table, document.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, metadata.DocumentTable, metadata.DocumentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, metadata.DocumentTable, metadata.DocumentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -390,7 +365,6 @@ func (mq *MetadataQuery) Clone() *MetadataQuery {
 		withTools:         mq.withTools.Clone(),
 		withAuthors:       mq.withAuthors.Clone(),
 		withDocumentTypes: mq.withDocumentTypes.Clone(),
-		withDate:          mq.withDate.Clone(),
 		withDocument:      mq.withDocument.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
@@ -421,24 +395,13 @@ func (mq *MetadataQuery) WithAuthors(opts ...func(*PersonQuery)) *MetadataQuery 
 }
 
 // WithDocumentTypes tells the query-builder to eager-load the nodes that are connected to
-// the "documentTypes" edge. The optional arguments are used to configure the query builder of the edge.
+// the "document_types" edge. The optional arguments are used to configure the query builder of the edge.
 func (mq *MetadataQuery) WithDocumentTypes(opts ...func(*DocumentTypeQuery)) *MetadataQuery {
 	query := (&DocumentTypeClient{config: mq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
 	mq.withDocumentTypes = query
-	return mq
-}
-
-// WithDate tells the query-builder to eager-load the nodes that are connected to
-// the "date" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MetadataQuery) WithDate(opts ...func(*TimestampQuery)) *MetadataQuery {
-	query := (&TimestampClient{config: mq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	mq.withDate = query
 	return mq
 }
 
@@ -530,22 +493,14 @@ func (mq *MetadataQuery) prepareQuery(ctx context.Context) error {
 func (mq *MetadataQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Metadata, error) {
 	var (
 		nodes       = []*Metadata{}
-		withFKs     = mq.withFKs
 		_spec       = mq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [4]bool{
 			mq.withTools != nil,
 			mq.withAuthors != nil,
 			mq.withDocumentTypes != nil,
-			mq.withDate != nil,
 			mq.withDocument != nil,
 		}
 	)
-	if mq.withDocument != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, metadata.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Metadata).scanValues(nil, columns)
 	}
@@ -582,13 +537,6 @@ func (mq *MetadataQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Met
 		if err := mq.loadDocumentTypes(ctx, query, nodes,
 			func(n *Metadata) { n.Edges.DocumentTypes = []*DocumentType{} },
 			func(n *Metadata, e *DocumentType) { n.Edges.DocumentTypes = append(n.Edges.DocumentTypes, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := mq.withDate; query != nil {
-		if err := mq.loadDate(ctx, query, nodes,
-			func(n *Metadata) { n.Edges.Date = []*Timestamp{} },
-			func(n *Metadata, e *Timestamp) { n.Edges.Date = append(n.Edges.Date, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -694,66 +642,31 @@ func (mq *MetadataQuery) loadDocumentTypes(ctx context.Context, query *DocumentT
 	}
 	return nil
 }
-func (mq *MetadataQuery) loadDate(ctx context.Context, query *TimestampQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *Timestamp)) error {
+func (mq *MetadataQuery) loadDocument(ctx context.Context, query *DocumentQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *Document)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Metadata)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
-	query.Where(predicate.Timestamp(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(metadata.DateColumn), fks...))
+	query.Where(predicate.Document(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(metadata.DocumentColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.metadata_date
+		fk := n.metadata_document
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "metadata_date" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "metadata_document" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "metadata_date" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "metadata_document" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
-	}
-	return nil
-}
-func (mq *MetadataQuery) loadDocument(ctx context.Context, query *DocumentQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *Document)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Metadata)
-	for i := range nodes {
-		if nodes[i].document_metadata == nil {
-			continue
-		}
-		fk := *nodes[i].document_metadata
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(document.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "document_metadata" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
 	}
 	return nil
 }

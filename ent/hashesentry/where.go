@@ -165,7 +165,7 @@ func HasExternalReferences() predicate.HashesEntry {
 	return predicate.HashesEntry(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ExternalReferencesTable, ExternalReferencesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, ExternalReferencesTable, ExternalReferencesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -188,7 +188,7 @@ func HasNodes() predicate.HashesEntry {
 	return predicate.HashesEntry(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, NodesTable, NodesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, NodesTable, NodesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

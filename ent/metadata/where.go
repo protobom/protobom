@@ -20,6 +20,8 @@
 package metadata
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/bom-squad/protobom/ent/predicate"
@@ -88,6 +90,11 @@ func Version(v string) predicate.Metadata {
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Metadata {
 	return predicate.Metadata(sql.FieldEQ(FieldName, v))
+}
+
+// Date applies equality check predicate on the "date" field. It's identical to DateEQ.
+func Date(v time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldEQ(FieldDate, v))
 }
 
 // Comment applies equality check predicate on the "comment" field. It's identical to CommentEQ.
@@ -225,6 +232,46 @@ func NameContainsFold(v string) predicate.Metadata {
 	return predicate.Metadata(sql.FieldContainsFold(FieldName, v))
 }
 
+// DateEQ applies the EQ predicate on the "date" field.
+func DateEQ(v time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldEQ(FieldDate, v))
+}
+
+// DateNEQ applies the NEQ predicate on the "date" field.
+func DateNEQ(v time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldNEQ(FieldDate, v))
+}
+
+// DateIn applies the In predicate on the "date" field.
+func DateIn(vs ...time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldIn(FieldDate, vs...))
+}
+
+// DateNotIn applies the NotIn predicate on the "date" field.
+func DateNotIn(vs ...time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldNotIn(FieldDate, vs...))
+}
+
+// DateGT applies the GT predicate on the "date" field.
+func DateGT(v time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldGT(FieldDate, v))
+}
+
+// DateGTE applies the GTE predicate on the "date" field.
+func DateGTE(v time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldGTE(FieldDate, v))
+}
+
+// DateLT applies the LT predicate on the "date" field.
+func DateLT(v time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldLT(FieldDate, v))
+}
+
+// DateLTE applies the LTE predicate on the "date" field.
+func DateLTE(v time.Time) predicate.Metadata {
+	return predicate.Metadata(sql.FieldLTE(FieldDate, v))
+}
+
 // CommentEQ applies the EQ predicate on the "comment" field.
 func CommentEQ(v string) predicate.Metadata {
 	return predicate.Metadata(sql.FieldEQ(FieldComment, v))
@@ -336,7 +383,7 @@ func HasAuthorsWith(preds ...predicate.Person) predicate.Metadata {
 	})
 }
 
-// HasDocumentTypes applies the HasEdge predicate on the "documentTypes" edge.
+// HasDocumentTypes applies the HasEdge predicate on the "document_types" edge.
 func HasDocumentTypes() predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
@@ -347,33 +394,10 @@ func HasDocumentTypes() predicate.Metadata {
 	})
 }
 
-// HasDocumentTypesWith applies the HasEdge predicate on the "documentTypes" edge with a given conditions (other predicates).
+// HasDocumentTypesWith applies the HasEdge predicate on the "document_types" edge with a given conditions (other predicates).
 func HasDocumentTypesWith(preds ...predicate.DocumentType) predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
 		step := newDocumentTypesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasDate applies the HasEdge predicate on the "date" edge.
-func HasDate() predicate.Metadata {
-	return predicate.Metadata(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, DateTable, DateColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasDateWith applies the HasEdge predicate on the "date" edge with a given conditions (other predicates).
-func HasDateWith(preds ...predicate.Timestamp) predicate.Metadata {
-	return predicate.Metadata(func(s *sql.Selector) {
-		step := newDateStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -387,7 +411,7 @@ func HasDocument() predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, DocumentTable, DocumentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, DocumentTable, DocumentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

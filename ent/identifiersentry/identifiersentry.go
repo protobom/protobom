@@ -39,11 +39,13 @@ const (
 	EdgeNodes = "nodes"
 	// Table holds the table name of the identifiersentry in the database.
 	Table = "identifiers_entries"
-	// NodesTable is the table that holds the nodes relation/edge. The primary key declared below.
-	NodesTable = "node_identifiers"
+	// NodesTable is the table that holds the nodes relation/edge.
+	NodesTable = "identifiers_entries"
 	// NodesInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodesInverseTable = "nodes"
+	// NodesColumn is the table column denoting the nodes relation/edge.
+	NodesColumn = "node_identifiers"
 )
 
 // Columns holds all SQL columns for identifiersentry fields.
@@ -53,16 +55,21 @@ var Columns = []string{
 	FieldSoftwareIdentifierValue,
 }
 
-var (
-	// NodesPrimaryKey and NodesColumn2 are the table columns denoting the
-	// primary key for the nodes relation (M2M).
-	NodesPrimaryKey = []string{"node_id", "identifiers_entry_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the "identifiers_entries"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"node_identifiers",
+}
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -113,23 +120,16 @@ func BySoftwareIdentifierValue(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSoftwareIdentifierValue, opts...).ToFunc()
 }
 
-// ByNodesCount orders the results by nodes count.
-func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByNodesField orders the results by nodes field.
+func ByNodesField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodesStep(), opts...)
-	}
-}
-
-// ByNodes orders the results by nodes terms.
-func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newNodesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, NodesTable, NodesPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2O, true, NodesTable, NodesColumn),
 	)
 }

@@ -41,16 +41,20 @@ const (
 	EdgeNodes = "nodes"
 	// Table holds the table name of the hashesentry in the database.
 	Table = "hashes_entries"
-	// ExternalReferencesTable is the table that holds the external_references relation/edge. The primary key declared below.
-	ExternalReferencesTable = "external_reference_hashes"
+	// ExternalReferencesTable is the table that holds the external_references relation/edge.
+	ExternalReferencesTable = "hashes_entries"
 	// ExternalReferencesInverseTable is the table name for the ExternalReference entity.
 	// It exists in this package in order to avoid circular dependency with the "externalreference" package.
 	ExternalReferencesInverseTable = "external_references"
-	// NodesTable is the table that holds the nodes relation/edge. The primary key declared below.
-	NodesTable = "node_hashes"
+	// ExternalReferencesColumn is the table column denoting the external_references relation/edge.
+	ExternalReferencesColumn = "external_reference_hashes"
+	// NodesTable is the table that holds the nodes relation/edge.
+	NodesTable = "hashes_entries"
 	// NodesInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodesInverseTable = "nodes"
+	// NodesColumn is the table column denoting the nodes relation/edge.
+	NodesColumn = "node_hashes"
 )
 
 // Columns holds all SQL columns for hashesentry fields.
@@ -60,19 +64,22 @@ var Columns = []string{
 	FieldHashData,
 }
 
-var (
-	// ExternalReferencesPrimaryKey and ExternalReferencesColumn2 are the table columns denoting the
-	// primary key for the external_references relation (M2M).
-	ExternalReferencesPrimaryKey = []string{"external_reference_id", "hashes_entry_id"}
-	// NodesPrimaryKey and NodesColumn2 are the table columns denoting the
-	// primary key for the nodes relation (M2M).
-	NodesPrimaryKey = []string{"node_id", "hashes_entry_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the "hashes_entries"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"external_reference_hashes",
+	"node_hashes",
+}
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -136,44 +143,30 @@ func ByHashData(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldHashData, opts...).ToFunc()
 }
 
-// ByExternalReferencesCount orders the results by external_references count.
-func ByExternalReferencesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByExternalReferencesField orders the results by external_references field.
+func ByExternalReferencesField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newExternalReferencesStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newExternalReferencesStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByExternalReferences orders the results by external_references terms.
-func ByExternalReferences(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByNodesField orders the results by nodes field.
+func ByNodesField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newExternalReferencesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByNodesCount orders the results by nodes count.
-func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodesStep(), opts...)
-	}
-}
-
-// ByNodes orders the results by nodes terms.
-func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newExternalReferencesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ExternalReferencesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ExternalReferencesTable, ExternalReferencesPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2O, true, ExternalReferencesTable, ExternalReferencesColumn),
 	)
 }
 func newNodesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, NodesTable, NodesPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2O, true, NodesTable, NodesColumn),
 	)
 }

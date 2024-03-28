@@ -115,6 +115,25 @@ func (pu *PersonUpdate) SetNillablePhone(s *string) *PersonUpdate {
 	return pu
 }
 
+// SetContactOwnerID sets the "contact_owner" edge to the Person entity by ID.
+func (pu *PersonUpdate) SetContactOwnerID(id int) *PersonUpdate {
+	pu.mutation.SetContactOwnerID(id)
+	return pu
+}
+
+// SetNillableContactOwnerID sets the "contact_owner" edge to the Person entity by ID if the given value is not nil.
+func (pu *PersonUpdate) SetNillableContactOwnerID(id *int) *PersonUpdate {
+	if id != nil {
+		pu = pu.SetContactOwnerID(*id)
+	}
+	return pu
+}
+
+// SetContactOwner sets the "contact_owner" edge to the Person entity.
+func (pu *PersonUpdate) SetContactOwner(p *Person) *PersonUpdate {
+	return pu.SetContactOwnerID(p.ID)
+}
+
 // AddContactIDs adds the "contacts" edge to the Person entity by IDs.
 func (pu *PersonUpdate) AddContactIDs(ids ...int) *PersonUpdate {
 	pu.mutation.AddContactIDs(ids...)
@@ -149,66 +168,34 @@ func (pu *PersonUpdate) SetMetadata(m *Metadata) *PersonUpdate {
 	return pu.SetMetadataID(m.ID)
 }
 
-// SetNodeSupplierID sets the "node_supplier" edge to the Node entity by ID.
-func (pu *PersonUpdate) SetNodeSupplierID(id string) *PersonUpdate {
-	pu.mutation.SetNodeSupplierID(id)
+// SetNodeID sets the "node" edge to the Node entity by ID.
+func (pu *PersonUpdate) SetNodeID(id string) *PersonUpdate {
+	pu.mutation.SetNodeID(id)
 	return pu
 }
 
-// SetNillableNodeSupplierID sets the "node_supplier" edge to the Node entity by ID if the given value is not nil.
-func (pu *PersonUpdate) SetNillableNodeSupplierID(id *string) *PersonUpdate {
+// SetNillableNodeID sets the "node" edge to the Node entity by ID if the given value is not nil.
+func (pu *PersonUpdate) SetNillableNodeID(id *string) *PersonUpdate {
 	if id != nil {
-		pu = pu.SetNodeSupplierID(*id)
+		pu = pu.SetNodeID(*id)
 	}
 	return pu
 }
 
-// SetNodeSupplier sets the "node_supplier" edge to the Node entity.
-func (pu *PersonUpdate) SetNodeSupplier(n *Node) *PersonUpdate {
-	return pu.SetNodeSupplierID(n.ID)
-}
-
-// SetNodeOriginatorID sets the "node_originator" edge to the Node entity by ID.
-func (pu *PersonUpdate) SetNodeOriginatorID(id string) *PersonUpdate {
-	pu.mutation.SetNodeOriginatorID(id)
-	return pu
-}
-
-// SetNillableNodeOriginatorID sets the "node_originator" edge to the Node entity by ID if the given value is not nil.
-func (pu *PersonUpdate) SetNillableNodeOriginatorID(id *string) *PersonUpdate {
-	if id != nil {
-		pu = pu.SetNodeOriginatorID(*id)
-	}
-	return pu
-}
-
-// SetNodeOriginator sets the "node_originator" edge to the Node entity.
-func (pu *PersonUpdate) SetNodeOriginator(n *Node) *PersonUpdate {
-	return pu.SetNodeOriginatorID(n.ID)
-}
-
-// SetPersonContactID sets the "person_contact" edge to the Person entity by ID.
-func (pu *PersonUpdate) SetPersonContactID(id int) *PersonUpdate {
-	pu.mutation.SetPersonContactID(id)
-	return pu
-}
-
-// SetNillablePersonContactID sets the "person_contact" edge to the Person entity by ID if the given value is not nil.
-func (pu *PersonUpdate) SetNillablePersonContactID(id *int) *PersonUpdate {
-	if id != nil {
-		pu = pu.SetPersonContactID(*id)
-	}
-	return pu
-}
-
-// SetPersonContact sets the "person_contact" edge to the Person entity.
-func (pu *PersonUpdate) SetPersonContact(p *Person) *PersonUpdate {
-	return pu.SetPersonContactID(p.ID)
+// SetNode sets the "node" edge to the Node entity.
+func (pu *PersonUpdate) SetNode(n *Node) *PersonUpdate {
+	return pu.SetNodeID(n.ID)
 }
 
 // Mutation returns the PersonMutation object of the builder.
 func (pu *PersonUpdate) Mutation() *PersonMutation {
 	return pu.mutation
+}
+
+// ClearContactOwner clears the "contact_owner" edge to the Person entity.
+func (pu *PersonUpdate) ClearContactOwner() *PersonUpdate {
+	pu.mutation.ClearContactOwner()
+	return pu
 }
 
 // ClearContacts clears all "contacts" edges to the Person entity.
@@ -238,21 +225,9 @@ func (pu *PersonUpdate) ClearMetadata() *PersonUpdate {
 	return pu
 }
 
-// ClearNodeSupplier clears the "node_supplier" edge to the Node entity.
-func (pu *PersonUpdate) ClearNodeSupplier() *PersonUpdate {
-	pu.mutation.ClearNodeSupplier()
-	return pu
-}
-
-// ClearNodeOriginator clears the "node_originator" edge to the Node entity.
-func (pu *PersonUpdate) ClearNodeOriginator() *PersonUpdate {
-	pu.mutation.ClearNodeOriginator()
-	return pu
-}
-
-// ClearPersonContact clears the "person_contact" edge to the Person entity.
-func (pu *PersonUpdate) ClearPersonContact() *PersonUpdate {
-	pu.mutation.ClearPersonContact()
+// ClearNode clears the "node" edge to the Node entity.
+func (pu *PersonUpdate) ClearNode() *PersonUpdate {
+	pu.mutation.ClearNode()
 	return pu
 }
 
@@ -307,13 +282,42 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.Phone(); ok {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
 	}
+	if pu.mutation.ContactOwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.ContactOwnerTable,
+			Columns: []string{person.ContactOwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.ContactOwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.ContactOwnerTable,
+			Columns: []string{person.ContactOwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if pu.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
 			Columns: []string{person.ContactsColumn},
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
@@ -326,7 +330,7 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Inverse: false,
 			Table:   person.ContactsTable,
 			Columns: []string{person.ContactsColumn},
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
@@ -342,7 +346,7 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Inverse: false,
 			Table:   person.ContactsTable,
 			Columns: []string{person.ContactsColumn},
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
@@ -381,12 +385,12 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.NodeSupplierCleared() {
+	if pu.mutation.NodeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   person.NodeSupplierTable,
-			Columns: []string{person.NodeSupplierColumn},
+			Table:   person.NodeTable,
+			Columns: []string{person.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -394,73 +398,15 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.NodeSupplierIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   person.NodeSupplierTable,
-			Columns: []string{person.NodeSupplierColumn},
+			Table:   person.NodeTable,
+			Columns: []string{person.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.NodeOriginatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.NodeOriginatorTable,
-			Columns: []string{person.NodeOriginatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.NodeOriginatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.NodeOriginatorTable,
-			Columns: []string{person.NodeOriginatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.PersonContactCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.PersonContactTable,
-			Columns: []string{person.PersonContactColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.PersonContactIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.PersonContactTable,
-			Columns: []string{person.PersonContactColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -558,6 +504,25 @@ func (puo *PersonUpdateOne) SetNillablePhone(s *string) *PersonUpdateOne {
 	return puo
 }
 
+// SetContactOwnerID sets the "contact_owner" edge to the Person entity by ID.
+func (puo *PersonUpdateOne) SetContactOwnerID(id int) *PersonUpdateOne {
+	puo.mutation.SetContactOwnerID(id)
+	return puo
+}
+
+// SetNillableContactOwnerID sets the "contact_owner" edge to the Person entity by ID if the given value is not nil.
+func (puo *PersonUpdateOne) SetNillableContactOwnerID(id *int) *PersonUpdateOne {
+	if id != nil {
+		puo = puo.SetContactOwnerID(*id)
+	}
+	return puo
+}
+
+// SetContactOwner sets the "contact_owner" edge to the Person entity.
+func (puo *PersonUpdateOne) SetContactOwner(p *Person) *PersonUpdateOne {
+	return puo.SetContactOwnerID(p.ID)
+}
+
 // AddContactIDs adds the "contacts" edge to the Person entity by IDs.
 func (puo *PersonUpdateOne) AddContactIDs(ids ...int) *PersonUpdateOne {
 	puo.mutation.AddContactIDs(ids...)
@@ -592,66 +557,34 @@ func (puo *PersonUpdateOne) SetMetadata(m *Metadata) *PersonUpdateOne {
 	return puo.SetMetadataID(m.ID)
 }
 
-// SetNodeSupplierID sets the "node_supplier" edge to the Node entity by ID.
-func (puo *PersonUpdateOne) SetNodeSupplierID(id string) *PersonUpdateOne {
-	puo.mutation.SetNodeSupplierID(id)
+// SetNodeID sets the "node" edge to the Node entity by ID.
+func (puo *PersonUpdateOne) SetNodeID(id string) *PersonUpdateOne {
+	puo.mutation.SetNodeID(id)
 	return puo
 }
 
-// SetNillableNodeSupplierID sets the "node_supplier" edge to the Node entity by ID if the given value is not nil.
-func (puo *PersonUpdateOne) SetNillableNodeSupplierID(id *string) *PersonUpdateOne {
+// SetNillableNodeID sets the "node" edge to the Node entity by ID if the given value is not nil.
+func (puo *PersonUpdateOne) SetNillableNodeID(id *string) *PersonUpdateOne {
 	if id != nil {
-		puo = puo.SetNodeSupplierID(*id)
+		puo = puo.SetNodeID(*id)
 	}
 	return puo
 }
 
-// SetNodeSupplier sets the "node_supplier" edge to the Node entity.
-func (puo *PersonUpdateOne) SetNodeSupplier(n *Node) *PersonUpdateOne {
-	return puo.SetNodeSupplierID(n.ID)
-}
-
-// SetNodeOriginatorID sets the "node_originator" edge to the Node entity by ID.
-func (puo *PersonUpdateOne) SetNodeOriginatorID(id string) *PersonUpdateOne {
-	puo.mutation.SetNodeOriginatorID(id)
-	return puo
-}
-
-// SetNillableNodeOriginatorID sets the "node_originator" edge to the Node entity by ID if the given value is not nil.
-func (puo *PersonUpdateOne) SetNillableNodeOriginatorID(id *string) *PersonUpdateOne {
-	if id != nil {
-		puo = puo.SetNodeOriginatorID(*id)
-	}
-	return puo
-}
-
-// SetNodeOriginator sets the "node_originator" edge to the Node entity.
-func (puo *PersonUpdateOne) SetNodeOriginator(n *Node) *PersonUpdateOne {
-	return puo.SetNodeOriginatorID(n.ID)
-}
-
-// SetPersonContactID sets the "person_contact" edge to the Person entity by ID.
-func (puo *PersonUpdateOne) SetPersonContactID(id int) *PersonUpdateOne {
-	puo.mutation.SetPersonContactID(id)
-	return puo
-}
-
-// SetNillablePersonContactID sets the "person_contact" edge to the Person entity by ID if the given value is not nil.
-func (puo *PersonUpdateOne) SetNillablePersonContactID(id *int) *PersonUpdateOne {
-	if id != nil {
-		puo = puo.SetPersonContactID(*id)
-	}
-	return puo
-}
-
-// SetPersonContact sets the "person_contact" edge to the Person entity.
-func (puo *PersonUpdateOne) SetPersonContact(p *Person) *PersonUpdateOne {
-	return puo.SetPersonContactID(p.ID)
+// SetNode sets the "node" edge to the Node entity.
+func (puo *PersonUpdateOne) SetNode(n *Node) *PersonUpdateOne {
+	return puo.SetNodeID(n.ID)
 }
 
 // Mutation returns the PersonMutation object of the builder.
 func (puo *PersonUpdateOne) Mutation() *PersonMutation {
 	return puo.mutation
+}
+
+// ClearContactOwner clears the "contact_owner" edge to the Person entity.
+func (puo *PersonUpdateOne) ClearContactOwner() *PersonUpdateOne {
+	puo.mutation.ClearContactOwner()
+	return puo
 }
 
 // ClearContacts clears all "contacts" edges to the Person entity.
@@ -681,21 +614,9 @@ func (puo *PersonUpdateOne) ClearMetadata() *PersonUpdateOne {
 	return puo
 }
 
-// ClearNodeSupplier clears the "node_supplier" edge to the Node entity.
-func (puo *PersonUpdateOne) ClearNodeSupplier() *PersonUpdateOne {
-	puo.mutation.ClearNodeSupplier()
-	return puo
-}
-
-// ClearNodeOriginator clears the "node_originator" edge to the Node entity.
-func (puo *PersonUpdateOne) ClearNodeOriginator() *PersonUpdateOne {
-	puo.mutation.ClearNodeOriginator()
-	return puo
-}
-
-// ClearPersonContact clears the "person_contact" edge to the Person entity.
-func (puo *PersonUpdateOne) ClearPersonContact() *PersonUpdateOne {
-	puo.mutation.ClearPersonContact()
+// ClearNode clears the "node" edge to the Node entity.
+func (puo *PersonUpdateOne) ClearNode() *PersonUpdateOne {
+	puo.mutation.ClearNode()
 	return puo
 }
 
@@ -780,13 +701,42 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 	if value, ok := puo.mutation.Phone(); ok {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
 	}
+	if puo.mutation.ContactOwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.ContactOwnerTable,
+			Columns: []string{person.ContactOwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.ContactOwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.ContactOwnerTable,
+			Columns: []string{person.ContactOwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if puo.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
 			Columns: []string{person.ContactsColumn},
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
@@ -799,7 +749,7 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 			Inverse: false,
 			Table:   person.ContactsTable,
 			Columns: []string{person.ContactsColumn},
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
@@ -815,7 +765,7 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 			Inverse: false,
 			Table:   person.ContactsTable,
 			Columns: []string{person.ContactsColumn},
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
@@ -854,12 +804,12 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.NodeSupplierCleared() {
+	if puo.mutation.NodeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   person.NodeSupplierTable,
-			Columns: []string{person.NodeSupplierColumn},
+			Table:   person.NodeTable,
+			Columns: []string{person.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -867,73 +817,15 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.NodeSupplierIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   person.NodeSupplierTable,
-			Columns: []string{person.NodeSupplierColumn},
+			Table:   person.NodeTable,
+			Columns: []string{person.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.NodeOriginatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.NodeOriginatorTable,
-			Columns: []string{person.NodeOriginatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.NodeOriginatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.NodeOriginatorTable,
-			Columns: []string{person.NodeOriginatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.PersonContactCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.PersonContactTable,
-			Columns: []string{person.PersonContactColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.PersonContactIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.PersonContactTable,
-			Columns: []string{person.PersonContactColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

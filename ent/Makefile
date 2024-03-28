@@ -4,7 +4,7 @@ PROTOC_ENT_URL := https://raw.githubusercontent.com/ent/contrib/${PROTOC_ENT_VER
 
 .PHONY: generate-ent
 .SILENT: generate-ent
-generate-ent: proto-ent ## Generate ent database types from schema
+generate-ent: ## Generate ent database types from schema
 	printf "Generating ${CYAN}ent${RESET} database types with ${CYAN}go generate${RESET}..."
 	go get -d github.com/segmentio/golines mvdan.cc/gofumpt &> /dev/null
 	go generate ${ENT_ROOT_DIR}

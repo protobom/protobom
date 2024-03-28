@@ -305,7 +305,7 @@ func HasHashes() predicate.ExternalReference {
 	return predicate.ExternalReference(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, HashesTable, HashesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

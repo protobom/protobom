@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/metadata.go
@@ -35,6 +34,7 @@ func (Metadata) Fields() []ent.Field {
 		field.String("id").Unique().Immutable(),
 		field.String("version"),
 		field.String("name"),
+		field.Time("date"),
 		field.String("comment"),
 	}
 }
@@ -43,9 +43,8 @@ func (Metadata) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("tools", Tool.Type),
 		edge.To("authors", Person.Type),
-		edge.To("documentTypes", DocumentType.Type),
-		edge.To("date", Timestamp.Type),
-		edge.From("document", Document.Type).Ref("metadata").Required().Unique(),
+		edge.To("document_types", DocumentType.Type),
+		edge.To("document", Document.Type).Unique(),
 	}
 }
 

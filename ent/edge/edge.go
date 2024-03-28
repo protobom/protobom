@@ -163,11 +163,6 @@ func ByFrom(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFrom, opts...).ToFunc()
 }
 
-// ByTo orders the results by the to field.
-func ByTo(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTo, opts...).ToFunc()
-}
-
 // ByNodeListField orders the results by node_list field.
 func ByNodeListField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {

@@ -54,12 +54,12 @@ const (
 	// EdgesColumn is the table column denoting the edges relation/edge.
 	EdgesColumn = "node_list_edges"
 	// DocumentTable is the table that holds the document relation/edge.
-	DocumentTable = "node_lists"
+	DocumentTable = "documents"
 	// DocumentInverseTable is the table name for the Document entity.
 	// It exists in this package in order to avoid circular dependency with the "document" package.
 	DocumentInverseTable = "documents"
 	// DocumentColumn is the table column denoting the document relation/edge.
-	DocumentColumn = "document_node_list"
+	DocumentColumn = "node_list_document"
 )
 
 // Columns holds all SQL columns for nodelist fields.
@@ -68,21 +68,10 @@ var Columns = []string{
 	FieldRootElements,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "node_lists"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"document_node_list",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -95,11 +84,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByRootElements orders the results by the root_elements field.
-func ByRootElements(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRootElements, opts...).ToFunc()
 }
 
 // ByNodesCount orders the results by nodes count.
@@ -154,6 +138,6 @@ func newDocumentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DocumentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, DocumentTable, DocumentColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, DocumentTable, DocumentColumn),
 	)
 }

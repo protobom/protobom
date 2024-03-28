@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/document_type.go
@@ -32,9 +31,7 @@ type DocumentType struct {
 
 func (DocumentType) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum(
-			"type",
-		).Optional().Values(
+		field.Enum("type").Values(
 			"OTHER",
 			"DESIGN",
 			"SOURCE",
@@ -44,14 +41,14 @@ func (DocumentType) Fields() []ent.Field {
 			"RUNTIME",
 			"DISCOVERY",
 			"DECOMISSION",
-		),
+		).Optional(),
 		field.String("name").Optional(),
 		field.String("description").Optional(),
 	}
 }
 
 func (DocumentType) Edges() []ent.Edge {
-	return []ent.Edge{edge.From("metadata", Metadata.Type).Ref("documentTypes").Unique()}
+	return []ent.Edge{edge.From("metadata", Metadata.Type).Ref("document_types").Unique()}
 }
 
 func (DocumentType) Annotations() []schema.Annotation { return nil }

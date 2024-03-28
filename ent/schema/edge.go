@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/edge.go
@@ -32,9 +31,7 @@ type Edge struct {
 
 func (Edge) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum(
-			"type",
-		).Values(
+		field.Enum("type").Values(
 			"UNKNOWN",
 			"amends",
 			"ancestor",
@@ -82,7 +79,7 @@ func (Edge) Fields() []ent.Field {
 			"variant",
 		),
 		field.String("from"),
-		field.String("to"),
+		field.Strings("to"),
 	}
 }
 

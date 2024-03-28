@@ -33,16 +33,16 @@ const (
 	FieldVersion = "version"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldDate holds the string denoting the date field in the database.
+	FieldDate = "date"
 	// FieldComment holds the string denoting the comment field in the database.
 	FieldComment = "comment"
 	// EdgeTools holds the string denoting the tools edge name in mutations.
 	EdgeTools = "tools"
 	// EdgeAuthors holds the string denoting the authors edge name in mutations.
 	EdgeAuthors = "authors"
-	// EdgeDocumentTypes holds the string denoting the documenttypes edge name in mutations.
-	EdgeDocumentTypes = "documentTypes"
-	// EdgeDate holds the string denoting the date edge name in mutations.
-	EdgeDate = "date"
+	// EdgeDocumentTypes holds the string denoting the document_types edge name in mutations.
+	EdgeDocumentTypes = "document_types"
 	// EdgeDocument holds the string denoting the document edge name in mutations.
 	EdgeDocument = "document"
 	// Table holds the table name of the metadata in the database.
@@ -61,27 +61,20 @@ const (
 	AuthorsInverseTable = "persons"
 	// AuthorsColumn is the table column denoting the authors relation/edge.
 	AuthorsColumn = "metadata_authors"
-	// DocumentTypesTable is the table that holds the documentTypes relation/edge.
+	// DocumentTypesTable is the table that holds the document_types relation/edge.
 	DocumentTypesTable = "document_types"
 	// DocumentTypesInverseTable is the table name for the DocumentType entity.
 	// It exists in this package in order to avoid circular dependency with the "documenttype" package.
 	DocumentTypesInverseTable = "document_types"
-	// DocumentTypesColumn is the table column denoting the documentTypes relation/edge.
+	// DocumentTypesColumn is the table column denoting the document_types relation/edge.
 	DocumentTypesColumn = "metadata_document_types"
-	// DateTable is the table that holds the date relation/edge.
-	DateTable = "timestamps"
-	// DateInverseTable is the table name for the Timestamp entity.
-	// It exists in this package in order to avoid circular dependency with the "timestamp" package.
-	DateInverseTable = "timestamps"
-	// DateColumn is the table column denoting the date relation/edge.
-	DateColumn = "metadata_date"
 	// DocumentTable is the table that holds the document relation/edge.
-	DocumentTable = "metadata"
+	DocumentTable = "documents"
 	// DocumentInverseTable is the table name for the Document entity.
 	// It exists in this package in order to avoid circular dependency with the "document" package.
 	DocumentInverseTable = "documents"
 	// DocumentColumn is the table column denoting the document relation/edge.
-	DocumentColumn = "document_metadata"
+	DocumentColumn = "metadata_document"
 )
 
 // Columns holds all SQL columns for metadata fields.
@@ -89,24 +82,14 @@ var Columns = []string{
 	FieldID,
 	FieldVersion,
 	FieldName,
+	FieldDate,
 	FieldComment,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "metadata"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"document_metadata",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -129,6 +112,11 @@ func ByVersion(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByDate orders the results by the date field.
+func ByDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDate, opts...).ToFunc()
 }
 
 // ByComment orders the results by the comment field.
@@ -164,31 +152,17 @@ func ByAuthors(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByDocumentTypesCount orders the results by documentTypes count.
+// ByDocumentTypesCount orders the results by document_types count.
 func ByDocumentTypesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborsCount(s, newDocumentTypesStep(), opts...)
 	}
 }
 
-// ByDocumentTypes orders the results by documentTypes terms.
+// ByDocumentTypes orders the results by document_types terms.
 func ByDocumentTypes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newDocumentTypesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByDateCount orders the results by date count.
-func ByDateCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newDateStep(), opts...)
-	}
-}
-
-// ByDate orders the results by date terms.
-func ByDate(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newDateStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -219,17 +193,10 @@ func newDocumentTypesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, DocumentTypesTable, DocumentTypesColumn),
 	)
 }
-func newDateStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DateInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, DateTable, DateColumn),
-	)
-}
 func newDocumentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DocumentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, DocumentTable, DocumentColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, DocumentTable, DocumentColumn),
 	)
 }

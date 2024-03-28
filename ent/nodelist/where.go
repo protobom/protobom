@@ -70,76 +70,6 @@ func IDLTE(id int) predicate.NodeList {
 	return predicate.NodeList(sql.FieldLTE(FieldID, id))
 }
 
-// RootElements applies equality check predicate on the "root_elements" field. It's identical to RootElementsEQ.
-func RootElements(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldEQ(FieldRootElements, v))
-}
-
-// RootElementsEQ applies the EQ predicate on the "root_elements" field.
-func RootElementsEQ(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldEQ(FieldRootElements, v))
-}
-
-// RootElementsNEQ applies the NEQ predicate on the "root_elements" field.
-func RootElementsNEQ(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldNEQ(FieldRootElements, v))
-}
-
-// RootElementsIn applies the In predicate on the "root_elements" field.
-func RootElementsIn(vs ...string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldIn(FieldRootElements, vs...))
-}
-
-// RootElementsNotIn applies the NotIn predicate on the "root_elements" field.
-func RootElementsNotIn(vs ...string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldNotIn(FieldRootElements, vs...))
-}
-
-// RootElementsGT applies the GT predicate on the "root_elements" field.
-func RootElementsGT(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldGT(FieldRootElements, v))
-}
-
-// RootElementsGTE applies the GTE predicate on the "root_elements" field.
-func RootElementsGTE(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldGTE(FieldRootElements, v))
-}
-
-// RootElementsLT applies the LT predicate on the "root_elements" field.
-func RootElementsLT(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldLT(FieldRootElements, v))
-}
-
-// RootElementsLTE applies the LTE predicate on the "root_elements" field.
-func RootElementsLTE(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldLTE(FieldRootElements, v))
-}
-
-// RootElementsContains applies the Contains predicate on the "root_elements" field.
-func RootElementsContains(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldContains(FieldRootElements, v))
-}
-
-// RootElementsHasPrefix applies the HasPrefix predicate on the "root_elements" field.
-func RootElementsHasPrefix(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldHasPrefix(FieldRootElements, v))
-}
-
-// RootElementsHasSuffix applies the HasSuffix predicate on the "root_elements" field.
-func RootElementsHasSuffix(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldHasSuffix(FieldRootElements, v))
-}
-
-// RootElementsEqualFold applies the EqualFold predicate on the "root_elements" field.
-func RootElementsEqualFold(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldEqualFold(FieldRootElements, v))
-}
-
-// RootElementsContainsFold applies the ContainsFold predicate on the "root_elements" field.
-func RootElementsContainsFold(v string) predicate.NodeList {
-	return predicate.NodeList(sql.FieldContainsFold(FieldRootElements, v))
-}
-
 // HasNodes applies the HasEdge predicate on the "nodes" edge.
 func HasNodes() predicate.NodeList {
 	return predicate.NodeList(func(s *sql.Selector) {
@@ -191,7 +121,7 @@ func HasDocument() predicate.NodeList {
 	return predicate.NodeList(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, DocumentTable, DocumentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, DocumentTable, DocumentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

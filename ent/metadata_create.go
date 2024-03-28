@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -31,7 +32,6 @@ import (
 	"github.com/bom-squad/protobom/ent/documenttype"
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/person"
-	"github.com/bom-squad/protobom/ent/timestamp"
 	"github.com/bom-squad/protobom/ent/tool"
 )
 
@@ -52,6 +52,12 @@ func (mc *MetadataCreate) SetVersion(s string) *MetadataCreate {
 // SetName sets the "name" field.
 func (mc *MetadataCreate) SetName(s string) *MetadataCreate {
 	mc.mutation.SetName(s)
+	return mc
+}
+
+// SetDate sets the "date" field.
+func (mc *MetadataCreate) SetDate(t time.Time) *MetadataCreate {
+	mc.mutation.SetDate(t)
 	return mc
 }
 
@@ -97,13 +103,13 @@ func (mc *MetadataCreate) AddAuthors(p ...*Person) *MetadataCreate {
 	return mc.AddAuthorIDs(ids...)
 }
 
-// AddDocumentTypeIDs adds the "documentTypes" edge to the DocumentType entity by IDs.
+// AddDocumentTypeIDs adds the "document_types" edge to the DocumentType entity by IDs.
 func (mc *MetadataCreate) AddDocumentTypeIDs(ids ...int) *MetadataCreate {
 	mc.mutation.AddDocumentTypeIDs(ids...)
 	return mc
 }
 
-// AddDocumentTypes adds the "documentTypes" edges to the DocumentType entity.
+// AddDocumentTypes adds the "document_types" edges to the DocumentType entity.
 func (mc *MetadataCreate) AddDocumentTypes(d ...*DocumentType) *MetadataCreate {
 	ids := make([]int, len(d))
 	for i := range d {
@@ -112,24 +118,17 @@ func (mc *MetadataCreate) AddDocumentTypes(d ...*DocumentType) *MetadataCreate {
 	return mc.AddDocumentTypeIDs(ids...)
 }
 
-// AddDateIDs adds the "date" edge to the Timestamp entity by IDs.
-func (mc *MetadataCreate) AddDateIDs(ids ...int) *MetadataCreate {
-	mc.mutation.AddDateIDs(ids...)
-	return mc
-}
-
-// AddDate adds the "date" edges to the Timestamp entity.
-func (mc *MetadataCreate) AddDate(t ...*Timestamp) *MetadataCreate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return mc.AddDateIDs(ids...)
-}
-
 // SetDocumentID sets the "document" edge to the Document entity by ID.
 func (mc *MetadataCreate) SetDocumentID(id int) *MetadataCreate {
 	mc.mutation.SetDocumentID(id)
+	return mc
+}
+
+// SetNillableDocumentID sets the "document" edge to the Document entity by ID if the given value is not nil.
+func (mc *MetadataCreate) SetNillableDocumentID(id *int) *MetadataCreate {
+	if id != nil {
+		mc = mc.SetDocumentID(*id)
+	}
 	return mc
 }
 
@@ -178,11 +177,11 @@ func (mc *MetadataCreate) check() error {
 	if _, ok := mc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Metadata.name"`)}
 	}
+	if _, ok := mc.mutation.Date(); !ok {
+		return &ValidationError{Name: "date", err: errors.New(`ent: missing required field "Metadata.date"`)}
+	}
 	if _, ok := mc.mutation.Comment(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "Metadata.comment"`)}
-	}
-	if _, ok := mc.mutation.DocumentID(); !ok {
-		return &ValidationError{Name: "document", err: errors.New(`ent: missing required edge "Metadata.document"`)}
 	}
 	return nil
 }
@@ -227,6 +226,10 @@ func (mc *MetadataCreate) createSpec() (*Metadata, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.Name(); ok {
 		_spec.SetField(metadata.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := mc.mutation.Date(); ok {
+		_spec.SetField(metadata.FieldDate, field.TypeTime, value)
+		_node.Date = value
 	}
 	if value, ok := mc.mutation.Comment(); ok {
 		_spec.SetField(metadata.FieldComment, field.TypeString, value)
@@ -280,26 +283,10 @@ func (mc *MetadataCreate) createSpec() (*Metadata, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mc.mutation.DateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   metadata.DateTable,
-			Columns: []string{metadata.DateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := mc.mutation.DocumentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   metadata.DocumentTable,
 			Columns: []string{metadata.DocumentColumn},
 			Bidi:    false,
@@ -310,7 +297,6 @@ func (mc *MetadataCreate) createSpec() (*Metadata, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.document_metadata = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -386,6 +372,18 @@ func (u *MetadataUpsert) SetName(v string) *MetadataUpsert {
 // UpdateName sets the "name" field to the value that was provided on create.
 func (u *MetadataUpsert) UpdateName() *MetadataUpsert {
 	u.SetExcluded(metadata.FieldName)
+	return u
+}
+
+// SetDate sets the "date" field.
+func (u *MetadataUpsert) SetDate(v time.Time) *MetadataUpsert {
+	u.Set(metadata.FieldDate, v)
+	return u
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *MetadataUpsert) UpdateDate() *MetadataUpsert {
+	u.SetExcluded(metadata.FieldDate)
 	return u
 }
 
@@ -474,6 +472,20 @@ func (u *MetadataUpsertOne) SetName(v string) *MetadataUpsertOne {
 func (u *MetadataUpsertOne) UpdateName() *MetadataUpsertOne {
 	return u.Update(func(s *MetadataUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetDate sets the "date" field.
+func (u *MetadataUpsertOne) SetDate(v time.Time) *MetadataUpsertOne {
+	return u.Update(func(s *MetadataUpsert) {
+		s.SetDate(v)
+	})
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *MetadataUpsertOne) UpdateDate() *MetadataUpsertOne {
+	return u.Update(func(s *MetadataUpsert) {
+		s.UpdateDate()
 	})
 }
 
@@ -730,6 +742,20 @@ func (u *MetadataUpsertBulk) SetName(v string) *MetadataUpsertBulk {
 func (u *MetadataUpsertBulk) UpdateName() *MetadataUpsertBulk {
 	return u.Update(func(s *MetadataUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetDate sets the "date" field.
+func (u *MetadataUpsertBulk) SetDate(v time.Time) *MetadataUpsertBulk {
+	return u.Update(func(s *MetadataUpsert) {
+		s.SetDate(v)
+	})
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *MetadataUpsertBulk) UpdateDate() *MetadataUpsertBulk {
+	return u.Update(func(s *MetadataUpsert) {
+		s.UpdateDate()
 	})
 }
 

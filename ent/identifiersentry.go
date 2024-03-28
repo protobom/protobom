@@ -25,6 +25,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/ent/identifiersentry"
+	"github.com/bom-squad/protobom/ent/node"
 )
 
 // IdentifiersEntry is the model entity for the IdentifiersEntry schema.
@@ -38,23 +39,28 @@ type IdentifiersEntry struct {
 	SoftwareIdentifierValue string `json:"software_identifier_value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the IdentifiersEntryQuery when eager-loading is set.
-	Edges        IdentifiersEntryEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges            IdentifiersEntryEdges `json:"edges"`
+	node_identifiers *string
+	selectValues     sql.SelectValues
 }
 
 // IdentifiersEntryEdges holds the relations/edges for other nodes in the graph.
 type IdentifiersEntryEdges struct {
 	// Nodes holds the value of the nodes edge.
-	Nodes []*Node `json:"nodes,omitempty"`
+	Nodes *Node `json:"nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // NodesOrErr returns the Nodes value or an error if the edge
-// was not loaded in eager-loading.
-func (e IdentifiersEntryEdges) NodesOrErr() ([]*Node, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e IdentifiersEntryEdges) NodesOrErr() (*Node, error) {
 	if e.loadedTypes[0] {
+		if e.Nodes == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: node.Label}
+		}
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
@@ -68,6 +74,8 @@ func (*IdentifiersEntry) scanValues(columns []string) ([]any, error) {
 		case identifiersentry.FieldID:
 			values[i] = new(sql.NullInt64)
 		case identifiersentry.FieldSoftwareIdentifierType, identifiersentry.FieldSoftwareIdentifierValue:
+			values[i] = new(sql.NullString)
+		case identifiersentry.ForeignKeys[0]: // node_identifiers
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -101,6 +109,13 @@ func (ie *IdentifiersEntry) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field software_identifier_value", values[i])
 			} else if value.Valid {
 				ie.SoftwareIdentifierValue = value.String
+			}
+		case identifiersentry.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field node_identifiers", values[i])
+			} else if value.Valid {
+				ie.node_identifiers = new(string)
+				*ie.node_identifiers = value.String
 			}
 		default:
 			ie.selectValues.Set(columns[i], values[i])

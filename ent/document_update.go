@@ -51,14 +51,6 @@ func (du *DocumentUpdate) SetMetadataID(id string) *DocumentUpdate {
 	return du
 }
 
-// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
-func (du *DocumentUpdate) SetNillableMetadataID(id *string) *DocumentUpdate {
-	if id != nil {
-		du = du.SetMetadataID(*id)
-	}
-	return du
-}
-
 // SetMetadata sets the "metadata" edge to the Metadata entity.
 func (du *DocumentUpdate) SetMetadata(m *Metadata) *DocumentUpdate {
 	return du.SetMetadataID(m.ID)
@@ -67,14 +59,6 @@ func (du *DocumentUpdate) SetMetadata(m *Metadata) *DocumentUpdate {
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
 func (du *DocumentUpdate) SetNodeListID(id int) *DocumentUpdate {
 	du.mutation.SetNodeListID(id)
-	return du
-}
-
-// SetNillableNodeListID sets the "node_list" edge to the NodeList entity by ID if the given value is not nil.
-func (du *DocumentUpdate) SetNillableNodeListID(id *int) *DocumentUpdate {
-	if id != nil {
-		du = du.SetNodeListID(*id)
-	}
 	return du
 }
 
@@ -127,7 +111,21 @@ func (du *DocumentUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (du *DocumentUpdate) check() error {
+	if _, ok := du.mutation.MetadataID(); du.mutation.MetadataCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Document.metadata"`)
+	}
+	if _, ok := du.mutation.NodeListID(); du.mutation.NodeListCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Document.node_list"`)
+	}
+	return nil
+}
+
 func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := du.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(document.Table, document.Columns, sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt))
 	if ps := du.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -139,7 +137,7 @@ func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if du.mutation.MetadataCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
 			Bidi:    false,
@@ -152,7 +150,7 @@ func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := du.mutation.MetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
 			Bidi:    false,
@@ -168,7 +166,7 @@ func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if du.mutation.NodeListCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},
 			Bidi:    false,
@@ -181,7 +179,7 @@ func (du *DocumentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := du.mutation.NodeListIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},
 			Bidi:    false,
@@ -220,14 +218,6 @@ func (duo *DocumentUpdateOne) SetMetadataID(id string) *DocumentUpdateOne {
 	return duo
 }
 
-// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
-func (duo *DocumentUpdateOne) SetNillableMetadataID(id *string) *DocumentUpdateOne {
-	if id != nil {
-		duo = duo.SetMetadataID(*id)
-	}
-	return duo
-}
-
 // SetMetadata sets the "metadata" edge to the Metadata entity.
 func (duo *DocumentUpdateOne) SetMetadata(m *Metadata) *DocumentUpdateOne {
 	return duo.SetMetadataID(m.ID)
@@ -236,14 +226,6 @@ func (duo *DocumentUpdateOne) SetMetadata(m *Metadata) *DocumentUpdateOne {
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
 func (duo *DocumentUpdateOne) SetNodeListID(id int) *DocumentUpdateOne {
 	duo.mutation.SetNodeListID(id)
-	return duo
-}
-
-// SetNillableNodeListID sets the "node_list" edge to the NodeList entity by ID if the given value is not nil.
-func (duo *DocumentUpdateOne) SetNillableNodeListID(id *int) *DocumentUpdateOne {
-	if id != nil {
-		duo = duo.SetNodeListID(*id)
-	}
 	return duo
 }
 
@@ -309,7 +291,21 @@ func (duo *DocumentUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (duo *DocumentUpdateOne) check() error {
+	if _, ok := duo.mutation.MetadataID(); duo.mutation.MetadataCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Document.metadata"`)
+	}
+	if _, ok := duo.mutation.NodeListID(); duo.mutation.NodeListCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Document.node_list"`)
+	}
+	return nil
+}
+
 func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err error) {
+	if err := duo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(document.Table, document.Columns, sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt))
 	id, ok := duo.mutation.ID()
 	if !ok {
@@ -338,7 +334,7 @@ func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err
 	if duo.mutation.MetadataCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
 			Bidi:    false,
@@ -351,7 +347,7 @@ func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err
 	if nodes := duo.mutation.MetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
 			Bidi:    false,
@@ -367,7 +363,7 @@ func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err
 	if duo.mutation.NodeListCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},
 			Bidi:    false,
@@ -380,7 +376,7 @@ func (duo *DocumentUpdateOne) sqlSave(ctx context.Context) (_node *Document, err
 	if nodes := duo.mutation.NodeListIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},
 			Bidi:    false,

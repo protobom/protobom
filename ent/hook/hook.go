@@ -146,16 +146,16 @@ func (f PersonFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PersonMutation", m)
 }
 
-// The TimestampFunc type is an adapter to allow the use of ordinary
-// function as Timestamp mutator.
-type TimestampFunc func(context.Context, *ent.TimestampMutation) (ent.Value, error)
+// The PurposeFunc type is an adapter to allow the use of ordinary
+// function as Purpose mutator.
+type PurposeFunc func(context.Context, *ent.PurposeMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f TimestampFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TimestampMutation); ok {
+func (f PurposeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PurposeMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TimestampMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PurposeMutation", m)
 }
 
 // The ToolFunc type is an adapter to allow the use of ordinary

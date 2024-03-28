@@ -34,7 +34,7 @@ import (
 	"github.com/bom-squad/protobom/ent/nodelist"
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/predicate"
-	"github.com/bom-squad/protobom/ent/timestamp"
+	"github.com/bom-squad/protobom/ent/purpose"
 )
 
 // NodeQuery is the builder for querying Node entities.
@@ -49,9 +49,7 @@ type NodeQuery struct {
 	withExternalReferences *ExternalReferenceQuery
 	withIdentifiers        *IdentifiersEntryQuery
 	withHashes             *HashesEntryQuery
-	withReleaseDate        *TimestampQuery
-	withBuildDate          *TimestampQuery
-	withValidUntilDate     *TimestampQuery
+	withPrimaryPurpose     *PurposeQuery
 	withNodeList           *NodeListQuery
 	withFKs                bool
 	// intermediate query (i.e. traversal path).
@@ -170,7 +168,7 @@ func (nq *NodeQuery) QueryIdentifiers() *IdentifiersEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(identifiersentry.Table, identifiersentry.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, node.IdentifiersTable, node.IdentifiersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.IdentifiersTable, node.IdentifiersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -192,7 +190,7 @@ func (nq *NodeQuery) QueryHashes() *HashesEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(hashesentry.Table, hashesentry.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, node.HashesTable, node.HashesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.HashesTable, node.HashesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -200,9 +198,9 @@ func (nq *NodeQuery) QueryHashes() *HashesEntryQuery {
 	return query
 }
 
-// QueryReleaseDate chains the current query on the "release_date" edge.
-func (nq *NodeQuery) QueryReleaseDate() *TimestampQuery {
-	query := (&TimestampClient{config: nq.config}).Query()
+// QueryPrimaryPurpose chains the current query on the "primary_purpose" edge.
+func (nq *NodeQuery) QueryPrimaryPurpose() *PurposeQuery {
+	query := (&PurposeClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -213,52 +211,8 @@ func (nq *NodeQuery) QueryReleaseDate() *TimestampQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.ReleaseDateTable, node.ReleaseDateColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryBuildDate chains the current query on the "build_date" edge.
-func (nq *NodeQuery) QueryBuildDate() *TimestampQuery {
-	query := (&TimestampClient{config: nq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := nq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := nq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(node.Table, node.FieldID, selector),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.BuildDateTable, node.BuildDateColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryValidUntilDate chains the current query on the "valid_until_date" edge.
-func (nq *NodeQuery) QueryValidUntilDate() *TimestampQuery {
-	query := (&TimestampClient{config: nq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := nq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := nq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(node.Table, node.FieldID, selector),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.ValidUntilDateTable, node.ValidUntilDateColumn),
+			sqlgraph.To(purpose.Table, purpose.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.PrimaryPurposeTable, node.PrimaryPurposePrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -485,9 +439,7 @@ func (nq *NodeQuery) Clone() *NodeQuery {
 		withExternalReferences: nq.withExternalReferences.Clone(),
 		withIdentifiers:        nq.withIdentifiers.Clone(),
 		withHashes:             nq.withHashes.Clone(),
-		withReleaseDate:        nq.withReleaseDate.Clone(),
-		withBuildDate:          nq.withBuildDate.Clone(),
-		withValidUntilDate:     nq.withValidUntilDate.Clone(),
+		withPrimaryPurpose:     nq.withPrimaryPurpose.Clone(),
 		withNodeList:           nq.withNodeList.Clone(),
 		// clone intermediate query.
 		sql:  nq.sql.Clone(),
@@ -550,36 +502,14 @@ func (nq *NodeQuery) WithHashes(opts ...func(*HashesEntryQuery)) *NodeQuery {
 	return nq
 }
 
-// WithReleaseDate tells the query-builder to eager-load the nodes that are connected to
-// the "release_date" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithReleaseDate(opts ...func(*TimestampQuery)) *NodeQuery {
-	query := (&TimestampClient{config: nq.config}).Query()
+// WithPrimaryPurpose tells the query-builder to eager-load the nodes that are connected to
+// the "primary_purpose" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithPrimaryPurpose(opts ...func(*PurposeQuery)) *NodeQuery {
+	query := (&PurposeClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withReleaseDate = query
-	return nq
-}
-
-// WithBuildDate tells the query-builder to eager-load the nodes that are connected to
-// the "build_date" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithBuildDate(opts ...func(*TimestampQuery)) *NodeQuery {
-	query := (&TimestampClient{config: nq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	nq.withBuildDate = query
-	return nq
-}
-
-// WithValidUntilDate tells the query-builder to eager-load the nodes that are connected to
-// the "valid_until_date" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithValidUntilDate(opts ...func(*TimestampQuery)) *NodeQuery {
-	query := (&TimestampClient{config: nq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	nq.withValidUntilDate = query
+	nq.withPrimaryPurpose = query
 	return nq
 }
 
@@ -673,15 +603,13 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 		nodes       = []*Node{}
 		withFKs     = nq.withFKs
 		_spec       = nq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [7]bool{
 			nq.withSuppliers != nil,
 			nq.withOriginators != nil,
 			nq.withExternalReferences != nil,
 			nq.withIdentifiers != nil,
 			nq.withHashes != nil,
-			nq.withReleaseDate != nil,
-			nq.withBuildDate != nil,
-			nq.withValidUntilDate != nil,
+			nq.withPrimaryPurpose != nil,
 			nq.withNodeList != nil,
 		}
 	)
@@ -746,24 +674,10 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			return nil, err
 		}
 	}
-	if query := nq.withReleaseDate; query != nil {
-		if err := nq.loadReleaseDate(ctx, query, nodes,
-			func(n *Node) { n.Edges.ReleaseDate = []*Timestamp{} },
-			func(n *Node, e *Timestamp) { n.Edges.ReleaseDate = append(n.Edges.ReleaseDate, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := nq.withBuildDate; query != nil {
-		if err := nq.loadBuildDate(ctx, query, nodes,
-			func(n *Node) { n.Edges.BuildDate = []*Timestamp{} },
-			func(n *Node, e *Timestamp) { n.Edges.BuildDate = append(n.Edges.BuildDate, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := nq.withValidUntilDate; query != nil {
-		if err := nq.loadValidUntilDate(ctx, query, nodes,
-			func(n *Node) { n.Edges.ValidUntilDate = []*Timestamp{} },
-			func(n *Node, e *Timestamp) { n.Edges.ValidUntilDate = append(n.Edges.ValidUntilDate, e) }); err != nil {
+	if query := nq.withPrimaryPurpose; query != nil {
+		if err := nq.loadPrimaryPurpose(ctx, query, nodes,
+			func(n *Node) { n.Edges.PrimaryPurpose = []*Purpose{} },
+			func(n *Node, e *Purpose) { n.Edges.PrimaryPurpose = append(n.Edges.PrimaryPurpose, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -870,67 +784,68 @@ func (nq *NodeQuery) loadExternalReferences(ctx context.Context, query *External
 	return nil
 }
 func (nq *NodeQuery) loadIdentifiers(ctx context.Context, query *IdentifiersEntryQuery, nodes []*Node, init func(*Node), assign func(*Node, *IdentifiersEntry)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*Node)
-	nids := make(map[int]map[*Node]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Node)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 		if init != nil {
-			init(node)
+			init(nodes[i])
 		}
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(node.IdentifiersTable)
-		s.Join(joinT).On(s.C(identifiersentry.FieldID), joinT.C(node.IdentifiersPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(node.IdentifiersPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(node.IdentifiersPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullString)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Node]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*IdentifiersEntry](ctx, query, qr, query.inters)
+	query.withFKs = true
+	query.Where(predicate.IdentifiersEntry(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(node.IdentifiersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		fk := n.node_identifiers
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "node_identifiers" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected "identifiers" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "node_identifiers" returned %v for node %v`, *fk, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
 func (nq *NodeQuery) loadHashes(ctx context.Context, query *HashesEntryQuery, nodes []*Node, init func(*Node), assign func(*Node, *HashesEntry)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Node)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.HashesEntry(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(node.HashesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.node_hashes
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "node_hashes" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "node_hashes" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (nq *NodeQuery) loadPrimaryPurpose(ctx context.Context, query *PurposeQuery, nodes []*Node, init func(*Node), assign func(*Node, *Purpose)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[string]*Node)
 	nids := make(map[int]map[*Node]struct{})
@@ -942,11 +857,11 @@ func (nq *NodeQuery) loadHashes(ctx context.Context, query *HashesEntryQuery, no
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(node.HashesTable)
-		s.Join(joinT).On(s.C(hashesentry.FieldID), joinT.C(node.HashesPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(node.HashesPrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(node.PrimaryPurposeTable)
+		s.Join(joinT).On(s.C(purpose.FieldID), joinT.C(node.PrimaryPurposePrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(node.PrimaryPurposePrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(node.HashesPrimaryKey[0]))
+		s.Select(joinT.C(node.PrimaryPurposePrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -976,111 +891,18 @@ func (nq *NodeQuery) loadHashes(ctx context.Context, query *HashesEntryQuery, no
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*HashesEntry](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Purpose](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "hashes" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "primary_purpose" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
 		}
-	}
-	return nil
-}
-func (nq *NodeQuery) loadReleaseDate(ctx context.Context, query *TimestampQuery, nodes []*Node, init func(*Node), assign func(*Node, *Timestamp)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*Node)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Timestamp(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(node.ReleaseDateColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.node_release_date
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "node_release_date" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "node_release_date" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (nq *NodeQuery) loadBuildDate(ctx context.Context, query *TimestampQuery, nodes []*Node, init func(*Node), assign func(*Node, *Timestamp)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*Node)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Timestamp(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(node.BuildDateColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.node_build_date
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "node_build_date" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "node_build_date" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (nq *NodeQuery) loadValidUntilDate(ctx context.Context, query *TimestampQuery, nodes []*Node, init func(*Node), assign func(*Node, *Timestamp)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*Node)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Timestamp(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(node.ValidUntilDateColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.node_valid_until_date
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "node_valid_until_date" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "node_valid_until_date" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
 	}
 	return nil
 }

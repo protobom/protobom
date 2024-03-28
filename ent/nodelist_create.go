@@ -41,7 +41,7 @@ type NodeListCreate struct {
 }
 
 // SetRootElements sets the "root_elements" field.
-func (nlc *NodeListCreate) SetRootElements(s string) *NodeListCreate {
+func (nlc *NodeListCreate) SetRootElements(s []string) *NodeListCreate {
 	nlc.mutation.SetRootElements(s)
 	return nlc
 }
@@ -79,6 +79,14 @@ func (nlc *NodeListCreate) AddEdges(e ...*Edge) *NodeListCreate {
 // SetDocumentID sets the "document" edge to the Document entity by ID.
 func (nlc *NodeListCreate) SetDocumentID(id int) *NodeListCreate {
 	nlc.mutation.SetDocumentID(id)
+	return nlc
+}
+
+// SetNillableDocumentID sets the "document" edge to the Document entity by ID if the given value is not nil.
+func (nlc *NodeListCreate) SetNillableDocumentID(id *int) *NodeListCreate {
+	if id != nil {
+		nlc = nlc.SetDocumentID(*id)
+	}
 	return nlc
 }
 
@@ -124,9 +132,6 @@ func (nlc *NodeListCreate) check() error {
 	if _, ok := nlc.mutation.RootElements(); !ok {
 		return &ValidationError{Name: "root_elements", err: errors.New(`ent: missing required field "NodeList.root_elements"`)}
 	}
-	if _, ok := nlc.mutation.DocumentID(); !ok {
-		return &ValidationError{Name: "document", err: errors.New(`ent: missing required edge "NodeList.document"`)}
-	}
 	return nil
 }
 
@@ -155,7 +160,7 @@ func (nlc *NodeListCreate) createSpec() (*NodeList, *sqlgraph.CreateSpec) {
 	)
 	_spec.OnConflict = nlc.conflict
 	if value, ok := nlc.mutation.RootElements(); ok {
-		_spec.SetField(nodelist.FieldRootElements, field.TypeString, value)
+		_spec.SetField(nodelist.FieldRootElements, field.TypeJSON, value)
 		_node.RootElements = value
 	}
 	if nodes := nlc.mutation.NodesIDs(); len(nodes) > 0 {
@@ -193,7 +198,7 @@ func (nlc *NodeListCreate) createSpec() (*NodeList, *sqlgraph.CreateSpec) {
 	if nodes := nlc.mutation.DocumentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   nodelist.DocumentTable,
 			Columns: []string{nodelist.DocumentColumn},
 			Bidi:    false,
@@ -204,7 +209,6 @@ func (nlc *NodeListCreate) createSpec() (*NodeList, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.document_node_list = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -260,7 +264,7 @@ type (
 )
 
 // SetRootElements sets the "root_elements" field.
-func (u *NodeListUpsert) SetRootElements(v string) *NodeListUpsert {
+func (u *NodeListUpsert) SetRootElements(v []string) *NodeListUpsert {
 	u.Set(nodelist.FieldRootElements, v)
 	return u
 }
@@ -312,7 +316,7 @@ func (u *NodeListUpsertOne) Update(set func(*NodeListUpsert)) *NodeListUpsertOne
 }
 
 // SetRootElements sets the "root_elements" field.
-func (u *NodeListUpsertOne) SetRootElements(v string) *NodeListUpsertOne {
+func (u *NodeListUpsertOne) SetRootElements(v []string) *NodeListUpsertOne {
 	return u.Update(func(s *NodeListUpsert) {
 		s.SetRootElements(v)
 	})
@@ -529,7 +533,7 @@ func (u *NodeListUpsertBulk) Update(set func(*NodeListUpsert)) *NodeListUpsertBu
 }
 
 // SetRootElements sets the "root_elements" field.
-func (u *NodeListUpsertBulk) SetRootElements(v string) *NodeListUpsertBulk {
+func (u *NodeListUpsertBulk) SetRootElements(v []string) *NodeListUpsertBulk {
 	return u.Update(func(s *NodeListUpsert) {
 		s.SetRootElements(v)
 	})

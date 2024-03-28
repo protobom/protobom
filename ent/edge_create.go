@@ -51,7 +51,7 @@ func (ec *EdgeCreate) SetFrom(s string) *EdgeCreate {
 }
 
 // SetTo sets the "to" field.
-func (ec *EdgeCreate) SetTo(s string) *EdgeCreate {
+func (ec *EdgeCreate) SetTo(s []string) *EdgeCreate {
 	ec.mutation.SetTo(s)
 	return ec
 }
@@ -154,7 +154,7 @@ func (ec *EdgeCreate) createSpec() (*Edge, *sqlgraph.CreateSpec) {
 		_node.From = value
 	}
 	if value, ok := ec.mutation.To(); ok {
-		_spec.SetField(edge.FieldTo, field.TypeString, value)
+		_spec.SetField(edge.FieldTo, field.TypeJSON, value)
 		_node.To = value
 	}
 	if nodes := ec.mutation.NodeListIDs(); len(nodes) > 0 {
@@ -251,7 +251,7 @@ func (u *EdgeUpsert) UpdateFrom() *EdgeUpsert {
 }
 
 // SetTo sets the "to" field.
-func (u *EdgeUpsert) SetTo(v string) *EdgeUpsert {
+func (u *EdgeUpsert) SetTo(v []string) *EdgeUpsert {
 	u.Set(edge.FieldTo, v)
 	return u
 }
@@ -331,7 +331,7 @@ func (u *EdgeUpsertOne) UpdateFrom() *EdgeUpsertOne {
 }
 
 // SetTo sets the "to" field.
-func (u *EdgeUpsertOne) SetTo(v string) *EdgeUpsertOne {
+func (u *EdgeUpsertOne) SetTo(v []string) *EdgeUpsertOne {
 	return u.Update(func(s *EdgeUpsert) {
 		s.SetTo(v)
 	})
@@ -576,7 +576,7 @@ func (u *EdgeUpsertBulk) UpdateFrom() *EdgeUpsertBulk {
 }
 
 // SetTo sets the "to" field.
-func (u *EdgeUpsertBulk) SetTo(v string) *EdgeUpsertBulk {
+func (u *EdgeUpsertBulk) SetTo(v []string) *EdgeUpsertBulk {
 	return u.Update(func(s *EdgeUpsert) {
 		s.SetTo(v)
 	})

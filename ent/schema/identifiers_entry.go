@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/identifiers_entry.go
@@ -32,9 +31,7 @@ type IdentifiersEntry struct {
 
 func (IdentifiersEntry) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum(
-			"software_identifier_type",
-		).Values(
+		field.Enum("software_identifier_type").Values(
 			"UNKNOWN_IDENTIFIER_TYPE",
 			"PURL",
 			"CPE22",
@@ -46,7 +43,7 @@ func (IdentifiersEntry) Fields() []ent.Field {
 }
 
 func (IdentifiersEntry) Edges() []ent.Edge {
-	return []ent.Edge{edge.From("nodes", Node.Type).Ref("identifiers")}
+	return []ent.Edge{edge.From("nodes", Node.Type).Ref("identifiers").Unique()}
 }
 
 func (IdentifiersEntry) Annotations() []schema.Annotation { return nil }

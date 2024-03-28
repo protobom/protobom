@@ -21,6 +21,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -37,13 +38,14 @@ type Metadata struct {
 	Version string `json:"version,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Date holds the value of the "date" field.
+	Date time.Time `json:"date,omitempty"`
 	// Comment holds the value of the "comment" field.
 	Comment string `json:"comment,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MetadataQuery when eager-loading is set.
-	Edges             MetadataEdges `json:"edges"`
-	document_metadata *int
-	selectValues      sql.SelectValues
+	Edges        MetadataEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // MetadataEdges holds the relations/edges for other nodes in the graph.
@@ -52,15 +54,13 @@ type MetadataEdges struct {
 	Tools []*Tool `json:"tools,omitempty"`
 	// Authors holds the value of the authors edge.
 	Authors []*Person `json:"authors,omitempty"`
-	// DocumentTypes holds the value of the documentTypes edge.
-	DocumentTypes []*DocumentType `json:"documentTypes,omitempty"`
-	// Date holds the value of the date edge.
-	Date []*Timestamp `json:"date,omitempty"`
+	// DocumentTypes holds the value of the document_types edge.
+	DocumentTypes []*DocumentType `json:"document_types,omitempty"`
 	// Document holds the value of the document edge.
 	Document *Document `json:"document,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [4]bool
 }
 
 // ToolsOrErr returns the Tools value or an error if the edge
@@ -87,22 +87,13 @@ func (e MetadataEdges) DocumentTypesOrErr() ([]*DocumentType, error) {
 	if e.loadedTypes[2] {
 		return e.DocumentTypes, nil
 	}
-	return nil, &NotLoadedError{edge: "documentTypes"}
-}
-
-// DateOrErr returns the Date value or an error if the edge
-// was not loaded in eager-loading.
-func (e MetadataEdges) DateOrErr() ([]*Timestamp, error) {
-	if e.loadedTypes[3] {
-		return e.Date, nil
-	}
-	return nil, &NotLoadedError{edge: "date"}
+	return nil, &NotLoadedError{edge: "document_types"}
 }
 
 // DocumentOrErr returns the Document value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MetadataEdges) DocumentOrErr() (*Document, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		if e.Document == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: document.Label}
@@ -119,8 +110,8 @@ func (*Metadata) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case metadata.FieldID, metadata.FieldVersion, metadata.FieldName, metadata.FieldComment:
 			values[i] = new(sql.NullString)
-		case metadata.ForeignKeys[0]: // document_metadata
-			values[i] = new(sql.NullInt64)
+		case metadata.FieldDate:
+			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -154,18 +145,17 @@ func (m *Metadata) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.Name = value.String
 			}
+		case metadata.FieldDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field date", values[i])
+			} else if value.Valid {
+				m.Date = value.Time
+			}
 		case metadata.FieldComment:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field comment", values[i])
 			} else if value.Valid {
 				m.Comment = value.String
-			}
-		case metadata.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field document_metadata", value)
-			} else if value.Valid {
-				m.document_metadata = new(int)
-				*m.document_metadata = int(value.Int64)
 			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
@@ -190,14 +180,9 @@ func (m *Metadata) QueryAuthors() *PersonQuery {
 	return NewMetadataClient(m.config).QueryAuthors(m)
 }
 
-// QueryDocumentTypes queries the "documentTypes" edge of the Metadata entity.
+// QueryDocumentTypes queries the "document_types" edge of the Metadata entity.
 func (m *Metadata) QueryDocumentTypes() *DocumentTypeQuery {
 	return NewMetadataClient(m.config).QueryDocumentTypes(m)
-}
-
-// QueryDate queries the "date" edge of the Metadata entity.
-func (m *Metadata) QueryDate() *TimestampQuery {
-	return NewMetadataClient(m.config).QueryDate(m)
 }
 
 // QueryDocument queries the "document" edge of the Metadata entity.
@@ -233,6 +218,9 @@ func (m *Metadata) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(m.Name)
+	builder.WriteString(", ")
+	builder.WriteString("date=")
+	builder.WriteString(m.Date.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
 	builder.WriteString(m.Comment)

@@ -48,8 +48,8 @@ type Tx struct {
 	NodeList *NodeListClient
 	// Person is the client for interacting with the Person builders.
 	Person *PersonClient
-	// Timestamp is the client for interacting with the Timestamp builders.
-	Timestamp *TimestampClient
+	// Purpose is the client for interacting with the Purpose builders.
+	Purpose *PurposeClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 
@@ -193,7 +193,7 @@ func (tx *Tx) init() {
 	tx.Node = NewNodeClient(tx.config)
 	tx.NodeList = NewNodeListClient(tx.config)
 	tx.Person = NewPersonClient(tx.config)
-	tx.Timestamp = NewTimestampClient(tx.config)
+	tx.Purpose = NewPurposeClient(tx.config)
 	tx.Tool = NewToolClient(tx.config)
 }
 

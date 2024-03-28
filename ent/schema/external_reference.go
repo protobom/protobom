@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/external_reference.go
@@ -35,9 +34,7 @@ func (ExternalReference) Fields() []ent.Field {
 		field.String("url"),
 		field.String("comment"),
 		field.String("authority"),
-		field.Enum(
-			"type",
-		).Values(
+		field.Enum("type").Values(
 			"UNKNOWN",
 			"ATTESTATION",
 			"BINARY",

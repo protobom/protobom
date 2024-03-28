@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -33,7 +34,7 @@ import (
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/nodelist"
 	"github.com/bom-squad/protobom/ent/person"
-	"github.com/bom-squad/protobom/ent/timestamp"
+	"github.com/bom-squad/protobom/ent/purpose"
 )
 
 // NodeCreate is the builder for creating a Node entity.
@@ -81,7 +82,7 @@ func (nc *NodeCreate) SetURLDownload(s string) *NodeCreate {
 }
 
 // SetLicenses sets the "licenses" field.
-func (nc *NodeCreate) SetLicenses(s string) *NodeCreate {
+func (nc *NodeCreate) SetLicenses(s []string) *NodeCreate {
 	nc.mutation.SetLicenses(s)
 	return nc
 }
@@ -128,21 +129,33 @@ func (nc *NodeCreate) SetDescription(s string) *NodeCreate {
 	return nc
 }
 
+// SetReleaseDate sets the "release_date" field.
+func (nc *NodeCreate) SetReleaseDate(t time.Time) *NodeCreate {
+	nc.mutation.SetReleaseDate(t)
+	return nc
+}
+
+// SetBuildDate sets the "build_date" field.
+func (nc *NodeCreate) SetBuildDate(t time.Time) *NodeCreate {
+	nc.mutation.SetBuildDate(t)
+	return nc
+}
+
+// SetValidUntilDate sets the "valid_until_date" field.
+func (nc *NodeCreate) SetValidUntilDate(t time.Time) *NodeCreate {
+	nc.mutation.SetValidUntilDate(t)
+	return nc
+}
+
 // SetAttribution sets the "attribution" field.
-func (nc *NodeCreate) SetAttribution(s string) *NodeCreate {
+func (nc *NodeCreate) SetAttribution(s []string) *NodeCreate {
 	nc.mutation.SetAttribution(s)
 	return nc
 }
 
 // SetFileTypes sets the "file_types" field.
-func (nc *NodeCreate) SetFileTypes(s string) *NodeCreate {
+func (nc *NodeCreate) SetFileTypes(s []string) *NodeCreate {
 	nc.mutation.SetFileTypes(s)
-	return nc
-}
-
-// SetPrimaryPurpose sets the "primary_purpose" field.
-func (nc *NodeCreate) SetPrimaryPurpose(np node.PrimaryPurpose) *NodeCreate {
-	nc.mutation.SetPrimaryPurpose(np)
 	return nc
 }
 
@@ -227,49 +240,19 @@ func (nc *NodeCreate) AddHashes(h ...*HashesEntry) *NodeCreate {
 	return nc.AddHashIDs(ids...)
 }
 
-// AddReleaseDateIDs adds the "release_date" edge to the Timestamp entity by IDs.
-func (nc *NodeCreate) AddReleaseDateIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddReleaseDateIDs(ids...)
+// AddPrimaryPurposeIDs adds the "primary_purpose" edge to the Purpose entity by IDs.
+func (nc *NodeCreate) AddPrimaryPurposeIDs(ids ...int) *NodeCreate {
+	nc.mutation.AddPrimaryPurposeIDs(ids...)
 	return nc
 }
 
-// AddReleaseDate adds the "release_date" edges to the Timestamp entity.
-func (nc *NodeCreate) AddReleaseDate(t ...*Timestamp) *NodeCreate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// AddPrimaryPurpose adds the "primary_purpose" edges to the Purpose entity.
+func (nc *NodeCreate) AddPrimaryPurpose(p ...*Purpose) *NodeCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return nc.AddReleaseDateIDs(ids...)
-}
-
-// AddBuildDateIDs adds the "build_date" edge to the Timestamp entity by IDs.
-func (nc *NodeCreate) AddBuildDateIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddBuildDateIDs(ids...)
-	return nc
-}
-
-// AddBuildDate adds the "build_date" edges to the Timestamp entity.
-func (nc *NodeCreate) AddBuildDate(t ...*Timestamp) *NodeCreate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nc.AddBuildDateIDs(ids...)
-}
-
-// AddValidUntilDateIDs adds the "valid_until_date" edge to the Timestamp entity by IDs.
-func (nc *NodeCreate) AddValidUntilDateIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddValidUntilDateIDs(ids...)
-	return nc
-}
-
-// AddValidUntilDate adds the "valid_until_date" edges to the Timestamp entity.
-func (nc *NodeCreate) AddValidUntilDate(t ...*Timestamp) *NodeCreate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nc.AddValidUntilDateIDs(ids...)
+	return nc.AddPrimaryPurposeIDs(ids...)
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
@@ -364,19 +347,20 @@ func (nc *NodeCreate) check() error {
 	if _, ok := nc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Node.description"`)}
 	}
+	if _, ok := nc.mutation.ReleaseDate(); !ok {
+		return &ValidationError{Name: "release_date", err: errors.New(`ent: missing required field "Node.release_date"`)}
+	}
+	if _, ok := nc.mutation.BuildDate(); !ok {
+		return &ValidationError{Name: "build_date", err: errors.New(`ent: missing required field "Node.build_date"`)}
+	}
+	if _, ok := nc.mutation.ValidUntilDate(); !ok {
+		return &ValidationError{Name: "valid_until_date", err: errors.New(`ent: missing required field "Node.valid_until_date"`)}
+	}
 	if _, ok := nc.mutation.Attribution(); !ok {
 		return &ValidationError{Name: "attribution", err: errors.New(`ent: missing required field "Node.attribution"`)}
 	}
 	if _, ok := nc.mutation.FileTypes(); !ok {
 		return &ValidationError{Name: "file_types", err: errors.New(`ent: missing required field "Node.file_types"`)}
-	}
-	if _, ok := nc.mutation.PrimaryPurpose(); !ok {
-		return &ValidationError{Name: "primary_purpose", err: errors.New(`ent: missing required field "Node.primary_purpose"`)}
-	}
-	if v, ok := nc.mutation.PrimaryPurpose(); ok {
-		if err := node.PrimaryPurposeValidator(v); err != nil {
-			return &ValidationError{Name: "primary_purpose", err: fmt.Errorf(`ent: validator failed for field "Node.primary_purpose": %w`, err)}
-		}
 	}
 	if _, ok := nc.mutation.NodeListID(); !ok {
 		return &ValidationError{Name: "node_list", err: errors.New(`ent: missing required edge "Node.node_list"`)}
@@ -442,7 +426,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_node.URLDownload = value
 	}
 	if value, ok := nc.mutation.Licenses(); ok {
-		_spec.SetField(node.FieldLicenses, field.TypeString, value)
+		_spec.SetField(node.FieldLicenses, field.TypeJSON, value)
 		_node.Licenses = value
 	}
 	if value, ok := nc.mutation.LicenseConcluded(); ok {
@@ -473,17 +457,25 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
+	if value, ok := nc.mutation.ReleaseDate(); ok {
+		_spec.SetField(node.FieldReleaseDate, field.TypeTime, value)
+		_node.ReleaseDate = value
+	}
+	if value, ok := nc.mutation.BuildDate(); ok {
+		_spec.SetField(node.FieldBuildDate, field.TypeTime, value)
+		_node.BuildDate = value
+	}
+	if value, ok := nc.mutation.ValidUntilDate(); ok {
+		_spec.SetField(node.FieldValidUntilDate, field.TypeTime, value)
+		_node.ValidUntilDate = value
+	}
 	if value, ok := nc.mutation.Attribution(); ok {
-		_spec.SetField(node.FieldAttribution, field.TypeString, value)
+		_spec.SetField(node.FieldAttribution, field.TypeJSON, value)
 		_node.Attribution = value
 	}
 	if value, ok := nc.mutation.FileTypes(); ok {
-		_spec.SetField(node.FieldFileTypes, field.TypeString, value)
+		_spec.SetField(node.FieldFileTypes, field.TypeJSON, value)
 		_node.FileTypes = value
-	}
-	if value, ok := nc.mutation.PrimaryPurpose(); ok {
-		_spec.SetField(node.FieldPrimaryPurpose, field.TypeEnum, value)
-		_node.PrimaryPurpose = value
 	}
 	if nodes := nc.mutation.SuppliersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -535,10 +527,10 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 	}
 	if nodes := nc.mutation.IdentifiersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.IdentifiersTable,
-			Columns: node.IdentifiersPrimaryKey,
+			Columns: []string{node.IdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -551,10 +543,10 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 	}
 	if nodes := nc.mutation.HashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.HashesTable,
-			Columns: node.HashesPrimaryKey,
+			Columns: []string{node.HashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -565,47 +557,15 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.ReleaseDateIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.PrimaryPurposeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.ReleaseDateTable,
-			Columns: []string{node.ReleaseDateColumn},
+			Table:   node.PrimaryPurposeTable,
+			Columns: node.PrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := nc.mutation.BuildDateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.BuildDateTable,
-			Columns: []string{node.BuildDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := nc.mutation.ValidUntilDateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.ValidUntilDateTable,
-			Columns: []string{node.ValidUntilDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -755,7 +715,7 @@ func (u *NodeUpsert) UpdateURLDownload() *NodeUpsert {
 }
 
 // SetLicenses sets the "licenses" field.
-func (u *NodeUpsert) SetLicenses(v string) *NodeUpsert {
+func (u *NodeUpsert) SetLicenses(v []string) *NodeUpsert {
 	u.Set(node.FieldLicenses, v)
 	return u
 }
@@ -850,8 +810,44 @@ func (u *NodeUpsert) UpdateDescription() *NodeUpsert {
 	return u
 }
 
+// SetReleaseDate sets the "release_date" field.
+func (u *NodeUpsert) SetReleaseDate(v time.Time) *NodeUpsert {
+	u.Set(node.FieldReleaseDate, v)
+	return u
+}
+
+// UpdateReleaseDate sets the "release_date" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateReleaseDate() *NodeUpsert {
+	u.SetExcluded(node.FieldReleaseDate)
+	return u
+}
+
+// SetBuildDate sets the "build_date" field.
+func (u *NodeUpsert) SetBuildDate(v time.Time) *NodeUpsert {
+	u.Set(node.FieldBuildDate, v)
+	return u
+}
+
+// UpdateBuildDate sets the "build_date" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateBuildDate() *NodeUpsert {
+	u.SetExcluded(node.FieldBuildDate)
+	return u
+}
+
+// SetValidUntilDate sets the "valid_until_date" field.
+func (u *NodeUpsert) SetValidUntilDate(v time.Time) *NodeUpsert {
+	u.Set(node.FieldValidUntilDate, v)
+	return u
+}
+
+// UpdateValidUntilDate sets the "valid_until_date" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateValidUntilDate() *NodeUpsert {
+	u.SetExcluded(node.FieldValidUntilDate)
+	return u
+}
+
 // SetAttribution sets the "attribution" field.
-func (u *NodeUpsert) SetAttribution(v string) *NodeUpsert {
+func (u *NodeUpsert) SetAttribution(v []string) *NodeUpsert {
 	u.Set(node.FieldAttribution, v)
 	return u
 }
@@ -863,7 +859,7 @@ func (u *NodeUpsert) UpdateAttribution() *NodeUpsert {
 }
 
 // SetFileTypes sets the "file_types" field.
-func (u *NodeUpsert) SetFileTypes(v string) *NodeUpsert {
+func (u *NodeUpsert) SetFileTypes(v []string) *NodeUpsert {
 	u.Set(node.FieldFileTypes, v)
 	return u
 }
@@ -871,18 +867,6 @@ func (u *NodeUpsert) SetFileTypes(v string) *NodeUpsert {
 // UpdateFileTypes sets the "file_types" field to the value that was provided on create.
 func (u *NodeUpsert) UpdateFileTypes() *NodeUpsert {
 	u.SetExcluded(node.FieldFileTypes)
-	return u
-}
-
-// SetPrimaryPurpose sets the "primary_purpose" field.
-func (u *NodeUpsert) SetPrimaryPurpose(v node.PrimaryPurpose) *NodeUpsert {
-	u.Set(node.FieldPrimaryPurpose, v)
-	return u
-}
-
-// UpdatePrimaryPurpose sets the "primary_purpose" field to the value that was provided on create.
-func (u *NodeUpsert) UpdatePrimaryPurpose() *NodeUpsert {
-	u.SetExcluded(node.FieldPrimaryPurpose)
 	return u
 }
 
@@ -1019,7 +1003,7 @@ func (u *NodeUpsertOne) UpdateURLDownload() *NodeUpsertOne {
 }
 
 // SetLicenses sets the "licenses" field.
-func (u *NodeUpsertOne) SetLicenses(v string) *NodeUpsertOne {
+func (u *NodeUpsertOne) SetLicenses(v []string) *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.SetLicenses(v)
 	})
@@ -1130,8 +1114,50 @@ func (u *NodeUpsertOne) UpdateDescription() *NodeUpsertOne {
 	})
 }
 
+// SetReleaseDate sets the "release_date" field.
+func (u *NodeUpsertOne) SetReleaseDate(v time.Time) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetReleaseDate(v)
+	})
+}
+
+// UpdateReleaseDate sets the "release_date" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateReleaseDate() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateReleaseDate()
+	})
+}
+
+// SetBuildDate sets the "build_date" field.
+func (u *NodeUpsertOne) SetBuildDate(v time.Time) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetBuildDate(v)
+	})
+}
+
+// UpdateBuildDate sets the "build_date" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateBuildDate() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateBuildDate()
+	})
+}
+
+// SetValidUntilDate sets the "valid_until_date" field.
+func (u *NodeUpsertOne) SetValidUntilDate(v time.Time) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetValidUntilDate(v)
+	})
+}
+
+// UpdateValidUntilDate sets the "valid_until_date" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateValidUntilDate() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateValidUntilDate()
+	})
+}
+
 // SetAttribution sets the "attribution" field.
-func (u *NodeUpsertOne) SetAttribution(v string) *NodeUpsertOne {
+func (u *NodeUpsertOne) SetAttribution(v []string) *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.SetAttribution(v)
 	})
@@ -1145,7 +1171,7 @@ func (u *NodeUpsertOne) UpdateAttribution() *NodeUpsertOne {
 }
 
 // SetFileTypes sets the "file_types" field.
-func (u *NodeUpsertOne) SetFileTypes(v string) *NodeUpsertOne {
+func (u *NodeUpsertOne) SetFileTypes(v []string) *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.SetFileTypes(v)
 	})
@@ -1155,20 +1181,6 @@ func (u *NodeUpsertOne) SetFileTypes(v string) *NodeUpsertOne {
 func (u *NodeUpsertOne) UpdateFileTypes() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateFileTypes()
-	})
-}
-
-// SetPrimaryPurpose sets the "primary_purpose" field.
-func (u *NodeUpsertOne) SetPrimaryPurpose(v node.PrimaryPurpose) *NodeUpsertOne {
-	return u.Update(func(s *NodeUpsert) {
-		s.SetPrimaryPurpose(v)
-	})
-}
-
-// UpdatePrimaryPurpose sets the "primary_purpose" field to the value that was provided on create.
-func (u *NodeUpsertOne) UpdatePrimaryPurpose() *NodeUpsertOne {
-	return u.Update(func(s *NodeUpsert) {
-		s.UpdatePrimaryPurpose()
 	})
 }
 
@@ -1471,7 +1483,7 @@ func (u *NodeUpsertBulk) UpdateURLDownload() *NodeUpsertBulk {
 }
 
 // SetLicenses sets the "licenses" field.
-func (u *NodeUpsertBulk) SetLicenses(v string) *NodeUpsertBulk {
+func (u *NodeUpsertBulk) SetLicenses(v []string) *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.SetLicenses(v)
 	})
@@ -1582,8 +1594,50 @@ func (u *NodeUpsertBulk) UpdateDescription() *NodeUpsertBulk {
 	})
 }
 
+// SetReleaseDate sets the "release_date" field.
+func (u *NodeUpsertBulk) SetReleaseDate(v time.Time) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetReleaseDate(v)
+	})
+}
+
+// UpdateReleaseDate sets the "release_date" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateReleaseDate() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateReleaseDate()
+	})
+}
+
+// SetBuildDate sets the "build_date" field.
+func (u *NodeUpsertBulk) SetBuildDate(v time.Time) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetBuildDate(v)
+	})
+}
+
+// UpdateBuildDate sets the "build_date" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateBuildDate() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateBuildDate()
+	})
+}
+
+// SetValidUntilDate sets the "valid_until_date" field.
+func (u *NodeUpsertBulk) SetValidUntilDate(v time.Time) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetValidUntilDate(v)
+	})
+}
+
+// UpdateValidUntilDate sets the "valid_until_date" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateValidUntilDate() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateValidUntilDate()
+	})
+}
+
 // SetAttribution sets the "attribution" field.
-func (u *NodeUpsertBulk) SetAttribution(v string) *NodeUpsertBulk {
+func (u *NodeUpsertBulk) SetAttribution(v []string) *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.SetAttribution(v)
 	})
@@ -1597,7 +1651,7 @@ func (u *NodeUpsertBulk) UpdateAttribution() *NodeUpsertBulk {
 }
 
 // SetFileTypes sets the "file_types" field.
-func (u *NodeUpsertBulk) SetFileTypes(v string) *NodeUpsertBulk {
+func (u *NodeUpsertBulk) SetFileTypes(v []string) *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.SetFileTypes(v)
 	})
@@ -1607,20 +1661,6 @@ func (u *NodeUpsertBulk) SetFileTypes(v string) *NodeUpsertBulk {
 func (u *NodeUpsertBulk) UpdateFileTypes() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateFileTypes()
-	})
-}
-
-// SetPrimaryPurpose sets the "primary_purpose" field.
-func (u *NodeUpsertBulk) SetPrimaryPurpose(v node.PrimaryPurpose) *NodeUpsertBulk {
-	return u.Update(func(s *NodeUpsert) {
-		s.SetPrimaryPurpose(v)
-	})
-}
-
-// UpdatePrimaryPurpose sets the "primary_purpose" field to the value that was provided on create.
-func (u *NodeUpsertBulk) UpdatePrimaryPurpose() *NodeUpsertBulk {
-	return u.Update(func(s *NodeUpsert) {
-		s.UpdatePrimaryPurpose()
 	})
 }
 

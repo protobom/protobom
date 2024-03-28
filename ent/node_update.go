@@ -22,9 +22,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/ent/externalreference"
 	"github.com/bom-squad/protobom/ent/hashesentry"
@@ -33,7 +35,7 @@ import (
 	"github.com/bom-squad/protobom/ent/nodelist"
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/predicate"
-	"github.com/bom-squad/protobom/ent/timestamp"
+	"github.com/bom-squad/protobom/ent/purpose"
 )
 
 // NodeUpdate is the builder for updating Node entities.
@@ -134,16 +136,14 @@ func (nu *NodeUpdate) SetNillableURLDownload(s *string) *NodeUpdate {
 }
 
 // SetLicenses sets the "licenses" field.
-func (nu *NodeUpdate) SetLicenses(s string) *NodeUpdate {
+func (nu *NodeUpdate) SetLicenses(s []string) *NodeUpdate {
 	nu.mutation.SetLicenses(s)
 	return nu
 }
 
-// SetNillableLicenses sets the "licenses" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableLicenses(s *string) *NodeUpdate {
-	if s != nil {
-		nu.SetLicenses(*s)
-	}
+// AppendLicenses appends s to the "licenses" field.
+func (nu *NodeUpdate) AppendLicenses(s []string) *NodeUpdate {
+	nu.mutation.AppendLicenses(s)
 	return nu
 }
 
@@ -245,45 +245,69 @@ func (nu *NodeUpdate) SetNillableDescription(s *string) *NodeUpdate {
 	return nu
 }
 
+// SetReleaseDate sets the "release_date" field.
+func (nu *NodeUpdate) SetReleaseDate(t time.Time) *NodeUpdate {
+	nu.mutation.SetReleaseDate(t)
+	return nu
+}
+
+// SetNillableReleaseDate sets the "release_date" field if the given value is not nil.
+func (nu *NodeUpdate) SetNillableReleaseDate(t *time.Time) *NodeUpdate {
+	if t != nil {
+		nu.SetReleaseDate(*t)
+	}
+	return nu
+}
+
+// SetBuildDate sets the "build_date" field.
+func (nu *NodeUpdate) SetBuildDate(t time.Time) *NodeUpdate {
+	nu.mutation.SetBuildDate(t)
+	return nu
+}
+
+// SetNillableBuildDate sets the "build_date" field if the given value is not nil.
+func (nu *NodeUpdate) SetNillableBuildDate(t *time.Time) *NodeUpdate {
+	if t != nil {
+		nu.SetBuildDate(*t)
+	}
+	return nu
+}
+
+// SetValidUntilDate sets the "valid_until_date" field.
+func (nu *NodeUpdate) SetValidUntilDate(t time.Time) *NodeUpdate {
+	nu.mutation.SetValidUntilDate(t)
+	return nu
+}
+
+// SetNillableValidUntilDate sets the "valid_until_date" field if the given value is not nil.
+func (nu *NodeUpdate) SetNillableValidUntilDate(t *time.Time) *NodeUpdate {
+	if t != nil {
+		nu.SetValidUntilDate(*t)
+	}
+	return nu
+}
+
 // SetAttribution sets the "attribution" field.
-func (nu *NodeUpdate) SetAttribution(s string) *NodeUpdate {
+func (nu *NodeUpdate) SetAttribution(s []string) *NodeUpdate {
 	nu.mutation.SetAttribution(s)
 	return nu
 }
 
-// SetNillableAttribution sets the "attribution" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableAttribution(s *string) *NodeUpdate {
-	if s != nil {
-		nu.SetAttribution(*s)
-	}
+// AppendAttribution appends s to the "attribution" field.
+func (nu *NodeUpdate) AppendAttribution(s []string) *NodeUpdate {
+	nu.mutation.AppendAttribution(s)
 	return nu
 }
 
 // SetFileTypes sets the "file_types" field.
-func (nu *NodeUpdate) SetFileTypes(s string) *NodeUpdate {
+func (nu *NodeUpdate) SetFileTypes(s []string) *NodeUpdate {
 	nu.mutation.SetFileTypes(s)
 	return nu
 }
 
-// SetNillableFileTypes sets the "file_types" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableFileTypes(s *string) *NodeUpdate {
-	if s != nil {
-		nu.SetFileTypes(*s)
-	}
-	return nu
-}
-
-// SetPrimaryPurpose sets the "primary_purpose" field.
-func (nu *NodeUpdate) SetPrimaryPurpose(np node.PrimaryPurpose) *NodeUpdate {
-	nu.mutation.SetPrimaryPurpose(np)
-	return nu
-}
-
-// SetNillablePrimaryPurpose sets the "primary_purpose" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillablePrimaryPurpose(np *node.PrimaryPurpose) *NodeUpdate {
-	if np != nil {
-		nu.SetPrimaryPurpose(*np)
-	}
+// AppendFileTypes appends s to the "file_types" field.
+func (nu *NodeUpdate) AppendFileTypes(s []string) *NodeUpdate {
+	nu.mutation.AppendFileTypes(s)
 	return nu
 }
 
@@ -362,49 +386,19 @@ func (nu *NodeUpdate) AddHashes(h ...*HashesEntry) *NodeUpdate {
 	return nu.AddHashIDs(ids...)
 }
 
-// AddReleaseDateIDs adds the "release_date" edge to the Timestamp entity by IDs.
-func (nu *NodeUpdate) AddReleaseDateIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddReleaseDateIDs(ids...)
+// AddPrimaryPurposeIDs adds the "primary_purpose" edge to the Purpose entity by IDs.
+func (nu *NodeUpdate) AddPrimaryPurposeIDs(ids ...int) *NodeUpdate {
+	nu.mutation.AddPrimaryPurposeIDs(ids...)
 	return nu
 }
 
-// AddReleaseDate adds the "release_date" edges to the Timestamp entity.
-func (nu *NodeUpdate) AddReleaseDate(t ...*Timestamp) *NodeUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// AddPrimaryPurpose adds the "primary_purpose" edges to the Purpose entity.
+func (nu *NodeUpdate) AddPrimaryPurpose(p ...*Purpose) *NodeUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return nu.AddReleaseDateIDs(ids...)
-}
-
-// AddBuildDateIDs adds the "build_date" edge to the Timestamp entity by IDs.
-func (nu *NodeUpdate) AddBuildDateIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddBuildDateIDs(ids...)
-	return nu
-}
-
-// AddBuildDate adds the "build_date" edges to the Timestamp entity.
-func (nu *NodeUpdate) AddBuildDate(t ...*Timestamp) *NodeUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nu.AddBuildDateIDs(ids...)
-}
-
-// AddValidUntilDateIDs adds the "valid_until_date" edge to the Timestamp entity by IDs.
-func (nu *NodeUpdate) AddValidUntilDateIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddValidUntilDateIDs(ids...)
-	return nu
-}
-
-// AddValidUntilDate adds the "valid_until_date" edges to the Timestamp entity.
-func (nu *NodeUpdate) AddValidUntilDate(t ...*Timestamp) *NodeUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nu.AddValidUntilDateIDs(ids...)
+	return nu.AddPrimaryPurposeIDs(ids...)
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
@@ -528,67 +522,25 @@ func (nu *NodeUpdate) RemoveHashes(h ...*HashesEntry) *NodeUpdate {
 	return nu.RemoveHashIDs(ids...)
 }
 
-// ClearReleaseDate clears all "release_date" edges to the Timestamp entity.
-func (nu *NodeUpdate) ClearReleaseDate() *NodeUpdate {
-	nu.mutation.ClearReleaseDate()
+// ClearPrimaryPurpose clears all "primary_purpose" edges to the Purpose entity.
+func (nu *NodeUpdate) ClearPrimaryPurpose() *NodeUpdate {
+	nu.mutation.ClearPrimaryPurpose()
 	return nu
 }
 
-// RemoveReleaseDateIDs removes the "release_date" edge to Timestamp entities by IDs.
-func (nu *NodeUpdate) RemoveReleaseDateIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemoveReleaseDateIDs(ids...)
+// RemovePrimaryPurposeIDs removes the "primary_purpose" edge to Purpose entities by IDs.
+func (nu *NodeUpdate) RemovePrimaryPurposeIDs(ids ...int) *NodeUpdate {
+	nu.mutation.RemovePrimaryPurposeIDs(ids...)
 	return nu
 }
 
-// RemoveReleaseDate removes "release_date" edges to Timestamp entities.
-func (nu *NodeUpdate) RemoveReleaseDate(t ...*Timestamp) *NodeUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// RemovePrimaryPurpose removes "primary_purpose" edges to Purpose entities.
+func (nu *NodeUpdate) RemovePrimaryPurpose(p ...*Purpose) *NodeUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return nu.RemoveReleaseDateIDs(ids...)
-}
-
-// ClearBuildDate clears all "build_date" edges to the Timestamp entity.
-func (nu *NodeUpdate) ClearBuildDate() *NodeUpdate {
-	nu.mutation.ClearBuildDate()
-	return nu
-}
-
-// RemoveBuildDateIDs removes the "build_date" edge to Timestamp entities by IDs.
-func (nu *NodeUpdate) RemoveBuildDateIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemoveBuildDateIDs(ids...)
-	return nu
-}
-
-// RemoveBuildDate removes "build_date" edges to Timestamp entities.
-func (nu *NodeUpdate) RemoveBuildDate(t ...*Timestamp) *NodeUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nu.RemoveBuildDateIDs(ids...)
-}
-
-// ClearValidUntilDate clears all "valid_until_date" edges to the Timestamp entity.
-func (nu *NodeUpdate) ClearValidUntilDate() *NodeUpdate {
-	nu.mutation.ClearValidUntilDate()
-	return nu
-}
-
-// RemoveValidUntilDateIDs removes the "valid_until_date" edge to Timestamp entities by IDs.
-func (nu *NodeUpdate) RemoveValidUntilDateIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemoveValidUntilDateIDs(ids...)
-	return nu
-}
-
-// RemoveValidUntilDate removes "valid_until_date" edges to Timestamp entities.
-func (nu *NodeUpdate) RemoveValidUntilDate(t ...*Timestamp) *NodeUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nu.RemoveValidUntilDateIDs(ids...)
+	return nu.RemovePrimaryPurposeIDs(ids...)
 }
 
 // ClearNodeList clears the "node_list" edge to the NodeList entity.
@@ -631,11 +583,6 @@ func (nu *NodeUpdate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Node.type": %w`, err)}
 		}
 	}
-	if v, ok := nu.mutation.PrimaryPurpose(); ok {
-		if err := node.PrimaryPurposeValidator(v); err != nil {
-			return &ValidationError{Name: "primary_purpose", err: fmt.Errorf(`ent: validator failed for field "Node.primary_purpose": %w`, err)}
-		}
-	}
 	if _, ok := nu.mutation.NodeListID(); nu.mutation.NodeListCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Node.node_list"`)
 	}
@@ -673,7 +620,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(node.FieldURLDownload, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.Licenses(); ok {
-		_spec.SetField(node.FieldLicenses, field.TypeString, value)
+		_spec.SetField(node.FieldLicenses, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.AppendedLicenses(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldLicenses, value)
+		})
 	}
 	if value, ok := nu.mutation.LicenseConcluded(); ok {
 		_spec.SetField(node.FieldLicenseConcluded, field.TypeString, value)
@@ -696,14 +648,30 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := nu.mutation.Description(); ok {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
 	}
+	if value, ok := nu.mutation.ReleaseDate(); ok {
+		_spec.SetField(node.FieldReleaseDate, field.TypeTime, value)
+	}
+	if value, ok := nu.mutation.BuildDate(); ok {
+		_spec.SetField(node.FieldBuildDate, field.TypeTime, value)
+	}
+	if value, ok := nu.mutation.ValidUntilDate(); ok {
+		_spec.SetField(node.FieldValidUntilDate, field.TypeTime, value)
+	}
 	if value, ok := nu.mutation.Attribution(); ok {
-		_spec.SetField(node.FieldAttribution, field.TypeString, value)
+		_spec.SetField(node.FieldAttribution, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.AppendedAttribution(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldAttribution, value)
+		})
 	}
 	if value, ok := nu.mutation.FileTypes(); ok {
-		_spec.SetField(node.FieldFileTypes, field.TypeString, value)
+		_spec.SetField(node.FieldFileTypes, field.TypeJSON, value)
 	}
-	if value, ok := nu.mutation.PrimaryPurpose(); ok {
-		_spec.SetField(node.FieldPrimaryPurpose, field.TypeEnum, value)
+	if value, ok := nu.mutation.AppendedFileTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldFileTypes, value)
+		})
 	}
 	if nu.mutation.SuppliersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -842,10 +810,10 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nu.mutation.IdentifiersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.IdentifiersTable,
-			Columns: node.IdentifiersPrimaryKey,
+			Columns: []string{node.IdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -855,10 +823,10 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := nu.mutation.RemovedIdentifiersIDs(); len(nodes) > 0 && !nu.mutation.IdentifiersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.IdentifiersTable,
-			Columns: node.IdentifiersPrimaryKey,
+			Columns: []string{node.IdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -871,10 +839,10 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := nu.mutation.IdentifiersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.IdentifiersTable,
-			Columns: node.IdentifiersPrimaryKey,
+			Columns: []string{node.IdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -887,10 +855,10 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nu.mutation.HashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.HashesTable,
-			Columns: node.HashesPrimaryKey,
+			Columns: []string{node.HashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -900,10 +868,10 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := nu.mutation.RemovedHashesIDs(); len(nodes) > 0 && !nu.mutation.HashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.HashesTable,
-			Columns: node.HashesPrimaryKey,
+			Columns: []string{node.HashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -916,10 +884,10 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := nu.mutation.HashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.HashesTable,
-			Columns: node.HashesPrimaryKey,
+			Columns: []string{node.HashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -930,28 +898,28 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.ReleaseDateCleared() {
+	if nu.mutation.PrimaryPurposeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.ReleaseDateTable,
-			Columns: []string{node.ReleaseDateColumn},
+			Table:   node.PrimaryPurposeTable,
+			Columns: node.PrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedReleaseDateIDs(); len(nodes) > 0 && !nu.mutation.ReleaseDateCleared() {
+	if nodes := nu.mutation.RemovedPrimaryPurposeIDs(); len(nodes) > 0 && !nu.mutation.PrimaryPurposeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.ReleaseDateTable,
-			Columns: []string{node.ReleaseDateColumn},
+			Table:   node.PrimaryPurposeTable,
+			Columns: node.PrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -959,105 +927,15 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.ReleaseDateIDs(); len(nodes) > 0 {
+	if nodes := nu.mutation.PrimaryPurposeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.ReleaseDateTable,
-			Columns: []string{node.ReleaseDateColumn},
+			Table:   node.PrimaryPurposeTable,
+			Columns: node.PrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if nu.mutation.BuildDateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.BuildDateTable,
-			Columns: []string{node.BuildDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nu.mutation.RemovedBuildDateIDs(); len(nodes) > 0 && !nu.mutation.BuildDateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.BuildDateTable,
-			Columns: []string{node.BuildDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nu.mutation.BuildDateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.BuildDateTable,
-			Columns: []string{node.BuildDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if nu.mutation.ValidUntilDateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.ValidUntilDateTable,
-			Columns: []string{node.ValidUntilDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nu.mutation.RemovedValidUntilDateIDs(); len(nodes) > 0 && !nu.mutation.ValidUntilDateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.ValidUntilDateTable,
-			Columns: []string{node.ValidUntilDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nu.mutation.ValidUntilDateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.ValidUntilDateTable,
-			Columns: []string{node.ValidUntilDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1199,16 +1077,14 @@ func (nuo *NodeUpdateOne) SetNillableURLDownload(s *string) *NodeUpdateOne {
 }
 
 // SetLicenses sets the "licenses" field.
-func (nuo *NodeUpdateOne) SetLicenses(s string) *NodeUpdateOne {
+func (nuo *NodeUpdateOne) SetLicenses(s []string) *NodeUpdateOne {
 	nuo.mutation.SetLicenses(s)
 	return nuo
 }
 
-// SetNillableLicenses sets the "licenses" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableLicenses(s *string) *NodeUpdateOne {
-	if s != nil {
-		nuo.SetLicenses(*s)
-	}
+// AppendLicenses appends s to the "licenses" field.
+func (nuo *NodeUpdateOne) AppendLicenses(s []string) *NodeUpdateOne {
+	nuo.mutation.AppendLicenses(s)
 	return nuo
 }
 
@@ -1310,45 +1186,69 @@ func (nuo *NodeUpdateOne) SetNillableDescription(s *string) *NodeUpdateOne {
 	return nuo
 }
 
+// SetReleaseDate sets the "release_date" field.
+func (nuo *NodeUpdateOne) SetReleaseDate(t time.Time) *NodeUpdateOne {
+	nuo.mutation.SetReleaseDate(t)
+	return nuo
+}
+
+// SetNillableReleaseDate sets the "release_date" field if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillableReleaseDate(t *time.Time) *NodeUpdateOne {
+	if t != nil {
+		nuo.SetReleaseDate(*t)
+	}
+	return nuo
+}
+
+// SetBuildDate sets the "build_date" field.
+func (nuo *NodeUpdateOne) SetBuildDate(t time.Time) *NodeUpdateOne {
+	nuo.mutation.SetBuildDate(t)
+	return nuo
+}
+
+// SetNillableBuildDate sets the "build_date" field if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillableBuildDate(t *time.Time) *NodeUpdateOne {
+	if t != nil {
+		nuo.SetBuildDate(*t)
+	}
+	return nuo
+}
+
+// SetValidUntilDate sets the "valid_until_date" field.
+func (nuo *NodeUpdateOne) SetValidUntilDate(t time.Time) *NodeUpdateOne {
+	nuo.mutation.SetValidUntilDate(t)
+	return nuo
+}
+
+// SetNillableValidUntilDate sets the "valid_until_date" field if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillableValidUntilDate(t *time.Time) *NodeUpdateOne {
+	if t != nil {
+		nuo.SetValidUntilDate(*t)
+	}
+	return nuo
+}
+
 // SetAttribution sets the "attribution" field.
-func (nuo *NodeUpdateOne) SetAttribution(s string) *NodeUpdateOne {
+func (nuo *NodeUpdateOne) SetAttribution(s []string) *NodeUpdateOne {
 	nuo.mutation.SetAttribution(s)
 	return nuo
 }
 
-// SetNillableAttribution sets the "attribution" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableAttribution(s *string) *NodeUpdateOne {
-	if s != nil {
-		nuo.SetAttribution(*s)
-	}
+// AppendAttribution appends s to the "attribution" field.
+func (nuo *NodeUpdateOne) AppendAttribution(s []string) *NodeUpdateOne {
+	nuo.mutation.AppendAttribution(s)
 	return nuo
 }
 
 // SetFileTypes sets the "file_types" field.
-func (nuo *NodeUpdateOne) SetFileTypes(s string) *NodeUpdateOne {
+func (nuo *NodeUpdateOne) SetFileTypes(s []string) *NodeUpdateOne {
 	nuo.mutation.SetFileTypes(s)
 	return nuo
 }
 
-// SetNillableFileTypes sets the "file_types" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableFileTypes(s *string) *NodeUpdateOne {
-	if s != nil {
-		nuo.SetFileTypes(*s)
-	}
-	return nuo
-}
-
-// SetPrimaryPurpose sets the "primary_purpose" field.
-func (nuo *NodeUpdateOne) SetPrimaryPurpose(np node.PrimaryPurpose) *NodeUpdateOne {
-	nuo.mutation.SetPrimaryPurpose(np)
-	return nuo
-}
-
-// SetNillablePrimaryPurpose sets the "primary_purpose" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillablePrimaryPurpose(np *node.PrimaryPurpose) *NodeUpdateOne {
-	if np != nil {
-		nuo.SetPrimaryPurpose(*np)
-	}
+// AppendFileTypes appends s to the "file_types" field.
+func (nuo *NodeUpdateOne) AppendFileTypes(s []string) *NodeUpdateOne {
+	nuo.mutation.AppendFileTypes(s)
 	return nuo
 }
 
@@ -1427,49 +1327,19 @@ func (nuo *NodeUpdateOne) AddHashes(h ...*HashesEntry) *NodeUpdateOne {
 	return nuo.AddHashIDs(ids...)
 }
 
-// AddReleaseDateIDs adds the "release_date" edge to the Timestamp entity by IDs.
-func (nuo *NodeUpdateOne) AddReleaseDateIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddReleaseDateIDs(ids...)
+// AddPrimaryPurposeIDs adds the "primary_purpose" edge to the Purpose entity by IDs.
+func (nuo *NodeUpdateOne) AddPrimaryPurposeIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.AddPrimaryPurposeIDs(ids...)
 	return nuo
 }
 
-// AddReleaseDate adds the "release_date" edges to the Timestamp entity.
-func (nuo *NodeUpdateOne) AddReleaseDate(t ...*Timestamp) *NodeUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// AddPrimaryPurpose adds the "primary_purpose" edges to the Purpose entity.
+func (nuo *NodeUpdateOne) AddPrimaryPurpose(p ...*Purpose) *NodeUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return nuo.AddReleaseDateIDs(ids...)
-}
-
-// AddBuildDateIDs adds the "build_date" edge to the Timestamp entity by IDs.
-func (nuo *NodeUpdateOne) AddBuildDateIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddBuildDateIDs(ids...)
-	return nuo
-}
-
-// AddBuildDate adds the "build_date" edges to the Timestamp entity.
-func (nuo *NodeUpdateOne) AddBuildDate(t ...*Timestamp) *NodeUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nuo.AddBuildDateIDs(ids...)
-}
-
-// AddValidUntilDateIDs adds the "valid_until_date" edge to the Timestamp entity by IDs.
-func (nuo *NodeUpdateOne) AddValidUntilDateIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddValidUntilDateIDs(ids...)
-	return nuo
-}
-
-// AddValidUntilDate adds the "valid_until_date" edges to the Timestamp entity.
-func (nuo *NodeUpdateOne) AddValidUntilDate(t ...*Timestamp) *NodeUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nuo.AddValidUntilDateIDs(ids...)
+	return nuo.AddPrimaryPurposeIDs(ids...)
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
@@ -1593,67 +1463,25 @@ func (nuo *NodeUpdateOne) RemoveHashes(h ...*HashesEntry) *NodeUpdateOne {
 	return nuo.RemoveHashIDs(ids...)
 }
 
-// ClearReleaseDate clears all "release_date" edges to the Timestamp entity.
-func (nuo *NodeUpdateOne) ClearReleaseDate() *NodeUpdateOne {
-	nuo.mutation.ClearReleaseDate()
+// ClearPrimaryPurpose clears all "primary_purpose" edges to the Purpose entity.
+func (nuo *NodeUpdateOne) ClearPrimaryPurpose() *NodeUpdateOne {
+	nuo.mutation.ClearPrimaryPurpose()
 	return nuo
 }
 
-// RemoveReleaseDateIDs removes the "release_date" edge to Timestamp entities by IDs.
-func (nuo *NodeUpdateOne) RemoveReleaseDateIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemoveReleaseDateIDs(ids...)
+// RemovePrimaryPurposeIDs removes the "primary_purpose" edge to Purpose entities by IDs.
+func (nuo *NodeUpdateOne) RemovePrimaryPurposeIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.RemovePrimaryPurposeIDs(ids...)
 	return nuo
 }
 
-// RemoveReleaseDate removes "release_date" edges to Timestamp entities.
-func (nuo *NodeUpdateOne) RemoveReleaseDate(t ...*Timestamp) *NodeUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// RemovePrimaryPurpose removes "primary_purpose" edges to Purpose entities.
+func (nuo *NodeUpdateOne) RemovePrimaryPurpose(p ...*Purpose) *NodeUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return nuo.RemoveReleaseDateIDs(ids...)
-}
-
-// ClearBuildDate clears all "build_date" edges to the Timestamp entity.
-func (nuo *NodeUpdateOne) ClearBuildDate() *NodeUpdateOne {
-	nuo.mutation.ClearBuildDate()
-	return nuo
-}
-
-// RemoveBuildDateIDs removes the "build_date" edge to Timestamp entities by IDs.
-func (nuo *NodeUpdateOne) RemoveBuildDateIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemoveBuildDateIDs(ids...)
-	return nuo
-}
-
-// RemoveBuildDate removes "build_date" edges to Timestamp entities.
-func (nuo *NodeUpdateOne) RemoveBuildDate(t ...*Timestamp) *NodeUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nuo.RemoveBuildDateIDs(ids...)
-}
-
-// ClearValidUntilDate clears all "valid_until_date" edges to the Timestamp entity.
-func (nuo *NodeUpdateOne) ClearValidUntilDate() *NodeUpdateOne {
-	nuo.mutation.ClearValidUntilDate()
-	return nuo
-}
-
-// RemoveValidUntilDateIDs removes the "valid_until_date" edge to Timestamp entities by IDs.
-func (nuo *NodeUpdateOne) RemoveValidUntilDateIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemoveValidUntilDateIDs(ids...)
-	return nuo
-}
-
-// RemoveValidUntilDate removes "valid_until_date" edges to Timestamp entities.
-func (nuo *NodeUpdateOne) RemoveValidUntilDate(t ...*Timestamp) *NodeUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return nuo.RemoveValidUntilDateIDs(ids...)
+	return nuo.RemovePrimaryPurposeIDs(ids...)
 }
 
 // ClearNodeList clears the "node_list" edge to the NodeList entity.
@@ -1707,11 +1535,6 @@ func (nuo *NodeUpdateOne) check() error {
 	if v, ok := nuo.mutation.GetType(); ok {
 		if err := node.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Node.type": %w`, err)}
-		}
-	}
-	if v, ok := nuo.mutation.PrimaryPurpose(); ok {
-		if err := node.PrimaryPurposeValidator(v); err != nil {
-			return &ValidationError{Name: "primary_purpose", err: fmt.Errorf(`ent: validator failed for field "Node.primary_purpose": %w`, err)}
 		}
 	}
 	if _, ok := nuo.mutation.NodeListID(); nuo.mutation.NodeListCleared() && !ok {
@@ -1768,7 +1591,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		_spec.SetField(node.FieldURLDownload, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.Licenses(); ok {
-		_spec.SetField(node.FieldLicenses, field.TypeString, value)
+		_spec.SetField(node.FieldLicenses, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.AppendedLicenses(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldLicenses, value)
+		})
 	}
 	if value, ok := nuo.mutation.LicenseConcluded(); ok {
 		_spec.SetField(node.FieldLicenseConcluded, field.TypeString, value)
@@ -1791,14 +1619,30 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	if value, ok := nuo.mutation.Description(); ok {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
 	}
+	if value, ok := nuo.mutation.ReleaseDate(); ok {
+		_spec.SetField(node.FieldReleaseDate, field.TypeTime, value)
+	}
+	if value, ok := nuo.mutation.BuildDate(); ok {
+		_spec.SetField(node.FieldBuildDate, field.TypeTime, value)
+	}
+	if value, ok := nuo.mutation.ValidUntilDate(); ok {
+		_spec.SetField(node.FieldValidUntilDate, field.TypeTime, value)
+	}
 	if value, ok := nuo.mutation.Attribution(); ok {
-		_spec.SetField(node.FieldAttribution, field.TypeString, value)
+		_spec.SetField(node.FieldAttribution, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.AppendedAttribution(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldAttribution, value)
+		})
 	}
 	if value, ok := nuo.mutation.FileTypes(); ok {
-		_spec.SetField(node.FieldFileTypes, field.TypeString, value)
+		_spec.SetField(node.FieldFileTypes, field.TypeJSON, value)
 	}
-	if value, ok := nuo.mutation.PrimaryPurpose(); ok {
-		_spec.SetField(node.FieldPrimaryPurpose, field.TypeEnum, value)
+	if value, ok := nuo.mutation.AppendedFileTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldFileTypes, value)
+		})
 	}
 	if nuo.mutation.SuppliersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1937,10 +1781,10 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if nuo.mutation.IdentifiersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.IdentifiersTable,
-			Columns: node.IdentifiersPrimaryKey,
+			Columns: []string{node.IdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -1950,10 +1794,10 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if nodes := nuo.mutation.RemovedIdentifiersIDs(); len(nodes) > 0 && !nuo.mutation.IdentifiersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.IdentifiersTable,
-			Columns: node.IdentifiersPrimaryKey,
+			Columns: []string{node.IdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -1966,10 +1810,10 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if nodes := nuo.mutation.IdentifiersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.IdentifiersTable,
-			Columns: node.IdentifiersPrimaryKey,
+			Columns: []string{node.IdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -1982,10 +1826,10 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if nuo.mutation.HashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.HashesTable,
-			Columns: node.HashesPrimaryKey,
+			Columns: []string{node.HashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -1995,10 +1839,10 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if nodes := nuo.mutation.RemovedHashesIDs(); len(nodes) > 0 && !nuo.mutation.HashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.HashesTable,
-			Columns: node.HashesPrimaryKey,
+			Columns: []string{node.HashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -2011,10 +1855,10 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if nodes := nuo.mutation.HashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   node.HashesTable,
-			Columns: node.HashesPrimaryKey,
+			Columns: []string{node.HashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -2025,28 +1869,28 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.ReleaseDateCleared() {
+	if nuo.mutation.PrimaryPurposeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.ReleaseDateTable,
-			Columns: []string{node.ReleaseDateColumn},
+			Table:   node.PrimaryPurposeTable,
+			Columns: node.PrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedReleaseDateIDs(); len(nodes) > 0 && !nuo.mutation.ReleaseDateCleared() {
+	if nodes := nuo.mutation.RemovedPrimaryPurposeIDs(); len(nodes) > 0 && !nuo.mutation.PrimaryPurposeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.ReleaseDateTable,
-			Columns: []string{node.ReleaseDateColumn},
+			Table:   node.PrimaryPurposeTable,
+			Columns: node.PrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2054,105 +1898,15 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.ReleaseDateIDs(); len(nodes) > 0 {
+	if nodes := nuo.mutation.PrimaryPurposeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.ReleaseDateTable,
-			Columns: []string{node.ReleaseDateColumn},
+			Table:   node.PrimaryPurposeTable,
+			Columns: node.PrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if nuo.mutation.BuildDateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.BuildDateTable,
-			Columns: []string{node.BuildDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuo.mutation.RemovedBuildDateIDs(); len(nodes) > 0 && !nuo.mutation.BuildDateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.BuildDateTable,
-			Columns: []string{node.BuildDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuo.mutation.BuildDateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.BuildDateTable,
-			Columns: []string{node.BuildDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if nuo.mutation.ValidUntilDateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.ValidUntilDateTable,
-			Columns: []string{node.ValidUntilDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuo.mutation.RemovedValidUntilDateIDs(); len(nodes) > 0 && !nuo.mutation.ValidUntilDateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.ValidUntilDateTable,
-			Columns: []string{node.ValidUntilDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuo.mutation.ValidUntilDateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.ValidUntilDateTable,
-			Columns: []string{node.ValidUntilDateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -75,11 +75,6 @@ func From(v string) predicate.Edge {
 	return predicate.Edge(sql.FieldEQ(FieldFrom, v))
 }
 
-// To applies equality check predicate on the "to" field. It's identical to ToEQ.
-func To(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldEQ(FieldTo, v))
-}
-
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v Type) predicate.Edge {
 	return predicate.Edge(sql.FieldEQ(FieldType, v))
@@ -163,71 +158,6 @@ func FromEqualFold(v string) predicate.Edge {
 // FromContainsFold applies the ContainsFold predicate on the "from" field.
 func FromContainsFold(v string) predicate.Edge {
 	return predicate.Edge(sql.FieldContainsFold(FieldFrom, v))
-}
-
-// ToEQ applies the EQ predicate on the "to" field.
-func ToEQ(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldEQ(FieldTo, v))
-}
-
-// ToNEQ applies the NEQ predicate on the "to" field.
-func ToNEQ(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldNEQ(FieldTo, v))
-}
-
-// ToIn applies the In predicate on the "to" field.
-func ToIn(vs ...string) predicate.Edge {
-	return predicate.Edge(sql.FieldIn(FieldTo, vs...))
-}
-
-// ToNotIn applies the NotIn predicate on the "to" field.
-func ToNotIn(vs ...string) predicate.Edge {
-	return predicate.Edge(sql.FieldNotIn(FieldTo, vs...))
-}
-
-// ToGT applies the GT predicate on the "to" field.
-func ToGT(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldGT(FieldTo, v))
-}
-
-// ToGTE applies the GTE predicate on the "to" field.
-func ToGTE(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldGTE(FieldTo, v))
-}
-
-// ToLT applies the LT predicate on the "to" field.
-func ToLT(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldLT(FieldTo, v))
-}
-
-// ToLTE applies the LTE predicate on the "to" field.
-func ToLTE(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldLTE(FieldTo, v))
-}
-
-// ToContains applies the Contains predicate on the "to" field.
-func ToContains(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldContains(FieldTo, v))
-}
-
-// ToHasPrefix applies the HasPrefix predicate on the "to" field.
-func ToHasPrefix(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldHasPrefix(FieldTo, v))
-}
-
-// ToHasSuffix applies the HasSuffix predicate on the "to" field.
-func ToHasSuffix(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldHasSuffix(FieldTo, v))
-}
-
-// ToEqualFold applies the EqualFold predicate on the "to" field.
-func ToEqualFold(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldEqualFold(FieldTo, v))
-}
-
-// ToContainsFold applies the ContainsFold predicate on the "to" field.
-func ToContainsFold(v string) predicate.Edge {
-	return predicate.Edge(sql.FieldContainsFold(FieldTo, v))
 }
 
 // HasNodeList applies the HasEdge predicate on the "node_list" edge.

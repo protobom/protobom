@@ -41,7 +41,7 @@ import (
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/nodelist"
 	"github.com/bom-squad/protobom/ent/person"
-	"github.com/bom-squad/protobom/ent/timestamp"
+	"github.com/bom-squad/protobom/ent/purpose"
 	"github.com/bom-squad/protobom/ent/tool"
 )
 
@@ -70,17 +70,15 @@ type Client struct {
 	NodeList *NodeListClient
 	// Person is the client for interacting with the Person builders.
 	Person *PersonClient
-	// Timestamp is the client for interacting with the Timestamp builders.
-	Timestamp *TimestampClient
+	// Purpose is the client for interacting with the Purpose builders.
+	Purpose *PurposeClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 }
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
-	cfg.options(opts...)
-	client := &Client{config: cfg}
+	client := &Client{config: newConfig(opts...)}
 	client.init()
 	return client
 }
@@ -97,7 +95,7 @@ func (c *Client) init() {
 	c.Node = NewNodeClient(c.config)
 	c.NodeList = NewNodeListClient(c.config)
 	c.Person = NewPersonClient(c.config)
-	c.Timestamp = NewTimestampClient(c.config)
+	c.Purpose = NewPurposeClient(c.config)
 	c.Tool = NewToolClient(c.config)
 }
 
@@ -118,6 +116,13 @@ type (
 	// Option function to configure the client.
 	Option func(*config)
 )
+
+// newConfig creates a new config for the client.
+func newConfig(opts ...Option) config {
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
+	cfg.options(opts...)
+	return cfg
+}
 
 // options applies the options on the config object.
 func (c *config) options(opts ...Option) {
@@ -194,7 +199,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Node:              NewNodeClient(cfg),
 		NodeList:          NewNodeListClient(cfg),
 		Person:            NewPersonClient(cfg),
-		Timestamp:         NewTimestampClient(cfg),
+		Purpose:           NewPurposeClient(cfg),
 		Tool:              NewToolClient(cfg),
 	}, nil
 }
@@ -225,7 +230,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Node:              NewNodeClient(cfg),
 		NodeList:          NewNodeListClient(cfg),
 		Person:            NewPersonClient(cfg),
-		Timestamp:         NewTimestampClient(cfg),
+		Purpose:           NewPurposeClient(cfg),
 		Tool:              NewToolClient(cfg),
 	}, nil
 }
@@ -257,7 +262,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Document, c.DocumentType, c.Edge, c.ExternalReference, c.HashesEntry,
-		c.IdentifiersEntry, c.Metadata, c.Node, c.NodeList, c.Person, c.Timestamp,
+		c.IdentifiersEntry, c.Metadata, c.Node, c.NodeList, c.Person, c.Purpose,
 		c.Tool,
 	} {
 		n.Use(hooks...)
@@ -269,7 +274,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Document, c.DocumentType, c.Edge, c.ExternalReference, c.HashesEntry,
-		c.IdentifiersEntry, c.Metadata, c.Node, c.NodeList, c.Person, c.Timestamp,
+		c.IdentifiersEntry, c.Metadata, c.Node, c.NodeList, c.Person, c.Purpose,
 		c.Tool,
 	} {
 		n.Intercept(interceptors...)
@@ -299,8 +304,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.NodeList.mutate(ctx, m)
 	case *PersonMutation:
 		return c.Person.mutate(ctx, m)
-	case *TimestampMutation:
-		return c.Timestamp.mutate(ctx, m)
+	case *PurposeMutation:
+		return c.Purpose.mutate(ctx, m)
 	case *ToolMutation:
 		return c.Tool.mutate(ctx, m)
 	default:
@@ -424,7 +429,7 @@ func (c *DocumentClient) QueryMetadata(d *Document) *MetadataQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(document.Table, document.FieldID, id),
 			sqlgraph.To(metadata.Table, metadata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, document.MetadataTable, document.MetadataColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, document.MetadataTable, document.MetadataColumn),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil
@@ -440,7 +445,7 @@ func (c *DocumentClient) QueryNodeList(d *Document) *NodeListQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(document.Table, document.FieldID, id),
 			sqlgraph.To(nodelist.Table, nodelist.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, document.NodeListTable, document.NodeListColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, document.NodeListTable, document.NodeListColumn),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil
@@ -887,7 +892,7 @@ func (c *ExternalReferenceClient) QueryHashes(er *ExternalReference) *HashesEntr
 		step := sqlgraph.NewStep(
 			sqlgraph.From(externalreference.Table, externalreference.FieldID, id),
 			sqlgraph.To(hashesentry.Table, hashesentry.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, externalreference.HashesTable, externalreference.HashesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, externalreference.HashesTable, externalreference.HashesColumn),
 		)
 		fromV = sqlgraph.Neighbors(er.driver.Dialect(), step)
 		return fromV, nil
@@ -1052,7 +1057,7 @@ func (c *HashesEntryClient) QueryExternalReferences(he *HashesEntry) *ExternalRe
 		step := sqlgraph.NewStep(
 			sqlgraph.From(hashesentry.Table, hashesentry.FieldID, id),
 			sqlgraph.To(externalreference.Table, externalreference.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, hashesentry.ExternalReferencesTable, hashesentry.ExternalReferencesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, hashesentry.ExternalReferencesTable, hashesentry.ExternalReferencesColumn),
 		)
 		fromV = sqlgraph.Neighbors(he.driver.Dialect(), step)
 		return fromV, nil
@@ -1068,7 +1073,7 @@ func (c *HashesEntryClient) QueryNodes(he *HashesEntry) *NodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(hashesentry.Table, hashesentry.FieldID, id),
 			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, hashesentry.NodesTable, hashesentry.NodesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, hashesentry.NodesTable, hashesentry.NodesColumn),
 		)
 		fromV = sqlgraph.Neighbors(he.driver.Dialect(), step)
 		return fromV, nil
@@ -1217,7 +1222,7 @@ func (c *IdentifiersEntryClient) QueryNodes(ie *IdentifiersEntry) *NodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(identifiersentry.Table, identifiersentry.FieldID, id),
 			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, identifiersentry.NodesTable, identifiersentry.NodesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, identifiersentry.NodesTable, identifiersentry.NodesColumn),
 		)
 		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
 		return fromV, nil
@@ -1390,7 +1395,7 @@ func (c *MetadataClient) QueryAuthors(m *Metadata) *PersonQuery {
 	return query
 }
 
-// QueryDocumentTypes queries the documentTypes edge of a Metadata.
+// QueryDocumentTypes queries the document_types edge of a Metadata.
 func (c *MetadataClient) QueryDocumentTypes(m *Metadata) *DocumentTypeQuery {
 	query := (&DocumentTypeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
@@ -1406,22 +1411,6 @@ func (c *MetadataClient) QueryDocumentTypes(m *Metadata) *DocumentTypeQuery {
 	return query
 }
 
-// QueryDate queries the date edge of a Metadata.
-func (c *MetadataClient) QueryDate(m *Metadata) *TimestampQuery {
-	query := (&TimestampClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(metadata.Table, metadata.FieldID, id),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, metadata.DateTable, metadata.DateColumn),
-		)
-		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryDocument queries the document edge of a Metadata.
 func (c *MetadataClient) QueryDocument(m *Metadata) *DocumentQuery {
 	query := (&DocumentClient{config: c.config}).Query()
@@ -1430,7 +1419,7 @@ func (c *MetadataClient) QueryDocument(m *Metadata) *DocumentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(metadata.Table, metadata.FieldID, id),
 			sqlgraph.To(document.Table, document.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, metadata.DocumentTable, metadata.DocumentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, metadata.DocumentTable, metadata.DocumentColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -1627,7 +1616,7 @@ func (c *NodeClient) QueryIdentifiers(n *Node) *IdentifiersEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(identifiersentry.Table, identifiersentry.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, node.IdentifiersTable, node.IdentifiersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.IdentifiersTable, node.IdentifiersColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1643,7 +1632,7 @@ func (c *NodeClient) QueryHashes(n *Node) *HashesEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(hashesentry.Table, hashesentry.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, node.HashesTable, node.HashesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.HashesTable, node.HashesColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1651,47 +1640,15 @@ func (c *NodeClient) QueryHashes(n *Node) *HashesEntryQuery {
 	return query
 }
 
-// QueryReleaseDate queries the release_date edge of a Node.
-func (c *NodeClient) QueryReleaseDate(n *Node) *TimestampQuery {
-	query := (&TimestampClient{config: c.config}).Query()
+// QueryPrimaryPurpose queries the primary_purpose edge of a Node.
+func (c *NodeClient) QueryPrimaryPurpose(n *Node) *PurposeQuery {
+	query := (&PurposeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.ReleaseDateTable, node.ReleaseDateColumn),
-		)
-		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryBuildDate queries the build_date edge of a Node.
-func (c *NodeClient) QueryBuildDate(n *Node) *TimestampQuery {
-	query := (&TimestampClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := n.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(node.Table, node.FieldID, id),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.BuildDateTable, node.BuildDateColumn),
-		)
-		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryValidUntilDate queries the valid_until_date edge of a Node.
-func (c *NodeClient) QueryValidUntilDate(n *Node) *TimestampQuery {
-	query := (&TimestampClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := n.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(node.Table, node.FieldID, id),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.ValidUntilDateTable, node.ValidUntilDateColumn),
+			sqlgraph.To(purpose.Table, purpose.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.PrimaryPurposeTable, node.PrimaryPurposePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1888,7 +1845,7 @@ func (c *NodeListClient) QueryDocument(nl *NodeList) *DocumentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(nodelist.Table, nodelist.FieldID, id),
 			sqlgraph.To(document.Table, document.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, nodelist.DocumentTable, nodelist.DocumentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, nodelist.DocumentTable, nodelist.DocumentColumn),
 		)
 		fromV = sqlgraph.Neighbors(nl.driver.Dialect(), step)
 		return fromV, nil
@@ -2029,6 +1986,22 @@ func (c *PersonClient) GetX(ctx context.Context, id int) *Person {
 	return obj
 }
 
+// QueryContactOwner queries the contact_owner edge of a Person.
+func (c *PersonClient) QueryContactOwner(pe *Person) *PersonQuery {
+	query := (&PersonClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pe.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(person.Table, person.FieldID, id),
+			sqlgraph.To(person.Table, person.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, person.ContactOwnerTable, person.ContactOwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryContacts queries the contacts edge of a Person.
 func (c *PersonClient) QueryContacts(pe *Person) *PersonQuery {
 	query := (&PersonClient{config: c.config}).Query()
@@ -2061,47 +2034,15 @@ func (c *PersonClient) QueryMetadata(pe *Person) *MetadataQuery {
 	return query
 }
 
-// QueryNodeSupplier queries the node_supplier edge of a Person.
-func (c *PersonClient) QueryNodeSupplier(pe *Person) *NodeQuery {
+// QueryNode queries the node edge of a Person.
+func (c *PersonClient) QueryNode(pe *Person) *NodeQuery {
 	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pe.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(person.Table, person.FieldID, id),
 			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, person.NodeSupplierTable, person.NodeSupplierColumn),
-		)
-		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryNodeOriginator queries the node_originator edge of a Person.
-func (c *PersonClient) QueryNodeOriginator(pe *Person) *NodeQuery {
-	query := (&NodeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pe.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(person.Table, person.FieldID, id),
-			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, person.NodeOriginatorTable, person.NodeOriginatorColumn),
-		)
-		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryPersonContact queries the person_contact edge of a Person.
-func (c *PersonClient) QueryPersonContact(pe *Person) *PersonQuery {
-	query := (&PersonClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pe.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(person.Table, person.FieldID, id),
-			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, person.PersonContactTable, person.PersonContactColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, person.NodeTable, person.NodeColumn),
 		)
 		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
 		return fromV, nil
@@ -2134,107 +2075,107 @@ func (c *PersonClient) mutate(ctx context.Context, m *PersonMutation) (Value, er
 	}
 }
 
-// TimestampClient is a client for the Timestamp schema.
-type TimestampClient struct {
+// PurposeClient is a client for the Purpose schema.
+type PurposeClient struct {
 	config
 }
 
-// NewTimestampClient returns a client for the Timestamp from the given config.
-func NewTimestampClient(c config) *TimestampClient {
-	return &TimestampClient{config: c}
+// NewPurposeClient returns a client for the Purpose from the given config.
+func NewPurposeClient(c config) *PurposeClient {
+	return &PurposeClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `timestamp.Hooks(f(g(h())))`.
-func (c *TimestampClient) Use(hooks ...Hook) {
-	c.hooks.Timestamp = append(c.hooks.Timestamp, hooks...)
+// A call to `Use(f, g, h)` equals to `purpose.Hooks(f(g(h())))`.
+func (c *PurposeClient) Use(hooks ...Hook) {
+	c.hooks.Purpose = append(c.hooks.Purpose, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `timestamp.Intercept(f(g(h())))`.
-func (c *TimestampClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Timestamp = append(c.inters.Timestamp, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `purpose.Intercept(f(g(h())))`.
+func (c *PurposeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Purpose = append(c.inters.Purpose, interceptors...)
 }
 
-// Create returns a builder for creating a Timestamp entity.
-func (c *TimestampClient) Create() *TimestampCreate {
-	mutation := newTimestampMutation(c.config, OpCreate)
-	return &TimestampCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Purpose entity.
+func (c *PurposeClient) Create() *PurposeCreate {
+	mutation := newPurposeMutation(c.config, OpCreate)
+	return &PurposeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Timestamp entities.
-func (c *TimestampClient) CreateBulk(builders ...*TimestampCreate) *TimestampCreateBulk {
-	return &TimestampCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Purpose entities.
+func (c *PurposeClient) CreateBulk(builders ...*PurposeCreate) *PurposeCreateBulk {
+	return &PurposeCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *TimestampClient) MapCreateBulk(slice any, setFunc func(*TimestampCreate, int)) *TimestampCreateBulk {
+func (c *PurposeClient) MapCreateBulk(slice any, setFunc func(*PurposeCreate, int)) *PurposeCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &TimestampCreateBulk{err: fmt.Errorf("calling to TimestampClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &PurposeCreateBulk{err: fmt.Errorf("calling to PurposeClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*TimestampCreate, rv.Len())
+	builders := make([]*PurposeCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &TimestampCreateBulk{config: c.config, builders: builders}
+	return &PurposeCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Timestamp.
-func (c *TimestampClient) Update() *TimestampUpdate {
-	mutation := newTimestampMutation(c.config, OpUpdate)
-	return &TimestampUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Purpose.
+func (c *PurposeClient) Update() *PurposeUpdate {
+	mutation := newPurposeMutation(c.config, OpUpdate)
+	return &PurposeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *TimestampClient) UpdateOne(t *Timestamp) *TimestampUpdateOne {
-	mutation := newTimestampMutation(c.config, OpUpdateOne, withTimestamp(t))
-	return &TimestampUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *PurposeClient) UpdateOne(pu *Purpose) *PurposeUpdateOne {
+	mutation := newPurposeMutation(c.config, OpUpdateOne, withPurpose(pu))
+	return &PurposeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TimestampClient) UpdateOneID(id int) *TimestampUpdateOne {
-	mutation := newTimestampMutation(c.config, OpUpdateOne, withTimestampID(id))
-	return &TimestampUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *PurposeClient) UpdateOneID(id int) *PurposeUpdateOne {
+	mutation := newPurposeMutation(c.config, OpUpdateOne, withPurposeID(id))
+	return &PurposeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Timestamp.
-func (c *TimestampClient) Delete() *TimestampDelete {
-	mutation := newTimestampMutation(c.config, OpDelete)
-	return &TimestampDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Purpose.
+func (c *PurposeClient) Delete() *PurposeDelete {
+	mutation := newPurposeMutation(c.config, OpDelete)
+	return &PurposeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *TimestampClient) DeleteOne(t *Timestamp) *TimestampDeleteOne {
-	return c.DeleteOneID(t.ID)
+func (c *PurposeClient) DeleteOne(pu *Purpose) *PurposeDeleteOne {
+	return c.DeleteOneID(pu.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TimestampClient) DeleteOneID(id int) *TimestampDeleteOne {
-	builder := c.Delete().Where(timestamp.ID(id))
+func (c *PurposeClient) DeleteOneID(id int) *PurposeDeleteOne {
+	builder := c.Delete().Where(purpose.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &TimestampDeleteOne{builder}
+	return &PurposeDeleteOne{builder}
 }
 
-// Query returns a query builder for Timestamp.
-func (c *TimestampClient) Query() *TimestampQuery {
-	return &TimestampQuery{
+// Query returns a query builder for Purpose.
+func (c *PurposeClient) Query() *PurposeQuery {
+	return &PurposeQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeTimestamp},
+		ctx:    &QueryContext{Type: TypePurpose},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Timestamp entity by its id.
-func (c *TimestampClient) Get(ctx context.Context, id int) (*Timestamp, error) {
-	return c.Query().Where(timestamp.ID(id)).Only(ctx)
+// Get returns a Purpose entity by its id.
+func (c *PurposeClient) Get(ctx context.Context, id int) (*Purpose, error) {
+	return c.Query().Where(purpose.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TimestampClient) GetX(ctx context.Context, id int) *Timestamp {
+func (c *PurposeClient) GetX(ctx context.Context, id int) *Purpose {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -2242,60 +2183,44 @@ func (c *TimestampClient) GetX(ctx context.Context, id int) *Timestamp {
 	return obj
 }
 
-// QueryDate queries the date edge of a Timestamp.
-func (c *TimestampClient) QueryDate(t *Timestamp) *TimestampQuery {
-	query := (&TimestampClient{config: c.config}).Query()
+// QueryNode queries the node edge of a Purpose.
+func (c *PurposeClient) QueryNode(pu *Purpose) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := t.ID
+		id := pu.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(timestamp.Table, timestamp.FieldID, id),
-			sqlgraph.To(timestamp.Table, timestamp.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, timestamp.DateTable, timestamp.DatePrimaryKey...),
+			sqlgraph.From(purpose.Table, purpose.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, purpose.NodeTable, purpose.NodePrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryMetadata queries the metadata edge of a Timestamp.
-func (c *TimestampClient) QueryMetadata(t *Timestamp) *MetadataQuery {
-	query := (&MetadataClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := t.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(timestamp.Table, timestamp.FieldID, id),
-			sqlgraph.To(metadata.Table, metadata.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, timestamp.MetadataTable, timestamp.MetadataColumn),
-		)
-		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(pu.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *TimestampClient) Hooks() []Hook {
-	return c.hooks.Timestamp
+func (c *PurposeClient) Hooks() []Hook {
+	return c.hooks.Purpose
 }
 
 // Interceptors returns the client interceptors.
-func (c *TimestampClient) Interceptors() []Interceptor {
-	return c.inters.Timestamp
+func (c *PurposeClient) Interceptors() []Interceptor {
+	return c.inters.Purpose
 }
 
-func (c *TimestampClient) mutate(ctx context.Context, m *TimestampMutation) (Value, error) {
+func (c *PurposeClient) mutate(ctx context.Context, m *PurposeMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&TimestampCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PurposeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&TimestampUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PurposeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&TimestampUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PurposeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&TimestampDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&PurposeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Timestamp mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Purpose mutation op: %q", m.Op())
 	}
 }
 
@@ -2452,10 +2377,10 @@ func (c *ToolClient) mutate(ctx context.Context, m *ToolMutation) (Value, error)
 type (
 	hooks struct {
 		Document, DocumentType, Edge, ExternalReference, HashesEntry, IdentifiersEntry,
-		Metadata, Node, NodeList, Person, Timestamp, Tool []ent.Hook
+		Metadata, Node, NodeList, Person, Purpose, Tool []ent.Hook
 	}
 	inters struct {
 		Document, DocumentType, Edge, ExternalReference, HashesEntry, IdentifiersEntry,
-		Metadata, Node, NodeList, Person, Timestamp, Tool []ent.Interceptor
+		Metadata, Node, NodeList, Person, Purpose, Tool []ent.Interceptor
 	}
 )

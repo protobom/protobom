@@ -20,6 +20,8 @@
 package node
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/bom-squad/protobom/ent/predicate"
@@ -105,11 +107,6 @@ func URLDownload(v string) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldURLDownload, v))
 }
 
-// Licenses applies equality check predicate on the "licenses" field. It's identical to LicensesEQ.
-func Licenses(v string) predicate.Node {
-	return predicate.Node(sql.FieldEQ(FieldLicenses, v))
-}
-
 // LicenseConcluded applies equality check predicate on the "license_concluded" field. It's identical to LicenseConcludedEQ.
 func LicenseConcluded(v string) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldLicenseConcluded, v))
@@ -145,14 +142,19 @@ func Description(v string) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldDescription, v))
 }
 
-// Attribution applies equality check predicate on the "attribution" field. It's identical to AttributionEQ.
-func Attribution(v string) predicate.Node {
-	return predicate.Node(sql.FieldEQ(FieldAttribution, v))
+// ReleaseDate applies equality check predicate on the "release_date" field. It's identical to ReleaseDateEQ.
+func ReleaseDate(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldReleaseDate, v))
 }
 
-// FileTypes applies equality check predicate on the "file_types" field. It's identical to FileTypesEQ.
-func FileTypes(v string) predicate.Node {
-	return predicate.Node(sql.FieldEQ(FieldFileTypes, v))
+// BuildDate applies equality check predicate on the "build_date" field. It's identical to BuildDateEQ.
+func BuildDate(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldBuildDate, v))
+}
+
+// ValidUntilDate applies equality check predicate on the "valid_until_date" field. It's identical to ValidUntilDateEQ.
+func ValidUntilDate(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldValidUntilDate, v))
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
@@ -498,71 +500,6 @@ func URLDownloadEqualFold(v string) predicate.Node {
 // URLDownloadContainsFold applies the ContainsFold predicate on the "url_download" field.
 func URLDownloadContainsFold(v string) predicate.Node {
 	return predicate.Node(sql.FieldContainsFold(FieldURLDownload, v))
-}
-
-// LicensesEQ applies the EQ predicate on the "licenses" field.
-func LicensesEQ(v string) predicate.Node {
-	return predicate.Node(sql.FieldEQ(FieldLicenses, v))
-}
-
-// LicensesNEQ applies the NEQ predicate on the "licenses" field.
-func LicensesNEQ(v string) predicate.Node {
-	return predicate.Node(sql.FieldNEQ(FieldLicenses, v))
-}
-
-// LicensesIn applies the In predicate on the "licenses" field.
-func LicensesIn(vs ...string) predicate.Node {
-	return predicate.Node(sql.FieldIn(FieldLicenses, vs...))
-}
-
-// LicensesNotIn applies the NotIn predicate on the "licenses" field.
-func LicensesNotIn(vs ...string) predicate.Node {
-	return predicate.Node(sql.FieldNotIn(FieldLicenses, vs...))
-}
-
-// LicensesGT applies the GT predicate on the "licenses" field.
-func LicensesGT(v string) predicate.Node {
-	return predicate.Node(sql.FieldGT(FieldLicenses, v))
-}
-
-// LicensesGTE applies the GTE predicate on the "licenses" field.
-func LicensesGTE(v string) predicate.Node {
-	return predicate.Node(sql.FieldGTE(FieldLicenses, v))
-}
-
-// LicensesLT applies the LT predicate on the "licenses" field.
-func LicensesLT(v string) predicate.Node {
-	return predicate.Node(sql.FieldLT(FieldLicenses, v))
-}
-
-// LicensesLTE applies the LTE predicate on the "licenses" field.
-func LicensesLTE(v string) predicate.Node {
-	return predicate.Node(sql.FieldLTE(FieldLicenses, v))
-}
-
-// LicensesContains applies the Contains predicate on the "licenses" field.
-func LicensesContains(v string) predicate.Node {
-	return predicate.Node(sql.FieldContains(FieldLicenses, v))
-}
-
-// LicensesHasPrefix applies the HasPrefix predicate on the "licenses" field.
-func LicensesHasPrefix(v string) predicate.Node {
-	return predicate.Node(sql.FieldHasPrefix(FieldLicenses, v))
-}
-
-// LicensesHasSuffix applies the HasSuffix predicate on the "licenses" field.
-func LicensesHasSuffix(v string) predicate.Node {
-	return predicate.Node(sql.FieldHasSuffix(FieldLicenses, v))
-}
-
-// LicensesEqualFold applies the EqualFold predicate on the "licenses" field.
-func LicensesEqualFold(v string) predicate.Node {
-	return predicate.Node(sql.FieldEqualFold(FieldLicenses, v))
-}
-
-// LicensesContainsFold applies the ContainsFold predicate on the "licenses" field.
-func LicensesContainsFold(v string) predicate.Node {
-	return predicate.Node(sql.FieldContainsFold(FieldLicenses, v))
 }
 
 // LicenseConcludedEQ applies the EQ predicate on the "license_concluded" field.
@@ -1020,154 +957,124 @@ func DescriptionContainsFold(v string) predicate.Node {
 	return predicate.Node(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// AttributionEQ applies the EQ predicate on the "attribution" field.
-func AttributionEQ(v string) predicate.Node {
-	return predicate.Node(sql.FieldEQ(FieldAttribution, v))
+// ReleaseDateEQ applies the EQ predicate on the "release_date" field.
+func ReleaseDateEQ(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldReleaseDate, v))
 }
 
-// AttributionNEQ applies the NEQ predicate on the "attribution" field.
-func AttributionNEQ(v string) predicate.Node {
-	return predicate.Node(sql.FieldNEQ(FieldAttribution, v))
+// ReleaseDateNEQ applies the NEQ predicate on the "release_date" field.
+func ReleaseDateNEQ(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldReleaseDate, v))
 }
 
-// AttributionIn applies the In predicate on the "attribution" field.
-func AttributionIn(vs ...string) predicate.Node {
-	return predicate.Node(sql.FieldIn(FieldAttribution, vs...))
+// ReleaseDateIn applies the In predicate on the "release_date" field.
+func ReleaseDateIn(vs ...time.Time) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldReleaseDate, vs...))
 }
 
-// AttributionNotIn applies the NotIn predicate on the "attribution" field.
-func AttributionNotIn(vs ...string) predicate.Node {
-	return predicate.Node(sql.FieldNotIn(FieldAttribution, vs...))
+// ReleaseDateNotIn applies the NotIn predicate on the "release_date" field.
+func ReleaseDateNotIn(vs ...time.Time) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldReleaseDate, vs...))
 }
 
-// AttributionGT applies the GT predicate on the "attribution" field.
-func AttributionGT(v string) predicate.Node {
-	return predicate.Node(sql.FieldGT(FieldAttribution, v))
+// ReleaseDateGT applies the GT predicate on the "release_date" field.
+func ReleaseDateGT(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldReleaseDate, v))
 }
 
-// AttributionGTE applies the GTE predicate on the "attribution" field.
-func AttributionGTE(v string) predicate.Node {
-	return predicate.Node(sql.FieldGTE(FieldAttribution, v))
+// ReleaseDateGTE applies the GTE predicate on the "release_date" field.
+func ReleaseDateGTE(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldReleaseDate, v))
 }
 
-// AttributionLT applies the LT predicate on the "attribution" field.
-func AttributionLT(v string) predicate.Node {
-	return predicate.Node(sql.FieldLT(FieldAttribution, v))
+// ReleaseDateLT applies the LT predicate on the "release_date" field.
+func ReleaseDateLT(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldReleaseDate, v))
 }
 
-// AttributionLTE applies the LTE predicate on the "attribution" field.
-func AttributionLTE(v string) predicate.Node {
-	return predicate.Node(sql.FieldLTE(FieldAttribution, v))
+// ReleaseDateLTE applies the LTE predicate on the "release_date" field.
+func ReleaseDateLTE(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldReleaseDate, v))
 }
 
-// AttributionContains applies the Contains predicate on the "attribution" field.
-func AttributionContains(v string) predicate.Node {
-	return predicate.Node(sql.FieldContains(FieldAttribution, v))
+// BuildDateEQ applies the EQ predicate on the "build_date" field.
+func BuildDateEQ(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldBuildDate, v))
 }
 
-// AttributionHasPrefix applies the HasPrefix predicate on the "attribution" field.
-func AttributionHasPrefix(v string) predicate.Node {
-	return predicate.Node(sql.FieldHasPrefix(FieldAttribution, v))
+// BuildDateNEQ applies the NEQ predicate on the "build_date" field.
+func BuildDateNEQ(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldBuildDate, v))
 }
 
-// AttributionHasSuffix applies the HasSuffix predicate on the "attribution" field.
-func AttributionHasSuffix(v string) predicate.Node {
-	return predicate.Node(sql.FieldHasSuffix(FieldAttribution, v))
+// BuildDateIn applies the In predicate on the "build_date" field.
+func BuildDateIn(vs ...time.Time) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldBuildDate, vs...))
 }
 
-// AttributionEqualFold applies the EqualFold predicate on the "attribution" field.
-func AttributionEqualFold(v string) predicate.Node {
-	return predicate.Node(sql.FieldEqualFold(FieldAttribution, v))
+// BuildDateNotIn applies the NotIn predicate on the "build_date" field.
+func BuildDateNotIn(vs ...time.Time) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldBuildDate, vs...))
 }
 
-// AttributionContainsFold applies the ContainsFold predicate on the "attribution" field.
-func AttributionContainsFold(v string) predicate.Node {
-	return predicate.Node(sql.FieldContainsFold(FieldAttribution, v))
+// BuildDateGT applies the GT predicate on the "build_date" field.
+func BuildDateGT(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldBuildDate, v))
 }
 
-// FileTypesEQ applies the EQ predicate on the "file_types" field.
-func FileTypesEQ(v string) predicate.Node {
-	return predicate.Node(sql.FieldEQ(FieldFileTypes, v))
+// BuildDateGTE applies the GTE predicate on the "build_date" field.
+func BuildDateGTE(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldBuildDate, v))
 }
 
-// FileTypesNEQ applies the NEQ predicate on the "file_types" field.
-func FileTypesNEQ(v string) predicate.Node {
-	return predicate.Node(sql.FieldNEQ(FieldFileTypes, v))
+// BuildDateLT applies the LT predicate on the "build_date" field.
+func BuildDateLT(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldBuildDate, v))
 }
 
-// FileTypesIn applies the In predicate on the "file_types" field.
-func FileTypesIn(vs ...string) predicate.Node {
-	return predicate.Node(sql.FieldIn(FieldFileTypes, vs...))
+// BuildDateLTE applies the LTE predicate on the "build_date" field.
+func BuildDateLTE(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldBuildDate, v))
 }
 
-// FileTypesNotIn applies the NotIn predicate on the "file_types" field.
-func FileTypesNotIn(vs ...string) predicate.Node {
-	return predicate.Node(sql.FieldNotIn(FieldFileTypes, vs...))
+// ValidUntilDateEQ applies the EQ predicate on the "valid_until_date" field.
+func ValidUntilDateEQ(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldValidUntilDate, v))
 }
 
-// FileTypesGT applies the GT predicate on the "file_types" field.
-func FileTypesGT(v string) predicate.Node {
-	return predicate.Node(sql.FieldGT(FieldFileTypes, v))
+// ValidUntilDateNEQ applies the NEQ predicate on the "valid_until_date" field.
+func ValidUntilDateNEQ(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldValidUntilDate, v))
 }
 
-// FileTypesGTE applies the GTE predicate on the "file_types" field.
-func FileTypesGTE(v string) predicate.Node {
-	return predicate.Node(sql.FieldGTE(FieldFileTypes, v))
+// ValidUntilDateIn applies the In predicate on the "valid_until_date" field.
+func ValidUntilDateIn(vs ...time.Time) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldValidUntilDate, vs...))
 }
 
-// FileTypesLT applies the LT predicate on the "file_types" field.
-func FileTypesLT(v string) predicate.Node {
-	return predicate.Node(sql.FieldLT(FieldFileTypes, v))
+// ValidUntilDateNotIn applies the NotIn predicate on the "valid_until_date" field.
+func ValidUntilDateNotIn(vs ...time.Time) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldValidUntilDate, vs...))
 }
 
-// FileTypesLTE applies the LTE predicate on the "file_types" field.
-func FileTypesLTE(v string) predicate.Node {
-	return predicate.Node(sql.FieldLTE(FieldFileTypes, v))
+// ValidUntilDateGT applies the GT predicate on the "valid_until_date" field.
+func ValidUntilDateGT(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldValidUntilDate, v))
 }
 
-// FileTypesContains applies the Contains predicate on the "file_types" field.
-func FileTypesContains(v string) predicate.Node {
-	return predicate.Node(sql.FieldContains(FieldFileTypes, v))
+// ValidUntilDateGTE applies the GTE predicate on the "valid_until_date" field.
+func ValidUntilDateGTE(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldValidUntilDate, v))
 }
 
-// FileTypesHasPrefix applies the HasPrefix predicate on the "file_types" field.
-func FileTypesHasPrefix(v string) predicate.Node {
-	return predicate.Node(sql.FieldHasPrefix(FieldFileTypes, v))
+// ValidUntilDateLT applies the LT predicate on the "valid_until_date" field.
+func ValidUntilDateLT(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldValidUntilDate, v))
 }
 
-// FileTypesHasSuffix applies the HasSuffix predicate on the "file_types" field.
-func FileTypesHasSuffix(v string) predicate.Node {
-	return predicate.Node(sql.FieldHasSuffix(FieldFileTypes, v))
-}
-
-// FileTypesEqualFold applies the EqualFold predicate on the "file_types" field.
-func FileTypesEqualFold(v string) predicate.Node {
-	return predicate.Node(sql.FieldEqualFold(FieldFileTypes, v))
-}
-
-// FileTypesContainsFold applies the ContainsFold predicate on the "file_types" field.
-func FileTypesContainsFold(v string) predicate.Node {
-	return predicate.Node(sql.FieldContainsFold(FieldFileTypes, v))
-}
-
-// PrimaryPurposeEQ applies the EQ predicate on the "primary_purpose" field.
-func PrimaryPurposeEQ(v PrimaryPurpose) predicate.Node {
-	return predicate.Node(sql.FieldEQ(FieldPrimaryPurpose, v))
-}
-
-// PrimaryPurposeNEQ applies the NEQ predicate on the "primary_purpose" field.
-func PrimaryPurposeNEQ(v PrimaryPurpose) predicate.Node {
-	return predicate.Node(sql.FieldNEQ(FieldPrimaryPurpose, v))
-}
-
-// PrimaryPurposeIn applies the In predicate on the "primary_purpose" field.
-func PrimaryPurposeIn(vs ...PrimaryPurpose) predicate.Node {
-	return predicate.Node(sql.FieldIn(FieldPrimaryPurpose, vs...))
-}
-
-// PrimaryPurposeNotIn applies the NotIn predicate on the "primary_purpose" field.
-func PrimaryPurposeNotIn(vs ...PrimaryPurpose) predicate.Node {
-	return predicate.Node(sql.FieldNotIn(FieldPrimaryPurpose, vs...))
+// ValidUntilDateLTE applies the LTE predicate on the "valid_until_date" field.
+func ValidUntilDateLTE(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldValidUntilDate, v))
 }
 
 // HasSuppliers applies the HasEdge predicate on the "suppliers" edge.
@@ -1244,7 +1151,7 @@ func HasIdentifiers() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, IdentifiersTable, IdentifiersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, IdentifiersTable, IdentifiersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1267,7 +1174,7 @@ func HasHashes() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, HashesTable, HashesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1285,67 +1192,21 @@ func HasHashesWith(preds ...predicate.HashesEntry) predicate.Node {
 	})
 }
 
-// HasReleaseDate applies the HasEdge predicate on the "release_date" edge.
-func HasReleaseDate() predicate.Node {
+// HasPrimaryPurpose applies the HasEdge predicate on the "primary_purpose" edge.
+func HasPrimaryPurpose() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ReleaseDateTable, ReleaseDateColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, PrimaryPurposeTable, PrimaryPurposePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasReleaseDateWith applies the HasEdge predicate on the "release_date" edge with a given conditions (other predicates).
-func HasReleaseDateWith(preds ...predicate.Timestamp) predicate.Node {
+// HasPrimaryPurposeWith applies the HasEdge predicate on the "primary_purpose" edge with a given conditions (other predicates).
+func HasPrimaryPurposeWith(preds ...predicate.Purpose) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
-		step := newReleaseDateStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasBuildDate applies the HasEdge predicate on the "build_date" edge.
-func HasBuildDate() predicate.Node {
-	return predicate.Node(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, BuildDateTable, BuildDateColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasBuildDateWith applies the HasEdge predicate on the "build_date" edge with a given conditions (other predicates).
-func HasBuildDateWith(preds ...predicate.Timestamp) predicate.Node {
-	return predicate.Node(func(s *sql.Selector) {
-		step := newBuildDateStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasValidUntilDate applies the HasEdge predicate on the "valid_until_date" edge.
-func HasValidUntilDate() predicate.Node {
-	return predicate.Node(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ValidUntilDateTable, ValidUntilDateColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasValidUntilDateWith applies the HasEdge predicate on the "valid_until_date" edge with a given conditions (other predicates).
-func HasValidUntilDateWith(preds ...predicate.Timestamp) predicate.Node {
-	return predicate.Node(func(s *sql.Selector) {
-		step := newValidUntilDateStep()
+		step := newPrimaryPurposeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

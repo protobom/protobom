@@ -25,6 +25,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/ent/edge"
 	"github.com/bom-squad/protobom/ent/nodelist"
@@ -73,16 +74,14 @@ func (eu *EdgeUpdate) SetNillableFrom(s *string) *EdgeUpdate {
 }
 
 // SetTo sets the "to" field.
-func (eu *EdgeUpdate) SetTo(s string) *EdgeUpdate {
+func (eu *EdgeUpdate) SetTo(s []string) *EdgeUpdate {
 	eu.mutation.SetTo(s)
 	return eu
 }
 
-// SetNillableTo sets the "to" field if the given value is not nil.
-func (eu *EdgeUpdate) SetNillableTo(s *string) *EdgeUpdate {
-	if s != nil {
-		eu.SetTo(*s)
-	}
+// AppendTo appends s to the "to" field.
+func (eu *EdgeUpdate) AppendTo(s []string) *EdgeUpdate {
+	eu.mutation.AppendTo(s)
 	return eu
 }
 
@@ -167,7 +166,12 @@ func (eu *EdgeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(edge.FieldFrom, field.TypeString, value)
 	}
 	if value, ok := eu.mutation.To(); ok {
-		_spec.SetField(edge.FieldTo, field.TypeString, value)
+		_spec.SetField(edge.FieldTo, field.TypeJSON, value)
+	}
+	if value, ok := eu.mutation.AppendedTo(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, edge.FieldTo, value)
+		})
 	}
 	if eu.mutation.NodeListCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -247,16 +251,14 @@ func (euo *EdgeUpdateOne) SetNillableFrom(s *string) *EdgeUpdateOne {
 }
 
 // SetTo sets the "to" field.
-func (euo *EdgeUpdateOne) SetTo(s string) *EdgeUpdateOne {
+func (euo *EdgeUpdateOne) SetTo(s []string) *EdgeUpdateOne {
 	euo.mutation.SetTo(s)
 	return euo
 }
 
-// SetNillableTo sets the "to" field if the given value is not nil.
-func (euo *EdgeUpdateOne) SetNillableTo(s *string) *EdgeUpdateOne {
-	if s != nil {
-		euo.SetTo(*s)
-	}
+// AppendTo appends s to the "to" field.
+func (euo *EdgeUpdateOne) AppendTo(s []string) *EdgeUpdateOne {
+	euo.mutation.AppendTo(s)
 	return euo
 }
 
@@ -371,7 +373,12 @@ func (euo *EdgeUpdateOne) sqlSave(ctx context.Context) (_node *Edge, err error) 
 		_spec.SetField(edge.FieldFrom, field.TypeString, value)
 	}
 	if value, ok := euo.mutation.To(); ok {
-		_spec.SetField(edge.FieldTo, field.TypeString, value)
+		_spec.SetField(edge.FieldTo, field.TypeJSON, value)
+	}
+	if value, ok := euo.mutation.AppendedTo(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, edge.FieldTo, value)
+		})
 	}
 	if euo.mutation.NodeListCleared() {
 		edge := &sqlgraph.EdgeSpec{

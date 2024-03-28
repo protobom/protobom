@@ -59,12 +59,16 @@ const (
 	FieldSummary = "summary"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldReleaseDate holds the string denoting the release_date field in the database.
+	FieldReleaseDate = "release_date"
+	// FieldBuildDate holds the string denoting the build_date field in the database.
+	FieldBuildDate = "build_date"
+	// FieldValidUntilDate holds the string denoting the valid_until_date field in the database.
+	FieldValidUntilDate = "valid_until_date"
 	// FieldAttribution holds the string denoting the attribution field in the database.
 	FieldAttribution = "attribution"
 	// FieldFileTypes holds the string denoting the file_types field in the database.
 	FieldFileTypes = "file_types"
-	// FieldPrimaryPurpose holds the string denoting the primary_purpose field in the database.
-	FieldPrimaryPurpose = "primary_purpose"
 	// EdgeSuppliers holds the string denoting the suppliers edge name in mutations.
 	EdgeSuppliers = "suppliers"
 	// EdgeOriginators holds the string denoting the originators edge name in mutations.
@@ -75,12 +79,8 @@ const (
 	EdgeIdentifiers = "identifiers"
 	// EdgeHashes holds the string denoting the hashes edge name in mutations.
 	EdgeHashes = "hashes"
-	// EdgeReleaseDate holds the string denoting the release_date edge name in mutations.
-	EdgeReleaseDate = "release_date"
-	// EdgeBuildDate holds the string denoting the build_date edge name in mutations.
-	EdgeBuildDate = "build_date"
-	// EdgeValidUntilDate holds the string denoting the valid_until_date edge name in mutations.
-	EdgeValidUntilDate = "valid_until_date"
+	// EdgePrimaryPurpose holds the string denoting the primary_purpose edge name in mutations.
+	EdgePrimaryPurpose = "primary_purpose"
 	// EdgeNodeList holds the string denoting the node_list edge name in mutations.
 	EdgeNodeList = "node_list"
 	// Table holds the table name of the node in the database.
@@ -106,37 +106,25 @@ const (
 	ExternalReferencesInverseTable = "external_references"
 	// ExternalReferencesColumn is the table column denoting the external_references relation/edge.
 	ExternalReferencesColumn = "node_external_references"
-	// IdentifiersTable is the table that holds the identifiers relation/edge. The primary key declared below.
-	IdentifiersTable = "node_identifiers"
+	// IdentifiersTable is the table that holds the identifiers relation/edge.
+	IdentifiersTable = "identifiers_entries"
 	// IdentifiersInverseTable is the table name for the IdentifiersEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "identifiersentry" package.
 	IdentifiersInverseTable = "identifiers_entries"
-	// HashesTable is the table that holds the hashes relation/edge. The primary key declared below.
-	HashesTable = "node_hashes"
+	// IdentifiersColumn is the table column denoting the identifiers relation/edge.
+	IdentifiersColumn = "node_identifiers"
+	// HashesTable is the table that holds the hashes relation/edge.
+	HashesTable = "hashes_entries"
 	// HashesInverseTable is the table name for the HashesEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "hashesentry" package.
 	HashesInverseTable = "hashes_entries"
-	// ReleaseDateTable is the table that holds the release_date relation/edge.
-	ReleaseDateTable = "timestamps"
-	// ReleaseDateInverseTable is the table name for the Timestamp entity.
-	// It exists in this package in order to avoid circular dependency with the "timestamp" package.
-	ReleaseDateInverseTable = "timestamps"
-	// ReleaseDateColumn is the table column denoting the release_date relation/edge.
-	ReleaseDateColumn = "node_release_date"
-	// BuildDateTable is the table that holds the build_date relation/edge.
-	BuildDateTable = "timestamps"
-	// BuildDateInverseTable is the table name for the Timestamp entity.
-	// It exists in this package in order to avoid circular dependency with the "timestamp" package.
-	BuildDateInverseTable = "timestamps"
-	// BuildDateColumn is the table column denoting the build_date relation/edge.
-	BuildDateColumn = "node_build_date"
-	// ValidUntilDateTable is the table that holds the valid_until_date relation/edge.
-	ValidUntilDateTable = "timestamps"
-	// ValidUntilDateInverseTable is the table name for the Timestamp entity.
-	// It exists in this package in order to avoid circular dependency with the "timestamp" package.
-	ValidUntilDateInverseTable = "timestamps"
-	// ValidUntilDateColumn is the table column denoting the valid_until_date relation/edge.
-	ValidUntilDateColumn = "node_valid_until_date"
+	// HashesColumn is the table column denoting the hashes relation/edge.
+	HashesColumn = "node_hashes"
+	// PrimaryPurposeTable is the table that holds the primary_purpose relation/edge. The primary key declared below.
+	PrimaryPurposeTable = "node_primary_purpose"
+	// PrimaryPurposeInverseTable is the table name for the Purpose entity.
+	// It exists in this package in order to avoid circular dependency with the "purpose" package.
+	PrimaryPurposeInverseTable = "purposes"
 	// NodeListTable is the table that holds the node_list relation/edge.
 	NodeListTable = "nodes"
 	// NodeListInverseTable is the table name for the NodeList entity.
@@ -163,9 +151,11 @@ var Columns = []string{
 	FieldComment,
 	FieldSummary,
 	FieldDescription,
+	FieldReleaseDate,
+	FieldBuildDate,
+	FieldValidUntilDate,
 	FieldAttribution,
 	FieldFileTypes,
-	FieldPrimaryPurpose,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "nodes"
@@ -175,12 +165,9 @@ var ForeignKeys = []string{
 }
 
 var (
-	// IdentifiersPrimaryKey and IdentifiersColumn2 are the table columns denoting the
-	// primary key for the identifiers relation (M2M).
-	IdentifiersPrimaryKey = []string{"node_id", "identifiers_entry_id"}
-	// HashesPrimaryKey and HashesColumn2 are the table columns denoting the
-	// primary key for the hashes relation (M2M).
-	HashesPrimaryKey = []string{"node_id", "hashes_entry_id"}
+	// PrimaryPurposePrimaryKey and PrimaryPurposeColumn2 are the table columns denoting the
+	// primary key for the primary_purpose relation (M2M).
+	PrimaryPurposePrimaryKey = []string{"node_id", "purpose_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -218,56 +205,6 @@ func TypeValidator(_type Type) error {
 		return nil
 	default:
 		return fmt.Errorf("node: invalid enum value for type field: %q", _type)
-	}
-}
-
-// PrimaryPurpose defines the type for the "primary_purpose" enum field.
-type PrimaryPurpose string
-
-// PrimaryPurpose values.
-const (
-	PrimaryPurposeUNKNOWN_PURPOSE        PrimaryPurpose = "UNKNOWN_PURPOSE"
-	PrimaryPurposeAPPLICATION            PrimaryPurpose = "APPLICATION"
-	PrimaryPurposeARCHIVE                PrimaryPurpose = "ARCHIVE"
-	PrimaryPurposeBOM                    PrimaryPurpose = "BOM"
-	PrimaryPurposeCONFIGURATION          PrimaryPurpose = "CONFIGURATION"
-	PrimaryPurposeCONTAINER              PrimaryPurpose = "CONTAINER"
-	PrimaryPurposeDATA                   PrimaryPurpose = "DATA"
-	PrimaryPurposeDEVICE                 PrimaryPurpose = "DEVICE"
-	PrimaryPurposeDEVICE_DRIVER          PrimaryPurpose = "DEVICE_DRIVER"
-	PrimaryPurposeDOCUMENTATION          PrimaryPurpose = "DOCUMENTATION"
-	PrimaryPurposeEVIDENCE               PrimaryPurpose = "EVIDENCE"
-	PrimaryPurposeEXECUTABLE             PrimaryPurpose = "EXECUTABLE"
-	PrimaryPurposeFILE                   PrimaryPurpose = "FILE"
-	PrimaryPurposeFIRMWARE               PrimaryPurpose = "FIRMWARE"
-	PrimaryPurposeFRAMEWORK              PrimaryPurpose = "FRAMEWORK"
-	PrimaryPurposeINSTALL                PrimaryPurpose = "INSTALL"
-	PrimaryPurposeLIBRARY                PrimaryPurpose = "LIBRARY"
-	PrimaryPurposeMACHINE_LEARNING_MODEL PrimaryPurpose = "MACHINE_LEARNING_MODEL"
-	PrimaryPurposeMANIFEST               PrimaryPurpose = "MANIFEST"
-	PrimaryPurposeMODEL                  PrimaryPurpose = "MODEL"
-	PrimaryPurposeMODULE                 PrimaryPurpose = "MODULE"
-	PrimaryPurposeOPERATING_SYSTEM       PrimaryPurpose = "OPERATING_SYSTEM"
-	PrimaryPurposeOTHER                  PrimaryPurpose = "OTHER"
-	PrimaryPurposePATCH                  PrimaryPurpose = "PATCH"
-	PrimaryPurposePLATFORM               PrimaryPurpose = "PLATFORM"
-	PrimaryPurposeREQUIREMENT            PrimaryPurpose = "REQUIREMENT"
-	PrimaryPurposeSOURCE                 PrimaryPurpose = "SOURCE"
-	PrimaryPurposeSPECIFICATION          PrimaryPurpose = "SPECIFICATION"
-	PrimaryPurposeTEST                   PrimaryPurpose = "TEST"
-)
-
-func (pp PrimaryPurpose) String() string {
-	return string(pp)
-}
-
-// PrimaryPurposeValidator is a validator for the "primary_purpose" field enum values. It is called by the builders before save.
-func PrimaryPurposeValidator(pp PrimaryPurpose) error {
-	switch pp {
-	case PrimaryPurposeUNKNOWN_PURPOSE, PrimaryPurposeAPPLICATION, PrimaryPurposeARCHIVE, PrimaryPurposeBOM, PrimaryPurposeCONFIGURATION, PrimaryPurposeCONTAINER, PrimaryPurposeDATA, PrimaryPurposeDEVICE, PrimaryPurposeDEVICE_DRIVER, PrimaryPurposeDOCUMENTATION, PrimaryPurposeEVIDENCE, PrimaryPurposeEXECUTABLE, PrimaryPurposeFILE, PrimaryPurposeFIRMWARE, PrimaryPurposeFRAMEWORK, PrimaryPurposeINSTALL, PrimaryPurposeLIBRARY, PrimaryPurposeMACHINE_LEARNING_MODEL, PrimaryPurposeMANIFEST, PrimaryPurposeMODEL, PrimaryPurposeMODULE, PrimaryPurposeOPERATING_SYSTEM, PrimaryPurposeOTHER, PrimaryPurposePATCH, PrimaryPurposePLATFORM, PrimaryPurposeREQUIREMENT, PrimaryPurposeSOURCE, PrimaryPurposeSPECIFICATION, PrimaryPurposeTEST:
-		return nil
-	default:
-		return fmt.Errorf("node: invalid enum value for primary_purpose field: %q", pp)
 	}
 }
 
@@ -309,11 +246,6 @@ func ByURLDownload(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldURLDownload, opts...).ToFunc()
 }
 
-// ByLicenses orders the results by the licenses field.
-func ByLicenses(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLicenses, opts...).ToFunc()
-}
-
 // ByLicenseConcluded orders the results by the license_concluded field.
 func ByLicenseConcluded(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLicenseConcluded, opts...).ToFunc()
@@ -349,19 +281,19 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
-// ByAttribution orders the results by the attribution field.
-func ByAttribution(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAttribution, opts...).ToFunc()
+// ByReleaseDate orders the results by the release_date field.
+func ByReleaseDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldReleaseDate, opts...).ToFunc()
 }
 
-// ByFileTypes orders the results by the file_types field.
-func ByFileTypes(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFileTypes, opts...).ToFunc()
+// ByBuildDate orders the results by the build_date field.
+func ByBuildDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBuildDate, opts...).ToFunc()
 }
 
-// ByPrimaryPurpose orders the results by the primary_purpose field.
-func ByPrimaryPurpose(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPrimaryPurpose, opts...).ToFunc()
+// ByValidUntilDate orders the results by the valid_until_date field.
+func ByValidUntilDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldValidUntilDate, opts...).ToFunc()
 }
 
 // BySuppliersCount orders the results by suppliers count.
@@ -434,45 +366,17 @@ func ByHashes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByReleaseDateCount orders the results by release_date count.
-func ByReleaseDateCount(opts ...sql.OrderTermOption) OrderOption {
+// ByPrimaryPurposeCount orders the results by primary_purpose count.
+func ByPrimaryPurposeCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newReleaseDateStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newPrimaryPurposeStep(), opts...)
 	}
 }
 
-// ByReleaseDate orders the results by release_date terms.
-func ByReleaseDate(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByPrimaryPurpose orders the results by primary_purpose terms.
+func ByPrimaryPurpose(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newReleaseDateStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByBuildDateCount orders the results by build_date count.
-func ByBuildDateCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newBuildDateStep(), opts...)
-	}
-}
-
-// ByBuildDate orders the results by build_date terms.
-func ByBuildDate(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newBuildDateStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByValidUntilDateCount orders the results by valid_until_date count.
-func ByValidUntilDateCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newValidUntilDateStep(), opts...)
-	}
-}
-
-// ByValidUntilDate orders the results by valid_until_date terms.
-func ByValidUntilDate(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newValidUntilDateStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newPrimaryPurposeStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -507,35 +411,21 @@ func newIdentifiersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(IdentifiersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, IdentifiersTable, IdentifiersPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, IdentifiersTable, IdentifiersColumn),
 	)
 }
 func newHashesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(HashesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, HashesTable, HashesPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
 	)
 }
-func newReleaseDateStep() *sqlgraph.Step {
+func newPrimaryPurposeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ReleaseDateInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ReleaseDateTable, ReleaseDateColumn),
-	)
-}
-func newBuildDateStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(BuildDateInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, BuildDateTable, BuildDateColumn),
-	)
-}
-func newValidUntilDateStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ValidUntilDateInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ValidUntilDateTable, ValidUntilDateColumn),
+		sqlgraph.To(PrimaryPurposeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, PrimaryPurposeTable, PrimaryPurposePrimaryKey...),
 	)
 }
 func newNodeListStep() *sqlgraph.Step {

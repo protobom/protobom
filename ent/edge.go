@@ -19,6 +19,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -38,7 +39,7 @@ type Edge struct {
 	// From holds the value of the "from" field.
 	From string `json:"from,omitempty"`
 	// To holds the value of the "to" field.
-	To string `json:"to,omitempty"`
+	To []string `json:"to,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EdgeQuery when eager-loading is set.
 	Edges           EdgeEdges `json:"edges"`
@@ -73,9 +74,11 @@ func (*Edge) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case edge.FieldTo:
+			values[i] = new([]byte)
 		case edge.FieldID:
 			values[i] = new(sql.NullInt64)
-		case edge.FieldType, edge.FieldFrom, edge.FieldTo:
+		case edge.FieldType, edge.FieldFrom:
 			values[i] = new(sql.NullString)
 		case edge.ForeignKeys[0]: // node_list_edges
 			values[i] = new(sql.NullInt64)
@@ -113,10 +116,12 @@ func (e *Edge) assignValues(columns []string, values []any) error {
 				e.From = value.String
 			}
 		case edge.FieldTo:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field to", values[i])
-			} else if value.Valid {
-				e.To = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &e.To); err != nil {
+					return fmt.Errorf("unmarshal field to: %w", err)
+				}
 			}
 		case edge.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -173,7 +178,7 @@ func (e *Edge) String() string {
 	builder.WriteString(e.From)
 	builder.WriteString(", ")
 	builder.WriteString("to=")
-	builder.WriteString(e.To)
+	builder.WriteString(fmt.Sprintf("%v", e.To))
 	builder.WriteByte(')')
 	return builder.String()
 }

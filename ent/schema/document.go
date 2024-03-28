@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/document.go
@@ -23,6 +22,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/index"
 )
 
 type Document struct {
@@ -33,8 +33,14 @@ func (Document) Fields() []ent.Field { return nil }
 
 func (Document) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("metadata", Metadata.Type).Unique(),
-		edge.To("node_list", NodeList.Type).Unique(),
+		edge.From("metadata", Metadata.Type).Ref("document").Required().Unique(),
+		edge.From("node_list", NodeList.Type).Ref("document").Required().Unique(),
+	}
+}
+
+func (Document) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Edges("metadata", "node_list").Unique(),
 	}
 }
 

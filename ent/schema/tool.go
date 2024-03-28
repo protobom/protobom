@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/tool.go
@@ -31,7 +30,11 @@ type Tool struct {
 }
 
 func (Tool) Fields() []ent.Field {
-	return []ent.Field{field.String("name"), field.String("version"), field.String("vendor")}
+	return []ent.Field{
+		field.String("name"),
+		field.String("version"),
+		field.String("vendor"),
+	}
 }
 
 func (Tool) Edges() []ent.Edge {

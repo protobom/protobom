@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/person.go
@@ -42,11 +41,9 @@ func (Person) Fields() []ent.Field {
 
 func (Person) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("contacts", Person.Type),
+		edge.To("contacts", Person.Type).From("contact_owner").Unique(),
 		edge.From("metadata", Metadata.Type).Ref("authors").Unique(),
-		edge.From("node_supplier", Node.Type).Ref("suppliers").Unique(),
-		edge.From("node_originator", Node.Type).Ref("originators").Unique(),
-		edge.From("person_contact", Person.Type).Ref("contacts").Unique(),
+		edge.From("node", Node.Type).Ref("suppliers").Unique().Ref("originators").Unique(),
 	}
 }
 

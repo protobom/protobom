@@ -3,7 +3,7 @@ module github.com/bom-squad/protobom
 go 1.21
 
 require (
-	entgo.io/ent v0.12.5-0.20231110085726-c2ff3ff3bca9
+	entgo.io/ent v0.13.0
 	github.com/CycloneDX/cyclonedx-go v0.8.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.6.0
@@ -22,7 +22,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.15.1-0.20231110144547-3e8e2e192e6b // indirect
+	ariga.io/atlas v0.19.1-0.20240203083654-5948b60a8e43 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/anchore/go-struct-converter v0.0.0-20230627203149-c72ef8859ca9 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect

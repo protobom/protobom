@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -37,7 +38,7 @@ import (
 	"github.com/bom-squad/protobom/ent/nodelist"
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/predicate"
-	"github.com/bom-squad/protobom/ent/timestamp"
+	"github.com/bom-squad/protobom/ent/purpose"
 	"github.com/bom-squad/protobom/ent/tool"
 )
 
@@ -60,7 +61,7 @@ const (
 	TypeNode              = "Node"
 	TypeNodeList          = "NodeList"
 	TypePerson            = "Person"
-	TypeTimestamp         = "Timestamp"
+	TypePurpose           = "Purpose"
 	TypeTool              = "Tool"
 )
 
@@ -1023,7 +1024,8 @@ type EdgeMutation struct {
 	id               *int
 	_type            *edge.Type
 	from             *string
-	to               *string
+	to               *[]string
+	appendto         []string
 	clearedFields    map[string]struct{}
 	node_list        *int
 	clearednode_list bool
@@ -1203,12 +1205,13 @@ func (m *EdgeMutation) ResetFrom() {
 }
 
 // SetTo sets the "to" field.
-func (m *EdgeMutation) SetTo(s string) {
+func (m *EdgeMutation) SetTo(s []string) {
 	m.to = &s
+	m.appendto = nil
 }
 
 // To returns the value of the "to" field in the mutation.
-func (m *EdgeMutation) To() (r string, exists bool) {
+func (m *EdgeMutation) To() (r []string, exists bool) {
 	v := m.to
 	if v == nil {
 		return
@@ -1219,7 +1222,7 @@ func (m *EdgeMutation) To() (r string, exists bool) {
 // OldTo returns the old "to" field's value of the Edge entity.
 // If the Edge object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EdgeMutation) OldTo(ctx context.Context) (v string, err error) {
+func (m *EdgeMutation) OldTo(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTo is only allowed on UpdateOne operations")
 	}
@@ -1233,9 +1236,23 @@ func (m *EdgeMutation) OldTo(ctx context.Context) (v string, err error) {
 	return oldValue.To, nil
 }
 
+// AppendTo adds s to the "to" field.
+func (m *EdgeMutation) AppendTo(s []string) {
+	m.appendto = append(m.appendto, s...)
+}
+
+// AppendedTo returns the list of values that were appended to the "to" field in this mutation.
+func (m *EdgeMutation) AppendedTo() ([]string, bool) {
+	if len(m.appendto) == 0 {
+		return nil, false
+	}
+	return m.appendto, true
+}
+
 // ResetTo resets all changes to the "to" field.
 func (m *EdgeMutation) ResetTo() {
 	m.to = nil
+	m.appendto = nil
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by id.
@@ -1374,7 +1391,7 @@ func (m *EdgeMutation) SetField(name string, value ent.Value) error {
 		m.SetFrom(v)
 		return nil
 	case edge.FieldTo:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2165,11 +2182,9 @@ type HashesEntryMutation struct {
 	hash_algorithm_type        *hashesentry.HashAlgorithmType
 	hash_data                  *string
 	clearedFields              map[string]struct{}
-	external_references        map[int]struct{}
-	removedexternal_references map[int]struct{}
+	external_references        *int
 	clearedexternal_references bool
-	nodes                      map[string]struct{}
-	removednodes               map[string]struct{}
+	nodes                      *string
 	clearednodes               bool
 	done                       bool
 	oldValue                   func(context.Context) (*HashesEntry, error)
@@ -2346,14 +2361,9 @@ func (m *HashesEntryMutation) ResetHashData() {
 	m.hash_data = nil
 }
 
-// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by ids.
-func (m *HashesEntryMutation) AddExternalReferenceIDs(ids ...int) {
-	if m.external_references == nil {
-		m.external_references = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.external_references[ids[i]] = struct{}{}
-	}
+// SetExternalReferencesID sets the "external_references" edge to the ExternalReference entity by id.
+func (m *HashesEntryMutation) SetExternalReferencesID(id int) {
+	m.external_references = &id
 }
 
 // ClearExternalReferences clears the "external_references" edge to the ExternalReference entity.
@@ -2366,29 +2376,20 @@ func (m *HashesEntryMutation) ExternalReferencesCleared() bool {
 	return m.clearedexternal_references
 }
 
-// RemoveExternalReferenceIDs removes the "external_references" edge to the ExternalReference entity by IDs.
-func (m *HashesEntryMutation) RemoveExternalReferenceIDs(ids ...int) {
-	if m.removedexternal_references == nil {
-		m.removedexternal_references = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.external_references, ids[i])
-		m.removedexternal_references[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedExternalReferences returns the removed IDs of the "external_references" edge to the ExternalReference entity.
-func (m *HashesEntryMutation) RemovedExternalReferencesIDs() (ids []int) {
-	for id := range m.removedexternal_references {
-		ids = append(ids, id)
+// ExternalReferencesID returns the "external_references" edge ID in the mutation.
+func (m *HashesEntryMutation) ExternalReferencesID() (id int, exists bool) {
+	if m.external_references != nil {
+		return *m.external_references, true
 	}
 	return
 }
 
 // ExternalReferencesIDs returns the "external_references" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ExternalReferencesID instead. It exists only for internal usage by the builders.
 func (m *HashesEntryMutation) ExternalReferencesIDs() (ids []int) {
-	for id := range m.external_references {
-		ids = append(ids, id)
+	if id := m.external_references; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2397,17 +2398,11 @@ func (m *HashesEntryMutation) ExternalReferencesIDs() (ids []int) {
 func (m *HashesEntryMutation) ResetExternalReferences() {
 	m.external_references = nil
 	m.clearedexternal_references = false
-	m.removedexternal_references = nil
 }
 
-// AddNodeIDs adds the "nodes" edge to the Node entity by ids.
-func (m *HashesEntryMutation) AddNodeIDs(ids ...string) {
-	if m.nodes == nil {
-		m.nodes = make(map[string]struct{})
-	}
-	for i := range ids {
-		m.nodes[ids[i]] = struct{}{}
-	}
+// SetNodesID sets the "nodes" edge to the Node entity by id.
+func (m *HashesEntryMutation) SetNodesID(id string) {
+	m.nodes = &id
 }
 
 // ClearNodes clears the "nodes" edge to the Node entity.
@@ -2420,29 +2415,20 @@ func (m *HashesEntryMutation) NodesCleared() bool {
 	return m.clearednodes
 }
 
-// RemoveNodeIDs removes the "nodes" edge to the Node entity by IDs.
-func (m *HashesEntryMutation) RemoveNodeIDs(ids ...string) {
-	if m.removednodes == nil {
-		m.removednodes = make(map[string]struct{})
-	}
-	for i := range ids {
-		delete(m.nodes, ids[i])
-		m.removednodes[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedNodes returns the removed IDs of the "nodes" edge to the Node entity.
-func (m *HashesEntryMutation) RemovedNodesIDs() (ids []string) {
-	for id := range m.removednodes {
-		ids = append(ids, id)
+// NodesID returns the "nodes" edge ID in the mutation.
+func (m *HashesEntryMutation) NodesID() (id string, exists bool) {
+	if m.nodes != nil {
+		return *m.nodes, true
 	}
 	return
 }
 
 // NodesIDs returns the "nodes" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// NodesID instead. It exists only for internal usage by the builders.
 func (m *HashesEntryMutation) NodesIDs() (ids []string) {
-	for id := range m.nodes {
-		ids = append(ids, id)
+	if id := m.nodes; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2451,7 +2437,6 @@ func (m *HashesEntryMutation) NodesIDs() (ids []string) {
 func (m *HashesEntryMutation) ResetNodes() {
 	m.nodes = nil
 	m.clearednodes = false
-	m.removednodes = nil
 }
 
 // Where appends a list predicates to the HashesEntryMutation builder.
@@ -2619,17 +2604,13 @@ func (m *HashesEntryMutation) AddedEdges() []string {
 func (m *HashesEntryMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case hashesentry.EdgeExternalReferences:
-		ids := make([]ent.Value, 0, len(m.external_references))
-		for id := range m.external_references {
-			ids = append(ids, id)
+		if id := m.external_references; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case hashesentry.EdgeNodes:
-		ids := make([]ent.Value, 0, len(m.nodes))
-		for id := range m.nodes {
-			ids = append(ids, id)
+		if id := m.nodes; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -2637,32 +2618,12 @@ func (m *HashesEntryMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *HashesEntryMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedexternal_references != nil {
-		edges = append(edges, hashesentry.EdgeExternalReferences)
-	}
-	if m.removednodes != nil {
-		edges = append(edges, hashesentry.EdgeNodes)
-	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *HashesEntryMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case hashesentry.EdgeExternalReferences:
-		ids := make([]ent.Value, 0, len(m.removedexternal_references))
-		for id := range m.removedexternal_references {
-			ids = append(ids, id)
-		}
-		return ids
-	case hashesentry.EdgeNodes:
-		ids := make([]ent.Value, 0, len(m.removednodes))
-		for id := range m.removednodes {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
@@ -2694,6 +2655,12 @@ func (m *HashesEntryMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *HashesEntryMutation) ClearEdge(name string) error {
 	switch name {
+	case hashesentry.EdgeExternalReferences:
+		m.ClearExternalReferences()
+		return nil
+	case hashesentry.EdgeNodes:
+		m.ClearNodes()
+		return nil
 	}
 	return fmt.Errorf("unknown HashesEntry unique edge %s", name)
 }
@@ -2721,8 +2688,7 @@ type IdentifiersEntryMutation struct {
 	software_identifier_type  *identifiersentry.SoftwareIdentifierType
 	software_identifier_value *string
 	clearedFields             map[string]struct{}
-	nodes                     map[string]struct{}
-	removednodes              map[string]struct{}
+	nodes                     *string
 	clearednodes              bool
 	done                      bool
 	oldValue                  func(context.Context) (*IdentifiersEntry, error)
@@ -2899,14 +2865,9 @@ func (m *IdentifiersEntryMutation) ResetSoftwareIdentifierValue() {
 	m.software_identifier_value = nil
 }
 
-// AddNodeIDs adds the "nodes" edge to the Node entity by ids.
-func (m *IdentifiersEntryMutation) AddNodeIDs(ids ...string) {
-	if m.nodes == nil {
-		m.nodes = make(map[string]struct{})
-	}
-	for i := range ids {
-		m.nodes[ids[i]] = struct{}{}
-	}
+// SetNodesID sets the "nodes" edge to the Node entity by id.
+func (m *IdentifiersEntryMutation) SetNodesID(id string) {
+	m.nodes = &id
 }
 
 // ClearNodes clears the "nodes" edge to the Node entity.
@@ -2919,29 +2880,20 @@ func (m *IdentifiersEntryMutation) NodesCleared() bool {
 	return m.clearednodes
 }
 
-// RemoveNodeIDs removes the "nodes" edge to the Node entity by IDs.
-func (m *IdentifiersEntryMutation) RemoveNodeIDs(ids ...string) {
-	if m.removednodes == nil {
-		m.removednodes = make(map[string]struct{})
-	}
-	for i := range ids {
-		delete(m.nodes, ids[i])
-		m.removednodes[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedNodes returns the removed IDs of the "nodes" edge to the Node entity.
-func (m *IdentifiersEntryMutation) RemovedNodesIDs() (ids []string) {
-	for id := range m.removednodes {
-		ids = append(ids, id)
+// NodesID returns the "nodes" edge ID in the mutation.
+func (m *IdentifiersEntryMutation) NodesID() (id string, exists bool) {
+	if m.nodes != nil {
+		return *m.nodes, true
 	}
 	return
 }
 
 // NodesIDs returns the "nodes" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// NodesID instead. It exists only for internal usage by the builders.
 func (m *IdentifiersEntryMutation) NodesIDs() (ids []string) {
-	for id := range m.nodes {
-		ids = append(ids, id)
+	if id := m.nodes; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2950,7 +2902,6 @@ func (m *IdentifiersEntryMutation) NodesIDs() (ids []string) {
 func (m *IdentifiersEntryMutation) ResetNodes() {
 	m.nodes = nil
 	m.clearednodes = false
-	m.removednodes = nil
 }
 
 // Where appends a list predicates to the IdentifiersEntryMutation builder.
@@ -3115,11 +3066,9 @@ func (m *IdentifiersEntryMutation) AddedEdges() []string {
 func (m *IdentifiersEntryMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case identifiersentry.EdgeNodes:
-		ids := make([]ent.Value, 0, len(m.nodes))
-		for id := range m.nodes {
-			ids = append(ids, id)
+		if id := m.nodes; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -3127,23 +3076,12 @@ func (m *IdentifiersEntryMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *IdentifiersEntryMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removednodes != nil {
-		edges = append(edges, identifiersentry.EdgeNodes)
-	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *IdentifiersEntryMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case identifiersentry.EdgeNodes:
-		ids := make([]ent.Value, 0, len(m.removednodes))
-		for id := range m.removednodes {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
@@ -3170,6 +3108,9 @@ func (m *IdentifiersEntryMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *IdentifiersEntryMutation) ClearEdge(name string) error {
 	switch name {
+	case identifiersentry.EdgeNodes:
+		m.ClearNodes()
+		return nil
 	}
 	return fmt.Errorf("unknown IdentifiersEntry unique edge %s", name)
 }
@@ -3188,30 +3129,28 @@ func (m *IdentifiersEntryMutation) ResetEdge(name string) error {
 // MetadataMutation represents an operation that mutates the Metadata nodes in the graph.
 type MetadataMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *string
-	version              *string
-	name                 *string
-	comment              *string
-	clearedFields        map[string]struct{}
-	tools                map[int]struct{}
-	removedtools         map[int]struct{}
-	clearedtools         bool
-	authors              map[int]struct{}
-	removedauthors       map[int]struct{}
-	clearedauthors       bool
-	documentTypes        map[int]struct{}
-	removeddocumentTypes map[int]struct{}
-	cleareddocumentTypes bool
-	date                 map[int]struct{}
-	removeddate          map[int]struct{}
-	cleareddate          bool
-	document             *int
-	cleareddocument      bool
-	done                 bool
-	oldValue             func(context.Context) (*Metadata, error)
-	predicates           []predicate.Metadata
+	op                    Op
+	typ                   string
+	id                    *string
+	version               *string
+	name                  *string
+	date                  *time.Time
+	comment               *string
+	clearedFields         map[string]struct{}
+	tools                 map[int]struct{}
+	removedtools          map[int]struct{}
+	clearedtools          bool
+	authors               map[int]struct{}
+	removedauthors        map[int]struct{}
+	clearedauthors        bool
+	document_types        map[int]struct{}
+	removeddocument_types map[int]struct{}
+	cleareddocument_types bool
+	document              *int
+	cleareddocument       bool
+	done                  bool
+	oldValue              func(context.Context) (*Metadata, error)
+	predicates            []predicate.Metadata
 }
 
 var _ ent.Mutation = (*MetadataMutation)(nil)
@@ -3390,6 +3329,42 @@ func (m *MetadataMutation) ResetName() {
 	m.name = nil
 }
 
+// SetDate sets the "date" field.
+func (m *MetadataMutation) SetDate(t time.Time) {
+	m.date = &t
+}
+
+// Date returns the value of the "date" field in the mutation.
+func (m *MetadataMutation) Date() (r time.Time, exists bool) {
+	v := m.date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDate returns the old "date" field's value of the Metadata entity.
+// If the Metadata object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MetadataMutation) OldDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDate: %w", err)
+	}
+	return oldValue.Date, nil
+}
+
+// ResetDate resets all changes to the "date" field.
+func (m *MetadataMutation) ResetDate() {
+	m.date = nil
+}
+
 // SetComment sets the "comment" field.
 func (m *MetadataMutation) SetComment(s string) {
 	m.comment = &s
@@ -3534,112 +3509,58 @@ func (m *MetadataMutation) ResetAuthors() {
 	m.removedauthors = nil
 }
 
-// AddDocumentTypeIDs adds the "documentTypes" edge to the DocumentType entity by ids.
+// AddDocumentTypeIDs adds the "document_types" edge to the DocumentType entity by ids.
 func (m *MetadataMutation) AddDocumentTypeIDs(ids ...int) {
-	if m.documentTypes == nil {
-		m.documentTypes = make(map[int]struct{})
+	if m.document_types == nil {
+		m.document_types = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.documentTypes[ids[i]] = struct{}{}
+		m.document_types[ids[i]] = struct{}{}
 	}
 }
 
-// ClearDocumentTypes clears the "documentTypes" edge to the DocumentType entity.
+// ClearDocumentTypes clears the "document_types" edge to the DocumentType entity.
 func (m *MetadataMutation) ClearDocumentTypes() {
-	m.cleareddocumentTypes = true
+	m.cleareddocument_types = true
 }
 
-// DocumentTypesCleared reports if the "documentTypes" edge to the DocumentType entity was cleared.
+// DocumentTypesCleared reports if the "document_types" edge to the DocumentType entity was cleared.
 func (m *MetadataMutation) DocumentTypesCleared() bool {
-	return m.cleareddocumentTypes
+	return m.cleareddocument_types
 }
 
-// RemoveDocumentTypeIDs removes the "documentTypes" edge to the DocumentType entity by IDs.
+// RemoveDocumentTypeIDs removes the "document_types" edge to the DocumentType entity by IDs.
 func (m *MetadataMutation) RemoveDocumentTypeIDs(ids ...int) {
-	if m.removeddocumentTypes == nil {
-		m.removeddocumentTypes = make(map[int]struct{})
+	if m.removeddocument_types == nil {
+		m.removeddocument_types = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.documentTypes, ids[i])
-		m.removeddocumentTypes[ids[i]] = struct{}{}
+		delete(m.document_types, ids[i])
+		m.removeddocument_types[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedDocumentTypes returns the removed IDs of the "documentTypes" edge to the DocumentType entity.
+// RemovedDocumentTypes returns the removed IDs of the "document_types" edge to the DocumentType entity.
 func (m *MetadataMutation) RemovedDocumentTypesIDs() (ids []int) {
-	for id := range m.removeddocumentTypes {
+	for id := range m.removeddocument_types {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// DocumentTypesIDs returns the "documentTypes" edge IDs in the mutation.
+// DocumentTypesIDs returns the "document_types" edge IDs in the mutation.
 func (m *MetadataMutation) DocumentTypesIDs() (ids []int) {
-	for id := range m.documentTypes {
+	for id := range m.document_types {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetDocumentTypes resets all changes to the "documentTypes" edge.
+// ResetDocumentTypes resets all changes to the "document_types" edge.
 func (m *MetadataMutation) ResetDocumentTypes() {
-	m.documentTypes = nil
-	m.cleareddocumentTypes = false
-	m.removeddocumentTypes = nil
-}
-
-// AddDateIDs adds the "date" edge to the Timestamp entity by ids.
-func (m *MetadataMutation) AddDateIDs(ids ...int) {
-	if m.date == nil {
-		m.date = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.date[ids[i]] = struct{}{}
-	}
-}
-
-// ClearDate clears the "date" edge to the Timestamp entity.
-func (m *MetadataMutation) ClearDate() {
-	m.cleareddate = true
-}
-
-// DateCleared reports if the "date" edge to the Timestamp entity was cleared.
-func (m *MetadataMutation) DateCleared() bool {
-	return m.cleareddate
-}
-
-// RemoveDateIDs removes the "date" edge to the Timestamp entity by IDs.
-func (m *MetadataMutation) RemoveDateIDs(ids ...int) {
-	if m.removeddate == nil {
-		m.removeddate = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.date, ids[i])
-		m.removeddate[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedDate returns the removed IDs of the "date" edge to the Timestamp entity.
-func (m *MetadataMutation) RemovedDateIDs() (ids []int) {
-	for id := range m.removeddate {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// DateIDs returns the "date" edge IDs in the mutation.
-func (m *MetadataMutation) DateIDs() (ids []int) {
-	for id := range m.date {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetDate resets all changes to the "date" edge.
-func (m *MetadataMutation) ResetDate() {
-	m.date = nil
-	m.cleareddate = false
-	m.removeddate = nil
+	m.document_types = nil
+	m.cleareddocument_types = false
+	m.removeddocument_types = nil
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by id.
@@ -3715,12 +3636,15 @@ func (m *MetadataMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MetadataMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.version != nil {
 		fields = append(fields, metadata.FieldVersion)
 	}
 	if m.name != nil {
 		fields = append(fields, metadata.FieldName)
+	}
+	if m.date != nil {
+		fields = append(fields, metadata.FieldDate)
 	}
 	if m.comment != nil {
 		fields = append(fields, metadata.FieldComment)
@@ -3737,6 +3661,8 @@ func (m *MetadataMutation) Field(name string) (ent.Value, bool) {
 		return m.Version()
 	case metadata.FieldName:
 		return m.Name()
+	case metadata.FieldDate:
+		return m.Date()
 	case metadata.FieldComment:
 		return m.Comment()
 	}
@@ -3752,6 +3678,8 @@ func (m *MetadataMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldVersion(ctx)
 	case metadata.FieldName:
 		return m.OldName(ctx)
+	case metadata.FieldDate:
+		return m.OldDate(ctx)
 	case metadata.FieldComment:
 		return m.OldComment(ctx)
 	}
@@ -3776,6 +3704,13 @@ func (m *MetadataMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case metadata.FieldDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDate(v)
 		return nil
 	case metadata.FieldComment:
 		v, ok := value.(string)
@@ -3839,6 +3774,9 @@ func (m *MetadataMutation) ResetField(name string) error {
 	case metadata.FieldName:
 		m.ResetName()
 		return nil
+	case metadata.FieldDate:
+		m.ResetDate()
+		return nil
 	case metadata.FieldComment:
 		m.ResetComment()
 		return nil
@@ -3848,18 +3786,15 @@ func (m *MetadataMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MetadataMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.tools != nil {
 		edges = append(edges, metadata.EdgeTools)
 	}
 	if m.authors != nil {
 		edges = append(edges, metadata.EdgeAuthors)
 	}
-	if m.documentTypes != nil {
+	if m.document_types != nil {
 		edges = append(edges, metadata.EdgeDocumentTypes)
-	}
-	if m.date != nil {
-		edges = append(edges, metadata.EdgeDate)
 	}
 	if m.document != nil {
 		edges = append(edges, metadata.EdgeDocument)
@@ -3884,14 +3819,8 @@ func (m *MetadataMutation) AddedIDs(name string) []ent.Value {
 		}
 		return ids
 	case metadata.EdgeDocumentTypes:
-		ids := make([]ent.Value, 0, len(m.documentTypes))
-		for id := range m.documentTypes {
-			ids = append(ids, id)
-		}
-		return ids
-	case metadata.EdgeDate:
-		ids := make([]ent.Value, 0, len(m.date))
-		for id := range m.date {
+		ids := make([]ent.Value, 0, len(m.document_types))
+		for id := range m.document_types {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3905,18 +3834,15 @@ func (m *MetadataMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MetadataMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.removedtools != nil {
 		edges = append(edges, metadata.EdgeTools)
 	}
 	if m.removedauthors != nil {
 		edges = append(edges, metadata.EdgeAuthors)
 	}
-	if m.removeddocumentTypes != nil {
+	if m.removeddocument_types != nil {
 		edges = append(edges, metadata.EdgeDocumentTypes)
-	}
-	if m.removeddate != nil {
-		edges = append(edges, metadata.EdgeDate)
 	}
 	return edges
 }
@@ -3938,14 +3864,8 @@ func (m *MetadataMutation) RemovedIDs(name string) []ent.Value {
 		}
 		return ids
 	case metadata.EdgeDocumentTypes:
-		ids := make([]ent.Value, 0, len(m.removeddocumentTypes))
-		for id := range m.removeddocumentTypes {
-			ids = append(ids, id)
-		}
-		return ids
-	case metadata.EdgeDate:
-		ids := make([]ent.Value, 0, len(m.removeddate))
-		for id := range m.removeddate {
+		ids := make([]ent.Value, 0, len(m.removeddocument_types))
+		for id := range m.removeddocument_types {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3955,18 +3875,15 @@ func (m *MetadataMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MetadataMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.clearedtools {
 		edges = append(edges, metadata.EdgeTools)
 	}
 	if m.clearedauthors {
 		edges = append(edges, metadata.EdgeAuthors)
 	}
-	if m.cleareddocumentTypes {
+	if m.cleareddocument_types {
 		edges = append(edges, metadata.EdgeDocumentTypes)
-	}
-	if m.cleareddate {
-		edges = append(edges, metadata.EdgeDate)
 	}
 	if m.cleareddocument {
 		edges = append(edges, metadata.EdgeDocument)
@@ -3983,9 +3900,7 @@ func (m *MetadataMutation) EdgeCleared(name string) bool {
 	case metadata.EdgeAuthors:
 		return m.clearedauthors
 	case metadata.EdgeDocumentTypes:
-		return m.cleareddocumentTypes
-	case metadata.EdgeDate:
-		return m.cleareddate
+		return m.cleareddocument_types
 	case metadata.EdgeDocument:
 		return m.cleareddocument
 	}
@@ -4016,9 +3931,6 @@ func (m *MetadataMutation) ResetEdge(name string) error {
 	case metadata.EdgeDocumentTypes:
 		m.ResetDocumentTypes()
 		return nil
-	case metadata.EdgeDate:
-		m.ResetDate()
-		return nil
 	case metadata.EdgeDocument:
 		m.ResetDocument()
 		return nil
@@ -4038,7 +3950,8 @@ type NodeMutation struct {
 	file_name                  *string
 	url_home                   *string
 	url_download               *string
-	licenses                   *string
+	licenses                   *[]string
+	appendlicenses             []string
 	license_concluded          *string
 	license_comments           *string
 	copyright                  *string
@@ -4046,9 +3959,13 @@ type NodeMutation struct {
 	comment                    *string
 	summary                    *string
 	description                *string
-	attribution                *string
-	file_types                 *string
-	primary_purpose            *node.PrimaryPurpose
+	release_date               *time.Time
+	build_date                 *time.Time
+	valid_until_date           *time.Time
+	attribution                *[]string
+	appendattribution          []string
+	file_types                 *[]string
+	appendfile_types           []string
 	clearedFields              map[string]struct{}
 	suppliers                  map[int]struct{}
 	removedsuppliers           map[int]struct{}
@@ -4065,15 +3982,9 @@ type NodeMutation struct {
 	hashes                     map[int]struct{}
 	removedhashes              map[int]struct{}
 	clearedhashes              bool
-	release_date               map[int]struct{}
-	removedrelease_date        map[int]struct{}
-	clearedrelease_date        bool
-	build_date                 map[int]struct{}
-	removedbuild_date          map[int]struct{}
-	clearedbuild_date          bool
-	valid_until_date           map[int]struct{}
-	removedvalid_until_date    map[int]struct{}
-	clearedvalid_until_date    bool
+	primary_purpose            map[int]struct{}
+	removedprimary_purpose     map[int]struct{}
+	clearedprimary_purpose     bool
 	node_list                  *int
 	clearednode_list           bool
 	done                       bool
@@ -4402,12 +4313,13 @@ func (m *NodeMutation) ResetURLDownload() {
 }
 
 // SetLicenses sets the "licenses" field.
-func (m *NodeMutation) SetLicenses(s string) {
+func (m *NodeMutation) SetLicenses(s []string) {
 	m.licenses = &s
+	m.appendlicenses = nil
 }
 
 // Licenses returns the value of the "licenses" field in the mutation.
-func (m *NodeMutation) Licenses() (r string, exists bool) {
+func (m *NodeMutation) Licenses() (r []string, exists bool) {
 	v := m.licenses
 	if v == nil {
 		return
@@ -4418,7 +4330,7 @@ func (m *NodeMutation) Licenses() (r string, exists bool) {
 // OldLicenses returns the old "licenses" field's value of the Node entity.
 // If the Node object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeMutation) OldLicenses(ctx context.Context) (v string, err error) {
+func (m *NodeMutation) OldLicenses(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLicenses is only allowed on UpdateOne operations")
 	}
@@ -4432,9 +4344,23 @@ func (m *NodeMutation) OldLicenses(ctx context.Context) (v string, err error) {
 	return oldValue.Licenses, nil
 }
 
+// AppendLicenses adds s to the "licenses" field.
+func (m *NodeMutation) AppendLicenses(s []string) {
+	m.appendlicenses = append(m.appendlicenses, s...)
+}
+
+// AppendedLicenses returns the list of values that were appended to the "licenses" field in this mutation.
+func (m *NodeMutation) AppendedLicenses() ([]string, bool) {
+	if len(m.appendlicenses) == 0 {
+		return nil, false
+	}
+	return m.appendlicenses, true
+}
+
 // ResetLicenses resets all changes to the "licenses" field.
 func (m *NodeMutation) ResetLicenses() {
 	m.licenses = nil
+	m.appendlicenses = nil
 }
 
 // SetLicenseConcluded sets the "license_concluded" field.
@@ -4689,13 +4615,122 @@ func (m *NodeMutation) ResetDescription() {
 	m.description = nil
 }
 
+// SetReleaseDate sets the "release_date" field.
+func (m *NodeMutation) SetReleaseDate(t time.Time) {
+	m.release_date = &t
+}
+
+// ReleaseDate returns the value of the "release_date" field in the mutation.
+func (m *NodeMutation) ReleaseDate() (r time.Time, exists bool) {
+	v := m.release_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReleaseDate returns the old "release_date" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldReleaseDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReleaseDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReleaseDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReleaseDate: %w", err)
+	}
+	return oldValue.ReleaseDate, nil
+}
+
+// ResetReleaseDate resets all changes to the "release_date" field.
+func (m *NodeMutation) ResetReleaseDate() {
+	m.release_date = nil
+}
+
+// SetBuildDate sets the "build_date" field.
+func (m *NodeMutation) SetBuildDate(t time.Time) {
+	m.build_date = &t
+}
+
+// BuildDate returns the value of the "build_date" field in the mutation.
+func (m *NodeMutation) BuildDate() (r time.Time, exists bool) {
+	v := m.build_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBuildDate returns the old "build_date" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldBuildDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBuildDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBuildDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBuildDate: %w", err)
+	}
+	return oldValue.BuildDate, nil
+}
+
+// ResetBuildDate resets all changes to the "build_date" field.
+func (m *NodeMutation) ResetBuildDate() {
+	m.build_date = nil
+}
+
+// SetValidUntilDate sets the "valid_until_date" field.
+func (m *NodeMutation) SetValidUntilDate(t time.Time) {
+	m.valid_until_date = &t
+}
+
+// ValidUntilDate returns the value of the "valid_until_date" field in the mutation.
+func (m *NodeMutation) ValidUntilDate() (r time.Time, exists bool) {
+	v := m.valid_until_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldValidUntilDate returns the old "valid_until_date" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldValidUntilDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldValidUntilDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldValidUntilDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldValidUntilDate: %w", err)
+	}
+	return oldValue.ValidUntilDate, nil
+}
+
+// ResetValidUntilDate resets all changes to the "valid_until_date" field.
+func (m *NodeMutation) ResetValidUntilDate() {
+	m.valid_until_date = nil
+}
+
 // SetAttribution sets the "attribution" field.
-func (m *NodeMutation) SetAttribution(s string) {
+func (m *NodeMutation) SetAttribution(s []string) {
 	m.attribution = &s
+	m.appendattribution = nil
 }
 
 // Attribution returns the value of the "attribution" field in the mutation.
-func (m *NodeMutation) Attribution() (r string, exists bool) {
+func (m *NodeMutation) Attribution() (r []string, exists bool) {
 	v := m.attribution
 	if v == nil {
 		return
@@ -4706,7 +4741,7 @@ func (m *NodeMutation) Attribution() (r string, exists bool) {
 // OldAttribution returns the old "attribution" field's value of the Node entity.
 // If the Node object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeMutation) OldAttribution(ctx context.Context) (v string, err error) {
+func (m *NodeMutation) OldAttribution(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAttribution is only allowed on UpdateOne operations")
 	}
@@ -4720,18 +4755,33 @@ func (m *NodeMutation) OldAttribution(ctx context.Context) (v string, err error)
 	return oldValue.Attribution, nil
 }
 
+// AppendAttribution adds s to the "attribution" field.
+func (m *NodeMutation) AppendAttribution(s []string) {
+	m.appendattribution = append(m.appendattribution, s...)
+}
+
+// AppendedAttribution returns the list of values that were appended to the "attribution" field in this mutation.
+func (m *NodeMutation) AppendedAttribution() ([]string, bool) {
+	if len(m.appendattribution) == 0 {
+		return nil, false
+	}
+	return m.appendattribution, true
+}
+
 // ResetAttribution resets all changes to the "attribution" field.
 func (m *NodeMutation) ResetAttribution() {
 	m.attribution = nil
+	m.appendattribution = nil
 }
 
 // SetFileTypes sets the "file_types" field.
-func (m *NodeMutation) SetFileTypes(s string) {
+func (m *NodeMutation) SetFileTypes(s []string) {
 	m.file_types = &s
+	m.appendfile_types = nil
 }
 
 // FileTypes returns the value of the "file_types" field in the mutation.
-func (m *NodeMutation) FileTypes() (r string, exists bool) {
+func (m *NodeMutation) FileTypes() (r []string, exists bool) {
 	v := m.file_types
 	if v == nil {
 		return
@@ -4742,7 +4792,7 @@ func (m *NodeMutation) FileTypes() (r string, exists bool) {
 // OldFileTypes returns the old "file_types" field's value of the Node entity.
 // If the Node object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeMutation) OldFileTypes(ctx context.Context) (v string, err error) {
+func (m *NodeMutation) OldFileTypes(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldFileTypes is only allowed on UpdateOne operations")
 	}
@@ -4756,45 +4806,23 @@ func (m *NodeMutation) OldFileTypes(ctx context.Context) (v string, err error) {
 	return oldValue.FileTypes, nil
 }
 
+// AppendFileTypes adds s to the "file_types" field.
+func (m *NodeMutation) AppendFileTypes(s []string) {
+	m.appendfile_types = append(m.appendfile_types, s...)
+}
+
+// AppendedFileTypes returns the list of values that were appended to the "file_types" field in this mutation.
+func (m *NodeMutation) AppendedFileTypes() ([]string, bool) {
+	if len(m.appendfile_types) == 0 {
+		return nil, false
+	}
+	return m.appendfile_types, true
+}
+
 // ResetFileTypes resets all changes to the "file_types" field.
 func (m *NodeMutation) ResetFileTypes() {
 	m.file_types = nil
-}
-
-// SetPrimaryPurpose sets the "primary_purpose" field.
-func (m *NodeMutation) SetPrimaryPurpose(np node.PrimaryPurpose) {
-	m.primary_purpose = &np
-}
-
-// PrimaryPurpose returns the value of the "primary_purpose" field in the mutation.
-func (m *NodeMutation) PrimaryPurpose() (r node.PrimaryPurpose, exists bool) {
-	v := m.primary_purpose
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPrimaryPurpose returns the old "primary_purpose" field's value of the Node entity.
-// If the Node object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeMutation) OldPrimaryPurpose(ctx context.Context) (v node.PrimaryPurpose, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPrimaryPurpose is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPrimaryPurpose requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPrimaryPurpose: %w", err)
-	}
-	return oldValue.PrimaryPurpose, nil
-}
-
-// ResetPrimaryPurpose resets all changes to the "primary_purpose" field.
-func (m *NodeMutation) ResetPrimaryPurpose() {
-	m.primary_purpose = nil
+	m.appendfile_types = nil
 }
 
 // AddSupplierIDs adds the "suppliers" edge to the Person entity by ids.
@@ -5067,166 +5095,58 @@ func (m *NodeMutation) ResetHashes() {
 	m.removedhashes = nil
 }
 
-// AddReleaseDateIDs adds the "release_date" edge to the Timestamp entity by ids.
-func (m *NodeMutation) AddReleaseDateIDs(ids ...int) {
-	if m.release_date == nil {
-		m.release_date = make(map[int]struct{})
+// AddPrimaryPurposeIDs adds the "primary_purpose" edge to the Purpose entity by ids.
+func (m *NodeMutation) AddPrimaryPurposeIDs(ids ...int) {
+	if m.primary_purpose == nil {
+		m.primary_purpose = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.release_date[ids[i]] = struct{}{}
+		m.primary_purpose[ids[i]] = struct{}{}
 	}
 }
 
-// ClearReleaseDate clears the "release_date" edge to the Timestamp entity.
-func (m *NodeMutation) ClearReleaseDate() {
-	m.clearedrelease_date = true
+// ClearPrimaryPurpose clears the "primary_purpose" edge to the Purpose entity.
+func (m *NodeMutation) ClearPrimaryPurpose() {
+	m.clearedprimary_purpose = true
 }
 
-// ReleaseDateCleared reports if the "release_date" edge to the Timestamp entity was cleared.
-func (m *NodeMutation) ReleaseDateCleared() bool {
-	return m.clearedrelease_date
+// PrimaryPurposeCleared reports if the "primary_purpose" edge to the Purpose entity was cleared.
+func (m *NodeMutation) PrimaryPurposeCleared() bool {
+	return m.clearedprimary_purpose
 }
 
-// RemoveReleaseDateIDs removes the "release_date" edge to the Timestamp entity by IDs.
-func (m *NodeMutation) RemoveReleaseDateIDs(ids ...int) {
-	if m.removedrelease_date == nil {
-		m.removedrelease_date = make(map[int]struct{})
+// RemovePrimaryPurposeIDs removes the "primary_purpose" edge to the Purpose entity by IDs.
+func (m *NodeMutation) RemovePrimaryPurposeIDs(ids ...int) {
+	if m.removedprimary_purpose == nil {
+		m.removedprimary_purpose = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.release_date, ids[i])
-		m.removedrelease_date[ids[i]] = struct{}{}
+		delete(m.primary_purpose, ids[i])
+		m.removedprimary_purpose[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedReleaseDate returns the removed IDs of the "release_date" edge to the Timestamp entity.
-func (m *NodeMutation) RemovedReleaseDateIDs() (ids []int) {
-	for id := range m.removedrelease_date {
+// RemovedPrimaryPurpose returns the removed IDs of the "primary_purpose" edge to the Purpose entity.
+func (m *NodeMutation) RemovedPrimaryPurposeIDs() (ids []int) {
+	for id := range m.removedprimary_purpose {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ReleaseDateIDs returns the "release_date" edge IDs in the mutation.
-func (m *NodeMutation) ReleaseDateIDs() (ids []int) {
-	for id := range m.release_date {
+// PrimaryPurposeIDs returns the "primary_purpose" edge IDs in the mutation.
+func (m *NodeMutation) PrimaryPurposeIDs() (ids []int) {
+	for id := range m.primary_purpose {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetReleaseDate resets all changes to the "release_date" edge.
-func (m *NodeMutation) ResetReleaseDate() {
-	m.release_date = nil
-	m.clearedrelease_date = false
-	m.removedrelease_date = nil
-}
-
-// AddBuildDateIDs adds the "build_date" edge to the Timestamp entity by ids.
-func (m *NodeMutation) AddBuildDateIDs(ids ...int) {
-	if m.build_date == nil {
-		m.build_date = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.build_date[ids[i]] = struct{}{}
-	}
-}
-
-// ClearBuildDate clears the "build_date" edge to the Timestamp entity.
-func (m *NodeMutation) ClearBuildDate() {
-	m.clearedbuild_date = true
-}
-
-// BuildDateCleared reports if the "build_date" edge to the Timestamp entity was cleared.
-func (m *NodeMutation) BuildDateCleared() bool {
-	return m.clearedbuild_date
-}
-
-// RemoveBuildDateIDs removes the "build_date" edge to the Timestamp entity by IDs.
-func (m *NodeMutation) RemoveBuildDateIDs(ids ...int) {
-	if m.removedbuild_date == nil {
-		m.removedbuild_date = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.build_date, ids[i])
-		m.removedbuild_date[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedBuildDate returns the removed IDs of the "build_date" edge to the Timestamp entity.
-func (m *NodeMutation) RemovedBuildDateIDs() (ids []int) {
-	for id := range m.removedbuild_date {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// BuildDateIDs returns the "build_date" edge IDs in the mutation.
-func (m *NodeMutation) BuildDateIDs() (ids []int) {
-	for id := range m.build_date {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetBuildDate resets all changes to the "build_date" edge.
-func (m *NodeMutation) ResetBuildDate() {
-	m.build_date = nil
-	m.clearedbuild_date = false
-	m.removedbuild_date = nil
-}
-
-// AddValidUntilDateIDs adds the "valid_until_date" edge to the Timestamp entity by ids.
-func (m *NodeMutation) AddValidUntilDateIDs(ids ...int) {
-	if m.valid_until_date == nil {
-		m.valid_until_date = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.valid_until_date[ids[i]] = struct{}{}
-	}
-}
-
-// ClearValidUntilDate clears the "valid_until_date" edge to the Timestamp entity.
-func (m *NodeMutation) ClearValidUntilDate() {
-	m.clearedvalid_until_date = true
-}
-
-// ValidUntilDateCleared reports if the "valid_until_date" edge to the Timestamp entity was cleared.
-func (m *NodeMutation) ValidUntilDateCleared() bool {
-	return m.clearedvalid_until_date
-}
-
-// RemoveValidUntilDateIDs removes the "valid_until_date" edge to the Timestamp entity by IDs.
-func (m *NodeMutation) RemoveValidUntilDateIDs(ids ...int) {
-	if m.removedvalid_until_date == nil {
-		m.removedvalid_until_date = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.valid_until_date, ids[i])
-		m.removedvalid_until_date[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedValidUntilDate returns the removed IDs of the "valid_until_date" edge to the Timestamp entity.
-func (m *NodeMutation) RemovedValidUntilDateIDs() (ids []int) {
-	for id := range m.removedvalid_until_date {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ValidUntilDateIDs returns the "valid_until_date" edge IDs in the mutation.
-func (m *NodeMutation) ValidUntilDateIDs() (ids []int) {
-	for id := range m.valid_until_date {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetValidUntilDate resets all changes to the "valid_until_date" edge.
-func (m *NodeMutation) ResetValidUntilDate() {
-	m.valid_until_date = nil
-	m.clearedvalid_until_date = false
-	m.removedvalid_until_date = nil
+// ResetPrimaryPurpose resets all changes to the "primary_purpose" edge.
+func (m *NodeMutation) ResetPrimaryPurpose() {
+	m.primary_purpose = nil
+	m.clearedprimary_purpose = false
+	m.removedprimary_purpose = nil
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by id.
@@ -5302,7 +5222,7 @@ func (m *NodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 19)
 	if m._type != nil {
 		fields = append(fields, node.FieldType)
 	}
@@ -5345,14 +5265,20 @@ func (m *NodeMutation) Fields() []string {
 	if m.description != nil {
 		fields = append(fields, node.FieldDescription)
 	}
+	if m.release_date != nil {
+		fields = append(fields, node.FieldReleaseDate)
+	}
+	if m.build_date != nil {
+		fields = append(fields, node.FieldBuildDate)
+	}
+	if m.valid_until_date != nil {
+		fields = append(fields, node.FieldValidUntilDate)
+	}
 	if m.attribution != nil {
 		fields = append(fields, node.FieldAttribution)
 	}
 	if m.file_types != nil {
 		fields = append(fields, node.FieldFileTypes)
-	}
-	if m.primary_purpose != nil {
-		fields = append(fields, node.FieldPrimaryPurpose)
 	}
 	return fields
 }
@@ -5390,12 +5316,16 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Summary()
 	case node.FieldDescription:
 		return m.Description()
+	case node.FieldReleaseDate:
+		return m.ReleaseDate()
+	case node.FieldBuildDate:
+		return m.BuildDate()
+	case node.FieldValidUntilDate:
+		return m.ValidUntilDate()
 	case node.FieldAttribution:
 		return m.Attribution()
 	case node.FieldFileTypes:
 		return m.FileTypes()
-	case node.FieldPrimaryPurpose:
-		return m.PrimaryPurpose()
 	}
 	return nil, false
 }
@@ -5433,12 +5363,16 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldSummary(ctx)
 	case node.FieldDescription:
 		return m.OldDescription(ctx)
+	case node.FieldReleaseDate:
+		return m.OldReleaseDate(ctx)
+	case node.FieldBuildDate:
+		return m.OldBuildDate(ctx)
+	case node.FieldValidUntilDate:
+		return m.OldValidUntilDate(ctx)
 	case node.FieldAttribution:
 		return m.OldAttribution(ctx)
 	case node.FieldFileTypes:
 		return m.OldFileTypes(ctx)
-	case node.FieldPrimaryPurpose:
-		return m.OldPrimaryPurpose(ctx)
 	}
 	return nil, fmt.Errorf("unknown Node field %s", name)
 }
@@ -5491,7 +5425,7 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 		m.SetURLDownload(v)
 		return nil
 	case node.FieldLicenses:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5546,26 +5480,40 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case node.FieldReleaseDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReleaseDate(v)
+		return nil
+	case node.FieldBuildDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBuildDate(v)
+		return nil
+	case node.FieldValidUntilDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetValidUntilDate(v)
+		return nil
 	case node.FieldAttribution:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAttribution(v)
 		return nil
 	case node.FieldFileTypes:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetFileTypes(v)
-		return nil
-	case node.FieldPrimaryPurpose:
-		v, ok := value.(node.PrimaryPurpose)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPrimaryPurpose(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Node field %s", name)
@@ -5658,14 +5606,20 @@ func (m *NodeMutation) ResetField(name string) error {
 	case node.FieldDescription:
 		m.ResetDescription()
 		return nil
+	case node.FieldReleaseDate:
+		m.ResetReleaseDate()
+		return nil
+	case node.FieldBuildDate:
+		m.ResetBuildDate()
+		return nil
+	case node.FieldValidUntilDate:
+		m.ResetValidUntilDate()
+		return nil
 	case node.FieldAttribution:
 		m.ResetAttribution()
 		return nil
 	case node.FieldFileTypes:
 		m.ResetFileTypes()
-		return nil
-	case node.FieldPrimaryPurpose:
-		m.ResetPrimaryPurpose()
 		return nil
 	}
 	return fmt.Errorf("unknown Node field %s", name)
@@ -5673,7 +5627,7 @@ func (m *NodeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 7)
 	if m.suppliers != nil {
 		edges = append(edges, node.EdgeSuppliers)
 	}
@@ -5689,14 +5643,8 @@ func (m *NodeMutation) AddedEdges() []string {
 	if m.hashes != nil {
 		edges = append(edges, node.EdgeHashes)
 	}
-	if m.release_date != nil {
-		edges = append(edges, node.EdgeReleaseDate)
-	}
-	if m.build_date != nil {
-		edges = append(edges, node.EdgeBuildDate)
-	}
-	if m.valid_until_date != nil {
-		edges = append(edges, node.EdgeValidUntilDate)
+	if m.primary_purpose != nil {
+		edges = append(edges, node.EdgePrimaryPurpose)
 	}
 	if m.node_list != nil {
 		edges = append(edges, node.EdgeNodeList)
@@ -5738,21 +5686,9 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeReleaseDate:
-		ids := make([]ent.Value, 0, len(m.release_date))
-		for id := range m.release_date {
-			ids = append(ids, id)
-		}
-		return ids
-	case node.EdgeBuildDate:
-		ids := make([]ent.Value, 0, len(m.build_date))
-		for id := range m.build_date {
-			ids = append(ids, id)
-		}
-		return ids
-	case node.EdgeValidUntilDate:
-		ids := make([]ent.Value, 0, len(m.valid_until_date))
-		for id := range m.valid_until_date {
+	case node.EdgePrimaryPurpose:
+		ids := make([]ent.Value, 0, len(m.primary_purpose))
+		for id := range m.primary_purpose {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5766,7 +5702,7 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 7)
 	if m.removedsuppliers != nil {
 		edges = append(edges, node.EdgeSuppliers)
 	}
@@ -5782,14 +5718,8 @@ func (m *NodeMutation) RemovedEdges() []string {
 	if m.removedhashes != nil {
 		edges = append(edges, node.EdgeHashes)
 	}
-	if m.removedrelease_date != nil {
-		edges = append(edges, node.EdgeReleaseDate)
-	}
-	if m.removedbuild_date != nil {
-		edges = append(edges, node.EdgeBuildDate)
-	}
-	if m.removedvalid_until_date != nil {
-		edges = append(edges, node.EdgeValidUntilDate)
+	if m.removedprimary_purpose != nil {
+		edges = append(edges, node.EdgePrimaryPurpose)
 	}
 	return edges
 }
@@ -5828,21 +5758,9 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeReleaseDate:
-		ids := make([]ent.Value, 0, len(m.removedrelease_date))
-		for id := range m.removedrelease_date {
-			ids = append(ids, id)
-		}
-		return ids
-	case node.EdgeBuildDate:
-		ids := make([]ent.Value, 0, len(m.removedbuild_date))
-		for id := range m.removedbuild_date {
-			ids = append(ids, id)
-		}
-		return ids
-	case node.EdgeValidUntilDate:
-		ids := make([]ent.Value, 0, len(m.removedvalid_until_date))
-		for id := range m.removedvalid_until_date {
+	case node.EdgePrimaryPurpose:
+		ids := make([]ent.Value, 0, len(m.removedprimary_purpose))
+		for id := range m.removedprimary_purpose {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5852,7 +5770,7 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 7)
 	if m.clearedsuppliers {
 		edges = append(edges, node.EdgeSuppliers)
 	}
@@ -5868,14 +5786,8 @@ func (m *NodeMutation) ClearedEdges() []string {
 	if m.clearedhashes {
 		edges = append(edges, node.EdgeHashes)
 	}
-	if m.clearedrelease_date {
-		edges = append(edges, node.EdgeReleaseDate)
-	}
-	if m.clearedbuild_date {
-		edges = append(edges, node.EdgeBuildDate)
-	}
-	if m.clearedvalid_until_date {
-		edges = append(edges, node.EdgeValidUntilDate)
+	if m.clearedprimary_purpose {
+		edges = append(edges, node.EdgePrimaryPurpose)
 	}
 	if m.clearednode_list {
 		edges = append(edges, node.EdgeNodeList)
@@ -5897,12 +5809,8 @@ func (m *NodeMutation) EdgeCleared(name string) bool {
 		return m.clearedidentifiers
 	case node.EdgeHashes:
 		return m.clearedhashes
-	case node.EdgeReleaseDate:
-		return m.clearedrelease_date
-	case node.EdgeBuildDate:
-		return m.clearedbuild_date
-	case node.EdgeValidUntilDate:
-		return m.clearedvalid_until_date
+	case node.EdgePrimaryPurpose:
+		return m.clearedprimary_purpose
 	case node.EdgeNodeList:
 		return m.clearednode_list
 	}
@@ -5939,14 +5847,8 @@ func (m *NodeMutation) ResetEdge(name string) error {
 	case node.EdgeHashes:
 		m.ResetHashes()
 		return nil
-	case node.EdgeReleaseDate:
-		m.ResetReleaseDate()
-		return nil
-	case node.EdgeBuildDate:
-		m.ResetBuildDate()
-		return nil
-	case node.EdgeValidUntilDate:
-		m.ResetValidUntilDate()
+	case node.EdgePrimaryPurpose:
+		m.ResetPrimaryPurpose()
 		return nil
 	case node.EdgeNodeList:
 		m.ResetNodeList()
@@ -5958,22 +5860,23 @@ func (m *NodeMutation) ResetEdge(name string) error {
 // NodeListMutation represents an operation that mutates the NodeList nodes in the graph.
 type NodeListMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	root_elements   *string
-	clearedFields   map[string]struct{}
-	nodes           map[string]struct{}
-	removednodes    map[string]struct{}
-	clearednodes    bool
-	edges           map[int]struct{}
-	removededges    map[int]struct{}
-	clearededges    bool
-	document        *int
-	cleareddocument bool
-	done            bool
-	oldValue        func(context.Context) (*NodeList, error)
-	predicates      []predicate.NodeList
+	op                  Op
+	typ                 string
+	id                  *int
+	root_elements       *[]string
+	appendroot_elements []string
+	clearedFields       map[string]struct{}
+	nodes               map[string]struct{}
+	removednodes        map[string]struct{}
+	clearednodes        bool
+	edges               map[int]struct{}
+	removededges        map[int]struct{}
+	clearededges        bool
+	document            *int
+	cleareddocument     bool
+	done                bool
+	oldValue            func(context.Context) (*NodeList, error)
+	predicates          []predicate.NodeList
 }
 
 var _ ent.Mutation = (*NodeListMutation)(nil)
@@ -6075,12 +5978,13 @@ func (m *NodeListMutation) IDs(ctx context.Context) ([]int, error) {
 }
 
 // SetRootElements sets the "root_elements" field.
-func (m *NodeListMutation) SetRootElements(s string) {
+func (m *NodeListMutation) SetRootElements(s []string) {
 	m.root_elements = &s
+	m.appendroot_elements = nil
 }
 
 // RootElements returns the value of the "root_elements" field in the mutation.
-func (m *NodeListMutation) RootElements() (r string, exists bool) {
+func (m *NodeListMutation) RootElements() (r []string, exists bool) {
 	v := m.root_elements
 	if v == nil {
 		return
@@ -6091,7 +5995,7 @@ func (m *NodeListMutation) RootElements() (r string, exists bool) {
 // OldRootElements returns the old "root_elements" field's value of the NodeList entity.
 // If the NodeList object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeListMutation) OldRootElements(ctx context.Context) (v string, err error) {
+func (m *NodeListMutation) OldRootElements(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRootElements is only allowed on UpdateOne operations")
 	}
@@ -6105,9 +6009,23 @@ func (m *NodeListMutation) OldRootElements(ctx context.Context) (v string, err e
 	return oldValue.RootElements, nil
 }
 
+// AppendRootElements adds s to the "root_elements" field.
+func (m *NodeListMutation) AppendRootElements(s []string) {
+	m.appendroot_elements = append(m.appendroot_elements, s...)
+}
+
+// AppendedRootElements returns the list of values that were appended to the "root_elements" field in this mutation.
+func (m *NodeListMutation) AppendedRootElements() ([]string, bool) {
+	if len(m.appendroot_elements) == 0 {
+		return nil, false
+	}
+	return m.appendroot_elements, true
+}
+
 // ResetRootElements resets all changes to the "root_elements" field.
 func (m *NodeListMutation) ResetRootElements() {
 	m.root_elements = nil
+	m.appendroot_elements = nil
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by ids.
@@ -6326,7 +6244,7 @@ func (m *NodeListMutation) OldField(ctx context.Context, name string) (ent.Value
 func (m *NodeListMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case nodelist.FieldRootElements:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6519,29 +6437,27 @@ func (m *NodeListMutation) ResetEdge(name string) error {
 // PersonMutation represents an operation that mutates the Person nodes in the graph.
 type PersonMutation struct {
 	config
-	op                     Op
-	typ                    string
-	id                     *int
-	name                   *string
-	is_org                 *bool
-	email                  *string
-	url                    *string
-	phone                  *string
-	clearedFields          map[string]struct{}
-	contacts               map[int]struct{}
-	removedcontacts        map[int]struct{}
-	clearedcontacts        bool
-	metadata               *string
-	clearedmetadata        bool
-	node_supplier          *string
-	clearednode_supplier   bool
-	node_originator        *string
-	clearednode_originator bool
-	person_contact         *int
-	clearedperson_contact  bool
-	done                   bool
-	oldValue               func(context.Context) (*Person, error)
-	predicates             []predicate.Person
+	op                   Op
+	typ                  string
+	id                   *int
+	name                 *string
+	is_org               *bool
+	email                *string
+	url                  *string
+	phone                *string
+	clearedFields        map[string]struct{}
+	contact_owner        *int
+	clearedcontact_owner bool
+	contacts             map[int]struct{}
+	removedcontacts      map[int]struct{}
+	clearedcontacts      bool
+	metadata             *string
+	clearedmetadata      bool
+	node                 *string
+	clearednode          bool
+	done                 bool
+	oldValue             func(context.Context) (*Person, error)
+	predicates           []predicate.Person
 }
 
 var _ ent.Mutation = (*PersonMutation)(nil)
@@ -6822,6 +6738,45 @@ func (m *PersonMutation) ResetPhone() {
 	m.phone = nil
 }
 
+// SetContactOwnerID sets the "contact_owner" edge to the Person entity by id.
+func (m *PersonMutation) SetContactOwnerID(id int) {
+	m.contact_owner = &id
+}
+
+// ClearContactOwner clears the "contact_owner" edge to the Person entity.
+func (m *PersonMutation) ClearContactOwner() {
+	m.clearedcontact_owner = true
+}
+
+// ContactOwnerCleared reports if the "contact_owner" edge to the Person entity was cleared.
+func (m *PersonMutation) ContactOwnerCleared() bool {
+	return m.clearedcontact_owner
+}
+
+// ContactOwnerID returns the "contact_owner" edge ID in the mutation.
+func (m *PersonMutation) ContactOwnerID() (id int, exists bool) {
+	if m.contact_owner != nil {
+		return *m.contact_owner, true
+	}
+	return
+}
+
+// ContactOwnerIDs returns the "contact_owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ContactOwnerID instead. It exists only for internal usage by the builders.
+func (m *PersonMutation) ContactOwnerIDs() (ids []int) {
+	if id := m.contact_owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetContactOwner resets all changes to the "contact_owner" edge.
+func (m *PersonMutation) ResetContactOwner() {
+	m.contact_owner = nil
+	m.clearedcontact_owner = false
+}
+
 // AddContactIDs adds the "contacts" edge to the Person entity by ids.
 func (m *PersonMutation) AddContactIDs(ids ...int) {
 	if m.contacts == nil {
@@ -6915,121 +6870,43 @@ func (m *PersonMutation) ResetMetadata() {
 	m.clearedmetadata = false
 }
 
-// SetNodeSupplierID sets the "node_supplier" edge to the Node entity by id.
-func (m *PersonMutation) SetNodeSupplierID(id string) {
-	m.node_supplier = &id
+// SetNodeID sets the "node" edge to the Node entity by id.
+func (m *PersonMutation) SetNodeID(id string) {
+	m.node = &id
 }
 
-// ClearNodeSupplier clears the "node_supplier" edge to the Node entity.
-func (m *PersonMutation) ClearNodeSupplier() {
-	m.clearednode_supplier = true
+// ClearNode clears the "node" edge to the Node entity.
+func (m *PersonMutation) ClearNode() {
+	m.clearednode = true
 }
 
-// NodeSupplierCleared reports if the "node_supplier" edge to the Node entity was cleared.
-func (m *PersonMutation) NodeSupplierCleared() bool {
-	return m.clearednode_supplier
+// NodeCleared reports if the "node" edge to the Node entity was cleared.
+func (m *PersonMutation) NodeCleared() bool {
+	return m.clearednode
 }
 
-// NodeSupplierID returns the "node_supplier" edge ID in the mutation.
-func (m *PersonMutation) NodeSupplierID() (id string, exists bool) {
-	if m.node_supplier != nil {
-		return *m.node_supplier, true
+// NodeID returns the "node" edge ID in the mutation.
+func (m *PersonMutation) NodeID() (id string, exists bool) {
+	if m.node != nil {
+		return *m.node, true
 	}
 	return
 }
 
-// NodeSupplierIDs returns the "node_supplier" edge IDs in the mutation.
+// NodeIDs returns the "node" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// NodeSupplierID instead. It exists only for internal usage by the builders.
-func (m *PersonMutation) NodeSupplierIDs() (ids []string) {
-	if id := m.node_supplier; id != nil {
+// NodeID instead. It exists only for internal usage by the builders.
+func (m *PersonMutation) NodeIDs() (ids []string) {
+	if id := m.node; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetNodeSupplier resets all changes to the "node_supplier" edge.
-func (m *PersonMutation) ResetNodeSupplier() {
-	m.node_supplier = nil
-	m.clearednode_supplier = false
-}
-
-// SetNodeOriginatorID sets the "node_originator" edge to the Node entity by id.
-func (m *PersonMutation) SetNodeOriginatorID(id string) {
-	m.node_originator = &id
-}
-
-// ClearNodeOriginator clears the "node_originator" edge to the Node entity.
-func (m *PersonMutation) ClearNodeOriginator() {
-	m.clearednode_originator = true
-}
-
-// NodeOriginatorCleared reports if the "node_originator" edge to the Node entity was cleared.
-func (m *PersonMutation) NodeOriginatorCleared() bool {
-	return m.clearednode_originator
-}
-
-// NodeOriginatorID returns the "node_originator" edge ID in the mutation.
-func (m *PersonMutation) NodeOriginatorID() (id string, exists bool) {
-	if m.node_originator != nil {
-		return *m.node_originator, true
-	}
-	return
-}
-
-// NodeOriginatorIDs returns the "node_originator" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// NodeOriginatorID instead. It exists only for internal usage by the builders.
-func (m *PersonMutation) NodeOriginatorIDs() (ids []string) {
-	if id := m.node_originator; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetNodeOriginator resets all changes to the "node_originator" edge.
-func (m *PersonMutation) ResetNodeOriginator() {
-	m.node_originator = nil
-	m.clearednode_originator = false
-}
-
-// SetPersonContactID sets the "person_contact" edge to the Person entity by id.
-func (m *PersonMutation) SetPersonContactID(id int) {
-	m.person_contact = &id
-}
-
-// ClearPersonContact clears the "person_contact" edge to the Person entity.
-func (m *PersonMutation) ClearPersonContact() {
-	m.clearedperson_contact = true
-}
-
-// PersonContactCleared reports if the "person_contact" edge to the Person entity was cleared.
-func (m *PersonMutation) PersonContactCleared() bool {
-	return m.clearedperson_contact
-}
-
-// PersonContactID returns the "person_contact" edge ID in the mutation.
-func (m *PersonMutation) PersonContactID() (id int, exists bool) {
-	if m.person_contact != nil {
-		return *m.person_contact, true
-	}
-	return
-}
-
-// PersonContactIDs returns the "person_contact" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// PersonContactID instead. It exists only for internal usage by the builders.
-func (m *PersonMutation) PersonContactIDs() (ids []int) {
-	if id := m.person_contact; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetPersonContact resets all changes to the "person_contact" edge.
-func (m *PersonMutation) ResetPersonContact() {
-	m.person_contact = nil
-	m.clearedperson_contact = false
+// ResetNode resets all changes to the "node" edge.
+func (m *PersonMutation) ResetNode() {
+	m.node = nil
+	m.clearednode = false
 }
 
 // Where appends a list predicates to the PersonMutation builder.
@@ -7233,21 +7110,18 @@ func (m *PersonMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PersonMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
+	if m.contact_owner != nil {
+		edges = append(edges, person.EdgeContactOwner)
+	}
 	if m.contacts != nil {
 		edges = append(edges, person.EdgeContacts)
 	}
 	if m.metadata != nil {
 		edges = append(edges, person.EdgeMetadata)
 	}
-	if m.node_supplier != nil {
-		edges = append(edges, person.EdgeNodeSupplier)
-	}
-	if m.node_originator != nil {
-		edges = append(edges, person.EdgeNodeOriginator)
-	}
-	if m.person_contact != nil {
-		edges = append(edges, person.EdgePersonContact)
+	if m.node != nil {
+		edges = append(edges, person.EdgeNode)
 	}
 	return edges
 }
@@ -7256,6 +7130,10 @@ func (m *PersonMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *PersonMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case person.EdgeContactOwner:
+		if id := m.contact_owner; id != nil {
+			return []ent.Value{*id}
+		}
 	case person.EdgeContacts:
 		ids := make([]ent.Value, 0, len(m.contacts))
 		for id := range m.contacts {
@@ -7266,16 +7144,8 @@ func (m *PersonMutation) AddedIDs(name string) []ent.Value {
 		if id := m.metadata; id != nil {
 			return []ent.Value{*id}
 		}
-	case person.EdgeNodeSupplier:
-		if id := m.node_supplier; id != nil {
-			return []ent.Value{*id}
-		}
-	case person.EdgeNodeOriginator:
-		if id := m.node_originator; id != nil {
-			return []ent.Value{*id}
-		}
-	case person.EdgePersonContact:
-		if id := m.person_contact; id != nil {
+	case person.EdgeNode:
+		if id := m.node; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -7284,7 +7154,7 @@ func (m *PersonMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PersonMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.removedcontacts != nil {
 		edges = append(edges, person.EdgeContacts)
 	}
@@ -7307,21 +7177,18 @@ func (m *PersonMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PersonMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
+	if m.clearedcontact_owner {
+		edges = append(edges, person.EdgeContactOwner)
+	}
 	if m.clearedcontacts {
 		edges = append(edges, person.EdgeContacts)
 	}
 	if m.clearedmetadata {
 		edges = append(edges, person.EdgeMetadata)
 	}
-	if m.clearednode_supplier {
-		edges = append(edges, person.EdgeNodeSupplier)
-	}
-	if m.clearednode_originator {
-		edges = append(edges, person.EdgeNodeOriginator)
-	}
-	if m.clearedperson_contact {
-		edges = append(edges, person.EdgePersonContact)
+	if m.clearednode {
+		edges = append(edges, person.EdgeNode)
 	}
 	return edges
 }
@@ -7330,16 +7197,14 @@ func (m *PersonMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *PersonMutation) EdgeCleared(name string) bool {
 	switch name {
+	case person.EdgeContactOwner:
+		return m.clearedcontact_owner
 	case person.EdgeContacts:
 		return m.clearedcontacts
 	case person.EdgeMetadata:
 		return m.clearedmetadata
-	case person.EdgeNodeSupplier:
-		return m.clearednode_supplier
-	case person.EdgeNodeOriginator:
-		return m.clearednode_originator
-	case person.EdgePersonContact:
-		return m.clearedperson_contact
+	case person.EdgeNode:
+		return m.clearednode
 	}
 	return false
 }
@@ -7348,17 +7213,14 @@ func (m *PersonMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *PersonMutation) ClearEdge(name string) error {
 	switch name {
+	case person.EdgeContactOwner:
+		m.ClearContactOwner()
+		return nil
 	case person.EdgeMetadata:
 		m.ClearMetadata()
 		return nil
-	case person.EdgeNodeSupplier:
-		m.ClearNodeSupplier()
-		return nil
-	case person.EdgeNodeOriginator:
-		m.ClearNodeOriginator()
-		return nil
-	case person.EdgePersonContact:
-		m.ClearPersonContact()
+	case person.EdgeNode:
+		m.ClearNode()
 		return nil
 	}
 	return fmt.Errorf("unknown Person unique edge %s", name)
@@ -7368,53 +7230,49 @@ func (m *PersonMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *PersonMutation) ResetEdge(name string) error {
 	switch name {
+	case person.EdgeContactOwner:
+		m.ResetContactOwner()
+		return nil
 	case person.EdgeContacts:
 		m.ResetContacts()
 		return nil
 	case person.EdgeMetadata:
 		m.ResetMetadata()
 		return nil
-	case person.EdgeNodeSupplier:
-		m.ResetNodeSupplier()
-		return nil
-	case person.EdgeNodeOriginator:
-		m.ResetNodeOriginator()
-		return nil
-	case person.EdgePersonContact:
-		m.ResetPersonContact()
+	case person.EdgeNode:
+		m.ResetNode()
 		return nil
 	}
 	return fmt.Errorf("unknown Person edge %s", name)
 }
 
-// TimestampMutation represents an operation that mutates the Timestamp nodes in the graph.
-type TimestampMutation struct {
+// PurposeMutation represents an operation that mutates the Purpose nodes in the graph.
+type PurposeMutation struct {
 	config
 	op              Op
 	typ             string
 	id              *int
+	primary_purpose *purpose.PrimaryPurpose
 	clearedFields   map[string]struct{}
-	date            map[int]struct{}
-	removeddate     map[int]struct{}
-	cleareddate     bool
-	metadata        *string
-	clearedmetadata bool
+	node            map[string]struct{}
+	removednode     map[string]struct{}
+	clearednode     bool
 	done            bool
-	oldValue        func(context.Context) (*Timestamp, error)
-	predicates      []predicate.Timestamp
+	oldValue        func(context.Context) (*Purpose, error)
+	predicates      []predicate.Purpose
 }
 
-var _ ent.Mutation = (*TimestampMutation)(nil)
+var _ ent.Mutation = (*PurposeMutation)(nil)
 
-// timestampOption allows management of the mutation configuration using functional options.
-type timestampOption func(*TimestampMutation)
+// purposeOption allows management of the mutation configuration using functional options.
+type purposeOption func(*PurposeMutation)
 
-// newTimestampMutation creates new mutation for the Timestamp entity.
-func newTimestampMutation(c config, op Op, opts ...timestampOption) *TimestampMutation {
-	m := &TimestampMutation{
+// newPurposeMutation creates new mutation for the Purpose entity.
+func newPurposeMutation(c config, op Op, opts ...purposeOption) *PurposeMutation {
+	m := &PurposeMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeTimestamp,
+		typ:           TypePurpose,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -7423,20 +7281,20 @@ func newTimestampMutation(c config, op Op, opts ...timestampOption) *TimestampMu
 	return m
 }
 
-// withTimestampID sets the ID field of the mutation.
-func withTimestampID(id int) timestampOption {
-	return func(m *TimestampMutation) {
+// withPurposeID sets the ID field of the mutation.
+func withPurposeID(id int) purposeOption {
+	return func(m *PurposeMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Timestamp
+			value *Purpose
 		)
-		m.oldValue = func(ctx context.Context) (*Timestamp, error) {
+		m.oldValue = func(ctx context.Context) (*Purpose, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Timestamp.Get(ctx, id)
+					value, err = m.Client().Purpose.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -7445,10 +7303,10 @@ func withTimestampID(id int) timestampOption {
 	}
 }
 
-// withTimestamp sets the old Timestamp of the mutation.
-func withTimestamp(node *Timestamp) timestampOption {
-	return func(m *TimestampMutation) {
-		m.oldValue = func(context.Context) (*Timestamp, error) {
+// withPurpose sets the old Purpose of the mutation.
+func withPurpose(node *Purpose) purposeOption {
+	return func(m *PurposeMutation) {
+		m.oldValue = func(context.Context) (*Purpose, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -7457,7 +7315,7 @@ func withTimestamp(node *Timestamp) timestampOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m TimestampMutation) Client() *Client {
+func (m PurposeMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -7465,7 +7323,7 @@ func (m TimestampMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m TimestampMutation) Tx() (*Tx, error) {
+func (m PurposeMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -7476,7 +7334,7 @@ func (m TimestampMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *TimestampMutation) ID() (id int, exists bool) {
+func (m *PurposeMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -7487,7 +7345,7 @@ func (m *TimestampMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *TimestampMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *PurposeMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -7496,114 +7354,111 @@ func (m *TimestampMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Timestamp.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().Purpose.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// AddDateIDs adds the "date" edge to the Timestamp entity by ids.
-func (m *TimestampMutation) AddDateIDs(ids ...int) {
-	if m.date == nil {
-		m.date = make(map[int]struct{})
+// SetPrimaryPurpose sets the "primary_purpose" field.
+func (m *PurposeMutation) SetPrimaryPurpose(pp purpose.PrimaryPurpose) {
+	m.primary_purpose = &pp
+}
+
+// PrimaryPurpose returns the value of the "primary_purpose" field in the mutation.
+func (m *PurposeMutation) PrimaryPurpose() (r purpose.PrimaryPurpose, exists bool) {
+	v := m.primary_purpose
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrimaryPurpose returns the old "primary_purpose" field's value of the Purpose entity.
+// If the Purpose object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PurposeMutation) OldPrimaryPurpose(ctx context.Context) (v purpose.PrimaryPurpose, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrimaryPurpose is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrimaryPurpose requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrimaryPurpose: %w", err)
+	}
+	return oldValue.PrimaryPurpose, nil
+}
+
+// ResetPrimaryPurpose resets all changes to the "primary_purpose" field.
+func (m *PurposeMutation) ResetPrimaryPurpose() {
+	m.primary_purpose = nil
+}
+
+// AddNodeIDs adds the "node" edge to the Node entity by ids.
+func (m *PurposeMutation) AddNodeIDs(ids ...string) {
+	if m.node == nil {
+		m.node = make(map[string]struct{})
 	}
 	for i := range ids {
-		m.date[ids[i]] = struct{}{}
+		m.node[ids[i]] = struct{}{}
 	}
 }
 
-// ClearDate clears the "date" edge to the Timestamp entity.
-func (m *TimestampMutation) ClearDate() {
-	m.cleareddate = true
+// ClearNode clears the "node" edge to the Node entity.
+func (m *PurposeMutation) ClearNode() {
+	m.clearednode = true
 }
 
-// DateCleared reports if the "date" edge to the Timestamp entity was cleared.
-func (m *TimestampMutation) DateCleared() bool {
-	return m.cleareddate
+// NodeCleared reports if the "node" edge to the Node entity was cleared.
+func (m *PurposeMutation) NodeCleared() bool {
+	return m.clearednode
 }
 
-// RemoveDateIDs removes the "date" edge to the Timestamp entity by IDs.
-func (m *TimestampMutation) RemoveDateIDs(ids ...int) {
-	if m.removeddate == nil {
-		m.removeddate = make(map[int]struct{})
+// RemoveNodeIDs removes the "node" edge to the Node entity by IDs.
+func (m *PurposeMutation) RemoveNodeIDs(ids ...string) {
+	if m.removednode == nil {
+		m.removednode = make(map[string]struct{})
 	}
 	for i := range ids {
-		delete(m.date, ids[i])
-		m.removeddate[ids[i]] = struct{}{}
+		delete(m.node, ids[i])
+		m.removednode[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedDate returns the removed IDs of the "date" edge to the Timestamp entity.
-func (m *TimestampMutation) RemovedDateIDs() (ids []int) {
-	for id := range m.removeddate {
+// RemovedNode returns the removed IDs of the "node" edge to the Node entity.
+func (m *PurposeMutation) RemovedNodeIDs() (ids []string) {
+	for id := range m.removednode {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// DateIDs returns the "date" edge IDs in the mutation.
-func (m *TimestampMutation) DateIDs() (ids []int) {
-	for id := range m.date {
+// NodeIDs returns the "node" edge IDs in the mutation.
+func (m *PurposeMutation) NodeIDs() (ids []string) {
+	for id := range m.node {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetDate resets all changes to the "date" edge.
-func (m *TimestampMutation) ResetDate() {
-	m.date = nil
-	m.cleareddate = false
-	m.removeddate = nil
+// ResetNode resets all changes to the "node" edge.
+func (m *PurposeMutation) ResetNode() {
+	m.node = nil
+	m.clearednode = false
+	m.removednode = nil
 }
 
-// SetMetadataID sets the "metadata" edge to the Metadata entity by id.
-func (m *TimestampMutation) SetMetadataID(id string) {
-	m.metadata = &id
-}
-
-// ClearMetadata clears the "metadata" edge to the Metadata entity.
-func (m *TimestampMutation) ClearMetadata() {
-	m.clearedmetadata = true
-}
-
-// MetadataCleared reports if the "metadata" edge to the Metadata entity was cleared.
-func (m *TimestampMutation) MetadataCleared() bool {
-	return m.clearedmetadata
-}
-
-// MetadataID returns the "metadata" edge ID in the mutation.
-func (m *TimestampMutation) MetadataID() (id string, exists bool) {
-	if m.metadata != nil {
-		return *m.metadata, true
-	}
-	return
-}
-
-// MetadataIDs returns the "metadata" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// MetadataID instead. It exists only for internal usage by the builders.
-func (m *TimestampMutation) MetadataIDs() (ids []string) {
-	if id := m.metadata; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetMetadata resets all changes to the "metadata" edge.
-func (m *TimestampMutation) ResetMetadata() {
-	m.metadata = nil
-	m.clearedmetadata = false
-}
-
-// Where appends a list predicates to the TimestampMutation builder.
-func (m *TimestampMutation) Where(ps ...predicate.Timestamp) {
+// Where appends a list predicates to the PurposeMutation builder.
+func (m *PurposeMutation) Where(ps ...predicate.Purpose) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the TimestampMutation builder. Using this method,
+// WhereP appends storage-level predicates to the PurposeMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *TimestampMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Timestamp, len(ps))
+func (m *PurposeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Purpose, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -7611,142 +7466,160 @@ func (m *TimestampMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *TimestampMutation) Op() Op {
+func (m *PurposeMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *TimestampMutation) SetOp(op Op) {
+func (m *PurposeMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (Timestamp).
-func (m *TimestampMutation) Type() string {
+// Type returns the node type of this mutation (Purpose).
+func (m *PurposeMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *TimestampMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+func (m *PurposeMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.primary_purpose != nil {
+		fields = append(fields, purpose.FieldPrimaryPurpose)
+	}
 	return fields
 }
 
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *TimestampMutation) Field(name string) (ent.Value, bool) {
+func (m *PurposeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case purpose.FieldPrimaryPurpose:
+		return m.PrimaryPurpose()
+	}
 	return nil, false
 }
 
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *TimestampMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, fmt.Errorf("unknown Timestamp field %s", name)
+func (m *PurposeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case purpose.FieldPrimaryPurpose:
+		return m.OldPrimaryPurpose(ctx)
+	}
+	return nil, fmt.Errorf("unknown Purpose field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *TimestampMutation) SetField(name string, value ent.Value) error {
+func (m *PurposeMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case purpose.FieldPrimaryPurpose:
+		v, ok := value.(purpose.PrimaryPurpose)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrimaryPurpose(v)
+		return nil
 	}
-	return fmt.Errorf("unknown Timestamp field %s", name)
+	return fmt.Errorf("unknown Purpose field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *TimestampMutation) AddedFields() []string {
+func (m *PurposeMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *TimestampMutation) AddedField(name string) (ent.Value, bool) {
+func (m *PurposeMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *TimestampMutation) AddField(name string, value ent.Value) error {
-	return fmt.Errorf("unknown Timestamp numeric field %s", name)
+func (m *PurposeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Purpose numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *TimestampMutation) ClearedFields() []string {
+func (m *PurposeMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *TimestampMutation) FieldCleared(name string) bool {
+func (m *PurposeMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *TimestampMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Timestamp nullable field %s", name)
+func (m *PurposeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Purpose nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *TimestampMutation) ResetField(name string) error {
-	return fmt.Errorf("unknown Timestamp field %s", name)
+func (m *PurposeMutation) ResetField(name string) error {
+	switch name {
+	case purpose.FieldPrimaryPurpose:
+		m.ResetPrimaryPurpose()
+		return nil
+	}
+	return fmt.Errorf("unknown Purpose field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *TimestampMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.date != nil {
-		edges = append(edges, timestamp.EdgeDate)
-	}
-	if m.metadata != nil {
-		edges = append(edges, timestamp.EdgeMetadata)
+func (m *PurposeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.node != nil {
+		edges = append(edges, purpose.EdgeNode)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *TimestampMutation) AddedIDs(name string) []ent.Value {
+func (m *PurposeMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case timestamp.EdgeDate:
-		ids := make([]ent.Value, 0, len(m.date))
-		for id := range m.date {
+	case purpose.EdgeNode:
+		ids := make([]ent.Value, 0, len(m.node))
+		for id := range m.node {
 			ids = append(ids, id)
 		}
 		return ids
-	case timestamp.EdgeMetadata:
-		if id := m.metadata; id != nil {
-			return []ent.Value{*id}
-		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *TimestampMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removeddate != nil {
-		edges = append(edges, timestamp.EdgeDate)
+func (m *PurposeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removednode != nil {
+		edges = append(edges, purpose.EdgeNode)
 	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *TimestampMutation) RemovedIDs(name string) []ent.Value {
+func (m *PurposeMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case timestamp.EdgeDate:
-		ids := make([]ent.Value, 0, len(m.removeddate))
-		for id := range m.removeddate {
+	case purpose.EdgeNode:
+		ids := make([]ent.Value, 0, len(m.removednode))
+		for id := range m.removednode {
 			ids = append(ids, id)
 		}
 		return ids
@@ -7755,52 +7628,41 @@ func (m *TimestampMutation) RemovedIDs(name string) []ent.Value {
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *TimestampMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.cleareddate {
-		edges = append(edges, timestamp.EdgeDate)
-	}
-	if m.clearedmetadata {
-		edges = append(edges, timestamp.EdgeMetadata)
+func (m *PurposeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearednode {
+		edges = append(edges, purpose.EdgeNode)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *TimestampMutation) EdgeCleared(name string) bool {
+func (m *PurposeMutation) EdgeCleared(name string) bool {
 	switch name {
-	case timestamp.EdgeDate:
-		return m.cleareddate
-	case timestamp.EdgeMetadata:
-		return m.clearedmetadata
+	case purpose.EdgeNode:
+		return m.clearednode
 	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *TimestampMutation) ClearEdge(name string) error {
+func (m *PurposeMutation) ClearEdge(name string) error {
 	switch name {
-	case timestamp.EdgeMetadata:
-		m.ClearMetadata()
-		return nil
 	}
-	return fmt.Errorf("unknown Timestamp unique edge %s", name)
+	return fmt.Errorf("unknown Purpose unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *TimestampMutation) ResetEdge(name string) error {
+func (m *PurposeMutation) ResetEdge(name string) error {
 	switch name {
-	case timestamp.EdgeDate:
-		m.ResetDate()
-		return nil
-	case timestamp.EdgeMetadata:
-		m.ResetMetadata()
+	case purpose.EdgeNode:
+		m.ResetNode()
 		return nil
 	}
-	return fmt.Errorf("unknown Timestamp edge %s", name)
+	return fmt.Errorf("unknown Purpose edge %s", name)
 }
 
 // ToolMutation represents an operation that mutates the Tool nodes in the graph.

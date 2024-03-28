@@ -365,6 +365,29 @@ func PhoneContainsFold(v string) predicate.Person {
 	return predicate.Person(sql.FieldContainsFold(FieldPhone, v))
 }
 
+// HasContactOwner applies the HasEdge predicate on the "contact_owner" edge.
+func HasContactOwner() predicate.Person {
+	return predicate.Person(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ContactOwnerTable, ContactOwnerColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasContactOwnerWith applies the HasEdge predicate on the "contact_owner" edge with a given conditions (other predicates).
+func HasContactOwnerWith(preds ...predicate.Person) predicate.Person {
+	return predicate.Person(func(s *sql.Selector) {
+		step := newContactOwnerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasContacts applies the HasEdge predicate on the "contacts" edge.
 func HasContacts() predicate.Person {
 	return predicate.Person(func(s *sql.Selector) {
@@ -411,67 +434,21 @@ func HasMetadataWith(preds ...predicate.Metadata) predicate.Person {
 	})
 }
 
-// HasNodeSupplier applies the HasEdge predicate on the "node_supplier" edge.
-func HasNodeSupplier() predicate.Person {
+// HasNode applies the HasEdge predicate on the "node" edge.
+func HasNode() predicate.Person {
 	return predicate.Person(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, NodeSupplierTable, NodeSupplierColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, NodeTable, NodeColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasNodeSupplierWith applies the HasEdge predicate on the "node_supplier" edge with a given conditions (other predicates).
-func HasNodeSupplierWith(preds ...predicate.Node) predicate.Person {
+// HasNodeWith applies the HasEdge predicate on the "node" edge with a given conditions (other predicates).
+func HasNodeWith(preds ...predicate.Node) predicate.Person {
 	return predicate.Person(func(s *sql.Selector) {
-		step := newNodeSupplierStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasNodeOriginator applies the HasEdge predicate on the "node_originator" edge.
-func HasNodeOriginator() predicate.Person {
-	return predicate.Person(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, NodeOriginatorTable, NodeOriginatorColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasNodeOriginatorWith applies the HasEdge predicate on the "node_originator" edge with a given conditions (other predicates).
-func HasNodeOriginatorWith(preds ...predicate.Node) predicate.Person {
-	return predicate.Person(func(s *sql.Selector) {
-		step := newNodeOriginatorStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasPersonContact applies the HasEdge predicate on the "person_contact" edge.
-func HasPersonContact() predicate.Person {
-	return predicate.Person(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, PersonContactTable, PersonContactColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasPersonContactWith applies the HasEdge predicate on the "person_contact" edge with a given conditions (other predicates).
-func HasPersonContactWith(preds ...predicate.Person) predicate.Person {
-	return predicate.Person(func(s *sql.Selector) {
-		step := newPersonContactStep()
+		step := newNodeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

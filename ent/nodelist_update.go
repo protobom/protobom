@@ -25,6 +25,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/edge"
@@ -47,16 +48,14 @@ func (nlu *NodeListUpdate) Where(ps ...predicate.NodeList) *NodeListUpdate {
 }
 
 // SetRootElements sets the "root_elements" field.
-func (nlu *NodeListUpdate) SetRootElements(s string) *NodeListUpdate {
+func (nlu *NodeListUpdate) SetRootElements(s []string) *NodeListUpdate {
 	nlu.mutation.SetRootElements(s)
 	return nlu
 }
 
-// SetNillableRootElements sets the "root_elements" field if the given value is not nil.
-func (nlu *NodeListUpdate) SetNillableRootElements(s *string) *NodeListUpdate {
-	if s != nil {
-		nlu.SetRootElements(*s)
-	}
+// AppendRootElements appends s to the "root_elements" field.
+func (nlu *NodeListUpdate) AppendRootElements(s []string) *NodeListUpdate {
+	nlu.mutation.AppendRootElements(s)
 	return nlu
 }
 
@@ -93,6 +92,14 @@ func (nlu *NodeListUpdate) AddEdges(e ...*Edge) *NodeListUpdate {
 // SetDocumentID sets the "document" edge to the Document entity by ID.
 func (nlu *NodeListUpdate) SetDocumentID(id int) *NodeListUpdate {
 	nlu.mutation.SetDocumentID(id)
+	return nlu
+}
+
+// SetNillableDocumentID sets the "document" edge to the Document entity by ID if the given value is not nil.
+func (nlu *NodeListUpdate) SetNillableDocumentID(id *int) *NodeListUpdate {
+	if id != nil {
+		nlu = nlu.SetDocumentID(*id)
+	}
 	return nlu
 }
 
@@ -181,18 +188,7 @@ func (nlu *NodeListUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (nlu *NodeListUpdate) check() error {
-	if _, ok := nlu.mutation.DocumentID(); nlu.mutation.DocumentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "NodeList.document"`)
-	}
-	return nil
-}
-
 func (nlu *NodeListUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := nlu.check(); err != nil {
-		return n, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(nodelist.Table, nodelist.Columns, sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt))
 	if ps := nlu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -202,7 +198,12 @@ func (nlu *NodeListUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := nlu.mutation.RootElements(); ok {
-		_spec.SetField(nodelist.FieldRootElements, field.TypeString, value)
+		_spec.SetField(nodelist.FieldRootElements, field.TypeJSON, value)
+	}
+	if value, ok := nlu.mutation.AppendedRootElements(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, nodelist.FieldRootElements, value)
+		})
 	}
 	if nlu.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -297,7 +298,7 @@ func (nlu *NodeListUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nlu.mutation.DocumentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   nodelist.DocumentTable,
 			Columns: []string{nodelist.DocumentColumn},
 			Bidi:    false,
@@ -310,7 +311,7 @@ func (nlu *NodeListUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := nlu.mutation.DocumentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   nodelist.DocumentTable,
 			Columns: []string{nodelist.DocumentColumn},
 			Bidi:    false,
@@ -344,16 +345,14 @@ type NodeListUpdateOne struct {
 }
 
 // SetRootElements sets the "root_elements" field.
-func (nluo *NodeListUpdateOne) SetRootElements(s string) *NodeListUpdateOne {
+func (nluo *NodeListUpdateOne) SetRootElements(s []string) *NodeListUpdateOne {
 	nluo.mutation.SetRootElements(s)
 	return nluo
 }
 
-// SetNillableRootElements sets the "root_elements" field if the given value is not nil.
-func (nluo *NodeListUpdateOne) SetNillableRootElements(s *string) *NodeListUpdateOne {
-	if s != nil {
-		nluo.SetRootElements(*s)
-	}
+// AppendRootElements appends s to the "root_elements" field.
+func (nluo *NodeListUpdateOne) AppendRootElements(s []string) *NodeListUpdateOne {
+	nluo.mutation.AppendRootElements(s)
 	return nluo
 }
 
@@ -390,6 +389,14 @@ func (nluo *NodeListUpdateOne) AddEdges(e ...*Edge) *NodeListUpdateOne {
 // SetDocumentID sets the "document" edge to the Document entity by ID.
 func (nluo *NodeListUpdateOne) SetDocumentID(id int) *NodeListUpdateOne {
 	nluo.mutation.SetDocumentID(id)
+	return nluo
+}
+
+// SetNillableDocumentID sets the "document" edge to the Document entity by ID if the given value is not nil.
+func (nluo *NodeListUpdateOne) SetNillableDocumentID(id *int) *NodeListUpdateOne {
+	if id != nil {
+		nluo = nluo.SetDocumentID(*id)
+	}
 	return nluo
 }
 
@@ -491,18 +498,7 @@ func (nluo *NodeListUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (nluo *NodeListUpdateOne) check() error {
-	if _, ok := nluo.mutation.DocumentID(); nluo.mutation.DocumentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "NodeList.document"`)
-	}
-	return nil
-}
-
 func (nluo *NodeListUpdateOne) sqlSave(ctx context.Context) (_node *NodeList, err error) {
-	if err := nluo.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(nodelist.Table, nodelist.Columns, sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt))
 	id, ok := nluo.mutation.ID()
 	if !ok {
@@ -529,7 +525,12 @@ func (nluo *NodeListUpdateOne) sqlSave(ctx context.Context) (_node *NodeList, er
 		}
 	}
 	if value, ok := nluo.mutation.RootElements(); ok {
-		_spec.SetField(nodelist.FieldRootElements, field.TypeString, value)
+		_spec.SetField(nodelist.FieldRootElements, field.TypeJSON, value)
+	}
+	if value, ok := nluo.mutation.AppendedRootElements(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, nodelist.FieldRootElements, value)
+		})
 	}
 	if nluo.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -624,7 +625,7 @@ func (nluo *NodeListUpdateOne) sqlSave(ctx context.Context) (_node *NodeList, er
 	if nluo.mutation.DocumentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   nodelist.DocumentTable,
 			Columns: []string{nodelist.DocumentColumn},
 			Bidi:    false,
@@ -637,7 +638,7 @@ func (nluo *NodeListUpdateOne) sqlSave(ctx context.Context) (_node *NodeList, er
 	if nodes := nluo.mutation.DocumentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   nodelist.DocumentTable,
 			Columns: []string{nodelist.DocumentColumn},
 			Bidi:    false,

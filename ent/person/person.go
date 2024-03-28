@@ -39,18 +39,20 @@ const (
 	FieldURL = "url"
 	// FieldPhone holds the string denoting the phone field in the database.
 	FieldPhone = "phone"
+	// EdgeContactOwner holds the string denoting the contact_owner edge name in mutations.
+	EdgeContactOwner = "contact_owner"
 	// EdgeContacts holds the string denoting the contacts edge name in mutations.
 	EdgeContacts = "contacts"
 	// EdgeMetadata holds the string denoting the metadata edge name in mutations.
 	EdgeMetadata = "metadata"
-	// EdgeNodeSupplier holds the string denoting the node_supplier edge name in mutations.
-	EdgeNodeSupplier = "node_supplier"
-	// EdgeNodeOriginator holds the string denoting the node_originator edge name in mutations.
-	EdgeNodeOriginator = "node_originator"
-	// EdgePersonContact holds the string denoting the person_contact edge name in mutations.
-	EdgePersonContact = "person_contact"
+	// EdgeNode holds the string denoting the node edge name in mutations.
+	EdgeNode = "node"
 	// Table holds the table name of the person in the database.
 	Table = "persons"
+	// ContactOwnerTable is the table that holds the contact_owner relation/edge.
+	ContactOwnerTable = "persons"
+	// ContactOwnerColumn is the table column denoting the contact_owner relation/edge.
+	ContactOwnerColumn = "person_contacts"
 	// ContactsTable is the table that holds the contacts relation/edge.
 	ContactsTable = "persons"
 	// ContactsColumn is the table column denoting the contacts relation/edge.
@@ -62,24 +64,13 @@ const (
 	MetadataInverseTable = "metadata"
 	// MetadataColumn is the table column denoting the metadata relation/edge.
 	MetadataColumn = "metadata_authors"
-	// NodeSupplierTable is the table that holds the node_supplier relation/edge.
-	NodeSupplierTable = "persons"
-	// NodeSupplierInverseTable is the table name for the Node entity.
+	// NodeTable is the table that holds the node relation/edge.
+	NodeTable = "persons"
+	// NodeInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
-	NodeSupplierInverseTable = "nodes"
-	// NodeSupplierColumn is the table column denoting the node_supplier relation/edge.
-	NodeSupplierColumn = "node_suppliers"
-	// NodeOriginatorTable is the table that holds the node_originator relation/edge.
-	NodeOriginatorTable = "persons"
-	// NodeOriginatorInverseTable is the table name for the Node entity.
-	// It exists in this package in order to avoid circular dependency with the "node" package.
-	NodeOriginatorInverseTable = "nodes"
-	// NodeOriginatorColumn is the table column denoting the node_originator relation/edge.
-	NodeOriginatorColumn = "node_originators"
-	// PersonContactTable is the table that holds the person_contact relation/edge.
-	PersonContactTable = "persons"
-	// PersonContactColumn is the table column denoting the person_contact relation/edge.
-	PersonContactColumn = "person_contacts"
+	NodeInverseTable = "nodes"
+	// NodeColumn is the table column denoting the node relation/edge.
+	NodeColumn = "node_originators"
 )
 
 // Columns holds all SQL columns for person fields.
@@ -149,6 +140,13 @@ func ByPhone(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPhone, opts...).ToFunc()
 }
 
+// ByContactOwnerField orders the results by contact_owner field.
+func ByContactOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newContactOwnerStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByContactsCount orders the results by contacts count.
 func ByContactsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -170,25 +168,18 @@ func ByMetadataField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByNodeSupplierField orders the results by node_supplier field.
-func ByNodeSupplierField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByNodeField orders the results by node field.
+func ByNodeField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeSupplierStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newNodeStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByNodeOriginatorField orders the results by node_originator field.
-func ByNodeOriginatorField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeOriginatorStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// ByPersonContactField orders the results by person_contact field.
-func ByPersonContactField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newPersonContactStep(), sql.OrderByField(field, opts...))
-	}
+func newContactOwnerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ContactOwnerTable, ContactOwnerColumn),
+	)
 }
 func newContactsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
@@ -204,24 +195,10 @@ func newMetadataStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, MetadataTable, MetadataColumn),
 	)
 }
-func newNodeSupplierStep() *sqlgraph.Step {
+func newNodeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodeSupplierInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, NodeSupplierTable, NodeSupplierColumn),
-	)
-}
-func newNodeOriginatorStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodeOriginatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, NodeOriginatorTable, NodeOriginatorColumn),
-	)
-}
-func newPersonContactStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, PersonContactTable, PersonContactColumn),
+		sqlgraph.To(NodeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, NodeTable, NodeColumn),
 	)
 }

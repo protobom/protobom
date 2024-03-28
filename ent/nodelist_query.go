@@ -44,7 +44,6 @@ type NodeListQuery struct {
 	withNodes    *NodeQuery
 	withEdges    *EdgeQuery
 	withDocument *DocumentQuery
-	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -139,7 +138,7 @@ func (nlq *NodeListQuery) QueryDocument() *DocumentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(nodelist.Table, nodelist.FieldID, selector),
 			sqlgraph.To(document.Table, document.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, nodelist.DocumentTable, nodelist.DocumentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, nodelist.DocumentTable, nodelist.DocumentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nlq.driver.Dialect(), step)
 		return fromU, nil
@@ -387,7 +386,7 @@ func (nlq *NodeListQuery) WithDocument(opts ...func(*DocumentQuery)) *NodeListQu
 // Example:
 //
 //	var v []struct {
-//		RootElements string `json:"root_elements,omitempty"`
+//		RootElements []string `json:"root_elements,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -410,7 +409,7 @@ func (nlq *NodeListQuery) GroupBy(field string, fields ...string) *NodeListGroup
 // Example:
 //
 //	var v []struct {
-//		RootElements string `json:"root_elements,omitempty"`
+//		RootElements []string `json:"root_elements,omitempty"`
 //	}
 //
 //	client.NodeList.Query().
@@ -458,7 +457,6 @@ func (nlq *NodeListQuery) prepareQuery(ctx context.Context) error {
 func (nlq *NodeListQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*NodeList, error) {
 	var (
 		nodes       = []*NodeList{}
-		withFKs     = nlq.withFKs
 		_spec       = nlq.querySpec()
 		loadedTypes = [3]bool{
 			nlq.withNodes != nil,
@@ -466,12 +464,6 @@ func (nlq *NodeListQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*No
 			nlq.withDocument != nil,
 		}
 	)
-	if nlq.withDocument != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, nodelist.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*NodeList).scanValues(nil, columns)
 	}
@@ -576,34 +568,30 @@ func (nlq *NodeListQuery) loadEdges(ctx context.Context, query *EdgeQuery, nodes
 	return nil
 }
 func (nlq *NodeListQuery) loadDocument(ctx context.Context, query *DocumentQuery, nodes []*NodeList, init func(*NodeList), assign func(*NodeList, *Document)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*NodeList)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*NodeList)
 	for i := range nodes {
-		if nodes[i].document_node_list == nil {
-			continue
-		}
-		fk := *nodes[i].document_node_list
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(document.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Document(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(nodelist.DocumentColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.node_list_document
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "node_list_document" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "document_node_list" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "node_list_document" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }

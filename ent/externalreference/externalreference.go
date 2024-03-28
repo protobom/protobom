@@ -45,11 +45,13 @@ const (
 	EdgeNodes = "nodes"
 	// Table holds the table name of the externalreference in the database.
 	Table = "external_references"
-	// HashesTable is the table that holds the hashes relation/edge. The primary key declared below.
-	HashesTable = "external_reference_hashes"
+	// HashesTable is the table that holds the hashes relation/edge.
+	HashesTable = "hashes_entries"
 	// HashesInverseTable is the table name for the HashesEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "hashesentry" package.
 	HashesInverseTable = "hashes_entries"
+	// HashesColumn is the table column denoting the hashes relation/edge.
+	HashesColumn = "external_reference_hashes"
 	// NodesTable is the table that holds the nodes relation/edge.
 	NodesTable = "external_references"
 	// NodesInverseTable is the table name for the Node entity.
@@ -73,12 +75,6 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"node_external_references",
 }
-
-var (
-	// HashesPrimaryKey and HashesColumn2 are the table columns denoting the
-	// primary key for the hashes relation (M2M).
-	HashesPrimaryKey = []string{"external_reference_id", "hashes_entry_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -229,7 +225,7 @@ func newHashesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(HashesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, HashesTable, HashesPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
 	)
 }
 func newNodesStep() *sqlgraph.Step {

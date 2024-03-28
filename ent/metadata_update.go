@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -31,7 +32,6 @@ import (
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/predicate"
-	"github.com/bom-squad/protobom/ent/timestamp"
 	"github.com/bom-squad/protobom/ent/tool"
 )
 
@@ -72,6 +72,20 @@ func (mu *MetadataUpdate) SetName(s string) *MetadataUpdate {
 func (mu *MetadataUpdate) SetNillableName(s *string) *MetadataUpdate {
 	if s != nil {
 		mu.SetName(*s)
+	}
+	return mu
+}
+
+// SetDate sets the "date" field.
+func (mu *MetadataUpdate) SetDate(t time.Time) *MetadataUpdate {
+	mu.mutation.SetDate(t)
+	return mu
+}
+
+// SetNillableDate sets the "date" field if the given value is not nil.
+func (mu *MetadataUpdate) SetNillableDate(t *time.Time) *MetadataUpdate {
+	if t != nil {
+		mu.SetDate(*t)
 	}
 	return mu
 }
@@ -120,13 +134,13 @@ func (mu *MetadataUpdate) AddAuthors(p ...*Person) *MetadataUpdate {
 	return mu.AddAuthorIDs(ids...)
 }
 
-// AddDocumentTypeIDs adds the "documentTypes" edge to the DocumentType entity by IDs.
+// AddDocumentTypeIDs adds the "document_types" edge to the DocumentType entity by IDs.
 func (mu *MetadataUpdate) AddDocumentTypeIDs(ids ...int) *MetadataUpdate {
 	mu.mutation.AddDocumentTypeIDs(ids...)
 	return mu
 }
 
-// AddDocumentTypes adds the "documentTypes" edges to the DocumentType entity.
+// AddDocumentTypes adds the "document_types" edges to the DocumentType entity.
 func (mu *MetadataUpdate) AddDocumentTypes(d ...*DocumentType) *MetadataUpdate {
 	ids := make([]int, len(d))
 	for i := range d {
@@ -135,24 +149,17 @@ func (mu *MetadataUpdate) AddDocumentTypes(d ...*DocumentType) *MetadataUpdate {
 	return mu.AddDocumentTypeIDs(ids...)
 }
 
-// AddDateIDs adds the "date" edge to the Timestamp entity by IDs.
-func (mu *MetadataUpdate) AddDateIDs(ids ...int) *MetadataUpdate {
-	mu.mutation.AddDateIDs(ids...)
-	return mu
-}
-
-// AddDate adds the "date" edges to the Timestamp entity.
-func (mu *MetadataUpdate) AddDate(t ...*Timestamp) *MetadataUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return mu.AddDateIDs(ids...)
-}
-
 // SetDocumentID sets the "document" edge to the Document entity by ID.
 func (mu *MetadataUpdate) SetDocumentID(id int) *MetadataUpdate {
 	mu.mutation.SetDocumentID(id)
+	return mu
+}
+
+// SetNillableDocumentID sets the "document" edge to the Document entity by ID if the given value is not nil.
+func (mu *MetadataUpdate) SetNillableDocumentID(id *int) *MetadataUpdate {
+	if id != nil {
+		mu = mu.SetDocumentID(*id)
+	}
 	return mu
 }
 
@@ -208,46 +215,25 @@ func (mu *MetadataUpdate) RemoveAuthors(p ...*Person) *MetadataUpdate {
 	return mu.RemoveAuthorIDs(ids...)
 }
 
-// ClearDocumentTypes clears all "documentTypes" edges to the DocumentType entity.
+// ClearDocumentTypes clears all "document_types" edges to the DocumentType entity.
 func (mu *MetadataUpdate) ClearDocumentTypes() *MetadataUpdate {
 	mu.mutation.ClearDocumentTypes()
 	return mu
 }
 
-// RemoveDocumentTypeIDs removes the "documentTypes" edge to DocumentType entities by IDs.
+// RemoveDocumentTypeIDs removes the "document_types" edge to DocumentType entities by IDs.
 func (mu *MetadataUpdate) RemoveDocumentTypeIDs(ids ...int) *MetadataUpdate {
 	mu.mutation.RemoveDocumentTypeIDs(ids...)
 	return mu
 }
 
-// RemoveDocumentTypes removes "documentTypes" edges to DocumentType entities.
+// RemoveDocumentTypes removes "document_types" edges to DocumentType entities.
 func (mu *MetadataUpdate) RemoveDocumentTypes(d ...*DocumentType) *MetadataUpdate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
 	return mu.RemoveDocumentTypeIDs(ids...)
-}
-
-// ClearDate clears all "date" edges to the Timestamp entity.
-func (mu *MetadataUpdate) ClearDate() *MetadataUpdate {
-	mu.mutation.ClearDate()
-	return mu
-}
-
-// RemoveDateIDs removes the "date" edge to Timestamp entities by IDs.
-func (mu *MetadataUpdate) RemoveDateIDs(ids ...int) *MetadataUpdate {
-	mu.mutation.RemoveDateIDs(ids...)
-	return mu
-}
-
-// RemoveDate removes "date" edges to Timestamp entities.
-func (mu *MetadataUpdate) RemoveDate(t ...*Timestamp) *MetadataUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return mu.RemoveDateIDs(ids...)
 }
 
 // ClearDocument clears the "document" edge to the Document entity.
@@ -283,18 +269,7 @@ func (mu *MetadataUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (mu *MetadataUpdate) check() error {
-	if _, ok := mu.mutation.DocumentID(); mu.mutation.DocumentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Metadata.document"`)
-	}
-	return nil
-}
-
 func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := mu.check(); err != nil {
-		return n, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(metadata.Table, metadata.Columns, sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString))
 	if ps := mu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -308,6 +283,9 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mu.mutation.Name(); ok {
 		_spec.SetField(metadata.FieldName, field.TypeString, value)
+	}
+	if value, ok := mu.mutation.Date(); ok {
+		_spec.SetField(metadata.FieldDate, field.TypeTime, value)
 	}
 	if value, ok := mu.mutation.Comment(); ok {
 		_spec.SetField(metadata.FieldComment, field.TypeString, value)
@@ -447,55 +425,10 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mu.mutation.DateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   metadata.DateTable,
-			Columns: []string{metadata.DateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mu.mutation.RemovedDateIDs(); len(nodes) > 0 && !mu.mutation.DateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   metadata.DateTable,
-			Columns: []string{metadata.DateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mu.mutation.DateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   metadata.DateTable,
-			Columns: []string{metadata.DateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if mu.mutation.DocumentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   metadata.DocumentTable,
 			Columns: []string{metadata.DocumentColumn},
 			Bidi:    false,
@@ -508,7 +441,7 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := mu.mutation.DocumentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   metadata.DocumentTable,
 			Columns: []string{metadata.DocumentColumn},
 			Bidi:    false,
@@ -569,6 +502,20 @@ func (muo *MetadataUpdateOne) SetNillableName(s *string) *MetadataUpdateOne {
 	return muo
 }
 
+// SetDate sets the "date" field.
+func (muo *MetadataUpdateOne) SetDate(t time.Time) *MetadataUpdateOne {
+	muo.mutation.SetDate(t)
+	return muo
+}
+
+// SetNillableDate sets the "date" field if the given value is not nil.
+func (muo *MetadataUpdateOne) SetNillableDate(t *time.Time) *MetadataUpdateOne {
+	if t != nil {
+		muo.SetDate(*t)
+	}
+	return muo
+}
+
 // SetComment sets the "comment" field.
 func (muo *MetadataUpdateOne) SetComment(s string) *MetadataUpdateOne {
 	muo.mutation.SetComment(s)
@@ -613,13 +560,13 @@ func (muo *MetadataUpdateOne) AddAuthors(p ...*Person) *MetadataUpdateOne {
 	return muo.AddAuthorIDs(ids...)
 }
 
-// AddDocumentTypeIDs adds the "documentTypes" edge to the DocumentType entity by IDs.
+// AddDocumentTypeIDs adds the "document_types" edge to the DocumentType entity by IDs.
 func (muo *MetadataUpdateOne) AddDocumentTypeIDs(ids ...int) *MetadataUpdateOne {
 	muo.mutation.AddDocumentTypeIDs(ids...)
 	return muo
 }
 
-// AddDocumentTypes adds the "documentTypes" edges to the DocumentType entity.
+// AddDocumentTypes adds the "document_types" edges to the DocumentType entity.
 func (muo *MetadataUpdateOne) AddDocumentTypes(d ...*DocumentType) *MetadataUpdateOne {
 	ids := make([]int, len(d))
 	for i := range d {
@@ -628,24 +575,17 @@ func (muo *MetadataUpdateOne) AddDocumentTypes(d ...*DocumentType) *MetadataUpda
 	return muo.AddDocumentTypeIDs(ids...)
 }
 
-// AddDateIDs adds the "date" edge to the Timestamp entity by IDs.
-func (muo *MetadataUpdateOne) AddDateIDs(ids ...int) *MetadataUpdateOne {
-	muo.mutation.AddDateIDs(ids...)
-	return muo
-}
-
-// AddDate adds the "date" edges to the Timestamp entity.
-func (muo *MetadataUpdateOne) AddDate(t ...*Timestamp) *MetadataUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return muo.AddDateIDs(ids...)
-}
-
 // SetDocumentID sets the "document" edge to the Document entity by ID.
 func (muo *MetadataUpdateOne) SetDocumentID(id int) *MetadataUpdateOne {
 	muo.mutation.SetDocumentID(id)
+	return muo
+}
+
+// SetNillableDocumentID sets the "document" edge to the Document entity by ID if the given value is not nil.
+func (muo *MetadataUpdateOne) SetNillableDocumentID(id *int) *MetadataUpdateOne {
+	if id != nil {
+		muo = muo.SetDocumentID(*id)
+	}
 	return muo
 }
 
@@ -701,46 +641,25 @@ func (muo *MetadataUpdateOne) RemoveAuthors(p ...*Person) *MetadataUpdateOne {
 	return muo.RemoveAuthorIDs(ids...)
 }
 
-// ClearDocumentTypes clears all "documentTypes" edges to the DocumentType entity.
+// ClearDocumentTypes clears all "document_types" edges to the DocumentType entity.
 func (muo *MetadataUpdateOne) ClearDocumentTypes() *MetadataUpdateOne {
 	muo.mutation.ClearDocumentTypes()
 	return muo
 }
 
-// RemoveDocumentTypeIDs removes the "documentTypes" edge to DocumentType entities by IDs.
+// RemoveDocumentTypeIDs removes the "document_types" edge to DocumentType entities by IDs.
 func (muo *MetadataUpdateOne) RemoveDocumentTypeIDs(ids ...int) *MetadataUpdateOne {
 	muo.mutation.RemoveDocumentTypeIDs(ids...)
 	return muo
 }
 
-// RemoveDocumentTypes removes "documentTypes" edges to DocumentType entities.
+// RemoveDocumentTypes removes "document_types" edges to DocumentType entities.
 func (muo *MetadataUpdateOne) RemoveDocumentTypes(d ...*DocumentType) *MetadataUpdateOne {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
 	return muo.RemoveDocumentTypeIDs(ids...)
-}
-
-// ClearDate clears all "date" edges to the Timestamp entity.
-func (muo *MetadataUpdateOne) ClearDate() *MetadataUpdateOne {
-	muo.mutation.ClearDate()
-	return muo
-}
-
-// RemoveDateIDs removes the "date" edge to Timestamp entities by IDs.
-func (muo *MetadataUpdateOne) RemoveDateIDs(ids ...int) *MetadataUpdateOne {
-	muo.mutation.RemoveDateIDs(ids...)
-	return muo
-}
-
-// RemoveDate removes "date" edges to Timestamp entities.
-func (muo *MetadataUpdateOne) RemoveDate(t ...*Timestamp) *MetadataUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return muo.RemoveDateIDs(ids...)
 }
 
 // ClearDocument clears the "document" edge to the Document entity.
@@ -789,18 +708,7 @@ func (muo *MetadataUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (muo *MetadataUpdateOne) check() error {
-	if _, ok := muo.mutation.DocumentID(); muo.mutation.DocumentCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Metadata.document"`)
-	}
-	return nil
-}
-
 func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err error) {
-	if err := muo.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(metadata.Table, metadata.Columns, sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString))
 	id, ok := muo.mutation.ID()
 	if !ok {
@@ -831,6 +739,9 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 	}
 	if value, ok := muo.mutation.Name(); ok {
 		_spec.SetField(metadata.FieldName, field.TypeString, value)
+	}
+	if value, ok := muo.mutation.Date(); ok {
+		_spec.SetField(metadata.FieldDate, field.TypeTime, value)
 	}
 	if value, ok := muo.mutation.Comment(); ok {
 		_spec.SetField(metadata.FieldComment, field.TypeString, value)
@@ -970,55 +881,10 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if muo.mutation.DateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   metadata.DateTable,
-			Columns: []string{metadata.DateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := muo.mutation.RemovedDateIDs(); len(nodes) > 0 && !muo.mutation.DateCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   metadata.DateTable,
-			Columns: []string{metadata.DateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := muo.mutation.DateIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   metadata.DateTable,
-			Columns: []string{metadata.DateColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(timestamp.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if muo.mutation.DocumentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   metadata.DocumentTable,
 			Columns: []string{metadata.DocumentColumn},
 			Bidi:    false,
@@ -1031,7 +897,7 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 	if nodes := muo.mutation.DocumentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   metadata.DocumentTable,
 			Columns: []string{metadata.DocumentColumn},
 			Bidi:    false,

@@ -45,14 +45,6 @@ func (dc *DocumentCreate) SetMetadataID(id string) *DocumentCreate {
 	return dc
 }
 
-// SetNillableMetadataID sets the "metadata" edge to the Metadata entity by ID if the given value is not nil.
-func (dc *DocumentCreate) SetNillableMetadataID(id *string) *DocumentCreate {
-	if id != nil {
-		dc = dc.SetMetadataID(*id)
-	}
-	return dc
-}
-
 // SetMetadata sets the "metadata" edge to the Metadata entity.
 func (dc *DocumentCreate) SetMetadata(m *Metadata) *DocumentCreate {
 	return dc.SetMetadataID(m.ID)
@@ -61,14 +53,6 @@ func (dc *DocumentCreate) SetMetadata(m *Metadata) *DocumentCreate {
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
 func (dc *DocumentCreate) SetNodeListID(id int) *DocumentCreate {
 	dc.mutation.SetNodeListID(id)
-	return dc
-}
-
-// SetNillableNodeListID sets the "node_list" edge to the NodeList entity by ID if the given value is not nil.
-func (dc *DocumentCreate) SetNillableNodeListID(id *int) *DocumentCreate {
-	if id != nil {
-		dc = dc.SetNodeListID(*id)
-	}
 	return dc
 }
 
@@ -111,6 +95,12 @@ func (dc *DocumentCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (dc *DocumentCreate) check() error {
+	if _, ok := dc.mutation.MetadataID(); !ok {
+		return &ValidationError{Name: "metadata", err: errors.New(`ent: missing required edge "Document.metadata"`)}
+	}
+	if _, ok := dc.mutation.NodeListID(); !ok {
+		return &ValidationError{Name: "node_list", err: errors.New(`ent: missing required edge "Document.node_list"`)}
+	}
 	return nil
 }
 
@@ -141,7 +131,7 @@ func (dc *DocumentCreate) createSpec() (*Document, *sqlgraph.CreateSpec) {
 	if nodes := dc.mutation.MetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.MetadataTable,
 			Columns: []string{document.MetadataColumn},
 			Bidi:    false,
@@ -152,12 +142,13 @@ func (dc *DocumentCreate) createSpec() (*Document, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.metadata_document = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dc.mutation.NodeListIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   document.NodeListTable,
 			Columns: []string{document.NodeListColumn},
 			Bidi:    false,
@@ -168,6 +159,7 @@ func (dc *DocumentCreate) createSpec() (*Document, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.node_list_document = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

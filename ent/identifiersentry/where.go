@@ -165,7 +165,7 @@ func HasNodes() predicate.IdentifiersEntry {
 	return predicate.IdentifiersEntry(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, NodesTable, NodesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, NodesTable, NodesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

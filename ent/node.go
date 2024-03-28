@@ -19,8 +19,10 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -46,7 +48,7 @@ type Node struct {
 	// URLDownload holds the value of the "url_download" field.
 	URLDownload string `json:"url_download,omitempty"`
 	// Licenses holds the value of the "licenses" field.
-	Licenses string `json:"licenses,omitempty"`
+	Licenses []string `json:"licenses,omitempty"`
 	// LicenseConcluded holds the value of the "license_concluded" field.
 	LicenseConcluded string `json:"license_concluded,omitempty"`
 	// LicenseComments holds the value of the "license_comments" field.
@@ -61,12 +63,16 @@ type Node struct {
 	Summary string `json:"summary,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// ReleaseDate holds the value of the "release_date" field.
+	ReleaseDate time.Time `json:"release_date,omitempty"`
+	// BuildDate holds the value of the "build_date" field.
+	BuildDate time.Time `json:"build_date,omitempty"`
+	// ValidUntilDate holds the value of the "valid_until_date" field.
+	ValidUntilDate time.Time `json:"valid_until_date,omitempty"`
 	// Attribution holds the value of the "attribution" field.
-	Attribution string `json:"attribution,omitempty"`
+	Attribution []string `json:"attribution,omitempty"`
 	// FileTypes holds the value of the "file_types" field.
-	FileTypes string `json:"file_types,omitempty"`
-	// PrimaryPurpose holds the value of the "primary_purpose" field.
-	PrimaryPurpose node.PrimaryPurpose `json:"primary_purpose,omitempty"`
+	FileTypes []string `json:"file_types,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NodeQuery when eager-loading is set.
 	Edges           NodeEdges `json:"edges"`
@@ -86,17 +92,13 @@ type NodeEdges struct {
 	Identifiers []*IdentifiersEntry `json:"identifiers,omitempty"`
 	// Hashes holds the value of the hashes edge.
 	Hashes []*HashesEntry `json:"hashes,omitempty"`
-	// ReleaseDate holds the value of the release_date edge.
-	ReleaseDate []*Timestamp `json:"release_date,omitempty"`
-	// BuildDate holds the value of the build_date edge.
-	BuildDate []*Timestamp `json:"build_date,omitempty"`
-	// ValidUntilDate holds the value of the valid_until_date edge.
-	ValidUntilDate []*Timestamp `json:"valid_until_date,omitempty"`
+	// PrimaryPurpose holds the value of the primary_purpose edge.
+	PrimaryPurpose []*Purpose `json:"primary_purpose,omitempty"`
 	// NodeList holds the value of the node_list edge.
 	NodeList *NodeList `json:"node_list,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [7]bool
 }
 
 // SuppliersOrErr returns the Suppliers value or an error if the edge
@@ -144,37 +146,19 @@ func (e NodeEdges) HashesOrErr() ([]*HashesEntry, error) {
 	return nil, &NotLoadedError{edge: "hashes"}
 }
 
-// ReleaseDateOrErr returns the ReleaseDate value or an error if the edge
+// PrimaryPurposeOrErr returns the PrimaryPurpose value or an error if the edge
 // was not loaded in eager-loading.
-func (e NodeEdges) ReleaseDateOrErr() ([]*Timestamp, error) {
+func (e NodeEdges) PrimaryPurposeOrErr() ([]*Purpose, error) {
 	if e.loadedTypes[5] {
-		return e.ReleaseDate, nil
+		return e.PrimaryPurpose, nil
 	}
-	return nil, &NotLoadedError{edge: "release_date"}
-}
-
-// BuildDateOrErr returns the BuildDate value or an error if the edge
-// was not loaded in eager-loading.
-func (e NodeEdges) BuildDateOrErr() ([]*Timestamp, error) {
-	if e.loadedTypes[6] {
-		return e.BuildDate, nil
-	}
-	return nil, &NotLoadedError{edge: "build_date"}
-}
-
-// ValidUntilDateOrErr returns the ValidUntilDate value or an error if the edge
-// was not loaded in eager-loading.
-func (e NodeEdges) ValidUntilDateOrErr() ([]*Timestamp, error) {
-	if e.loadedTypes[7] {
-		return e.ValidUntilDate, nil
-	}
-	return nil, &NotLoadedError{edge: "valid_until_date"}
+	return nil, &NotLoadedError{edge: "primary_purpose"}
 }
 
 // NodeListOrErr returns the NodeList value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e NodeEdges) NodeListOrErr() (*NodeList, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[6] {
 		if e.NodeList == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: nodelist.Label}
@@ -189,8 +173,12 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case node.FieldID, node.FieldType, node.FieldName, node.FieldVersion, node.FieldFileName, node.FieldURLHome, node.FieldURLDownload, node.FieldLicenses, node.FieldLicenseConcluded, node.FieldLicenseComments, node.FieldCopyright, node.FieldSourceInfo, node.FieldComment, node.FieldSummary, node.FieldDescription, node.FieldAttribution, node.FieldFileTypes, node.FieldPrimaryPurpose:
+		case node.FieldLicenses, node.FieldAttribution, node.FieldFileTypes:
+			values[i] = new([]byte)
+		case node.FieldID, node.FieldType, node.FieldName, node.FieldVersion, node.FieldFileName, node.FieldURLHome, node.FieldURLDownload, node.FieldLicenseConcluded, node.FieldLicenseComments, node.FieldCopyright, node.FieldSourceInfo, node.FieldComment, node.FieldSummary, node.FieldDescription:
 			values[i] = new(sql.NullString)
+		case node.FieldReleaseDate, node.FieldBuildDate, node.FieldValidUntilDate:
+			values[i] = new(sql.NullTime)
 		case node.ForeignKeys[0]: // node_list_nodes
 			values[i] = new(sql.NullInt64)
 		default:
@@ -251,10 +239,12 @@ func (n *Node) assignValues(columns []string, values []any) error {
 				n.URLDownload = value.String
 			}
 		case node.FieldLicenses:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field licenses", values[i])
-			} else if value.Valid {
-				n.Licenses = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.Licenses); err != nil {
+					return fmt.Errorf("unmarshal field licenses: %w", err)
+				}
 			}
 		case node.FieldLicenseConcluded:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -298,23 +288,39 @@ func (n *Node) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.Description = value.String
 			}
-		case node.FieldAttribution:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field attribution", values[i])
+		case node.FieldReleaseDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field release_date", values[i])
 			} else if value.Valid {
-				n.Attribution = value.String
+				n.ReleaseDate = value.Time
+			}
+		case node.FieldBuildDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field build_date", values[i])
+			} else if value.Valid {
+				n.BuildDate = value.Time
+			}
+		case node.FieldValidUntilDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field valid_until_date", values[i])
+			} else if value.Valid {
+				n.ValidUntilDate = value.Time
+			}
+		case node.FieldAttribution:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field attribution", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.Attribution); err != nil {
+					return fmt.Errorf("unmarshal field attribution: %w", err)
+				}
 			}
 		case node.FieldFileTypes:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field file_types", values[i])
-			} else if value.Valid {
-				n.FileTypes = value.String
-			}
-		case node.FieldPrimaryPurpose:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field primary_purpose", values[i])
-			} else if value.Valid {
-				n.PrimaryPurpose = node.PrimaryPurpose(value.String)
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.FileTypes); err != nil {
+					return fmt.Errorf("unmarshal field file_types: %w", err)
+				}
 			}
 		case node.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -361,19 +367,9 @@ func (n *Node) QueryHashes() *HashesEntryQuery {
 	return NewNodeClient(n.config).QueryHashes(n)
 }
 
-// QueryReleaseDate queries the "release_date" edge of the Node entity.
-func (n *Node) QueryReleaseDate() *TimestampQuery {
-	return NewNodeClient(n.config).QueryReleaseDate(n)
-}
-
-// QueryBuildDate queries the "build_date" edge of the Node entity.
-func (n *Node) QueryBuildDate() *TimestampQuery {
-	return NewNodeClient(n.config).QueryBuildDate(n)
-}
-
-// QueryValidUntilDate queries the "valid_until_date" edge of the Node entity.
-func (n *Node) QueryValidUntilDate() *TimestampQuery {
-	return NewNodeClient(n.config).QueryValidUntilDate(n)
+// QueryPrimaryPurpose queries the "primary_purpose" edge of the Node entity.
+func (n *Node) QueryPrimaryPurpose() *PurposeQuery {
+	return NewNodeClient(n.config).QueryPrimaryPurpose(n)
 }
 
 // QueryNodeList queries the "node_list" edge of the Node entity.
@@ -423,7 +419,7 @@ func (n *Node) String() string {
 	builder.WriteString(n.URLDownload)
 	builder.WriteString(", ")
 	builder.WriteString("licenses=")
-	builder.WriteString(n.Licenses)
+	builder.WriteString(fmt.Sprintf("%v", n.Licenses))
 	builder.WriteString(", ")
 	builder.WriteString("license_concluded=")
 	builder.WriteString(n.LicenseConcluded)
@@ -446,14 +442,20 @@ func (n *Node) String() string {
 	builder.WriteString("description=")
 	builder.WriteString(n.Description)
 	builder.WriteString(", ")
+	builder.WriteString("release_date=")
+	builder.WriteString(n.ReleaseDate.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("build_date=")
+	builder.WriteString(n.BuildDate.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("valid_until_date=")
+	builder.WriteString(n.ValidUntilDate.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("attribution=")
-	builder.WriteString(n.Attribution)
+	builder.WriteString(fmt.Sprintf("%v", n.Attribution))
 	builder.WriteString(", ")
 	builder.WriteString("file_types=")
-	builder.WriteString(n.FileTypes)
-	builder.WriteString(", ")
-	builder.WriteString("primary_purpose=")
-	builder.WriteString(fmt.Sprintf("%v", n.PrimaryPurpose))
+	builder.WriteString(fmt.Sprintf("%v", n.FileTypes))
 	builder.WriteByte(')')
 	return builder.String()
 }

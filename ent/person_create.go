@@ -69,6 +69,25 @@ func (pc *PersonCreate) SetPhone(s string) *PersonCreate {
 	return pc
 }
 
+// SetContactOwnerID sets the "contact_owner" edge to the Person entity by ID.
+func (pc *PersonCreate) SetContactOwnerID(id int) *PersonCreate {
+	pc.mutation.SetContactOwnerID(id)
+	return pc
+}
+
+// SetNillableContactOwnerID sets the "contact_owner" edge to the Person entity by ID if the given value is not nil.
+func (pc *PersonCreate) SetNillableContactOwnerID(id *int) *PersonCreate {
+	if id != nil {
+		pc = pc.SetContactOwnerID(*id)
+	}
+	return pc
+}
+
+// SetContactOwner sets the "contact_owner" edge to the Person entity.
+func (pc *PersonCreate) SetContactOwner(p *Person) *PersonCreate {
+	return pc.SetContactOwnerID(p.ID)
+}
+
 // AddContactIDs adds the "contacts" edge to the Person entity by IDs.
 func (pc *PersonCreate) AddContactIDs(ids ...int) *PersonCreate {
 	pc.mutation.AddContactIDs(ids...)
@@ -103,61 +122,23 @@ func (pc *PersonCreate) SetMetadata(m *Metadata) *PersonCreate {
 	return pc.SetMetadataID(m.ID)
 }
 
-// SetNodeSupplierID sets the "node_supplier" edge to the Node entity by ID.
-func (pc *PersonCreate) SetNodeSupplierID(id string) *PersonCreate {
-	pc.mutation.SetNodeSupplierID(id)
+// SetNodeID sets the "node" edge to the Node entity by ID.
+func (pc *PersonCreate) SetNodeID(id string) *PersonCreate {
+	pc.mutation.SetNodeID(id)
 	return pc
 }
 
-// SetNillableNodeSupplierID sets the "node_supplier" edge to the Node entity by ID if the given value is not nil.
-func (pc *PersonCreate) SetNillableNodeSupplierID(id *string) *PersonCreate {
+// SetNillableNodeID sets the "node" edge to the Node entity by ID if the given value is not nil.
+func (pc *PersonCreate) SetNillableNodeID(id *string) *PersonCreate {
 	if id != nil {
-		pc = pc.SetNodeSupplierID(*id)
+		pc = pc.SetNodeID(*id)
 	}
 	return pc
 }
 
-// SetNodeSupplier sets the "node_supplier" edge to the Node entity.
-func (pc *PersonCreate) SetNodeSupplier(n *Node) *PersonCreate {
-	return pc.SetNodeSupplierID(n.ID)
-}
-
-// SetNodeOriginatorID sets the "node_originator" edge to the Node entity by ID.
-func (pc *PersonCreate) SetNodeOriginatorID(id string) *PersonCreate {
-	pc.mutation.SetNodeOriginatorID(id)
-	return pc
-}
-
-// SetNillableNodeOriginatorID sets the "node_originator" edge to the Node entity by ID if the given value is not nil.
-func (pc *PersonCreate) SetNillableNodeOriginatorID(id *string) *PersonCreate {
-	if id != nil {
-		pc = pc.SetNodeOriginatorID(*id)
-	}
-	return pc
-}
-
-// SetNodeOriginator sets the "node_originator" edge to the Node entity.
-func (pc *PersonCreate) SetNodeOriginator(n *Node) *PersonCreate {
-	return pc.SetNodeOriginatorID(n.ID)
-}
-
-// SetPersonContactID sets the "person_contact" edge to the Person entity by ID.
-func (pc *PersonCreate) SetPersonContactID(id int) *PersonCreate {
-	pc.mutation.SetPersonContactID(id)
-	return pc
-}
-
-// SetNillablePersonContactID sets the "person_contact" edge to the Person entity by ID if the given value is not nil.
-func (pc *PersonCreate) SetNillablePersonContactID(id *int) *PersonCreate {
-	if id != nil {
-		pc = pc.SetPersonContactID(*id)
-	}
-	return pc
-}
-
-// SetPersonContact sets the "person_contact" edge to the Person entity.
-func (pc *PersonCreate) SetPersonContact(p *Person) *PersonCreate {
-	return pc.SetPersonContactID(p.ID)
+// SetNode sets the "node" edge to the Node entity.
+func (pc *PersonCreate) SetNode(n *Node) *PersonCreate {
+	return pc.SetNodeID(n.ID)
 }
 
 // Mutation returns the PersonMutation object of the builder.
@@ -256,13 +237,30 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
 		_node.Phone = value
 	}
+	if nodes := pc.mutation.ContactOwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   person.ContactOwnerTable,
+			Columns: []string{person.ContactOwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.person_contacts = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := pc.mutation.ContactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   person.ContactsTable,
 			Columns: []string{person.ContactsColumn},
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
 			},
@@ -289,29 +287,12 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 		_node.metadata_authors = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.NodeSupplierIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   person.NodeSupplierTable,
-			Columns: []string{person.NodeSupplierColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.node_suppliers = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.NodeOriginatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.NodeOriginatorTable,
-			Columns: []string{person.NodeOriginatorColumn},
+			Table:   person.NodeTable,
+			Columns: []string{person.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -321,23 +302,6 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.node_originators = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.PersonContactIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   person.PersonContactTable,
-			Columns: []string{person.PersonContactColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.person_contacts = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

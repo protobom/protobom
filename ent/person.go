@@ -56,25 +56,36 @@ type Person struct {
 
 // PersonEdges holds the relations/edges for other nodes in the graph.
 type PersonEdges struct {
+	// ContactOwner holds the value of the contact_owner edge.
+	ContactOwner *Person `json:"contact_owner,omitempty"`
 	// Contacts holds the value of the contacts edge.
 	Contacts []*Person `json:"contacts,omitempty"`
 	// Metadata holds the value of the metadata edge.
 	Metadata *Metadata `json:"metadata,omitempty"`
-	// NodeSupplier holds the value of the node_supplier edge.
-	NodeSupplier *Node `json:"node_supplier,omitempty"`
-	// NodeOriginator holds the value of the node_originator edge.
-	NodeOriginator *Node `json:"node_originator,omitempty"`
-	// PersonContact holds the value of the person_contact edge.
-	PersonContact *Person `json:"person_contact,omitempty"`
+	// Node holds the value of the node edge.
+	Node *Node `json:"node,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [4]bool
+}
+
+// ContactOwnerOrErr returns the ContactOwner value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PersonEdges) ContactOwnerOrErr() (*Person, error) {
+	if e.loadedTypes[0] {
+		if e.ContactOwner == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: person.Label}
+		}
+		return e.ContactOwner, nil
+	}
+	return nil, &NotLoadedError{edge: "contact_owner"}
 }
 
 // ContactsOrErr returns the Contacts value or an error if the edge
 // was not loaded in eager-loading.
 func (e PersonEdges) ContactsOrErr() ([]*Person, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		return e.Contacts, nil
 	}
 	return nil, &NotLoadedError{edge: "contacts"}
@@ -83,7 +94,7 @@ func (e PersonEdges) ContactsOrErr() ([]*Person, error) {
 // MetadataOrErr returns the Metadata value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PersonEdges) MetadataOrErr() (*Metadata, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.Metadata == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: metadata.Label}
@@ -93,43 +104,17 @@ func (e PersonEdges) MetadataOrErr() (*Metadata, error) {
 	return nil, &NotLoadedError{edge: "metadata"}
 }
 
-// NodeSupplierOrErr returns the NodeSupplier value or an error if the edge
+// NodeOrErr returns the Node value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e PersonEdges) NodeSupplierOrErr() (*Node, error) {
-	if e.loadedTypes[2] {
-		if e.NodeSupplier == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: node.Label}
-		}
-		return e.NodeSupplier, nil
-	}
-	return nil, &NotLoadedError{edge: "node_supplier"}
-}
-
-// NodeOriginatorOrErr returns the NodeOriginator value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e PersonEdges) NodeOriginatorOrErr() (*Node, error) {
+func (e PersonEdges) NodeOrErr() (*Node, error) {
 	if e.loadedTypes[3] {
-		if e.NodeOriginator == nil {
+		if e.Node == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: node.Label}
 		}
-		return e.NodeOriginator, nil
+		return e.Node, nil
 	}
-	return nil, &NotLoadedError{edge: "node_originator"}
-}
-
-// PersonContactOrErr returns the PersonContact value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e PersonEdges) PersonContactOrErr() (*Person, error) {
-	if e.loadedTypes[4] {
-		if e.PersonContact == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: person.Label}
-		}
-		return e.PersonContact, nil
-	}
-	return nil, &NotLoadedError{edge: "person_contact"}
+	return nil, &NotLoadedError{edge: "node"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -243,6 +228,11 @@ func (pe *Person) Value(name string) (ent.Value, error) {
 	return pe.selectValues.Get(name)
 }
 
+// QueryContactOwner queries the "contact_owner" edge of the Person entity.
+func (pe *Person) QueryContactOwner() *PersonQuery {
+	return NewPersonClient(pe.config).QueryContactOwner(pe)
+}
+
 // QueryContacts queries the "contacts" edge of the Person entity.
 func (pe *Person) QueryContacts() *PersonQuery {
 	return NewPersonClient(pe.config).QueryContacts(pe)
@@ -253,19 +243,9 @@ func (pe *Person) QueryMetadata() *MetadataQuery {
 	return NewPersonClient(pe.config).QueryMetadata(pe)
 }
 
-// QueryNodeSupplier queries the "node_supplier" edge of the Person entity.
-func (pe *Person) QueryNodeSupplier() *NodeQuery {
-	return NewPersonClient(pe.config).QueryNodeSupplier(pe)
-}
-
-// QueryNodeOriginator queries the "node_originator" edge of the Person entity.
-func (pe *Person) QueryNodeOriginator() *NodeQuery {
-	return NewPersonClient(pe.config).QueryNodeOriginator(pe)
-}
-
-// QueryPersonContact queries the "person_contact" edge of the Person entity.
-func (pe *Person) QueryPersonContact() *PersonQuery {
-	return NewPersonClient(pe.config).QueryPersonContact(pe)
+// QueryNode queries the "node" edge of the Person entity.
+func (pe *Person) QueryNode() *NodeQuery {
+	return NewPersonClient(pe.config).QueryNode(pe)
 }
 
 // Update returns a builder for updating this Person.

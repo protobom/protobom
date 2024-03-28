@@ -51,34 +51,42 @@ func (hec *HashesEntryCreate) SetHashData(s string) *HashesEntryCreate {
 	return hec
 }
 
-// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by IDs.
-func (hec *HashesEntryCreate) AddExternalReferenceIDs(ids ...int) *HashesEntryCreate {
-	hec.mutation.AddExternalReferenceIDs(ids...)
+// SetExternalReferencesID sets the "external_references" edge to the ExternalReference entity by ID.
+func (hec *HashesEntryCreate) SetExternalReferencesID(id int) *HashesEntryCreate {
+	hec.mutation.SetExternalReferencesID(id)
 	return hec
 }
 
-// AddExternalReferences adds the "external_references" edges to the ExternalReference entity.
-func (hec *HashesEntryCreate) AddExternalReferences(e ...*ExternalReference) *HashesEntryCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableExternalReferencesID sets the "external_references" edge to the ExternalReference entity by ID if the given value is not nil.
+func (hec *HashesEntryCreate) SetNillableExternalReferencesID(id *int) *HashesEntryCreate {
+	if id != nil {
+		hec = hec.SetExternalReferencesID(*id)
 	}
-	return hec.AddExternalReferenceIDs(ids...)
-}
-
-// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (hec *HashesEntryCreate) AddNodeIDs(ids ...string) *HashesEntryCreate {
-	hec.mutation.AddNodeIDs(ids...)
 	return hec
 }
 
-// AddNodes adds the "nodes" edges to the Node entity.
-func (hec *HashesEntryCreate) AddNodes(n ...*Node) *HashesEntryCreate {
-	ids := make([]string, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+// SetExternalReferences sets the "external_references" edge to the ExternalReference entity.
+func (hec *HashesEntryCreate) SetExternalReferences(e *ExternalReference) *HashesEntryCreate {
+	return hec.SetExternalReferencesID(e.ID)
+}
+
+// SetNodesID sets the "nodes" edge to the Node entity by ID.
+func (hec *HashesEntryCreate) SetNodesID(id string) *HashesEntryCreate {
+	hec.mutation.SetNodesID(id)
+	return hec
+}
+
+// SetNillableNodesID sets the "nodes" edge to the Node entity by ID if the given value is not nil.
+func (hec *HashesEntryCreate) SetNillableNodesID(id *string) *HashesEntryCreate {
+	if id != nil {
+		hec = hec.SetNodesID(*id)
 	}
-	return hec.AddNodeIDs(ids...)
+	return hec
+}
+
+// SetNodes sets the "nodes" edge to the Node entity.
+func (hec *HashesEntryCreate) SetNodes(n *Node) *HashesEntryCreate {
+	return hec.SetNodesID(n.ID)
 }
 
 // Mutation returns the HashesEntryMutation object of the builder.
@@ -163,10 +171,10 @@ func (hec *HashesEntryCreate) createSpec() (*HashesEntry, *sqlgraph.CreateSpec) 
 	}
 	if nodes := hec.mutation.ExternalReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   hashesentry.ExternalReferencesTable,
-			Columns: hashesentry.ExternalReferencesPrimaryKey,
+			Columns: []string{hashesentry.ExternalReferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
@@ -175,14 +183,15 @@ func (hec *HashesEntryCreate) createSpec() (*HashesEntry, *sqlgraph.CreateSpec) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.external_reference_hashes = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := hec.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   hashesentry.NodesTable,
-			Columns: hashesentry.NodesPrimaryKey,
+			Columns: []string{hashesentry.NodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -191,6 +200,7 @@ func (hec *HashesEntryCreate) createSpec() (*HashesEntry, *sqlgraph.CreateSpec) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.node_hashes = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

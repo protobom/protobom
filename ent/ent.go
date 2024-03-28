@@ -38,7 +38,7 @@ import (
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/nodelist"
 	"github.com/bom-squad/protobom/ent/person"
-	"github.com/bom-squad/protobom/ent/timestamp"
+	"github.com/bom-squad/protobom/ent/purpose"
 	"github.com/bom-squad/protobom/ent/tool"
 )
 
@@ -110,7 +110,7 @@ func checkColumn(table, column string) error {
 			node.Table:              node.ValidColumn,
 			nodelist.Table:          nodelist.ValidColumn,
 			person.Table:            person.ValidColumn,
-			timestamp.Table:         timestamp.ValidColumn,
+			purpose.Table:           purpose.ValidColumn,
 			tool.Table:              tool.ValidColumn,
 		})
 	})

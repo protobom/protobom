@@ -1,4 +1,3 @@
-// File updated by protoc-gen-ent.
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
 // SPDX-FileName: ent/schema/node.go
@@ -39,7 +38,7 @@ func (Node) Fields() []ent.Field {
 		field.String("file_name"),
 		field.String("url_home"),
 		field.String("url_download"),
-		field.String("licenses"),
+		field.Strings("licenses"),
 		field.String("license_concluded"),
 		field.String("license_comments"),
 		field.String("copyright"),
@@ -47,41 +46,11 @@ func (Node) Fields() []ent.Field {
 		field.String("comment"),
 		field.String("summary"),
 		field.String("description"),
-		field.String("attribution"),
-		field.String("file_types"),
-		field.Enum(
-			"primary_purpose",
-		).Values(
-			"UNKNOWN_PURPOSE",
-			"APPLICATION",
-			"ARCHIVE",
-			"BOM",
-			"CONFIGURATION",
-			"CONTAINER",
-			"DATA",
-			"DEVICE",
-			"DEVICE_DRIVER",
-			"DOCUMENTATION",
-			"EVIDENCE",
-			"EXECUTABLE",
-			"FILE",
-			"FIRMWARE",
-			"FRAMEWORK",
-			"INSTALL",
-			"LIBRARY",
-			"MACHINE_LEARNING_MODEL",
-			"MANIFEST",
-			"MODEL",
-			"MODULE",
-			"OPERATING_SYSTEM",
-			"OTHER",
-			"PATCH",
-			"PLATFORM",
-			"REQUIREMENT",
-			"SOURCE",
-			"SPECIFICATION",
-			"TEST",
-		),
+		field.Time("release_date"),
+		field.Time("build_date"),
+		field.Time("valid_until_date"),
+		field.Strings("attribution"),
+		field.Strings("file_types"),
 	}
 }
 
@@ -92,9 +61,7 @@ func (Node) Edges() []ent.Edge {
 		edge.To("external_references", ExternalReference.Type),
 		edge.To("identifiers", IdentifiersEntry.Type),
 		edge.To("hashes", HashesEntry.Type),
-		edge.To("release_date", Timestamp.Type),
-		edge.To("build_date", Timestamp.Type),
-		edge.To("valid_until_date", Timestamp.Type),
+		edge.To("primary_purpose", Purpose.Type),
 		edge.From("node_list", NodeList.Type).Ref("nodes").Required().Unique(),
 	}
 }

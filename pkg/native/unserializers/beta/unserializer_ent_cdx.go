@@ -71,7 +71,7 @@ func (components *cdxComponents) Unserialize(r io.Reader, _ *native.EntUnseriali
 	}
 
 	cc := 1
-	entNodes := make(ent.Nodes, 0, len(*components))
+	entNodes := ent.Nodes{}
 
 	for i := range *components {
 		component := (*components)[i]
@@ -134,7 +134,7 @@ func (refs *cdxExternalReferences) Unserialize(r io.Reader, _ *native.EntUnseria
 		return ent.ExternalReferences{}
 	}
 
-	entRefs := make(ent.ExternalReferences, 0, len(*refs))
+	entRefs := ent.ExternalReferences{}
 
 	for i := range *refs {
 		ref := (*refs)[i]
@@ -156,7 +156,7 @@ func (hashes *cdxHashes) Unserialize(r io.Reader, _ *native.EntUnserializeOption
 		return ent.HashesEntries{}
 	}
 
-	entHashes := make(ent.HashesEntries, 0, len(*hashes))
+	entHashes := ent.HashesEntries{}
 
 	for i := range *hashes {
 		hash := (*hashes)[i]
@@ -205,7 +205,7 @@ func (phases *cdxLifecycles) Unserialize(r io.Reader, _ *native.EntUnserializeOp
 		return ent.DocumentTypes{}
 	}
 
-	entDocTypes := make(ent.DocumentTypes, 0, len(*phases))
+	entDocTypes := ent.DocumentTypes{}
 
 	for i := range *phases {
 		phase := (*phases)[i]
@@ -224,7 +224,7 @@ func (phases *cdxLifecycles) Unserialize(r io.Reader, _ *native.EntUnserializeOp
 
 // Unserialize converts a list of cdx.OrganizationalContact to their ent.Person representations
 func (authors *cdxOrgContacts) Unserialize(r io.Reader, _ *native.EntUnserializeOptions, _ any) any {
-	entAuthors := make(ent.Persons, 0, len(*authors))
+	entAuthors := ent.Persons{}
 
 	for _, author := range *authors {
 		entAuthors = append(entAuthors, client.Person.Create().
@@ -240,7 +240,7 @@ func (authors *cdxOrgContacts) Unserialize(r io.Reader, _ *native.EntUnserialize
 
 // Unserialize converts a cdx.ToolsChoice to its ent.Tool list representation
 func (tools *cdxTools) Unserialize(r io.Reader, _ *native.EntUnserializeOptions, _ any) any {
-	var entTools []*ent.Tool
+	entTools := ent.Tools{}
 
 	if tools.Components != nil {
 		for i := range *tools.Components {

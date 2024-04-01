@@ -1,6 +1,22 @@
+# ------------------------------------------------------------------------
+# SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
+# SPDX-FileName: ent/Makefile
+# SPDX-FileType: SOURCE
+# SPDX-License-Identifier: Apache-2.0
+# ------------------------------------------------------------------------
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ------------------------------------------------------------------------
 ENT_ROOT_DIR   := ${abspath ${patsubst %/,%,${dir ${lastword ${MAKEFILE_LIST}}}}}
-PROTOC_ENT_VER := e03f38664cb77a2cee57a1a014133052f79478e6
-PROTOC_ENT_URL := https://raw.githubusercontent.com/ent/contrib/${PROTOC_ENT_VER}/entproto/cmd/protoc-gen-ent/options/ent/opts.proto
 
 .PHONY: generate-ent
 .SILENT: generate-ent
@@ -14,30 +30,3 @@ generate-ent: ## Generate ent database types from schema
 .SILENT: describe-schemas
 describe-schemas: ## Print descriptions of generated ent schema types
 	go run -mod=mod entgo.io/ent/cmd/ent describe ${ENT_ROOT_DIR}/schema
-
-.PHONY: proto-ent
-.SILENT: proto-ent
-proto-ent: ${ENT_ROOT_DIR}/proto/options/opts.proto ## Compile protobufs with protoc-gen-ent plugin
-	mkdir -p ${ENT_ROOT_DIR}/schema
-
-	printf "Compiling protobufs with ${CYAN}protoc-gen-ent${RESET}..."
-	protoc \
-	  --proto_path=${ENT_ROOT_DIR} \
-	  --proto_path=${ENT_ROOT_DIR}/proto \
-	  --ent_out=${ENT_ROOT_DIR} \
-	  --ent_opt=schemadir=${ENT_ROOT_DIR}/schema \
-	  ${ENT_ROOT_DIR}/proto/entpb/sbom.proto
-	printf "${GREEN}DONE${RESET}\n"
-
-	go fmt ${ENT_ROOT_DIR}/schema
-
-.SILENT: ${ENT_ROOT_DIR}/proto/options/opts.proto
-${ENT_ROOT_DIR}/proto/options/opts.proto:
-	printf "Installing ${CYAN}protoc-gen-ent${RESET}..."
-	go install entgo.io/contrib/entproto/cmd/protoc-gen-ent@${PROTOC_ENT_VER}
-	printf "${GREEN}DONE${RESET}\n"
-
-	printf "Downloading ${CYAN}protoc-gen-ent${RESET} protobuf definitions..."
-	mkdir -p ${ENT_ROOT_DIR}/proto/options
-	curl --fail --silent --show-error --location --output ${ENT_ROOT_DIR}/proto/options/opts.proto --url ${PROTOC_ENT_URL}
-	printf "${GREEN}DONE${RESET}\n"

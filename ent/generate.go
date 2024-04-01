@@ -19,6 +19,3 @@
 package ent
 
 //go:generate go run -mod=mod entc.go
-//go:generate go run -mod=mod github.com/segmentio/golines --no-chain-split-dots -w .
-//go:generate go run -mod=mod mvdan.cc/gofumpt -w .
-//go:generate go mod tidy

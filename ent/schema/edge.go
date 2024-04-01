@@ -84,7 +84,9 @@ func (Edge) Fields() []ent.Field {
 }
 
 func (Edge) Edges() []ent.Edge {
-	return []ent.Edge{edge.From("node_list", NodeList.Type).Ref("edges").Required().Unique()}
+	return []ent.Edge{
+		edge.From("node_list", NodeList.Type).Ref("edges").Required().Unique(),
+	}
 }
 
 func (Edge) Annotations() []schema.Annotation { return nil }

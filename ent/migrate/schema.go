@@ -180,6 +180,13 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "identifiersentry_software_identifier_type_software_identifier_value",
+				Unique:  true,
+				Columns: []*schema.Column{IdentifiersEntriesColumns[1], IdentifiersEntriesColumns[2]},
+			},
+		},
 	}
 	// MetadataColumns holds the columns for the "metadata" table.
 	MetadataColumns = []*schema.Column{

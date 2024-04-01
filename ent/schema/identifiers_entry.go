@@ -23,6 +23,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 type IdentifiersEntry struct {
@@ -43,7 +44,15 @@ func (IdentifiersEntry) Fields() []ent.Field {
 }
 
 func (IdentifiersEntry) Edges() []ent.Edge {
-	return []ent.Edge{edge.From("nodes", Node.Type).Ref("identifiers").Unique()}
+	return []ent.Edge{
+		edge.From("nodes", Node.Type).Ref("identifiers").Unique(),
+	}
+}
+
+func (IdentifiersEntry) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("software_identifier_type", "software_identifier_value").Unique(),
+	}
 }
 
 func (IdentifiersEntry) Annotations() []schema.Annotation { return nil }

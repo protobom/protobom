@@ -22,7 +22,6 @@ ENT_ROOT_DIR   := ${abspath ${patsubst %/,%,${dir ${lastword ${MAKEFILE_LIST}}}}
 .SILENT: generate-ent
 generate-ent: ## Generate ent database types from schema
 	printf "Generating ${CYAN}ent${RESET} database types with ${CYAN}go generate${RESET}..."
-	go get -d github.com/segmentio/golines mvdan.cc/gofumpt &> /dev/null
 	go generate ${ENT_ROOT_DIR}
 	printf "${GREEN}DONE${RESET}\n"
 

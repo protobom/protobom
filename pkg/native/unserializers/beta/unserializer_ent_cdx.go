@@ -8,6 +8,10 @@ import (
 	"time"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
+	_ "github.com/glebarez/go-sqlite"
+	"github.com/sirupsen/logrus"
+
+	"github.com/bom-squad/protobom/ent"
 	"github.com/bom-squad/protobom/ent/documenttype"
 	"github.com/bom-squad/protobom/ent/externalreference"
 	"github.com/bom-squad/protobom/ent/hashesentry"
@@ -15,11 +19,8 @@ import (
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/purpose"
 	cdxformats "github.com/bom-squad/protobom/pkg/formats/cyclonedx"
-	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/sirupsen/logrus"
-
-	"github.com/bom-squad/protobom/ent"
 	"github.com/bom-squad/protobom/pkg/native"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // Enable SQLite foreign key support.

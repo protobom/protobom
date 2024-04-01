@@ -2,13 +2,15 @@ package beta
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 	"time"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
-	_ "github.com/glebarez/go-sqlite"
+	sqlite "github.com/glebarez/go-sqlite"
 	"github.com/sirupsen/logrus"
 
 	"github.com/bom-squad/protobom/ent"
@@ -275,7 +277,11 @@ func (tools *cdxTools) Unserialize(r io.Reader, _ *native.EntUnserializeOptions,
 // Unserialize reads datq data from io.Reader r and parses it as a CycloneDX
 // document. If successful returns a protobom Document loaded with the SBOM data.
 func (entcdx *EntCDX) Unserialize(r io.Reader, _ *native.EntUnserializeOptions, _ any) any {
-	client, err := ent.Open("sqlite", entcdx.databaseFile+dsnParams)
+	if !slices.Contains(sql.Drivers(), "sqlite3") {
+		sqlite.RegisterAsSQLITE3()
+	}
+
+	client, err := ent.Open("sqlite3", entcdx.databaseFile+dsnParams)
 	if err != nil {
 		logrus.Fatalf("failed opening connection to sqlite: %v", err)
 	}

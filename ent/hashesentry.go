@@ -40,10 +40,10 @@ type HashesEntry struct {
 	HashData string `json:"hash_data,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the HashesEntryQuery when eager-loading is set.
-	Edges                     HashesEntryEdges `json:"edges"`
-	external_reference_hashes *int
-	node_hashes               *string
-	selectValues              sql.SelectValues
+	Edges                                        HashesEntryEdges `json:"edges"`
+	external_reference_external_reference_hashes *int
+	node_node_hashes                             *string
+	selectValues                                 sql.SelectValues
 }
 
 // HashesEntryEdges holds the relations/edges for other nodes in the graph.
@@ -92,9 +92,9 @@ func (*HashesEntry) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case hashesentry.FieldHashAlgorithmType, hashesentry.FieldHashData:
 			values[i] = new(sql.NullString)
-		case hashesentry.ForeignKeys[0]: // external_reference_hashes
+		case hashesentry.ForeignKeys[0]: // external_reference_external_reference_hashes
 			values[i] = new(sql.NullInt64)
-		case hashesentry.ForeignKeys[1]: // node_hashes
+		case hashesentry.ForeignKeys[1]: // node_node_hashes
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -131,17 +131,17 @@ func (he *HashesEntry) assignValues(columns []string, values []any) error {
 			}
 		case hashesentry.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field external_reference_hashes", value)
+				return fmt.Errorf("unexpected type %T for edge-field external_reference_external_reference_hashes", value)
 			} else if value.Valid {
-				he.external_reference_hashes = new(int)
-				*he.external_reference_hashes = int(value.Int64)
+				he.external_reference_external_reference_hashes = new(int)
+				*he.external_reference_external_reference_hashes = int(value.Int64)
 			}
 		case hashesentry.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field node_hashes", values[i])
+				return fmt.Errorf("unexpected type %T for field node_node_hashes", values[i])
 			} else if value.Valid {
-				he.node_hashes = new(string)
-				*he.node_hashes = value.String
+				he.node_node_hashes = new(string)
+				*he.node_node_hashes = value.String
 			}
 		default:
 			he.selectValues.Set(columns[i], values[i])

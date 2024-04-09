@@ -36,13 +36,13 @@ import (
 // ExternalReferenceQuery is the builder for querying ExternalReference entities.
 type ExternalReferenceQuery struct {
 	config
-	ctx        *QueryContext
-	order      []externalreference.OrderOption
-	inters     []Interceptor
-	predicates []predicate.ExternalReference
-	withHashes *HashesEntryQuery
-	withNodes  *NodeQuery
-	withFKs    bool
+	ctx                         *QueryContext
+	order                       []externalreference.OrderOption
+	inters                      []Interceptor
+	predicates                  []predicate.ExternalReference
+	withExternalReferenceHashes *HashesEntryQuery
+	withNode                    *NodeQuery
+	withFKs                     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -79,8 +79,8 @@ func (erq *ExternalReferenceQuery) Order(o ...externalreference.OrderOption) *Ex
 	return erq
 }
 
-// QueryHashes chains the current query on the "hashes" edge.
-func (erq *ExternalReferenceQuery) QueryHashes() *HashesEntryQuery {
+// QueryExternalReferenceHashes chains the current query on the "external_reference_hashes" edge.
+func (erq *ExternalReferenceQuery) QueryExternalReferenceHashes() *HashesEntryQuery {
 	query := (&HashesEntryClient{config: erq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := erq.prepareQuery(ctx); err != nil {
@@ -93,7 +93,7 @@ func (erq *ExternalReferenceQuery) QueryHashes() *HashesEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(externalreference.Table, externalreference.FieldID, selector),
 			sqlgraph.To(hashesentry.Table, hashesentry.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, externalreference.HashesTable, externalreference.HashesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, externalreference.ExternalReferenceHashesTable, externalreference.ExternalReferenceHashesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(erq.driver.Dialect(), step)
 		return fromU, nil
@@ -101,8 +101,8 @@ func (erq *ExternalReferenceQuery) QueryHashes() *HashesEntryQuery {
 	return query
 }
 
-// QueryNodes chains the current query on the "nodes" edge.
-func (erq *ExternalReferenceQuery) QueryNodes() *NodeQuery {
+// QueryNode chains the current query on the "node" edge.
+func (erq *ExternalReferenceQuery) QueryNode() *NodeQuery {
 	query := (&NodeClient{config: erq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := erq.prepareQuery(ctx); err != nil {
@@ -115,7 +115,7 @@ func (erq *ExternalReferenceQuery) QueryNodes() *NodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(externalreference.Table, externalreference.FieldID, selector),
 			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, externalreference.NodesTable, externalreference.NodesColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, externalreference.NodeTable, externalreference.NodeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(erq.driver.Dialect(), step)
 		return fromU, nil
@@ -310,38 +310,38 @@ func (erq *ExternalReferenceQuery) Clone() *ExternalReferenceQuery {
 		return nil
 	}
 	return &ExternalReferenceQuery{
-		config:     erq.config,
-		ctx:        erq.ctx.Clone(),
-		order:      append([]externalreference.OrderOption{}, erq.order...),
-		inters:     append([]Interceptor{}, erq.inters...),
-		predicates: append([]predicate.ExternalReference{}, erq.predicates...),
-		withHashes: erq.withHashes.Clone(),
-		withNodes:  erq.withNodes.Clone(),
+		config:                      erq.config,
+		ctx:                         erq.ctx.Clone(),
+		order:                       append([]externalreference.OrderOption{}, erq.order...),
+		inters:                      append([]Interceptor{}, erq.inters...),
+		predicates:                  append([]predicate.ExternalReference{}, erq.predicates...),
+		withExternalReferenceHashes: erq.withExternalReferenceHashes.Clone(),
+		withNode:                    erq.withNode.Clone(),
 		// clone intermediate query.
 		sql:  erq.sql.Clone(),
 		path: erq.path,
 	}
 }
 
-// WithHashes tells the query-builder to eager-load the nodes that are connected to
-// the "hashes" edge. The optional arguments are used to configure the query builder of the edge.
-func (erq *ExternalReferenceQuery) WithHashes(opts ...func(*HashesEntryQuery)) *ExternalReferenceQuery {
+// WithExternalReferenceHashes tells the query-builder to eager-load the nodes that are connected to
+// the "external_reference_hashes" edge. The optional arguments are used to configure the query builder of the edge.
+func (erq *ExternalReferenceQuery) WithExternalReferenceHashes(opts ...func(*HashesEntryQuery)) *ExternalReferenceQuery {
 	query := (&HashesEntryClient{config: erq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	erq.withHashes = query
+	erq.withExternalReferenceHashes = query
 	return erq
 }
 
-// WithNodes tells the query-builder to eager-load the nodes that are connected to
-// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
-func (erq *ExternalReferenceQuery) WithNodes(opts ...func(*NodeQuery)) *ExternalReferenceQuery {
+// WithNode tells the query-builder to eager-load the nodes that are connected to
+// the "node" edge. The optional arguments are used to configure the query builder of the edge.
+func (erq *ExternalReferenceQuery) WithNode(opts ...func(*NodeQuery)) *ExternalReferenceQuery {
 	query := (&NodeClient{config: erq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	erq.withNodes = query
+	erq.withNode = query
 	return erq
 }
 
@@ -425,11 +425,11 @@ func (erq *ExternalReferenceQuery) sqlAll(ctx context.Context, hooks ...queryHoo
 		withFKs     = erq.withFKs
 		_spec       = erq.querySpec()
 		loadedTypes = [2]bool{
-			erq.withHashes != nil,
-			erq.withNodes != nil,
+			erq.withExternalReferenceHashes != nil,
+			erq.withNode != nil,
 		}
 	)
-	if erq.withNodes != nil {
+	if erq.withNode != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -453,23 +453,25 @@ func (erq *ExternalReferenceQuery) sqlAll(ctx context.Context, hooks ...queryHoo
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := erq.withHashes; query != nil {
-		if err := erq.loadHashes(ctx, query, nodes,
-			func(n *ExternalReference) { n.Edges.Hashes = []*HashesEntry{} },
-			func(n *ExternalReference, e *HashesEntry) { n.Edges.Hashes = append(n.Edges.Hashes, e) }); err != nil {
+	if query := erq.withExternalReferenceHashes; query != nil {
+		if err := erq.loadExternalReferenceHashes(ctx, query, nodes,
+			func(n *ExternalReference) { n.Edges.ExternalReferenceHashes = []*HashesEntry{} },
+			func(n *ExternalReference, e *HashesEntry) {
+				n.Edges.ExternalReferenceHashes = append(n.Edges.ExternalReferenceHashes, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
-	if query := erq.withNodes; query != nil {
-		if err := erq.loadNodes(ctx, query, nodes, nil,
-			func(n *ExternalReference, e *Node) { n.Edges.Nodes = e }); err != nil {
+	if query := erq.withNode; query != nil {
+		if err := erq.loadNode(ctx, query, nodes, nil,
+			func(n *ExternalReference, e *Node) { n.Edges.Node = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (erq *ExternalReferenceQuery) loadHashes(ctx context.Context, query *HashesEntryQuery, nodes []*ExternalReference, init func(*ExternalReference), assign func(*ExternalReference, *HashesEntry)) error {
+func (erq *ExternalReferenceQuery) loadExternalReferenceHashes(ctx context.Context, query *HashesEntryQuery, nodes []*ExternalReference, init func(*ExternalReference), assign func(*ExternalReference, *HashesEntry)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*ExternalReference)
 	for i := range nodes {
@@ -481,33 +483,33 @@ func (erq *ExternalReferenceQuery) loadHashes(ctx context.Context, query *Hashes
 	}
 	query.withFKs = true
 	query.Where(predicate.HashesEntry(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(externalreference.HashesColumn), fks...))
+		s.Where(sql.InValues(s.C(externalreference.ExternalReferenceHashesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.external_reference_hashes
+		fk := n.external_reference_external_reference_hashes
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "external_reference_hashes" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "external_reference_external_reference_hashes" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "external_reference_hashes" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "external_reference_external_reference_hashes" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (erq *ExternalReferenceQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*ExternalReference, init func(*ExternalReference), assign func(*ExternalReference, *Node)) error {
+func (erq *ExternalReferenceQuery) loadNode(ctx context.Context, query *NodeQuery, nodes []*ExternalReference, init func(*ExternalReference), assign func(*ExternalReference, *Node)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*ExternalReference)
 	for i := range nodes {
-		if nodes[i].node_external_references == nil {
+		if nodes[i].node_node_external_references == nil {
 			continue
 		}
-		fk := *nodes[i].node_external_references
+		fk := *nodes[i].node_node_external_references
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -524,7 +526,7 @@ func (erq *ExternalReferenceQuery) loadNodes(ctx context.Context, query *NodeQue
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "node_external_references" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "node_node_external_references" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

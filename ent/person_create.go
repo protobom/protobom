@@ -29,6 +29,7 @@ import (
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/person"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // PersonCreate is the builder for creating a Person entity.
@@ -69,6 +70,12 @@ func (pc *PersonCreate) SetPhone(s string) *PersonCreate {
 	return pc
 }
 
+// SetContacts sets the "contacts" field.
+func (pc *PersonCreate) SetContacts(s []*sbom.Person) *PersonCreate {
+	pc.mutation.SetContacts(s)
+	return pc
+}
+
 // SetContactOwnerID sets the "contact_owner" edge to the Person entity by ID.
 func (pc *PersonCreate) SetContactOwnerID(id int) *PersonCreate {
 	pc.mutation.SetContactOwnerID(id)
@@ -88,19 +95,19 @@ func (pc *PersonCreate) SetContactOwner(p *Person) *PersonCreate {
 	return pc.SetContactOwnerID(p.ID)
 }
 
-// AddContactIDs adds the "contacts" edge to the Person entity by IDs.
-func (pc *PersonCreate) AddContactIDs(ids ...int) *PersonCreate {
-	pc.mutation.AddContactIDs(ids...)
+// AddPersonContactIDs adds the "person_contacts" edge to the Person entity by IDs.
+func (pc *PersonCreate) AddPersonContactIDs(ids ...int) *PersonCreate {
+	pc.mutation.AddPersonContactIDs(ids...)
 	return pc
 }
 
-// AddContacts adds the "contacts" edges to the Person entity.
-func (pc *PersonCreate) AddContacts(p ...*Person) *PersonCreate {
+// AddPersonContacts adds the "person_contacts" edges to the Person entity.
+func (pc *PersonCreate) AddPersonContacts(p ...*Person) *PersonCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return pc.AddContactIDs(ids...)
+	return pc.AddPersonContactIDs(ids...)
 }
 
 // SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
@@ -190,6 +197,9 @@ func (pc *PersonCreate) check() error {
 	if _, ok := pc.mutation.Phone(); !ok {
 		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "Person.phone"`)}
 	}
+	if _, ok := pc.mutation.Contacts(); !ok {
+		return &ValidationError{Name: "contacts", err: errors.New(`ent: missing required field "Person.contacts"`)}
+	}
 	return nil
 }
 
@@ -237,6 +247,10 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
 		_node.Phone = value
 	}
+	if value, ok := pc.mutation.Contacts(); ok {
+		_spec.SetField(person.FieldContacts, field.TypeJSON, value)
+		_node.Contacts = value
+	}
 	if nodes := pc.mutation.ContactOwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -251,15 +265,15 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.person_contacts = &nodes[0]
+		_node.person_person_contacts = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.ContactsIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.PersonContactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   person.ContactsTable,
-			Columns: []string{person.ContactsColumn},
+			Table:   person.PersonContactsTable,
+			Columns: []string{person.PersonContactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -284,7 +298,7 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.metadata_authors = &nodes[0]
+		_node.metadata_metadata_authors = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.NodeIDs(); len(nodes) > 0 {
@@ -301,7 +315,7 @@ func (pc *PersonCreate) createSpec() (*Person, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.node_originators = &nodes[0]
+		_node.node_node_originators = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -416,6 +430,18 @@ func (u *PersonUpsert) UpdatePhone() *PersonUpsert {
 	return u
 }
 
+// SetContacts sets the "contacts" field.
+func (u *PersonUpsert) SetContacts(v []*sbom.Person) *PersonUpsert {
+	u.Set(person.FieldContacts, v)
+	return u
+}
+
+// UpdateContacts sets the "contacts" field to the value that was provided on create.
+func (u *PersonUpsert) UpdateContacts() *PersonUpsert {
+	u.SetExcluded(person.FieldContacts)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -523,6 +549,20 @@ func (u *PersonUpsertOne) SetPhone(v string) *PersonUpsertOne {
 func (u *PersonUpsertOne) UpdatePhone() *PersonUpsertOne {
 	return u.Update(func(s *PersonUpsert) {
 		s.UpdatePhone()
+	})
+}
+
+// SetContacts sets the "contacts" field.
+func (u *PersonUpsertOne) SetContacts(v []*sbom.Person) *PersonUpsertOne {
+	return u.Update(func(s *PersonUpsert) {
+		s.SetContacts(v)
+	})
+}
+
+// UpdateContacts sets the "contacts" field to the value that was provided on create.
+func (u *PersonUpsertOne) UpdateContacts() *PersonUpsertOne {
+	return u.Update(func(s *PersonUpsert) {
+		s.UpdateContacts()
 	})
 }
 
@@ -796,6 +836,20 @@ func (u *PersonUpsertBulk) SetPhone(v string) *PersonUpsertBulk {
 func (u *PersonUpsertBulk) UpdatePhone() *PersonUpsertBulk {
 	return u.Update(func(s *PersonUpsert) {
 		s.UpdatePhone()
+	})
+}
+
+// SetContacts sets the "contacts" field.
+func (u *PersonUpsertBulk) SetContacts(v []*sbom.Person) *PersonUpsertBulk {
+	return u.Update(func(s *PersonUpsert) {
+		s.SetContacts(v)
+	})
+}
+
+// UpdateContacts sets the "contacts" field to the value that was provided on create.
+func (u *PersonUpsertBulk) UpdateContacts() *PersonUpsertBulk {
+	return u.Update(func(s *PersonUpsert) {
+		s.UpdateContacts()
 	})
 }
 

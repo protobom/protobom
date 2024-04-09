@@ -70,21 +70,21 @@ func IDLTE(id int) predicate.Document {
 	return predicate.Document(sql.FieldLTE(FieldID, id))
 }
 
-// HasMetadata applies the HasEdge predicate on the "metadata" edge.
-func HasMetadata() predicate.Document {
+// HasDocumentMetadata applies the HasEdge predicate on the "document_metadata" edge.
+func HasDocumentMetadata() predicate.Document {
 	return predicate.Document(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, MetadataTable, MetadataColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, DocumentMetadataTable, DocumentMetadataColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasMetadataWith applies the HasEdge predicate on the "metadata" edge with a given conditions (other predicates).
-func HasMetadataWith(preds ...predicate.Metadata) predicate.Document {
+// HasDocumentMetadataWith applies the HasEdge predicate on the "document_metadata" edge with a given conditions (other predicates).
+func HasDocumentMetadataWith(preds ...predicate.Metadata) predicate.Document {
 	return predicate.Document(func(s *sql.Selector) {
-		step := newMetadataStep()
+		step := newDocumentMetadataStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -93,21 +93,21 @@ func HasMetadataWith(preds ...predicate.Metadata) predicate.Document {
 	})
 }
 
-// HasNodeList applies the HasEdge predicate on the "node_list" edge.
-func HasNodeList() predicate.Document {
+// HasDocumentNodeList applies the HasEdge predicate on the "document_node_list" edge.
+func HasDocumentNodeList() predicate.Document {
 	return predicate.Document(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, NodeListTable, NodeListColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, DocumentNodeListTable, DocumentNodeListColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasNodeListWith applies the HasEdge predicate on the "node_list" edge with a given conditions (other predicates).
-func HasNodeListWith(preds ...predicate.NodeList) predicate.Document {
+// HasDocumentNodeListWith applies the HasEdge predicate on the "document_node_list" edge with a given conditions (other predicates).
+func HasDocumentNodeListWith(preds ...predicate.NodeList) predicate.Document {
 	return predicate.Document(func(s *sql.Selector) {
-		step := newNodeListStep()
+		step := newDocumentNodeListStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

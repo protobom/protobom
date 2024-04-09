@@ -28,10 +28,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/ent/document"
-	"github.com/bom-squad/protobom/ent/edge"
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/nodelist"
 	"github.com/bom-squad/protobom/ent/predicate"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // NodeListUpdate is the builder for updating NodeList entities.
@@ -59,34 +59,31 @@ func (nlu *NodeListUpdate) AppendRootElements(s []string) *NodeListUpdate {
 	return nlu
 }
 
-// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (nlu *NodeListUpdate) AddNodeIDs(ids ...string) *NodeListUpdate {
-	nlu.mutation.AddNodeIDs(ids...)
+// SetNodes sets the "nodes" field.
+func (nlu *NodeListUpdate) SetNodes(s []*sbom.Node) *NodeListUpdate {
+	nlu.mutation.SetNodes(s)
 	return nlu
 }
 
-// AddNodes adds the "nodes" edges to the Node entity.
-func (nlu *NodeListUpdate) AddNodes(n ...*Node) *NodeListUpdate {
+// AppendNodes appends s to the "nodes" field.
+func (nlu *NodeListUpdate) AppendNodes(s []*sbom.Node) *NodeListUpdate {
+	nlu.mutation.AppendNodes(s)
+	return nlu
+}
+
+// AddNodeListNodeIDs adds the "node_list_nodes" edge to the Node entity by IDs.
+func (nlu *NodeListUpdate) AddNodeListNodeIDs(ids ...string) *NodeListUpdate {
+	nlu.mutation.AddNodeListNodeIDs(ids...)
+	return nlu
+}
+
+// AddNodeListNodes adds the "node_list_nodes" edges to the Node entity.
+func (nlu *NodeListUpdate) AddNodeListNodes(n ...*Node) *NodeListUpdate {
 	ids := make([]string, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
-	return nlu.AddNodeIDs(ids...)
-}
-
-// AddEdgeIDs adds the "edges" edge to the Edge entity by IDs.
-func (nlu *NodeListUpdate) AddEdgeIDs(ids ...int) *NodeListUpdate {
-	nlu.mutation.AddEdgeIDs(ids...)
-	return nlu
-}
-
-// AddEdges adds the "edges" edges to the Edge entity.
-func (nlu *NodeListUpdate) AddEdges(e ...*Edge) *NodeListUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return nlu.AddEdgeIDs(ids...)
+	return nlu.AddNodeListNodeIDs(ids...)
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by ID.
@@ -113,46 +110,25 @@ func (nlu *NodeListUpdate) Mutation() *NodeListMutation {
 	return nlu.mutation
 }
 
-// ClearNodes clears all "nodes" edges to the Node entity.
-func (nlu *NodeListUpdate) ClearNodes() *NodeListUpdate {
-	nlu.mutation.ClearNodes()
+// ClearNodeListNodes clears all "node_list_nodes" edges to the Node entity.
+func (nlu *NodeListUpdate) ClearNodeListNodes() *NodeListUpdate {
+	nlu.mutation.ClearNodeListNodes()
 	return nlu
 }
 
-// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (nlu *NodeListUpdate) RemoveNodeIDs(ids ...string) *NodeListUpdate {
-	nlu.mutation.RemoveNodeIDs(ids...)
+// RemoveNodeListNodeIDs removes the "node_list_nodes" edge to Node entities by IDs.
+func (nlu *NodeListUpdate) RemoveNodeListNodeIDs(ids ...string) *NodeListUpdate {
+	nlu.mutation.RemoveNodeListNodeIDs(ids...)
 	return nlu
 }
 
-// RemoveNodes removes "nodes" edges to Node entities.
-func (nlu *NodeListUpdate) RemoveNodes(n ...*Node) *NodeListUpdate {
+// RemoveNodeListNodes removes "node_list_nodes" edges to Node entities.
+func (nlu *NodeListUpdate) RemoveNodeListNodes(n ...*Node) *NodeListUpdate {
 	ids := make([]string, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
-	return nlu.RemoveNodeIDs(ids...)
-}
-
-// ClearEdges clears all "edges" edges to the Edge entity.
-func (nlu *NodeListUpdate) ClearEdges() *NodeListUpdate {
-	nlu.mutation.ClearEdges()
-	return nlu
-}
-
-// RemoveEdgeIDs removes the "edges" edge to Edge entities by IDs.
-func (nlu *NodeListUpdate) RemoveEdgeIDs(ids ...int) *NodeListUpdate {
-	nlu.mutation.RemoveEdgeIDs(ids...)
-	return nlu
-}
-
-// RemoveEdges removes "edges" edges to Edge entities.
-func (nlu *NodeListUpdate) RemoveEdges(e ...*Edge) *NodeListUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return nlu.RemoveEdgeIDs(ids...)
+	return nlu.RemoveNodeListNodeIDs(ids...)
 }
 
 // ClearDocument clears the "document" edge to the Document entity.
@@ -205,12 +181,20 @@ func (nlu *NodeListUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, nodelist.FieldRootElements, value)
 		})
 	}
-	if nlu.mutation.NodesCleared() {
+	if value, ok := nlu.mutation.Nodes(); ok {
+		_spec.SetField(nodelist.FieldNodes, field.TypeJSON, value)
+	}
+	if value, ok := nlu.mutation.AppendedNodes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, nodelist.FieldNodes, value)
+		})
+	}
+	if nlu.mutation.NodeListNodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   nodelist.NodesTable,
-			Columns: []string{nodelist.NodesColumn},
+			Table:   nodelist.NodeListNodesTable,
+			Columns: []string{nodelist.NodeListNodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -218,28 +202,12 @@ func (nlu *NodeListUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nlu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !nlu.mutation.NodesCleared() {
+	if nodes := nlu.mutation.RemovedNodeListNodesIDs(); len(nodes) > 0 && !nlu.mutation.NodeListNodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   nodelist.NodesTable,
-			Columns: []string{nodelist.NodesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nlu.mutation.NodesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   nodelist.NodesTable,
-			Columns: []string{nodelist.NodesColumn},
+			Table:   nodelist.NodeListNodesTable,
+			Columns: []string{nodelist.NodeListNodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -248,46 +216,17 @@ func (nlu *NodeListUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if nlu.mutation.EdgesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   nodelist.EdgesTable,
-			Columns: []string{nodelist.EdgesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(edge.FieldID, field.TypeInt),
-			},
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nlu.mutation.RemovedEdgesIDs(); len(nodes) > 0 && !nlu.mutation.EdgesCleared() {
+	if nodes := nlu.mutation.NodeListNodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   nodelist.EdgesTable,
-			Columns: []string{nodelist.EdgesColumn},
+			Table:   nodelist.NodeListNodesTable,
+			Columns: []string{nodelist.NodeListNodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(edge.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nlu.mutation.EdgesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   nodelist.EdgesTable,
-			Columns: []string{nodelist.EdgesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(edge.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -356,34 +295,31 @@ func (nluo *NodeListUpdateOne) AppendRootElements(s []string) *NodeListUpdateOne
 	return nluo
 }
 
-// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (nluo *NodeListUpdateOne) AddNodeIDs(ids ...string) *NodeListUpdateOne {
-	nluo.mutation.AddNodeIDs(ids...)
+// SetNodes sets the "nodes" field.
+func (nluo *NodeListUpdateOne) SetNodes(s []*sbom.Node) *NodeListUpdateOne {
+	nluo.mutation.SetNodes(s)
 	return nluo
 }
 
-// AddNodes adds the "nodes" edges to the Node entity.
-func (nluo *NodeListUpdateOne) AddNodes(n ...*Node) *NodeListUpdateOne {
+// AppendNodes appends s to the "nodes" field.
+func (nluo *NodeListUpdateOne) AppendNodes(s []*sbom.Node) *NodeListUpdateOne {
+	nluo.mutation.AppendNodes(s)
+	return nluo
+}
+
+// AddNodeListNodeIDs adds the "node_list_nodes" edge to the Node entity by IDs.
+func (nluo *NodeListUpdateOne) AddNodeListNodeIDs(ids ...string) *NodeListUpdateOne {
+	nluo.mutation.AddNodeListNodeIDs(ids...)
+	return nluo
+}
+
+// AddNodeListNodes adds the "node_list_nodes" edges to the Node entity.
+func (nluo *NodeListUpdateOne) AddNodeListNodes(n ...*Node) *NodeListUpdateOne {
 	ids := make([]string, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
-	return nluo.AddNodeIDs(ids...)
-}
-
-// AddEdgeIDs adds the "edges" edge to the Edge entity by IDs.
-func (nluo *NodeListUpdateOne) AddEdgeIDs(ids ...int) *NodeListUpdateOne {
-	nluo.mutation.AddEdgeIDs(ids...)
-	return nluo
-}
-
-// AddEdges adds the "edges" edges to the Edge entity.
-func (nluo *NodeListUpdateOne) AddEdges(e ...*Edge) *NodeListUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return nluo.AddEdgeIDs(ids...)
+	return nluo.AddNodeListNodeIDs(ids...)
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by ID.
@@ -410,46 +346,25 @@ func (nluo *NodeListUpdateOne) Mutation() *NodeListMutation {
 	return nluo.mutation
 }
 
-// ClearNodes clears all "nodes" edges to the Node entity.
-func (nluo *NodeListUpdateOne) ClearNodes() *NodeListUpdateOne {
-	nluo.mutation.ClearNodes()
+// ClearNodeListNodes clears all "node_list_nodes" edges to the Node entity.
+func (nluo *NodeListUpdateOne) ClearNodeListNodes() *NodeListUpdateOne {
+	nluo.mutation.ClearNodeListNodes()
 	return nluo
 }
 
-// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (nluo *NodeListUpdateOne) RemoveNodeIDs(ids ...string) *NodeListUpdateOne {
-	nluo.mutation.RemoveNodeIDs(ids...)
+// RemoveNodeListNodeIDs removes the "node_list_nodes" edge to Node entities by IDs.
+func (nluo *NodeListUpdateOne) RemoveNodeListNodeIDs(ids ...string) *NodeListUpdateOne {
+	nluo.mutation.RemoveNodeListNodeIDs(ids...)
 	return nluo
 }
 
-// RemoveNodes removes "nodes" edges to Node entities.
-func (nluo *NodeListUpdateOne) RemoveNodes(n ...*Node) *NodeListUpdateOne {
+// RemoveNodeListNodes removes "node_list_nodes" edges to Node entities.
+func (nluo *NodeListUpdateOne) RemoveNodeListNodes(n ...*Node) *NodeListUpdateOne {
 	ids := make([]string, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
-	return nluo.RemoveNodeIDs(ids...)
-}
-
-// ClearEdges clears all "edges" edges to the Edge entity.
-func (nluo *NodeListUpdateOne) ClearEdges() *NodeListUpdateOne {
-	nluo.mutation.ClearEdges()
-	return nluo
-}
-
-// RemoveEdgeIDs removes the "edges" edge to Edge entities by IDs.
-func (nluo *NodeListUpdateOne) RemoveEdgeIDs(ids ...int) *NodeListUpdateOne {
-	nluo.mutation.RemoveEdgeIDs(ids...)
-	return nluo
-}
-
-// RemoveEdges removes "edges" edges to Edge entities.
-func (nluo *NodeListUpdateOne) RemoveEdges(e ...*Edge) *NodeListUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return nluo.RemoveEdgeIDs(ids...)
+	return nluo.RemoveNodeListNodeIDs(ids...)
 }
 
 // ClearDocument clears the "document" edge to the Document entity.
@@ -532,12 +447,20 @@ func (nluo *NodeListUpdateOne) sqlSave(ctx context.Context) (_node *NodeList, er
 			sqljson.Append(u, nodelist.FieldRootElements, value)
 		})
 	}
-	if nluo.mutation.NodesCleared() {
+	if value, ok := nluo.mutation.Nodes(); ok {
+		_spec.SetField(nodelist.FieldNodes, field.TypeJSON, value)
+	}
+	if value, ok := nluo.mutation.AppendedNodes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, nodelist.FieldNodes, value)
+		})
+	}
+	if nluo.mutation.NodeListNodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   nodelist.NodesTable,
-			Columns: []string{nodelist.NodesColumn},
+			Table:   nodelist.NodeListNodesTable,
+			Columns: []string{nodelist.NodeListNodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -545,28 +468,12 @@ func (nluo *NodeListUpdateOne) sqlSave(ctx context.Context) (_node *NodeList, er
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nluo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !nluo.mutation.NodesCleared() {
+	if nodes := nluo.mutation.RemovedNodeListNodesIDs(); len(nodes) > 0 && !nluo.mutation.NodeListNodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   nodelist.NodesTable,
-			Columns: []string{nodelist.NodesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nluo.mutation.NodesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   nodelist.NodesTable,
-			Columns: []string{nodelist.NodesColumn},
+			Table:   nodelist.NodeListNodesTable,
+			Columns: []string{nodelist.NodeListNodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -575,46 +482,17 @@ func (nluo *NodeListUpdateOne) sqlSave(ctx context.Context) (_node *NodeList, er
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if nluo.mutation.EdgesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   nodelist.EdgesTable,
-			Columns: []string{nodelist.EdgesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(edge.FieldID, field.TypeInt),
-			},
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nluo.mutation.RemovedEdgesIDs(); len(nodes) > 0 && !nluo.mutation.EdgesCleared() {
+	if nodes := nluo.mutation.NodeListNodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   nodelist.EdgesTable,
-			Columns: []string{nodelist.EdgesColumn},
+			Table:   nodelist.NodeListNodesTable,
+			Columns: []string{nodelist.NodeListNodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(edge.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nluo.mutation.EdgesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   nodelist.EdgesTable,
-			Columns: []string{nodelist.EdgesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(edge.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

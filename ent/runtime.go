@@ -18,8 +18,19 @@
 // ------------------------------------------------------------------------
 package ent
 
+import (
+	"github.com/bom-squad/protobom/ent/node"
+	"github.com/bom-squad/protobom/ent/schema"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	nodeFields := schema.Node{}.Fields()
+	_ = nodeFields
+	// nodeDescID is the schema descriptor for id field.
+	nodeDescID := nodeFields[0].Descriptor()
+	// node.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	node.IDValidator = nodeDescID.Validators[0].(func(string) error)
 }

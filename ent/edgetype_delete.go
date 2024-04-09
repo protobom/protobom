@@ -24,81 +24,81 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/bom-squad/protobom/ent/edge"
+	"github.com/bom-squad/protobom/ent/edgetype"
 	"github.com/bom-squad/protobom/ent/predicate"
 )
 
-// EdgeDelete is the builder for deleting a Edge entity.
-type EdgeDelete struct {
+// EdgeTypeDelete is the builder for deleting a EdgeType entity.
+type EdgeTypeDelete struct {
 	config
 	hooks    []Hook
-	mutation *EdgeMutation
+	mutation *EdgeTypeMutation
 }
 
-// Where appends a list predicates to the EdgeDelete builder.
-func (ed *EdgeDelete) Where(ps ...predicate.Edge) *EdgeDelete {
-	ed.mutation.Where(ps...)
-	return ed
+// Where appends a list predicates to the EdgeTypeDelete builder.
+func (etd *EdgeTypeDelete) Where(ps ...predicate.EdgeType) *EdgeTypeDelete {
+	etd.mutation.Where(ps...)
+	return etd
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (ed *EdgeDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, ed.sqlExec, ed.mutation, ed.hooks)
+func (etd *EdgeTypeDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, etd.sqlExec, etd.mutation, etd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ed *EdgeDelete) ExecX(ctx context.Context) int {
-	n, err := ed.Exec(ctx)
+func (etd *EdgeTypeDelete) ExecX(ctx context.Context) int {
+	n, err := etd.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (ed *EdgeDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(edge.Table, sqlgraph.NewFieldSpec(edge.FieldID, field.TypeInt))
-	if ps := ed.mutation.predicates; len(ps) > 0 {
+func (etd *EdgeTypeDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(edgetype.Table, sqlgraph.NewFieldSpec(edgetype.FieldID, field.TypeInt))
+	if ps := etd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, ed.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, etd.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	ed.mutation.done = true
+	etd.mutation.done = true
 	return affected, err
 }
 
-// EdgeDeleteOne is the builder for deleting a single Edge entity.
-type EdgeDeleteOne struct {
-	ed *EdgeDelete
+// EdgeTypeDeleteOne is the builder for deleting a single EdgeType entity.
+type EdgeTypeDeleteOne struct {
+	etd *EdgeTypeDelete
 }
 
-// Where appends a list predicates to the EdgeDelete builder.
-func (edo *EdgeDeleteOne) Where(ps ...predicate.Edge) *EdgeDeleteOne {
-	edo.ed.mutation.Where(ps...)
-	return edo
+// Where appends a list predicates to the EdgeTypeDelete builder.
+func (etdo *EdgeTypeDeleteOne) Where(ps ...predicate.EdgeType) *EdgeTypeDeleteOne {
+	etdo.etd.mutation.Where(ps...)
+	return etdo
 }
 
 // Exec executes the deletion query.
-func (edo *EdgeDeleteOne) Exec(ctx context.Context) error {
-	n, err := edo.ed.Exec(ctx)
+func (etdo *EdgeTypeDeleteOne) Exec(ctx context.Context) error {
+	n, err := etdo.etd.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{edge.Label}
+		return &NotFoundError{edgetype.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (edo *EdgeDeleteOne) ExecX(ctx context.Context) {
-	if err := edo.Exec(ctx); err != nil {
+func (etdo *EdgeTypeDeleteOne) ExecX(ctx context.Context) {
+	if err := etdo.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

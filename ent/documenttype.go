@@ -34,16 +34,16 @@ type DocumentType struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Type holds the value of the "type" field.
-	Type documenttype.Type `json:"type,omitempty"`
+	Type *documenttype.Type `json:"type,omitempty"`
 	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DocumentTypeQuery when eager-loading is set.
-	Edges                   DocumentTypeEdges `json:"edges"`
-	metadata_document_types *string
-	selectValues            sql.SelectValues
+	Edges                            DocumentTypeEdges `json:"edges"`
+	metadata_metadata_document_types *string
+	selectValues                     sql.SelectValues
 }
 
 // DocumentTypeEdges holds the relations/edges for other nodes in the graph.
@@ -77,7 +77,7 @@ func (*DocumentType) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case documenttype.FieldType, documenttype.FieldName, documenttype.FieldDescription:
 			values[i] = new(sql.NullString)
-		case documenttype.ForeignKeys[0]: // metadata_document_types
+		case documenttype.ForeignKeys[0]: // metadata_metadata_document_types
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -104,26 +104,29 @@ func (dt *DocumentType) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				dt.Type = documenttype.Type(value.String)
+				dt.Type = new(documenttype.Type)
+				*dt.Type = documenttype.Type(value.String)
 			}
 		case documenttype.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				dt.Name = value.String
+				dt.Name = new(string)
+				*dt.Name = value.String
 			}
 		case documenttype.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				dt.Description = value.String
+				dt.Description = new(string)
+				*dt.Description = value.String
 			}
 		case documenttype.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field metadata_document_types", values[i])
+				return fmt.Errorf("unexpected type %T for field metadata_metadata_document_types", values[i])
 			} else if value.Valid {
-				dt.metadata_document_types = new(string)
-				*dt.metadata_document_types = value.String
+				dt.metadata_metadata_document_types = new(string)
+				*dt.metadata_metadata_document_types = value.String
 			}
 		default:
 			dt.selectValues.Set(columns[i], values[i])
@@ -166,14 +169,20 @@ func (dt *DocumentType) String() string {
 	var builder strings.Builder
 	builder.WriteString("DocumentType(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", dt.ID))
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", dt.Type))
+	if v := dt.Type; v != nil {
+		builder.WriteString("type=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("name=")
-	builder.WriteString(dt.Name)
+	if v := dt.Name; v != nil {
+		builder.WriteString("name=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(dt.Description)
+	if v := dt.Description; v != nil {
+		builder.WriteString("description=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

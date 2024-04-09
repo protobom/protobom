@@ -41,15 +41,15 @@ func (DocumentType) Fields() []ent.Field {
 			"RUNTIME",
 			"DISCOVERY",
 			"DECOMISSION",
-		).Optional(),
-		field.String("name").Optional(),
-		field.String("description").Optional(),
+		).Optional().Nillable(),
+		field.String("name").Optional().Nillable(),
+		field.String("description").Optional().Nillable(),
 	}
 }
 
 func (DocumentType) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("metadata", Metadata.Type).Ref("document_types").Unique(),
+		edge.From("metadata", Metadata.Type).Ref("metadata_document_types").Unique(),
 	}
 }
 

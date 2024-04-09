@@ -167,15 +167,15 @@ func (dtc *DocumentTypeCreate) createSpec() (*DocumentType, *sqlgraph.CreateSpec
 	_spec.OnConflict = dtc.conflict
 	if value, ok := dtc.mutation.GetType(); ok {
 		_spec.SetField(documenttype.FieldType, field.TypeEnum, value)
-		_node.Type = value
+		_node.Type = &value
 	}
 	if value, ok := dtc.mutation.Name(); ok {
 		_spec.SetField(documenttype.FieldName, field.TypeString, value)
-		_node.Name = value
+		_node.Name = &value
 	}
 	if value, ok := dtc.mutation.Description(); ok {
 		_spec.SetField(documenttype.FieldDescription, field.TypeString, value)
-		_node.Description = value
+		_node.Description = &value
 	}
 	if nodes := dtc.mutation.MetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -191,7 +191,7 @@ func (dtc *DocumentTypeCreate) createSpec() (*DocumentType, *sqlgraph.CreateSpec
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.metadata_document_types = &nodes[0]
+		_node.metadata_metadata_document_types = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

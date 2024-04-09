@@ -23,6 +23,8 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 type Node struct {
@@ -31,7 +33,7 @@ type Node struct {
 
 func (Node) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").Unique().Immutable(),
+		field.String("id").NotEmpty().Unique().Immutable(),
 		field.Enum("type").Values("PACKAGE", "FILE"),
 		field.String("name"),
 		field.String("version"),
@@ -51,18 +53,25 @@ func (Node) Fields() []ent.Field {
 		field.Time("valid_until_date"),
 		field.Strings("attribution"),
 		field.Strings("file_types"),
+		field.JSON("suppliers", []*sbom.Person{}),
+		field.JSON("originators", []*sbom.Person{}),
+		field.JSON("external_references", []*sbom.ExternalReference{}),
+		field.JSON("hashes", map[int32]string{}),
+		field.JSON("identifiers", map[int32]string{}),
+		field.JSON("primary_purpose", []sbom.Purpose{}),
 	}
 }
 
 func (Node) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("suppliers", Person.Type),
-		edge.To("originators", Person.Type),
-		edge.To("external_references", ExternalReference.Type),
-		edge.To("identifiers", IdentifiersEntry.Type),
-		edge.To("hashes", HashesEntry.Type),
-		edge.To("primary_purpose", Purpose.Type),
-		edge.From("node_list", NodeList.Type).Ref("nodes").Required().Unique(),
+		edge.To("node_suppliers", Person.Type),
+		edge.To("node_originators", Person.Type),
+		edge.To("node_external_references", ExternalReference.Type),
+		edge.To("node_identifiers", IdentifiersEntry.Type),
+		edge.To("node_hashes", HashesEntry.Type),
+		edge.To("node_primary_purpose", Purpose.Type),
+		edge.To("nodes", Node.Type).Through("edge_types", EdgeType.Type),
+		edge.From("node_list", NodeList.Type).Ref("node_list_nodes").Required().Unique(),
 	}
 }
 

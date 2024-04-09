@@ -33,7 +33,7 @@ func (ExternalReference) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("url"),
 		field.String("comment"),
-		field.String("authority"),
+		field.String("authority").Optional(),
 		field.Enum("type").Values(
 			"UNKNOWN",
 			"ATTESTATION",
@@ -97,13 +97,14 @@ func (ExternalReference) Fields() []ent.Field {
 			"VULNERABILITY_EXPLOITABILITY_ASSESSMENT",
 			"WEBSITE",
 		),
+		field.JSON("hashes", map[int32]string{}),
 	}
 }
 
 func (ExternalReference) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("hashes", HashesEntry.Type),
-		edge.From("nodes", Node.Type).Ref("external_references").Required().Unique(),
+		edge.To("external_reference_hashes", HashesEntry.Type),
+		edge.From("node", Node.Type).Ref("node_external_references").Required().Unique(),
 	}
 }
 

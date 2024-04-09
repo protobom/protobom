@@ -47,7 +47,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "metadata" package.
 	MetadataInverseTable = "metadata"
 	// MetadataColumn is the table column denoting the metadata relation/edge.
-	MetadataColumn = "metadata_document_types"
+	MetadataColumn = "metadata_metadata_document_types"
 )
 
 // Columns holds all SQL columns for documenttype fields.
@@ -61,7 +61,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "document_types"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"metadata_document_types",
+	"metadata_metadata_document_types",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -33,6 +33,7 @@ import (
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/tool"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // MetadataCreate is the builder for creating a Metadata entity.
@@ -67,55 +68,73 @@ func (mc *MetadataCreate) SetComment(s string) *MetadataCreate {
 	return mc
 }
 
+// SetTools sets the "tools" field.
+func (mc *MetadataCreate) SetTools(s []*sbom.Tool) *MetadataCreate {
+	mc.mutation.SetTools(s)
+	return mc
+}
+
+// SetAuthors sets the "authors" field.
+func (mc *MetadataCreate) SetAuthors(s []*sbom.Person) *MetadataCreate {
+	mc.mutation.SetAuthors(s)
+	return mc
+}
+
+// SetDocumentTypes sets the "document_types" field.
+func (mc *MetadataCreate) SetDocumentTypes(st []*sbom.DocumentType) *MetadataCreate {
+	mc.mutation.SetDocumentTypes(st)
+	return mc
+}
+
 // SetID sets the "id" field.
 func (mc *MetadataCreate) SetID(s string) *MetadataCreate {
 	mc.mutation.SetID(s)
 	return mc
 }
 
-// AddToolIDs adds the "tools" edge to the Tool entity by IDs.
-func (mc *MetadataCreate) AddToolIDs(ids ...int) *MetadataCreate {
-	mc.mutation.AddToolIDs(ids...)
+// AddMetadataToolIDs adds the "metadata_tools" edge to the Tool entity by IDs.
+func (mc *MetadataCreate) AddMetadataToolIDs(ids ...int) *MetadataCreate {
+	mc.mutation.AddMetadataToolIDs(ids...)
 	return mc
 }
 
-// AddTools adds the "tools" edges to the Tool entity.
-func (mc *MetadataCreate) AddTools(t ...*Tool) *MetadataCreate {
+// AddMetadataTools adds the "metadata_tools" edges to the Tool entity.
+func (mc *MetadataCreate) AddMetadataTools(t ...*Tool) *MetadataCreate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return mc.AddToolIDs(ids...)
+	return mc.AddMetadataToolIDs(ids...)
 }
 
-// AddAuthorIDs adds the "authors" edge to the Person entity by IDs.
-func (mc *MetadataCreate) AddAuthorIDs(ids ...int) *MetadataCreate {
-	mc.mutation.AddAuthorIDs(ids...)
+// AddMetadataAuthorIDs adds the "metadata_authors" edge to the Person entity by IDs.
+func (mc *MetadataCreate) AddMetadataAuthorIDs(ids ...int) *MetadataCreate {
+	mc.mutation.AddMetadataAuthorIDs(ids...)
 	return mc
 }
 
-// AddAuthors adds the "authors" edges to the Person entity.
-func (mc *MetadataCreate) AddAuthors(p ...*Person) *MetadataCreate {
+// AddMetadataAuthors adds the "metadata_authors" edges to the Person entity.
+func (mc *MetadataCreate) AddMetadataAuthors(p ...*Person) *MetadataCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return mc.AddAuthorIDs(ids...)
+	return mc.AddMetadataAuthorIDs(ids...)
 }
 
-// AddDocumentTypeIDs adds the "document_types" edge to the DocumentType entity by IDs.
-func (mc *MetadataCreate) AddDocumentTypeIDs(ids ...int) *MetadataCreate {
-	mc.mutation.AddDocumentTypeIDs(ids...)
+// AddMetadataDocumentTypeIDs adds the "metadata_document_types" edge to the DocumentType entity by IDs.
+func (mc *MetadataCreate) AddMetadataDocumentTypeIDs(ids ...int) *MetadataCreate {
+	mc.mutation.AddMetadataDocumentTypeIDs(ids...)
 	return mc
 }
 
-// AddDocumentTypes adds the "document_types" edges to the DocumentType entity.
-func (mc *MetadataCreate) AddDocumentTypes(d ...*DocumentType) *MetadataCreate {
+// AddMetadataDocumentTypes adds the "metadata_document_types" edges to the DocumentType entity.
+func (mc *MetadataCreate) AddMetadataDocumentTypes(d ...*DocumentType) *MetadataCreate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return mc.AddDocumentTypeIDs(ids...)
+	return mc.AddMetadataDocumentTypeIDs(ids...)
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by ID.
@@ -183,6 +202,15 @@ func (mc *MetadataCreate) check() error {
 	if _, ok := mc.mutation.Comment(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "Metadata.comment"`)}
 	}
+	if _, ok := mc.mutation.Tools(); !ok {
+		return &ValidationError{Name: "tools", err: errors.New(`ent: missing required field "Metadata.tools"`)}
+	}
+	if _, ok := mc.mutation.Authors(); !ok {
+		return &ValidationError{Name: "authors", err: errors.New(`ent: missing required field "Metadata.authors"`)}
+	}
+	if _, ok := mc.mutation.DocumentTypes(); !ok {
+		return &ValidationError{Name: "document_types", err: errors.New(`ent: missing required field "Metadata.document_types"`)}
+	}
 	return nil
 }
 
@@ -235,12 +263,24 @@ func (mc *MetadataCreate) createSpec() (*Metadata, *sqlgraph.CreateSpec) {
 		_spec.SetField(metadata.FieldComment, field.TypeString, value)
 		_node.Comment = value
 	}
-	if nodes := mc.mutation.ToolsIDs(); len(nodes) > 0 {
+	if value, ok := mc.mutation.Tools(); ok {
+		_spec.SetField(metadata.FieldTools, field.TypeJSON, value)
+		_node.Tools = value
+	}
+	if value, ok := mc.mutation.Authors(); ok {
+		_spec.SetField(metadata.FieldAuthors, field.TypeJSON, value)
+		_node.Authors = value
+	}
+	if value, ok := mc.mutation.DocumentTypes(); ok {
+		_spec.SetField(metadata.FieldDocumentTypes, field.TypeJSON, value)
+		_node.DocumentTypes = value
+	}
+	if nodes := mc.mutation.MetadataToolsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.ToolsTable,
-			Columns: []string{metadata.ToolsColumn},
+			Table:   metadata.MetadataToolsTable,
+			Columns: []string{metadata.MetadataToolsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
@@ -251,12 +291,12 @@ func (mc *MetadataCreate) createSpec() (*Metadata, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mc.mutation.AuthorsIDs(); len(nodes) > 0 {
+	if nodes := mc.mutation.MetadataAuthorsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.AuthorsTable,
-			Columns: []string{metadata.AuthorsColumn},
+			Table:   metadata.MetadataAuthorsTable,
+			Columns: []string{metadata.MetadataAuthorsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -267,12 +307,12 @@ func (mc *MetadataCreate) createSpec() (*Metadata, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mc.mutation.DocumentTypesIDs(); len(nodes) > 0 {
+	if nodes := mc.mutation.MetadataDocumentTypesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.DocumentTypesTable,
-			Columns: []string{metadata.DocumentTypesColumn},
+			Table:   metadata.MetadataDocumentTypesTable,
+			Columns: []string{metadata.MetadataDocumentTypesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(documenttype.FieldID, field.TypeInt),
@@ -399,6 +439,42 @@ func (u *MetadataUpsert) UpdateComment() *MetadataUpsert {
 	return u
 }
 
+// SetTools sets the "tools" field.
+func (u *MetadataUpsert) SetTools(v []*sbom.Tool) *MetadataUpsert {
+	u.Set(metadata.FieldTools, v)
+	return u
+}
+
+// UpdateTools sets the "tools" field to the value that was provided on create.
+func (u *MetadataUpsert) UpdateTools() *MetadataUpsert {
+	u.SetExcluded(metadata.FieldTools)
+	return u
+}
+
+// SetAuthors sets the "authors" field.
+func (u *MetadataUpsert) SetAuthors(v []*sbom.Person) *MetadataUpsert {
+	u.Set(metadata.FieldAuthors, v)
+	return u
+}
+
+// UpdateAuthors sets the "authors" field to the value that was provided on create.
+func (u *MetadataUpsert) UpdateAuthors() *MetadataUpsert {
+	u.SetExcluded(metadata.FieldAuthors)
+	return u
+}
+
+// SetDocumentTypes sets the "document_types" field.
+func (u *MetadataUpsert) SetDocumentTypes(v []*sbom.DocumentType) *MetadataUpsert {
+	u.Set(metadata.FieldDocumentTypes, v)
+	return u
+}
+
+// UpdateDocumentTypes sets the "document_types" field to the value that was provided on create.
+func (u *MetadataUpsert) UpdateDocumentTypes() *MetadataUpsert {
+	u.SetExcluded(metadata.FieldDocumentTypes)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -500,6 +576,48 @@ func (u *MetadataUpsertOne) SetComment(v string) *MetadataUpsertOne {
 func (u *MetadataUpsertOne) UpdateComment() *MetadataUpsertOne {
 	return u.Update(func(s *MetadataUpsert) {
 		s.UpdateComment()
+	})
+}
+
+// SetTools sets the "tools" field.
+func (u *MetadataUpsertOne) SetTools(v []*sbom.Tool) *MetadataUpsertOne {
+	return u.Update(func(s *MetadataUpsert) {
+		s.SetTools(v)
+	})
+}
+
+// UpdateTools sets the "tools" field to the value that was provided on create.
+func (u *MetadataUpsertOne) UpdateTools() *MetadataUpsertOne {
+	return u.Update(func(s *MetadataUpsert) {
+		s.UpdateTools()
+	})
+}
+
+// SetAuthors sets the "authors" field.
+func (u *MetadataUpsertOne) SetAuthors(v []*sbom.Person) *MetadataUpsertOne {
+	return u.Update(func(s *MetadataUpsert) {
+		s.SetAuthors(v)
+	})
+}
+
+// UpdateAuthors sets the "authors" field to the value that was provided on create.
+func (u *MetadataUpsertOne) UpdateAuthors() *MetadataUpsertOne {
+	return u.Update(func(s *MetadataUpsert) {
+		s.UpdateAuthors()
+	})
+}
+
+// SetDocumentTypes sets the "document_types" field.
+func (u *MetadataUpsertOne) SetDocumentTypes(v []*sbom.DocumentType) *MetadataUpsertOne {
+	return u.Update(func(s *MetadataUpsert) {
+		s.SetDocumentTypes(v)
+	})
+}
+
+// UpdateDocumentTypes sets the "document_types" field to the value that was provided on create.
+func (u *MetadataUpsertOne) UpdateDocumentTypes() *MetadataUpsertOne {
+	return u.Update(func(s *MetadataUpsert) {
+		s.UpdateDocumentTypes()
 	})
 }
 
@@ -770,6 +888,48 @@ func (u *MetadataUpsertBulk) SetComment(v string) *MetadataUpsertBulk {
 func (u *MetadataUpsertBulk) UpdateComment() *MetadataUpsertBulk {
 	return u.Update(func(s *MetadataUpsert) {
 		s.UpdateComment()
+	})
+}
+
+// SetTools sets the "tools" field.
+func (u *MetadataUpsertBulk) SetTools(v []*sbom.Tool) *MetadataUpsertBulk {
+	return u.Update(func(s *MetadataUpsert) {
+		s.SetTools(v)
+	})
+}
+
+// UpdateTools sets the "tools" field to the value that was provided on create.
+func (u *MetadataUpsertBulk) UpdateTools() *MetadataUpsertBulk {
+	return u.Update(func(s *MetadataUpsert) {
+		s.UpdateTools()
+	})
+}
+
+// SetAuthors sets the "authors" field.
+func (u *MetadataUpsertBulk) SetAuthors(v []*sbom.Person) *MetadataUpsertBulk {
+	return u.Update(func(s *MetadataUpsert) {
+		s.SetAuthors(v)
+	})
+}
+
+// UpdateAuthors sets the "authors" field to the value that was provided on create.
+func (u *MetadataUpsertBulk) UpdateAuthors() *MetadataUpsertBulk {
+	return u.Update(func(s *MetadataUpsert) {
+		s.UpdateAuthors()
+	})
+}
+
+// SetDocumentTypes sets the "document_types" field.
+func (u *MetadataUpsertBulk) SetDocumentTypes(v []*sbom.DocumentType) *MetadataUpsertBulk {
+	return u.Update(func(s *MetadataUpsert) {
+		s.SetDocumentTypes(v)
+	})
+}
+
+// UpdateDocumentTypes sets the "document_types" field to the value that was provided on create.
+func (u *MetadataUpsertBulk) UpdateDocumentTypes() *MetadataUpsertBulk {
+	return u.Update(func(s *MetadataUpsert) {
+		s.UpdateDocumentTypes()
 	})
 }
 

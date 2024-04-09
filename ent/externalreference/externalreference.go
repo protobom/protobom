@@ -39,26 +39,28 @@ const (
 	FieldAuthority = "authority"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// EdgeHashes holds the string denoting the hashes edge name in mutations.
-	EdgeHashes = "hashes"
-	// EdgeNodes holds the string denoting the nodes edge name in mutations.
-	EdgeNodes = "nodes"
+	// FieldHashes holds the string denoting the hashes field in the database.
+	FieldHashes = "hashes"
+	// EdgeExternalReferenceHashes holds the string denoting the external_reference_hashes edge name in mutations.
+	EdgeExternalReferenceHashes = "external_reference_hashes"
+	// EdgeNode holds the string denoting the node edge name in mutations.
+	EdgeNode = "node"
 	// Table holds the table name of the externalreference in the database.
 	Table = "external_references"
-	// HashesTable is the table that holds the hashes relation/edge.
-	HashesTable = "hashes_entries"
-	// HashesInverseTable is the table name for the HashesEntry entity.
+	// ExternalReferenceHashesTable is the table that holds the external_reference_hashes relation/edge.
+	ExternalReferenceHashesTable = "hashes_entries"
+	// ExternalReferenceHashesInverseTable is the table name for the HashesEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "hashesentry" package.
-	HashesInverseTable = "hashes_entries"
-	// HashesColumn is the table column denoting the hashes relation/edge.
-	HashesColumn = "external_reference_hashes"
-	// NodesTable is the table that holds the nodes relation/edge.
-	NodesTable = "external_references"
-	// NodesInverseTable is the table name for the Node entity.
+	ExternalReferenceHashesInverseTable = "hashes_entries"
+	// ExternalReferenceHashesColumn is the table column denoting the external_reference_hashes relation/edge.
+	ExternalReferenceHashesColumn = "external_reference_external_reference_hashes"
+	// NodeTable is the table that holds the node relation/edge.
+	NodeTable = "external_references"
+	// NodeInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
-	NodesInverseTable = "nodes"
-	// NodesColumn is the table column denoting the nodes relation/edge.
-	NodesColumn = "node_external_references"
+	NodeInverseTable = "nodes"
+	// NodeColumn is the table column denoting the node relation/edge.
+	NodeColumn = "node_node_external_references"
 )
 
 // Columns holds all SQL columns for externalreference fields.
@@ -68,12 +70,13 @@ var Columns = []string{
 	FieldComment,
 	FieldAuthority,
 	FieldType,
+	FieldHashes,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "external_references"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"node_external_references",
+	"node_node_external_references",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -201,37 +204,37 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
-// ByHashesCount orders the results by hashes count.
-func ByHashesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByExternalReferenceHashesCount orders the results by external_reference_hashes count.
+func ByExternalReferenceHashesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newHashesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newExternalReferenceHashesStep(), opts...)
 	}
 }
 
-// ByHashes orders the results by hashes terms.
-func ByHashes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByExternalReferenceHashes orders the results by external_reference_hashes terms.
+func ByExternalReferenceHashes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newHashesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newExternalReferenceHashesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByNodesField orders the results by nodes field.
-func ByNodesField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByNodeField orders the results by node field.
+func ByNodeField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newNodeStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newHashesStep() *sqlgraph.Step {
+func newExternalReferenceHashesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(HashesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
+		sqlgraph.To(ExternalReferenceHashesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ExternalReferenceHashesTable, ExternalReferenceHashesColumn),
 	)
 }
-func newNodesStep() *sqlgraph.Step {
+func newNodeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, NodesTable, NodesColumn),
+		sqlgraph.To(NodeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, NodeTable, NodeColumn),
 	)
 }

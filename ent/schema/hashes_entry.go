@@ -58,8 +58,8 @@ func (HashesEntry) Fields() []ent.Field {
 
 func (HashesEntry) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("external_references", ExternalReference.Type).Ref("hashes").Unique(),
-		edge.From("nodes", Node.Type).Ref("hashes").Unique(),
+		edge.From("external_references", ExternalReference.Type).Ref("external_reference_hashes").Unique(),
+		edge.From("nodes", Node.Type).Ref("node_hashes").Unique(),
 	}
 }
 

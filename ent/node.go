@@ -28,6 +28,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/nodelist"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // Node is the model entity for the Node schema.
@@ -73,92 +74,117 @@ type Node struct {
 	Attribution []string `json:"attribution,omitempty"`
 	// FileTypes holds the value of the "file_types" field.
 	FileTypes []string `json:"file_types,omitempty"`
+	// Suppliers holds the value of the "suppliers" field.
+	Suppliers []*sbom.Person `json:"suppliers,omitempty"`
+	// Originators holds the value of the "originators" field.
+	Originators []*sbom.Person `json:"originators,omitempty"`
+	// ExternalReferences holds the value of the "external_references" field.
+	ExternalReferences []*sbom.ExternalReference `json:"external_references,omitempty"`
+	// Hashes holds the value of the "hashes" field.
+	Hashes map[int32]string `json:"hashes,omitempty"`
+	// Identifiers holds the value of the "identifiers" field.
+	Identifiers map[int32]string `json:"identifiers,omitempty"`
+	// PrimaryPurpose holds the value of the "primary_purpose" field.
+	PrimaryPurpose []sbom.Purpose `json:"primary_purpose,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NodeQuery when eager-loading is set.
-	Edges           NodeEdges `json:"edges"`
-	node_list_nodes *int
-	selectValues    sql.SelectValues
+	Edges                     NodeEdges `json:"edges"`
+	node_list_node_list_nodes *int
+	selectValues              sql.SelectValues
 }
 
 // NodeEdges holds the relations/edges for other nodes in the graph.
 type NodeEdges struct {
-	// Suppliers holds the value of the suppliers edge.
-	Suppliers []*Person `json:"suppliers,omitempty"`
-	// Originators holds the value of the originators edge.
-	Originators []*Person `json:"originators,omitempty"`
-	// ExternalReferences holds the value of the external_references edge.
-	ExternalReferences []*ExternalReference `json:"external_references,omitempty"`
-	// Identifiers holds the value of the identifiers edge.
-	Identifiers []*IdentifiersEntry `json:"identifiers,omitempty"`
-	// Hashes holds the value of the hashes edge.
-	Hashes []*HashesEntry `json:"hashes,omitempty"`
-	// PrimaryPurpose holds the value of the primary_purpose edge.
-	PrimaryPurpose []*Purpose `json:"primary_purpose,omitempty"`
+	// NodeSuppliers holds the value of the node_suppliers edge.
+	NodeSuppliers []*Person `json:"node_suppliers,omitempty"`
+	// NodeOriginators holds the value of the node_originators edge.
+	NodeOriginators []*Person `json:"node_originators,omitempty"`
+	// NodeExternalReferences holds the value of the node_external_references edge.
+	NodeExternalReferences []*ExternalReference `json:"node_external_references,omitempty"`
+	// NodeIdentifiers holds the value of the node_identifiers edge.
+	NodeIdentifiers []*IdentifiersEntry `json:"node_identifiers,omitempty"`
+	// NodeHashes holds the value of the node_hashes edge.
+	NodeHashes []*HashesEntry `json:"node_hashes,omitempty"`
+	// NodePrimaryPurpose holds the value of the node_primary_purpose edge.
+	NodePrimaryPurpose []*Purpose `json:"node_primary_purpose,omitempty"`
+	// Nodes holds the value of the nodes edge.
+	Nodes []*Node `json:"nodes,omitempty"`
 	// NodeList holds the value of the node_list edge.
 	NodeList *NodeList `json:"node_list,omitempty"`
+	// EdgeTypes holds the value of the edge_types edge.
+	EdgeTypes []*EdgeType `json:"edge_types,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [9]bool
 }
 
-// SuppliersOrErr returns the Suppliers value or an error if the edge
+// NodeSuppliersOrErr returns the NodeSuppliers value or an error if the edge
 // was not loaded in eager-loading.
-func (e NodeEdges) SuppliersOrErr() ([]*Person, error) {
+func (e NodeEdges) NodeSuppliersOrErr() ([]*Person, error) {
 	if e.loadedTypes[0] {
-		return e.Suppliers, nil
+		return e.NodeSuppliers, nil
 	}
-	return nil, &NotLoadedError{edge: "suppliers"}
+	return nil, &NotLoadedError{edge: "node_suppliers"}
 }
 
-// OriginatorsOrErr returns the Originators value or an error if the edge
+// NodeOriginatorsOrErr returns the NodeOriginators value or an error if the edge
 // was not loaded in eager-loading.
-func (e NodeEdges) OriginatorsOrErr() ([]*Person, error) {
+func (e NodeEdges) NodeOriginatorsOrErr() ([]*Person, error) {
 	if e.loadedTypes[1] {
-		return e.Originators, nil
+		return e.NodeOriginators, nil
 	}
-	return nil, &NotLoadedError{edge: "originators"}
+	return nil, &NotLoadedError{edge: "node_originators"}
 }
 
-// ExternalReferencesOrErr returns the ExternalReferences value or an error if the edge
+// NodeExternalReferencesOrErr returns the NodeExternalReferences value or an error if the edge
 // was not loaded in eager-loading.
-func (e NodeEdges) ExternalReferencesOrErr() ([]*ExternalReference, error) {
+func (e NodeEdges) NodeExternalReferencesOrErr() ([]*ExternalReference, error) {
 	if e.loadedTypes[2] {
-		return e.ExternalReferences, nil
+		return e.NodeExternalReferences, nil
 	}
-	return nil, &NotLoadedError{edge: "external_references"}
+	return nil, &NotLoadedError{edge: "node_external_references"}
 }
 
-// IdentifiersOrErr returns the Identifiers value or an error if the edge
+// NodeIdentifiersOrErr returns the NodeIdentifiers value or an error if the edge
 // was not loaded in eager-loading.
-func (e NodeEdges) IdentifiersOrErr() ([]*IdentifiersEntry, error) {
+func (e NodeEdges) NodeIdentifiersOrErr() ([]*IdentifiersEntry, error) {
 	if e.loadedTypes[3] {
-		return e.Identifiers, nil
+		return e.NodeIdentifiers, nil
 	}
-	return nil, &NotLoadedError{edge: "identifiers"}
+	return nil, &NotLoadedError{edge: "node_identifiers"}
 }
 
-// HashesOrErr returns the Hashes value or an error if the edge
+// NodeHashesOrErr returns the NodeHashes value or an error if the edge
 // was not loaded in eager-loading.
-func (e NodeEdges) HashesOrErr() ([]*HashesEntry, error) {
+func (e NodeEdges) NodeHashesOrErr() ([]*HashesEntry, error) {
 	if e.loadedTypes[4] {
-		return e.Hashes, nil
+		return e.NodeHashes, nil
 	}
-	return nil, &NotLoadedError{edge: "hashes"}
+	return nil, &NotLoadedError{edge: "node_hashes"}
 }
 
-// PrimaryPurposeOrErr returns the PrimaryPurpose value or an error if the edge
+// NodePrimaryPurposeOrErr returns the NodePrimaryPurpose value or an error if the edge
 // was not loaded in eager-loading.
-func (e NodeEdges) PrimaryPurposeOrErr() ([]*Purpose, error) {
+func (e NodeEdges) NodePrimaryPurposeOrErr() ([]*Purpose, error) {
 	if e.loadedTypes[5] {
-		return e.PrimaryPurpose, nil
+		return e.NodePrimaryPurpose, nil
 	}
-	return nil, &NotLoadedError{edge: "primary_purpose"}
+	return nil, &NotLoadedError{edge: "node_primary_purpose"}
+}
+
+// NodesOrErr returns the Nodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e NodeEdges) NodesOrErr() ([]*Node, error) {
+	if e.loadedTypes[6] {
+		return e.Nodes, nil
+	}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // NodeListOrErr returns the NodeList value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e NodeEdges) NodeListOrErr() (*NodeList, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[7] {
 		if e.NodeList == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: nodelist.Label}
@@ -168,18 +194,27 @@ func (e NodeEdges) NodeListOrErr() (*NodeList, error) {
 	return nil, &NotLoadedError{edge: "node_list"}
 }
 
+// EdgeTypesOrErr returns the EdgeTypes value or an error if the edge
+// was not loaded in eager-loading.
+func (e NodeEdges) EdgeTypesOrErr() ([]*EdgeType, error) {
+	if e.loadedTypes[8] {
+		return e.EdgeTypes, nil
+	}
+	return nil, &NotLoadedError{edge: "edge_types"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Node) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case node.FieldLicenses, node.FieldAttribution, node.FieldFileTypes:
+		case node.FieldLicenses, node.FieldAttribution, node.FieldFileTypes, node.FieldSuppliers, node.FieldOriginators, node.FieldExternalReferences, node.FieldHashes, node.FieldIdentifiers, node.FieldPrimaryPurpose:
 			values[i] = new([]byte)
 		case node.FieldID, node.FieldType, node.FieldName, node.FieldVersion, node.FieldFileName, node.FieldURLHome, node.FieldURLDownload, node.FieldLicenseConcluded, node.FieldLicenseComments, node.FieldCopyright, node.FieldSourceInfo, node.FieldComment, node.FieldSummary, node.FieldDescription:
 			values[i] = new(sql.NullString)
 		case node.FieldReleaseDate, node.FieldBuildDate, node.FieldValidUntilDate:
 			values[i] = new(sql.NullTime)
-		case node.ForeignKeys[0]: // node_list_nodes
+		case node.ForeignKeys[0]: // node_list_node_list_nodes
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -322,12 +357,60 @@ func (n *Node) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field file_types: %w", err)
 				}
 			}
+		case node.FieldSuppliers:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field suppliers", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.Suppliers); err != nil {
+					return fmt.Errorf("unmarshal field suppliers: %w", err)
+				}
+			}
+		case node.FieldOriginators:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field originators", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.Originators); err != nil {
+					return fmt.Errorf("unmarshal field originators: %w", err)
+				}
+			}
+		case node.FieldExternalReferences:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field external_references", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.ExternalReferences); err != nil {
+					return fmt.Errorf("unmarshal field external_references: %w", err)
+				}
+			}
+		case node.FieldHashes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field hashes", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.Hashes); err != nil {
+					return fmt.Errorf("unmarshal field hashes: %w", err)
+				}
+			}
+		case node.FieldIdentifiers:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field identifiers", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.Identifiers); err != nil {
+					return fmt.Errorf("unmarshal field identifiers: %w", err)
+				}
+			}
+		case node.FieldPrimaryPurpose:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field primary_purpose", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.PrimaryPurpose); err != nil {
+					return fmt.Errorf("unmarshal field primary_purpose: %w", err)
+				}
+			}
 		case node.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field node_list_nodes", value)
+				return fmt.Errorf("unexpected type %T for edge-field node_list_node_list_nodes", value)
 			} else if value.Valid {
-				n.node_list_nodes = new(int)
-				*n.node_list_nodes = int(value.Int64)
+				n.node_list_node_list_nodes = new(int)
+				*n.node_list_node_list_nodes = int(value.Int64)
 			}
 		default:
 			n.selectValues.Set(columns[i], values[i])
@@ -342,39 +425,49 @@ func (n *Node) Value(name string) (ent.Value, error) {
 	return n.selectValues.Get(name)
 }
 
-// QuerySuppliers queries the "suppliers" edge of the Node entity.
-func (n *Node) QuerySuppliers() *PersonQuery {
-	return NewNodeClient(n.config).QuerySuppliers(n)
+// QueryNodeSuppliers queries the "node_suppliers" edge of the Node entity.
+func (n *Node) QueryNodeSuppliers() *PersonQuery {
+	return NewNodeClient(n.config).QueryNodeSuppliers(n)
 }
 
-// QueryOriginators queries the "originators" edge of the Node entity.
-func (n *Node) QueryOriginators() *PersonQuery {
-	return NewNodeClient(n.config).QueryOriginators(n)
+// QueryNodeOriginators queries the "node_originators" edge of the Node entity.
+func (n *Node) QueryNodeOriginators() *PersonQuery {
+	return NewNodeClient(n.config).QueryNodeOriginators(n)
 }
 
-// QueryExternalReferences queries the "external_references" edge of the Node entity.
-func (n *Node) QueryExternalReferences() *ExternalReferenceQuery {
-	return NewNodeClient(n.config).QueryExternalReferences(n)
+// QueryNodeExternalReferences queries the "node_external_references" edge of the Node entity.
+func (n *Node) QueryNodeExternalReferences() *ExternalReferenceQuery {
+	return NewNodeClient(n.config).QueryNodeExternalReferences(n)
 }
 
-// QueryIdentifiers queries the "identifiers" edge of the Node entity.
-func (n *Node) QueryIdentifiers() *IdentifiersEntryQuery {
-	return NewNodeClient(n.config).QueryIdentifiers(n)
+// QueryNodeIdentifiers queries the "node_identifiers" edge of the Node entity.
+func (n *Node) QueryNodeIdentifiers() *IdentifiersEntryQuery {
+	return NewNodeClient(n.config).QueryNodeIdentifiers(n)
 }
 
-// QueryHashes queries the "hashes" edge of the Node entity.
-func (n *Node) QueryHashes() *HashesEntryQuery {
-	return NewNodeClient(n.config).QueryHashes(n)
+// QueryNodeHashes queries the "node_hashes" edge of the Node entity.
+func (n *Node) QueryNodeHashes() *HashesEntryQuery {
+	return NewNodeClient(n.config).QueryNodeHashes(n)
 }
 
-// QueryPrimaryPurpose queries the "primary_purpose" edge of the Node entity.
-func (n *Node) QueryPrimaryPurpose() *PurposeQuery {
-	return NewNodeClient(n.config).QueryPrimaryPurpose(n)
+// QueryNodePrimaryPurpose queries the "node_primary_purpose" edge of the Node entity.
+func (n *Node) QueryNodePrimaryPurpose() *PurposeQuery {
+	return NewNodeClient(n.config).QueryNodePrimaryPurpose(n)
+}
+
+// QueryNodes queries the "nodes" edge of the Node entity.
+func (n *Node) QueryNodes() *NodeQuery {
+	return NewNodeClient(n.config).QueryNodes(n)
 }
 
 // QueryNodeList queries the "node_list" edge of the Node entity.
 func (n *Node) QueryNodeList() *NodeListQuery {
 	return NewNodeClient(n.config).QueryNodeList(n)
+}
+
+// QueryEdgeTypes queries the "edge_types" edge of the Node entity.
+func (n *Node) QueryEdgeTypes() *EdgeTypeQuery {
+	return NewNodeClient(n.config).QueryEdgeTypes(n)
 }
 
 // Update returns a builder for updating this Node.
@@ -456,6 +549,24 @@ func (n *Node) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("file_types=")
 	builder.WriteString(fmt.Sprintf("%v", n.FileTypes))
+	builder.WriteString(", ")
+	builder.WriteString("suppliers=")
+	builder.WriteString(fmt.Sprintf("%v", n.Suppliers))
+	builder.WriteString(", ")
+	builder.WriteString("originators=")
+	builder.WriteString(fmt.Sprintf("%v", n.Originators))
+	builder.WriteString(", ")
+	builder.WriteString("external_references=")
+	builder.WriteString(fmt.Sprintf("%v", n.ExternalReferences))
+	builder.WriteString(", ")
+	builder.WriteString("hashes=")
+	builder.WriteString(fmt.Sprintf("%v", n.Hashes))
+	builder.WriteString(", ")
+	builder.WriteString("identifiers=")
+	builder.WriteString(fmt.Sprintf("%v", n.Identifiers))
+	builder.WriteString(", ")
+	builder.WriteString("primary_purpose=")
+	builder.WriteString(fmt.Sprintf("%v", n.PrimaryPurpose))
 	builder.WriteByte(')')
 	return builder.String()
 }

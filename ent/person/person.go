@@ -39,10 +39,12 @@ const (
 	FieldURL = "url"
 	// FieldPhone holds the string denoting the phone field in the database.
 	FieldPhone = "phone"
+	// FieldContacts holds the string denoting the contacts field in the database.
+	FieldContacts = "contacts"
 	// EdgeContactOwner holds the string denoting the contact_owner edge name in mutations.
 	EdgeContactOwner = "contact_owner"
-	// EdgeContacts holds the string denoting the contacts edge name in mutations.
-	EdgeContacts = "contacts"
+	// EdgePersonContacts holds the string denoting the person_contacts edge name in mutations.
+	EdgePersonContacts = "person_contacts"
 	// EdgeMetadata holds the string denoting the metadata edge name in mutations.
 	EdgeMetadata = "metadata"
 	// EdgeNode holds the string denoting the node edge name in mutations.
@@ -52,25 +54,25 @@ const (
 	// ContactOwnerTable is the table that holds the contact_owner relation/edge.
 	ContactOwnerTable = "persons"
 	// ContactOwnerColumn is the table column denoting the contact_owner relation/edge.
-	ContactOwnerColumn = "person_contacts"
-	// ContactsTable is the table that holds the contacts relation/edge.
-	ContactsTable = "persons"
-	// ContactsColumn is the table column denoting the contacts relation/edge.
-	ContactsColumn = "person_contacts"
+	ContactOwnerColumn = "person_person_contacts"
+	// PersonContactsTable is the table that holds the person_contacts relation/edge.
+	PersonContactsTable = "persons"
+	// PersonContactsColumn is the table column denoting the person_contacts relation/edge.
+	PersonContactsColumn = "person_person_contacts"
 	// MetadataTable is the table that holds the metadata relation/edge.
 	MetadataTable = "persons"
 	// MetadataInverseTable is the table name for the Metadata entity.
 	// It exists in this package in order to avoid circular dependency with the "metadata" package.
 	MetadataInverseTable = "metadata"
 	// MetadataColumn is the table column denoting the metadata relation/edge.
-	MetadataColumn = "metadata_authors"
+	MetadataColumn = "metadata_metadata_authors"
 	// NodeTable is the table that holds the node relation/edge.
 	NodeTable = "persons"
 	// NodeInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodeInverseTable = "nodes"
 	// NodeColumn is the table column denoting the node relation/edge.
-	NodeColumn = "node_originators"
+	NodeColumn = "node_node_originators"
 )
 
 // Columns holds all SQL columns for person fields.
@@ -81,15 +83,16 @@ var Columns = []string{
 	FieldEmail,
 	FieldURL,
 	FieldPhone,
+	FieldContacts,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "persons"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"metadata_authors",
-	"node_suppliers",
-	"node_originators",
-	"person_contacts",
+	"metadata_metadata_authors",
+	"node_node_suppliers",
+	"node_node_originators",
+	"person_person_contacts",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -147,17 +150,17 @@ func ByContactOwnerField(field string, opts ...sql.OrderTermOption) OrderOption 
 	}
 }
 
-// ByContactsCount orders the results by contacts count.
-func ByContactsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByPersonContactsCount orders the results by person_contacts count.
+func ByPersonContactsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newContactsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newPersonContactsStep(), opts...)
 	}
 }
 
-// ByContacts orders the results by contacts terms.
-func ByContacts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByPersonContacts orders the results by person_contacts terms.
+func ByPersonContacts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newContactsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newPersonContactsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -181,11 +184,11 @@ func newContactOwnerStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, ContactOwnerTable, ContactOwnerColumn),
 	)
 }
-func newContactsStep() *sqlgraph.Step {
+func newPersonContactsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ContactsTable, ContactsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, PersonContactsTable, PersonContactsColumn),
 	)
 }
 func newMetadataStep() *sqlgraph.Step {

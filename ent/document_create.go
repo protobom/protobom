@@ -29,6 +29,7 @@ import (
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/nodelist"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // DocumentCreate is the builder for creating a Document entity.
@@ -39,26 +40,38 @@ type DocumentCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
-func (dc *DocumentCreate) SetMetadataID(id string) *DocumentCreate {
-	dc.mutation.SetMetadataID(id)
+// SetMetadata sets the "metadata" field.
+func (dc *DocumentCreate) SetMetadata(s *sbom.Metadata) *DocumentCreate {
+	dc.mutation.SetMetadata(s)
 	return dc
 }
 
-// SetMetadata sets the "metadata" edge to the Metadata entity.
-func (dc *DocumentCreate) SetMetadata(m *Metadata) *DocumentCreate {
-	return dc.SetMetadataID(m.ID)
-}
-
-// SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
-func (dc *DocumentCreate) SetNodeListID(id int) *DocumentCreate {
-	dc.mutation.SetNodeListID(id)
+// SetNodeList sets the "node_list" field.
+func (dc *DocumentCreate) SetNodeList(sl *sbom.NodeList) *DocumentCreate {
+	dc.mutation.SetNodeList(sl)
 	return dc
 }
 
-// SetNodeList sets the "node_list" edge to the NodeList entity.
-func (dc *DocumentCreate) SetNodeList(n *NodeList) *DocumentCreate {
-	return dc.SetNodeListID(n.ID)
+// SetDocumentMetadataID sets the "document_metadata" edge to the Metadata entity by ID.
+func (dc *DocumentCreate) SetDocumentMetadataID(id string) *DocumentCreate {
+	dc.mutation.SetDocumentMetadataID(id)
+	return dc
+}
+
+// SetDocumentMetadata sets the "document_metadata" edge to the Metadata entity.
+func (dc *DocumentCreate) SetDocumentMetadata(m *Metadata) *DocumentCreate {
+	return dc.SetDocumentMetadataID(m.ID)
+}
+
+// SetDocumentNodeListID sets the "document_node_list" edge to the NodeList entity by ID.
+func (dc *DocumentCreate) SetDocumentNodeListID(id int) *DocumentCreate {
+	dc.mutation.SetDocumentNodeListID(id)
+	return dc
+}
+
+// SetDocumentNodeList sets the "document_node_list" edge to the NodeList entity.
+func (dc *DocumentCreate) SetDocumentNodeList(n *NodeList) *DocumentCreate {
+	return dc.SetDocumentNodeListID(n.ID)
 }
 
 // Mutation returns the DocumentMutation object of the builder.
@@ -95,11 +108,17 @@ func (dc *DocumentCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (dc *DocumentCreate) check() error {
-	if _, ok := dc.mutation.MetadataID(); !ok {
-		return &ValidationError{Name: "metadata", err: errors.New(`ent: missing required edge "Document.metadata"`)}
+	if _, ok := dc.mutation.Metadata(); !ok {
+		return &ValidationError{Name: "metadata", err: errors.New(`ent: missing required field "Document.metadata"`)}
 	}
-	if _, ok := dc.mutation.NodeListID(); !ok {
-		return &ValidationError{Name: "node_list", err: errors.New(`ent: missing required edge "Document.node_list"`)}
+	if _, ok := dc.mutation.NodeList(); !ok {
+		return &ValidationError{Name: "node_list", err: errors.New(`ent: missing required field "Document.node_list"`)}
+	}
+	if _, ok := dc.mutation.DocumentMetadataID(); !ok {
+		return &ValidationError{Name: "document_metadata", err: errors.New(`ent: missing required edge "Document.document_metadata"`)}
+	}
+	if _, ok := dc.mutation.DocumentNodeListID(); !ok {
+		return &ValidationError{Name: "document_node_list", err: errors.New(`ent: missing required edge "Document.document_node_list"`)}
 	}
 	return nil
 }
@@ -128,12 +147,20 @@ func (dc *DocumentCreate) createSpec() (*Document, *sqlgraph.CreateSpec) {
 		_spec = sqlgraph.NewCreateSpec(document.Table, sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt))
 	)
 	_spec.OnConflict = dc.conflict
-	if nodes := dc.mutation.MetadataIDs(); len(nodes) > 0 {
+	if value, ok := dc.mutation.Metadata(); ok {
+		_spec.SetField(document.FieldMetadata, field.TypeJSON, value)
+		_node.Metadata = value
+	}
+	if value, ok := dc.mutation.NodeList(); ok {
+		_spec.SetField(document.FieldNodeList, field.TypeJSON, value)
+		_node.NodeList = value
+	}
+	if nodes := dc.mutation.DocumentMetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   document.MetadataTable,
-			Columns: []string{document.MetadataColumn},
+			Table:   document.DocumentMetadataTable,
+			Columns: []string{document.DocumentMetadataColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(metadata.FieldID, field.TypeString),
@@ -145,12 +172,12 @@ func (dc *DocumentCreate) createSpec() (*Document, *sqlgraph.CreateSpec) {
 		_node.metadata_document = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := dc.mutation.NodeListIDs(); len(nodes) > 0 {
+	if nodes := dc.mutation.DocumentNodeListIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   document.NodeListTable,
-			Columns: []string{document.NodeListColumn},
+			Table:   document.DocumentNodeListTable,
+			Columns: []string{document.DocumentNodeListColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
@@ -169,11 +196,17 @@ func (dc *DocumentCreate) createSpec() (*Document, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Document.Create().
+//		SetMetadata(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.DocumentUpsert) {
+//			SetMetadata(v+v).
+//		}).
 //		Exec(ctx)
 func (dc *DocumentCreate) OnConflict(opts ...sql.ConflictOption) *DocumentUpsertOne {
 	dc.conflict = opts
@@ -207,6 +240,30 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetMetadata sets the "metadata" field.
+func (u *DocumentUpsert) SetMetadata(v *sbom.Metadata) *DocumentUpsert {
+	u.Set(document.FieldMetadata, v)
+	return u
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *DocumentUpsert) UpdateMetadata() *DocumentUpsert {
+	u.SetExcluded(document.FieldMetadata)
+	return u
+}
+
+// SetNodeList sets the "node_list" field.
+func (u *DocumentUpsert) SetNodeList(v *sbom.NodeList) *DocumentUpsert {
+	u.Set(document.FieldNodeList, v)
+	return u
+}
+
+// UpdateNodeList sets the "node_list" field to the value that was provided on create.
+func (u *DocumentUpsert) UpdateNodeList() *DocumentUpsert {
+	u.SetExcluded(document.FieldNodeList)
+	return u
+}
 
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
@@ -246,6 +303,34 @@ func (u *DocumentUpsertOne) Update(set func(*DocumentUpsert)) *DocumentUpsertOne
 		set(&DocumentUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *DocumentUpsertOne) SetMetadata(v *sbom.Metadata) *DocumentUpsertOne {
+	return u.Update(func(s *DocumentUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *DocumentUpsertOne) UpdateMetadata() *DocumentUpsertOne {
+	return u.Update(func(s *DocumentUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// SetNodeList sets the "node_list" field.
+func (u *DocumentUpsertOne) SetNodeList(v *sbom.NodeList) *DocumentUpsertOne {
+	return u.Update(func(s *DocumentUpsert) {
+		s.SetNodeList(v)
+	})
+}
+
+// UpdateNodeList sets the "node_list" field to the value that was provided on create.
+func (u *DocumentUpsertOne) UpdateNodeList() *DocumentUpsertOne {
+	return u.Update(func(s *DocumentUpsert) {
+		s.UpdateNodeList()
+	})
 }
 
 // Exec executes the query.
@@ -379,6 +464,11 @@ func (dcb *DocumentCreateBulk) ExecX(ctx context.Context) {
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.DocumentUpsert) {
+//			SetMetadata(v+v).
+//		}).
 //		Exec(ctx)
 func (dcb *DocumentCreateBulk) OnConflict(opts ...sql.ConflictOption) *DocumentUpsertBulk {
 	dcb.conflict = opts
@@ -444,6 +534,34 @@ func (u *DocumentUpsertBulk) Update(set func(*DocumentUpsert)) *DocumentUpsertBu
 		set(&DocumentUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *DocumentUpsertBulk) SetMetadata(v *sbom.Metadata) *DocumentUpsertBulk {
+	return u.Update(func(s *DocumentUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *DocumentUpsertBulk) UpdateMetadata() *DocumentUpsertBulk {
+	return u.Update(func(s *DocumentUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// SetNodeList sets the "node_list" field.
+func (u *DocumentUpsertBulk) SetNodeList(v *sbom.NodeList) *DocumentUpsertBulk {
+	return u.Update(func(s *DocumentUpsert) {
+		s.SetNodeList(v)
+	})
+}
+
+// UpdateNodeList sets the "node_list" field to the value that was provided on create.
+func (u *DocumentUpsertBulk) UpdateNodeList() *DocumentUpsertBulk {
+	return u.Update(func(s *DocumentUpsert) {
+		s.UpdateNodeList()
+	})
 }
 
 // Exec executes the query.

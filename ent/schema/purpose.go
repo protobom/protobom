@@ -67,7 +67,7 @@ func (Purpose) Fields() []ent.Field {
 
 func (Purpose) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("node", Node.Type).Ref("primary_purpose"),
+		edge.From("node", Node.Type).Ref("node_primary_purpose"),
 	}
 }
 

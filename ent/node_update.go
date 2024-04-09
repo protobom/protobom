@@ -28,6 +28,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/ent/edgetype"
 	"github.com/bom-squad/protobom/ent/externalreference"
 	"github.com/bom-squad/protobom/ent/hashesentry"
 	"github.com/bom-squad/protobom/ent/identifiersentry"
@@ -36,6 +37,7 @@ import (
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/predicate"
 	"github.com/bom-squad/protobom/ent/purpose"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // NodeUpdate is the builder for updating Node entities.
@@ -311,94 +313,169 @@ func (nu *NodeUpdate) AppendFileTypes(s []string) *NodeUpdate {
 	return nu
 }
 
-// AddSupplierIDs adds the "suppliers" edge to the Person entity by IDs.
-func (nu *NodeUpdate) AddSupplierIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddSupplierIDs(ids...)
+// SetSuppliers sets the "suppliers" field.
+func (nu *NodeUpdate) SetSuppliers(s []*sbom.Person) *NodeUpdate {
+	nu.mutation.SetSuppliers(s)
 	return nu
 }
 
-// AddSuppliers adds the "suppliers" edges to the Person entity.
-func (nu *NodeUpdate) AddSuppliers(p ...*Person) *NodeUpdate {
+// AppendSuppliers appends s to the "suppliers" field.
+func (nu *NodeUpdate) AppendSuppliers(s []*sbom.Person) *NodeUpdate {
+	nu.mutation.AppendSuppliers(s)
+	return nu
+}
+
+// SetOriginators sets the "originators" field.
+func (nu *NodeUpdate) SetOriginators(s []*sbom.Person) *NodeUpdate {
+	nu.mutation.SetOriginators(s)
+	return nu
+}
+
+// AppendOriginators appends s to the "originators" field.
+func (nu *NodeUpdate) AppendOriginators(s []*sbom.Person) *NodeUpdate {
+	nu.mutation.AppendOriginators(s)
+	return nu
+}
+
+// SetExternalReferences sets the "external_references" field.
+func (nu *NodeUpdate) SetExternalReferences(sr []*sbom.ExternalReference) *NodeUpdate {
+	nu.mutation.SetExternalReferences(sr)
+	return nu
+}
+
+// AppendExternalReferences appends sr to the "external_references" field.
+func (nu *NodeUpdate) AppendExternalReferences(sr []*sbom.ExternalReference) *NodeUpdate {
+	nu.mutation.AppendExternalReferences(sr)
+	return nu
+}
+
+// SetHashes sets the "hashes" field.
+func (nu *NodeUpdate) SetHashes(m map[int32]string) *NodeUpdate {
+	nu.mutation.SetHashes(m)
+	return nu
+}
+
+// SetIdentifiers sets the "identifiers" field.
+func (nu *NodeUpdate) SetIdentifiers(m map[int32]string) *NodeUpdate {
+	nu.mutation.SetIdentifiers(m)
+	return nu
+}
+
+// SetPrimaryPurpose sets the "primary_purpose" field.
+func (nu *NodeUpdate) SetPrimaryPurpose(s []sbom.Purpose) *NodeUpdate {
+	nu.mutation.SetPrimaryPurpose(s)
+	return nu
+}
+
+// AppendPrimaryPurpose appends s to the "primary_purpose" field.
+func (nu *NodeUpdate) AppendPrimaryPurpose(s []sbom.Purpose) *NodeUpdate {
+	nu.mutation.AppendPrimaryPurpose(s)
+	return nu
+}
+
+// AddNodeSupplierIDs adds the "node_suppliers" edge to the Person entity by IDs.
+func (nu *NodeUpdate) AddNodeSupplierIDs(ids ...int) *NodeUpdate {
+	nu.mutation.AddNodeSupplierIDs(ids...)
+	return nu
+}
+
+// AddNodeSuppliers adds the "node_suppliers" edges to the Person entity.
+func (nu *NodeUpdate) AddNodeSuppliers(p ...*Person) *NodeUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nu.AddSupplierIDs(ids...)
+	return nu.AddNodeSupplierIDs(ids...)
 }
 
-// AddOriginatorIDs adds the "originators" edge to the Person entity by IDs.
-func (nu *NodeUpdate) AddOriginatorIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddOriginatorIDs(ids...)
+// AddNodeOriginatorIDs adds the "node_originators" edge to the Person entity by IDs.
+func (nu *NodeUpdate) AddNodeOriginatorIDs(ids ...int) *NodeUpdate {
+	nu.mutation.AddNodeOriginatorIDs(ids...)
 	return nu
 }
 
-// AddOriginators adds the "originators" edges to the Person entity.
-func (nu *NodeUpdate) AddOriginators(p ...*Person) *NodeUpdate {
+// AddNodeOriginators adds the "node_originators" edges to the Person entity.
+func (nu *NodeUpdate) AddNodeOriginators(p ...*Person) *NodeUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nu.AddOriginatorIDs(ids...)
+	return nu.AddNodeOriginatorIDs(ids...)
 }
 
-// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by IDs.
-func (nu *NodeUpdate) AddExternalReferenceIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddExternalReferenceIDs(ids...)
+// AddNodeExternalReferenceIDs adds the "node_external_references" edge to the ExternalReference entity by IDs.
+func (nu *NodeUpdate) AddNodeExternalReferenceIDs(ids ...int) *NodeUpdate {
+	nu.mutation.AddNodeExternalReferenceIDs(ids...)
 	return nu
 }
 
-// AddExternalReferences adds the "external_references" edges to the ExternalReference entity.
-func (nu *NodeUpdate) AddExternalReferences(e ...*ExternalReference) *NodeUpdate {
+// AddNodeExternalReferences adds the "node_external_references" edges to the ExternalReference entity.
+func (nu *NodeUpdate) AddNodeExternalReferences(e ...*ExternalReference) *NodeUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return nu.AddExternalReferenceIDs(ids...)
+	return nu.AddNodeExternalReferenceIDs(ids...)
 }
 
-// AddIdentifierIDs adds the "identifiers" edge to the IdentifiersEntry entity by IDs.
-func (nu *NodeUpdate) AddIdentifierIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddIdentifierIDs(ids...)
+// AddNodeIdentifierIDs adds the "node_identifiers" edge to the IdentifiersEntry entity by IDs.
+func (nu *NodeUpdate) AddNodeIdentifierIDs(ids ...int) *NodeUpdate {
+	nu.mutation.AddNodeIdentifierIDs(ids...)
 	return nu
 }
 
-// AddIdentifiers adds the "identifiers" edges to the IdentifiersEntry entity.
-func (nu *NodeUpdate) AddIdentifiers(i ...*IdentifiersEntry) *NodeUpdate {
+// AddNodeIdentifiers adds the "node_identifiers" edges to the IdentifiersEntry entity.
+func (nu *NodeUpdate) AddNodeIdentifiers(i ...*IdentifiersEntry) *NodeUpdate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return nu.AddIdentifierIDs(ids...)
+	return nu.AddNodeIdentifierIDs(ids...)
 }
 
-// AddHashIDs adds the "hashes" edge to the HashesEntry entity by IDs.
-func (nu *NodeUpdate) AddHashIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddHashIDs(ids...)
+// AddNodeHashIDs adds the "node_hashes" edge to the HashesEntry entity by IDs.
+func (nu *NodeUpdate) AddNodeHashIDs(ids ...int) *NodeUpdate {
+	nu.mutation.AddNodeHashIDs(ids...)
 	return nu
 }
 
-// AddHashes adds the "hashes" edges to the HashesEntry entity.
-func (nu *NodeUpdate) AddHashes(h ...*HashesEntry) *NodeUpdate {
+// AddNodeHashes adds the "node_hashes" edges to the HashesEntry entity.
+func (nu *NodeUpdate) AddNodeHashes(h ...*HashesEntry) *NodeUpdate {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return nu.AddHashIDs(ids...)
+	return nu.AddNodeHashIDs(ids...)
 }
 
-// AddPrimaryPurposeIDs adds the "primary_purpose" edge to the Purpose entity by IDs.
-func (nu *NodeUpdate) AddPrimaryPurposeIDs(ids ...int) *NodeUpdate {
-	nu.mutation.AddPrimaryPurposeIDs(ids...)
+// AddNodePrimaryPurposeIDs adds the "node_primary_purpose" edge to the Purpose entity by IDs.
+func (nu *NodeUpdate) AddNodePrimaryPurposeIDs(ids ...int) *NodeUpdate {
+	nu.mutation.AddNodePrimaryPurposeIDs(ids...)
 	return nu
 }
 
-// AddPrimaryPurpose adds the "primary_purpose" edges to the Purpose entity.
-func (nu *NodeUpdate) AddPrimaryPurpose(p ...*Purpose) *NodeUpdate {
+// AddNodePrimaryPurpose adds the "node_primary_purpose" edges to the Purpose entity.
+func (nu *NodeUpdate) AddNodePrimaryPurpose(p ...*Purpose) *NodeUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nu.AddPrimaryPurposeIDs(ids...)
+	return nu.AddNodePrimaryPurposeIDs(ids...)
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (nu *NodeUpdate) AddNodeIDs(ids ...string) *NodeUpdate {
+	nu.mutation.AddNodeIDs(ids...)
+	return nu
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (nu *NodeUpdate) AddNodes(n ...*Node) *NodeUpdate {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return nu.AddNodeIDs(ids...)
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
@@ -412,141 +489,198 @@ func (nu *NodeUpdate) SetNodeList(n *NodeList) *NodeUpdate {
 	return nu.SetNodeListID(n.ID)
 }
 
+// AddEdgeTypeIDs adds the "edge_types" edge to the EdgeType entity by IDs.
+func (nu *NodeUpdate) AddEdgeTypeIDs(ids ...int) *NodeUpdate {
+	nu.mutation.AddEdgeTypeIDs(ids...)
+	return nu
+}
+
+// AddEdgeTypes adds the "edge_types" edges to the EdgeType entity.
+func (nu *NodeUpdate) AddEdgeTypes(e ...*EdgeType) *NodeUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return nu.AddEdgeTypeIDs(ids...)
+}
+
 // Mutation returns the NodeMutation object of the builder.
 func (nu *NodeUpdate) Mutation() *NodeMutation {
 	return nu.mutation
 }
 
-// ClearSuppliers clears all "suppliers" edges to the Person entity.
-func (nu *NodeUpdate) ClearSuppliers() *NodeUpdate {
-	nu.mutation.ClearSuppliers()
+// ClearNodeSuppliers clears all "node_suppliers" edges to the Person entity.
+func (nu *NodeUpdate) ClearNodeSuppliers() *NodeUpdate {
+	nu.mutation.ClearNodeSuppliers()
 	return nu
 }
 
-// RemoveSupplierIDs removes the "suppliers" edge to Person entities by IDs.
-func (nu *NodeUpdate) RemoveSupplierIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemoveSupplierIDs(ids...)
+// RemoveNodeSupplierIDs removes the "node_suppliers" edge to Person entities by IDs.
+func (nu *NodeUpdate) RemoveNodeSupplierIDs(ids ...int) *NodeUpdate {
+	nu.mutation.RemoveNodeSupplierIDs(ids...)
 	return nu
 }
 
-// RemoveSuppliers removes "suppliers" edges to Person entities.
-func (nu *NodeUpdate) RemoveSuppliers(p ...*Person) *NodeUpdate {
+// RemoveNodeSuppliers removes "node_suppliers" edges to Person entities.
+func (nu *NodeUpdate) RemoveNodeSuppliers(p ...*Person) *NodeUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nu.RemoveSupplierIDs(ids...)
+	return nu.RemoveNodeSupplierIDs(ids...)
 }
 
-// ClearOriginators clears all "originators" edges to the Person entity.
-func (nu *NodeUpdate) ClearOriginators() *NodeUpdate {
-	nu.mutation.ClearOriginators()
+// ClearNodeOriginators clears all "node_originators" edges to the Person entity.
+func (nu *NodeUpdate) ClearNodeOriginators() *NodeUpdate {
+	nu.mutation.ClearNodeOriginators()
 	return nu
 }
 
-// RemoveOriginatorIDs removes the "originators" edge to Person entities by IDs.
-func (nu *NodeUpdate) RemoveOriginatorIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemoveOriginatorIDs(ids...)
+// RemoveNodeOriginatorIDs removes the "node_originators" edge to Person entities by IDs.
+func (nu *NodeUpdate) RemoveNodeOriginatorIDs(ids ...int) *NodeUpdate {
+	nu.mutation.RemoveNodeOriginatorIDs(ids...)
 	return nu
 }
 
-// RemoveOriginators removes "originators" edges to Person entities.
-func (nu *NodeUpdate) RemoveOriginators(p ...*Person) *NodeUpdate {
+// RemoveNodeOriginators removes "node_originators" edges to Person entities.
+func (nu *NodeUpdate) RemoveNodeOriginators(p ...*Person) *NodeUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nu.RemoveOriginatorIDs(ids...)
+	return nu.RemoveNodeOriginatorIDs(ids...)
 }
 
-// ClearExternalReferences clears all "external_references" edges to the ExternalReference entity.
-func (nu *NodeUpdate) ClearExternalReferences() *NodeUpdate {
-	nu.mutation.ClearExternalReferences()
+// ClearNodeExternalReferences clears all "node_external_references" edges to the ExternalReference entity.
+func (nu *NodeUpdate) ClearNodeExternalReferences() *NodeUpdate {
+	nu.mutation.ClearNodeExternalReferences()
 	return nu
 }
 
-// RemoveExternalReferenceIDs removes the "external_references" edge to ExternalReference entities by IDs.
-func (nu *NodeUpdate) RemoveExternalReferenceIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemoveExternalReferenceIDs(ids...)
+// RemoveNodeExternalReferenceIDs removes the "node_external_references" edge to ExternalReference entities by IDs.
+func (nu *NodeUpdate) RemoveNodeExternalReferenceIDs(ids ...int) *NodeUpdate {
+	nu.mutation.RemoveNodeExternalReferenceIDs(ids...)
 	return nu
 }
 
-// RemoveExternalReferences removes "external_references" edges to ExternalReference entities.
-func (nu *NodeUpdate) RemoveExternalReferences(e ...*ExternalReference) *NodeUpdate {
+// RemoveNodeExternalReferences removes "node_external_references" edges to ExternalReference entities.
+func (nu *NodeUpdate) RemoveNodeExternalReferences(e ...*ExternalReference) *NodeUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return nu.RemoveExternalReferenceIDs(ids...)
+	return nu.RemoveNodeExternalReferenceIDs(ids...)
 }
 
-// ClearIdentifiers clears all "identifiers" edges to the IdentifiersEntry entity.
-func (nu *NodeUpdate) ClearIdentifiers() *NodeUpdate {
-	nu.mutation.ClearIdentifiers()
+// ClearNodeIdentifiers clears all "node_identifiers" edges to the IdentifiersEntry entity.
+func (nu *NodeUpdate) ClearNodeIdentifiers() *NodeUpdate {
+	nu.mutation.ClearNodeIdentifiers()
 	return nu
 }
 
-// RemoveIdentifierIDs removes the "identifiers" edge to IdentifiersEntry entities by IDs.
-func (nu *NodeUpdate) RemoveIdentifierIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemoveIdentifierIDs(ids...)
+// RemoveNodeIdentifierIDs removes the "node_identifiers" edge to IdentifiersEntry entities by IDs.
+func (nu *NodeUpdate) RemoveNodeIdentifierIDs(ids ...int) *NodeUpdate {
+	nu.mutation.RemoveNodeIdentifierIDs(ids...)
 	return nu
 }
 
-// RemoveIdentifiers removes "identifiers" edges to IdentifiersEntry entities.
-func (nu *NodeUpdate) RemoveIdentifiers(i ...*IdentifiersEntry) *NodeUpdate {
+// RemoveNodeIdentifiers removes "node_identifiers" edges to IdentifiersEntry entities.
+func (nu *NodeUpdate) RemoveNodeIdentifiers(i ...*IdentifiersEntry) *NodeUpdate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return nu.RemoveIdentifierIDs(ids...)
+	return nu.RemoveNodeIdentifierIDs(ids...)
 }
 
-// ClearHashes clears all "hashes" edges to the HashesEntry entity.
-func (nu *NodeUpdate) ClearHashes() *NodeUpdate {
-	nu.mutation.ClearHashes()
+// ClearNodeHashes clears all "node_hashes" edges to the HashesEntry entity.
+func (nu *NodeUpdate) ClearNodeHashes() *NodeUpdate {
+	nu.mutation.ClearNodeHashes()
 	return nu
 }
 
-// RemoveHashIDs removes the "hashes" edge to HashesEntry entities by IDs.
-func (nu *NodeUpdate) RemoveHashIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemoveHashIDs(ids...)
+// RemoveNodeHashIDs removes the "node_hashes" edge to HashesEntry entities by IDs.
+func (nu *NodeUpdate) RemoveNodeHashIDs(ids ...int) *NodeUpdate {
+	nu.mutation.RemoveNodeHashIDs(ids...)
 	return nu
 }
 
-// RemoveHashes removes "hashes" edges to HashesEntry entities.
-func (nu *NodeUpdate) RemoveHashes(h ...*HashesEntry) *NodeUpdate {
+// RemoveNodeHashes removes "node_hashes" edges to HashesEntry entities.
+func (nu *NodeUpdate) RemoveNodeHashes(h ...*HashesEntry) *NodeUpdate {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return nu.RemoveHashIDs(ids...)
+	return nu.RemoveNodeHashIDs(ids...)
 }
 
-// ClearPrimaryPurpose clears all "primary_purpose" edges to the Purpose entity.
-func (nu *NodeUpdate) ClearPrimaryPurpose() *NodeUpdate {
-	nu.mutation.ClearPrimaryPurpose()
+// ClearNodePrimaryPurpose clears all "node_primary_purpose" edges to the Purpose entity.
+func (nu *NodeUpdate) ClearNodePrimaryPurpose() *NodeUpdate {
+	nu.mutation.ClearNodePrimaryPurpose()
 	return nu
 }
 
-// RemovePrimaryPurposeIDs removes the "primary_purpose" edge to Purpose entities by IDs.
-func (nu *NodeUpdate) RemovePrimaryPurposeIDs(ids ...int) *NodeUpdate {
-	nu.mutation.RemovePrimaryPurposeIDs(ids...)
+// RemoveNodePrimaryPurposeIDs removes the "node_primary_purpose" edge to Purpose entities by IDs.
+func (nu *NodeUpdate) RemoveNodePrimaryPurposeIDs(ids ...int) *NodeUpdate {
+	nu.mutation.RemoveNodePrimaryPurposeIDs(ids...)
 	return nu
 }
 
-// RemovePrimaryPurpose removes "primary_purpose" edges to Purpose entities.
-func (nu *NodeUpdate) RemovePrimaryPurpose(p ...*Purpose) *NodeUpdate {
+// RemoveNodePrimaryPurpose removes "node_primary_purpose" edges to Purpose entities.
+func (nu *NodeUpdate) RemoveNodePrimaryPurpose(p ...*Purpose) *NodeUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nu.RemovePrimaryPurposeIDs(ids...)
+	return nu.RemoveNodePrimaryPurposeIDs(ids...)
+}
+
+// ClearNodes clears all "nodes" edges to the Node entity.
+func (nu *NodeUpdate) ClearNodes() *NodeUpdate {
+	nu.mutation.ClearNodes()
+	return nu
+}
+
+// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
+func (nu *NodeUpdate) RemoveNodeIDs(ids ...string) *NodeUpdate {
+	nu.mutation.RemoveNodeIDs(ids...)
+	return nu
+}
+
+// RemoveNodes removes "nodes" edges to Node entities.
+func (nu *NodeUpdate) RemoveNodes(n ...*Node) *NodeUpdate {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return nu.RemoveNodeIDs(ids...)
 }
 
 // ClearNodeList clears the "node_list" edge to the NodeList entity.
 func (nu *NodeUpdate) ClearNodeList() *NodeUpdate {
 	nu.mutation.ClearNodeList()
 	return nu
+}
+
+// ClearEdgeTypes clears all "edge_types" edges to the EdgeType entity.
+func (nu *NodeUpdate) ClearEdgeTypes() *NodeUpdate {
+	nu.mutation.ClearEdgeTypes()
+	return nu
+}
+
+// RemoveEdgeTypeIDs removes the "edge_types" edge to EdgeType entities by IDs.
+func (nu *NodeUpdate) RemoveEdgeTypeIDs(ids ...int) *NodeUpdate {
+	nu.mutation.RemoveEdgeTypeIDs(ids...)
+	return nu
+}
+
+// RemoveEdgeTypes removes "edge_types" edges to EdgeType entities.
+func (nu *NodeUpdate) RemoveEdgeTypes(e ...*EdgeType) *NodeUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return nu.RemoveEdgeTypeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -673,12 +807,50 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, node.FieldFileTypes, value)
 		})
 	}
-	if nu.mutation.SuppliersCleared() {
+	if value, ok := nu.mutation.Suppliers(); ok {
+		_spec.SetField(node.FieldSuppliers, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.AppendedSuppliers(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldSuppliers, value)
+		})
+	}
+	if value, ok := nu.mutation.Originators(); ok {
+		_spec.SetField(node.FieldOriginators, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.AppendedOriginators(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldOriginators, value)
+		})
+	}
+	if value, ok := nu.mutation.ExternalReferences(); ok {
+		_spec.SetField(node.FieldExternalReferences, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.AppendedExternalReferences(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldExternalReferences, value)
+		})
+	}
+	if value, ok := nu.mutation.Hashes(); ok {
+		_spec.SetField(node.FieldHashes, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.Identifiers(); ok {
+		_spec.SetField(node.FieldIdentifiers, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.PrimaryPurpose(); ok {
+		_spec.SetField(node.FieldPrimaryPurpose, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.AppendedPrimaryPurpose(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldPrimaryPurpose, value)
+		})
+	}
+	if nu.mutation.NodeSuppliersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.SuppliersTable,
-			Columns: []string{node.SuppliersColumn},
+			Table:   node.NodeSuppliersTable,
+			Columns: []string{node.NodeSuppliersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -686,12 +858,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedSuppliersIDs(); len(nodes) > 0 && !nu.mutation.SuppliersCleared() {
+	if nodes := nu.mutation.RemovedNodeSuppliersIDs(); len(nodes) > 0 && !nu.mutation.NodeSuppliersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.SuppliersTable,
-			Columns: []string{node.SuppliersColumn},
+			Table:   node.NodeSuppliersTable,
+			Columns: []string{node.NodeSuppliersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -702,57 +874,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.SuppliersIDs(); len(nodes) > 0 {
+	if nodes := nu.mutation.NodeSuppliersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.SuppliersTable,
-			Columns: []string{node.SuppliersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if nu.mutation.OriginatorsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.OriginatorsTable,
-			Columns: []string{node.OriginatorsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nu.mutation.RemovedOriginatorsIDs(); len(nodes) > 0 && !nu.mutation.OriginatorsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.OriginatorsTable,
-			Columns: []string{node.OriginatorsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nu.mutation.OriginatorsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.OriginatorsTable,
-			Columns: []string{node.OriginatorsColumn},
+			Table:   node.NodeSuppliersTable,
+			Columns: []string{node.NodeSuppliersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -763,12 +890,57 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.ExternalReferencesCleared() {
+	if nu.mutation.NodeOriginatorsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.ExternalReferencesTable,
-			Columns: []string{node.ExternalReferencesColumn},
+			Table:   node.NodeOriginatorsTable,
+			Columns: []string{node.NodeOriginatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.RemovedNodeOriginatorsIDs(); len(nodes) > 0 && !nu.mutation.NodeOriginatorsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   node.NodeOriginatorsTable,
+			Columns: []string{node.NodeOriginatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.NodeOriginatorsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   node.NodeOriginatorsTable,
+			Columns: []string{node.NodeOriginatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nu.mutation.NodeExternalReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   node.NodeExternalReferencesTable,
+			Columns: []string{node.NodeExternalReferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
@@ -776,12 +948,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedExternalReferencesIDs(); len(nodes) > 0 && !nu.mutation.ExternalReferencesCleared() {
+	if nodes := nu.mutation.RemovedNodeExternalReferencesIDs(); len(nodes) > 0 && !nu.mutation.NodeExternalReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.ExternalReferencesTable,
-			Columns: []string{node.ExternalReferencesColumn},
+			Table:   node.NodeExternalReferencesTable,
+			Columns: []string{node.NodeExternalReferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
@@ -792,12 +964,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.ExternalReferencesIDs(); len(nodes) > 0 {
+	if nodes := nu.mutation.NodeExternalReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.ExternalReferencesTable,
-			Columns: []string{node.ExternalReferencesColumn},
+			Table:   node.NodeExternalReferencesTable,
+			Columns: []string{node.NodeExternalReferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
@@ -808,12 +980,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.IdentifiersCleared() {
+	if nu.mutation.NodeIdentifiersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.IdentifiersTable,
-			Columns: []string{node.IdentifiersColumn},
+			Table:   node.NodeIdentifiersTable,
+			Columns: []string{node.NodeIdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -821,12 +993,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedIdentifiersIDs(); len(nodes) > 0 && !nu.mutation.IdentifiersCleared() {
+	if nodes := nu.mutation.RemovedNodeIdentifiersIDs(); len(nodes) > 0 && !nu.mutation.NodeIdentifiersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.IdentifiersTable,
-			Columns: []string{node.IdentifiersColumn},
+			Table:   node.NodeIdentifiersTable,
+			Columns: []string{node.NodeIdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -837,12 +1009,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.IdentifiersIDs(); len(nodes) > 0 {
+	if nodes := nu.mutation.NodeIdentifiersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.IdentifiersTable,
-			Columns: []string{node.IdentifiersColumn},
+			Table:   node.NodeIdentifiersTable,
+			Columns: []string{node.NodeIdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -853,12 +1025,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.HashesCleared() {
+	if nu.mutation.NodeHashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.HashesTable,
-			Columns: []string{node.HashesColumn},
+			Table:   node.NodeHashesTable,
+			Columns: []string{node.NodeHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -866,12 +1038,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedHashesIDs(); len(nodes) > 0 && !nu.mutation.HashesCleared() {
+	if nodes := nu.mutation.RemovedNodeHashesIDs(); len(nodes) > 0 && !nu.mutation.NodeHashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.HashesTable,
-			Columns: []string{node.HashesColumn},
+			Table:   node.NodeHashesTable,
+			Columns: []string{node.NodeHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -882,12 +1054,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.HashesIDs(); len(nodes) > 0 {
+	if nodes := nu.mutation.NodeHashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.HashesTable,
-			Columns: []string{node.HashesColumn},
+			Table:   node.NodeHashesTable,
+			Columns: []string{node.NodeHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -898,12 +1070,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.PrimaryPurposeCleared() {
+	if nu.mutation.NodePrimaryPurposeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.PrimaryPurposeTable,
-			Columns: node.PrimaryPurposePrimaryKey,
+			Table:   node.NodePrimaryPurposeTable,
+			Columns: node.NodePrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
@@ -911,12 +1083,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedPrimaryPurposeIDs(); len(nodes) > 0 && !nu.mutation.PrimaryPurposeCleared() {
+	if nodes := nu.mutation.RemovedNodePrimaryPurposeIDs(); len(nodes) > 0 && !nu.mutation.NodePrimaryPurposeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.PrimaryPurposeTable,
-			Columns: node.PrimaryPurposePrimaryKey,
+			Table:   node.NodePrimaryPurposeTable,
+			Columns: node.NodePrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
@@ -927,15 +1099,60 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.PrimaryPurposeIDs(); len(nodes) > 0 {
+	if nodes := nu.mutation.NodePrimaryPurposeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.PrimaryPurposeTable,
-			Columns: node.PrimaryPurposePrimaryKey,
+			Table:   node.NodePrimaryPurposeTable,
+			Columns: node.NodePrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nu.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   node.NodesTable,
+			Columns: node.NodesPrimaryKey,
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !nu.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   node.NodesTable,
+			Columns: node.NodesPrimaryKey,
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   node.NodesTable,
+			Columns: node.NodesPrimaryKey,
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -965,6 +1182,51 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nu.mutation.EdgeTypesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.EdgeTypesTable,
+			Columns: []string{node.EdgeTypesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(edgetype.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.RemovedEdgeTypesIDs(); len(nodes) > 0 && !nu.mutation.EdgeTypesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.EdgeTypesTable,
+			Columns: []string{node.EdgeTypesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(edgetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.EdgeTypesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.EdgeTypesTable,
+			Columns: []string{node.EdgeTypesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(edgetype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1252,94 +1514,169 @@ func (nuo *NodeUpdateOne) AppendFileTypes(s []string) *NodeUpdateOne {
 	return nuo
 }
 
-// AddSupplierIDs adds the "suppliers" edge to the Person entity by IDs.
-func (nuo *NodeUpdateOne) AddSupplierIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddSupplierIDs(ids...)
+// SetSuppliers sets the "suppliers" field.
+func (nuo *NodeUpdateOne) SetSuppliers(s []*sbom.Person) *NodeUpdateOne {
+	nuo.mutation.SetSuppliers(s)
 	return nuo
 }
 
-// AddSuppliers adds the "suppliers" edges to the Person entity.
-func (nuo *NodeUpdateOne) AddSuppliers(p ...*Person) *NodeUpdateOne {
+// AppendSuppliers appends s to the "suppliers" field.
+func (nuo *NodeUpdateOne) AppendSuppliers(s []*sbom.Person) *NodeUpdateOne {
+	nuo.mutation.AppendSuppliers(s)
+	return nuo
+}
+
+// SetOriginators sets the "originators" field.
+func (nuo *NodeUpdateOne) SetOriginators(s []*sbom.Person) *NodeUpdateOne {
+	nuo.mutation.SetOriginators(s)
+	return nuo
+}
+
+// AppendOriginators appends s to the "originators" field.
+func (nuo *NodeUpdateOne) AppendOriginators(s []*sbom.Person) *NodeUpdateOne {
+	nuo.mutation.AppendOriginators(s)
+	return nuo
+}
+
+// SetExternalReferences sets the "external_references" field.
+func (nuo *NodeUpdateOne) SetExternalReferences(sr []*sbom.ExternalReference) *NodeUpdateOne {
+	nuo.mutation.SetExternalReferences(sr)
+	return nuo
+}
+
+// AppendExternalReferences appends sr to the "external_references" field.
+func (nuo *NodeUpdateOne) AppendExternalReferences(sr []*sbom.ExternalReference) *NodeUpdateOne {
+	nuo.mutation.AppendExternalReferences(sr)
+	return nuo
+}
+
+// SetHashes sets the "hashes" field.
+func (nuo *NodeUpdateOne) SetHashes(m map[int32]string) *NodeUpdateOne {
+	nuo.mutation.SetHashes(m)
+	return nuo
+}
+
+// SetIdentifiers sets the "identifiers" field.
+func (nuo *NodeUpdateOne) SetIdentifiers(m map[int32]string) *NodeUpdateOne {
+	nuo.mutation.SetIdentifiers(m)
+	return nuo
+}
+
+// SetPrimaryPurpose sets the "primary_purpose" field.
+func (nuo *NodeUpdateOne) SetPrimaryPurpose(s []sbom.Purpose) *NodeUpdateOne {
+	nuo.mutation.SetPrimaryPurpose(s)
+	return nuo
+}
+
+// AppendPrimaryPurpose appends s to the "primary_purpose" field.
+func (nuo *NodeUpdateOne) AppendPrimaryPurpose(s []sbom.Purpose) *NodeUpdateOne {
+	nuo.mutation.AppendPrimaryPurpose(s)
+	return nuo
+}
+
+// AddNodeSupplierIDs adds the "node_suppliers" edge to the Person entity by IDs.
+func (nuo *NodeUpdateOne) AddNodeSupplierIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.AddNodeSupplierIDs(ids...)
+	return nuo
+}
+
+// AddNodeSuppliers adds the "node_suppliers" edges to the Person entity.
+func (nuo *NodeUpdateOne) AddNodeSuppliers(p ...*Person) *NodeUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nuo.AddSupplierIDs(ids...)
+	return nuo.AddNodeSupplierIDs(ids...)
 }
 
-// AddOriginatorIDs adds the "originators" edge to the Person entity by IDs.
-func (nuo *NodeUpdateOne) AddOriginatorIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddOriginatorIDs(ids...)
+// AddNodeOriginatorIDs adds the "node_originators" edge to the Person entity by IDs.
+func (nuo *NodeUpdateOne) AddNodeOriginatorIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.AddNodeOriginatorIDs(ids...)
 	return nuo
 }
 
-// AddOriginators adds the "originators" edges to the Person entity.
-func (nuo *NodeUpdateOne) AddOriginators(p ...*Person) *NodeUpdateOne {
+// AddNodeOriginators adds the "node_originators" edges to the Person entity.
+func (nuo *NodeUpdateOne) AddNodeOriginators(p ...*Person) *NodeUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nuo.AddOriginatorIDs(ids...)
+	return nuo.AddNodeOriginatorIDs(ids...)
 }
 
-// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by IDs.
-func (nuo *NodeUpdateOne) AddExternalReferenceIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddExternalReferenceIDs(ids...)
+// AddNodeExternalReferenceIDs adds the "node_external_references" edge to the ExternalReference entity by IDs.
+func (nuo *NodeUpdateOne) AddNodeExternalReferenceIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.AddNodeExternalReferenceIDs(ids...)
 	return nuo
 }
 
-// AddExternalReferences adds the "external_references" edges to the ExternalReference entity.
-func (nuo *NodeUpdateOne) AddExternalReferences(e ...*ExternalReference) *NodeUpdateOne {
+// AddNodeExternalReferences adds the "node_external_references" edges to the ExternalReference entity.
+func (nuo *NodeUpdateOne) AddNodeExternalReferences(e ...*ExternalReference) *NodeUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return nuo.AddExternalReferenceIDs(ids...)
+	return nuo.AddNodeExternalReferenceIDs(ids...)
 }
 
-// AddIdentifierIDs adds the "identifiers" edge to the IdentifiersEntry entity by IDs.
-func (nuo *NodeUpdateOne) AddIdentifierIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddIdentifierIDs(ids...)
+// AddNodeIdentifierIDs adds the "node_identifiers" edge to the IdentifiersEntry entity by IDs.
+func (nuo *NodeUpdateOne) AddNodeIdentifierIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.AddNodeIdentifierIDs(ids...)
 	return nuo
 }
 
-// AddIdentifiers adds the "identifiers" edges to the IdentifiersEntry entity.
-func (nuo *NodeUpdateOne) AddIdentifiers(i ...*IdentifiersEntry) *NodeUpdateOne {
+// AddNodeIdentifiers adds the "node_identifiers" edges to the IdentifiersEntry entity.
+func (nuo *NodeUpdateOne) AddNodeIdentifiers(i ...*IdentifiersEntry) *NodeUpdateOne {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return nuo.AddIdentifierIDs(ids...)
+	return nuo.AddNodeIdentifierIDs(ids...)
 }
 
-// AddHashIDs adds the "hashes" edge to the HashesEntry entity by IDs.
-func (nuo *NodeUpdateOne) AddHashIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddHashIDs(ids...)
+// AddNodeHashIDs adds the "node_hashes" edge to the HashesEntry entity by IDs.
+func (nuo *NodeUpdateOne) AddNodeHashIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.AddNodeHashIDs(ids...)
 	return nuo
 }
 
-// AddHashes adds the "hashes" edges to the HashesEntry entity.
-func (nuo *NodeUpdateOne) AddHashes(h ...*HashesEntry) *NodeUpdateOne {
+// AddNodeHashes adds the "node_hashes" edges to the HashesEntry entity.
+func (nuo *NodeUpdateOne) AddNodeHashes(h ...*HashesEntry) *NodeUpdateOne {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return nuo.AddHashIDs(ids...)
+	return nuo.AddNodeHashIDs(ids...)
 }
 
-// AddPrimaryPurposeIDs adds the "primary_purpose" edge to the Purpose entity by IDs.
-func (nuo *NodeUpdateOne) AddPrimaryPurposeIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.AddPrimaryPurposeIDs(ids...)
+// AddNodePrimaryPurposeIDs adds the "node_primary_purpose" edge to the Purpose entity by IDs.
+func (nuo *NodeUpdateOne) AddNodePrimaryPurposeIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.AddNodePrimaryPurposeIDs(ids...)
 	return nuo
 }
 
-// AddPrimaryPurpose adds the "primary_purpose" edges to the Purpose entity.
-func (nuo *NodeUpdateOne) AddPrimaryPurpose(p ...*Purpose) *NodeUpdateOne {
+// AddNodePrimaryPurpose adds the "node_primary_purpose" edges to the Purpose entity.
+func (nuo *NodeUpdateOne) AddNodePrimaryPurpose(p ...*Purpose) *NodeUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nuo.AddPrimaryPurposeIDs(ids...)
+	return nuo.AddNodePrimaryPurposeIDs(ids...)
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (nuo *NodeUpdateOne) AddNodeIDs(ids ...string) *NodeUpdateOne {
+	nuo.mutation.AddNodeIDs(ids...)
+	return nuo
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (nuo *NodeUpdateOne) AddNodes(n ...*Node) *NodeUpdateOne {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return nuo.AddNodeIDs(ids...)
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
@@ -1353,141 +1690,198 @@ func (nuo *NodeUpdateOne) SetNodeList(n *NodeList) *NodeUpdateOne {
 	return nuo.SetNodeListID(n.ID)
 }
 
+// AddEdgeTypeIDs adds the "edge_types" edge to the EdgeType entity by IDs.
+func (nuo *NodeUpdateOne) AddEdgeTypeIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.AddEdgeTypeIDs(ids...)
+	return nuo
+}
+
+// AddEdgeTypes adds the "edge_types" edges to the EdgeType entity.
+func (nuo *NodeUpdateOne) AddEdgeTypes(e ...*EdgeType) *NodeUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return nuo.AddEdgeTypeIDs(ids...)
+}
+
 // Mutation returns the NodeMutation object of the builder.
 func (nuo *NodeUpdateOne) Mutation() *NodeMutation {
 	return nuo.mutation
 }
 
-// ClearSuppliers clears all "suppliers" edges to the Person entity.
-func (nuo *NodeUpdateOne) ClearSuppliers() *NodeUpdateOne {
-	nuo.mutation.ClearSuppliers()
+// ClearNodeSuppliers clears all "node_suppliers" edges to the Person entity.
+func (nuo *NodeUpdateOne) ClearNodeSuppliers() *NodeUpdateOne {
+	nuo.mutation.ClearNodeSuppliers()
 	return nuo
 }
 
-// RemoveSupplierIDs removes the "suppliers" edge to Person entities by IDs.
-func (nuo *NodeUpdateOne) RemoveSupplierIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemoveSupplierIDs(ids...)
+// RemoveNodeSupplierIDs removes the "node_suppliers" edge to Person entities by IDs.
+func (nuo *NodeUpdateOne) RemoveNodeSupplierIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.RemoveNodeSupplierIDs(ids...)
 	return nuo
 }
 
-// RemoveSuppliers removes "suppliers" edges to Person entities.
-func (nuo *NodeUpdateOne) RemoveSuppliers(p ...*Person) *NodeUpdateOne {
+// RemoveNodeSuppliers removes "node_suppliers" edges to Person entities.
+func (nuo *NodeUpdateOne) RemoveNodeSuppliers(p ...*Person) *NodeUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nuo.RemoveSupplierIDs(ids...)
+	return nuo.RemoveNodeSupplierIDs(ids...)
 }
 
-// ClearOriginators clears all "originators" edges to the Person entity.
-func (nuo *NodeUpdateOne) ClearOriginators() *NodeUpdateOne {
-	nuo.mutation.ClearOriginators()
+// ClearNodeOriginators clears all "node_originators" edges to the Person entity.
+func (nuo *NodeUpdateOne) ClearNodeOriginators() *NodeUpdateOne {
+	nuo.mutation.ClearNodeOriginators()
 	return nuo
 }
 
-// RemoveOriginatorIDs removes the "originators" edge to Person entities by IDs.
-func (nuo *NodeUpdateOne) RemoveOriginatorIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemoveOriginatorIDs(ids...)
+// RemoveNodeOriginatorIDs removes the "node_originators" edge to Person entities by IDs.
+func (nuo *NodeUpdateOne) RemoveNodeOriginatorIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.RemoveNodeOriginatorIDs(ids...)
 	return nuo
 }
 
-// RemoveOriginators removes "originators" edges to Person entities.
-func (nuo *NodeUpdateOne) RemoveOriginators(p ...*Person) *NodeUpdateOne {
+// RemoveNodeOriginators removes "node_originators" edges to Person entities.
+func (nuo *NodeUpdateOne) RemoveNodeOriginators(p ...*Person) *NodeUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nuo.RemoveOriginatorIDs(ids...)
+	return nuo.RemoveNodeOriginatorIDs(ids...)
 }
 
-// ClearExternalReferences clears all "external_references" edges to the ExternalReference entity.
-func (nuo *NodeUpdateOne) ClearExternalReferences() *NodeUpdateOne {
-	nuo.mutation.ClearExternalReferences()
+// ClearNodeExternalReferences clears all "node_external_references" edges to the ExternalReference entity.
+func (nuo *NodeUpdateOne) ClearNodeExternalReferences() *NodeUpdateOne {
+	nuo.mutation.ClearNodeExternalReferences()
 	return nuo
 }
 
-// RemoveExternalReferenceIDs removes the "external_references" edge to ExternalReference entities by IDs.
-func (nuo *NodeUpdateOne) RemoveExternalReferenceIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemoveExternalReferenceIDs(ids...)
+// RemoveNodeExternalReferenceIDs removes the "node_external_references" edge to ExternalReference entities by IDs.
+func (nuo *NodeUpdateOne) RemoveNodeExternalReferenceIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.RemoveNodeExternalReferenceIDs(ids...)
 	return nuo
 }
 
-// RemoveExternalReferences removes "external_references" edges to ExternalReference entities.
-func (nuo *NodeUpdateOne) RemoveExternalReferences(e ...*ExternalReference) *NodeUpdateOne {
+// RemoveNodeExternalReferences removes "node_external_references" edges to ExternalReference entities.
+func (nuo *NodeUpdateOne) RemoveNodeExternalReferences(e ...*ExternalReference) *NodeUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return nuo.RemoveExternalReferenceIDs(ids...)
+	return nuo.RemoveNodeExternalReferenceIDs(ids...)
 }
 
-// ClearIdentifiers clears all "identifiers" edges to the IdentifiersEntry entity.
-func (nuo *NodeUpdateOne) ClearIdentifiers() *NodeUpdateOne {
-	nuo.mutation.ClearIdentifiers()
+// ClearNodeIdentifiers clears all "node_identifiers" edges to the IdentifiersEntry entity.
+func (nuo *NodeUpdateOne) ClearNodeIdentifiers() *NodeUpdateOne {
+	nuo.mutation.ClearNodeIdentifiers()
 	return nuo
 }
 
-// RemoveIdentifierIDs removes the "identifiers" edge to IdentifiersEntry entities by IDs.
-func (nuo *NodeUpdateOne) RemoveIdentifierIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemoveIdentifierIDs(ids...)
+// RemoveNodeIdentifierIDs removes the "node_identifiers" edge to IdentifiersEntry entities by IDs.
+func (nuo *NodeUpdateOne) RemoveNodeIdentifierIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.RemoveNodeIdentifierIDs(ids...)
 	return nuo
 }
 
-// RemoveIdentifiers removes "identifiers" edges to IdentifiersEntry entities.
-func (nuo *NodeUpdateOne) RemoveIdentifiers(i ...*IdentifiersEntry) *NodeUpdateOne {
+// RemoveNodeIdentifiers removes "node_identifiers" edges to IdentifiersEntry entities.
+func (nuo *NodeUpdateOne) RemoveNodeIdentifiers(i ...*IdentifiersEntry) *NodeUpdateOne {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return nuo.RemoveIdentifierIDs(ids...)
+	return nuo.RemoveNodeIdentifierIDs(ids...)
 }
 
-// ClearHashes clears all "hashes" edges to the HashesEntry entity.
-func (nuo *NodeUpdateOne) ClearHashes() *NodeUpdateOne {
-	nuo.mutation.ClearHashes()
+// ClearNodeHashes clears all "node_hashes" edges to the HashesEntry entity.
+func (nuo *NodeUpdateOne) ClearNodeHashes() *NodeUpdateOne {
+	nuo.mutation.ClearNodeHashes()
 	return nuo
 }
 
-// RemoveHashIDs removes the "hashes" edge to HashesEntry entities by IDs.
-func (nuo *NodeUpdateOne) RemoveHashIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemoveHashIDs(ids...)
+// RemoveNodeHashIDs removes the "node_hashes" edge to HashesEntry entities by IDs.
+func (nuo *NodeUpdateOne) RemoveNodeHashIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.RemoveNodeHashIDs(ids...)
 	return nuo
 }
 
-// RemoveHashes removes "hashes" edges to HashesEntry entities.
-func (nuo *NodeUpdateOne) RemoveHashes(h ...*HashesEntry) *NodeUpdateOne {
+// RemoveNodeHashes removes "node_hashes" edges to HashesEntry entities.
+func (nuo *NodeUpdateOne) RemoveNodeHashes(h ...*HashesEntry) *NodeUpdateOne {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return nuo.RemoveHashIDs(ids...)
+	return nuo.RemoveNodeHashIDs(ids...)
 }
 
-// ClearPrimaryPurpose clears all "primary_purpose" edges to the Purpose entity.
-func (nuo *NodeUpdateOne) ClearPrimaryPurpose() *NodeUpdateOne {
-	nuo.mutation.ClearPrimaryPurpose()
+// ClearNodePrimaryPurpose clears all "node_primary_purpose" edges to the Purpose entity.
+func (nuo *NodeUpdateOne) ClearNodePrimaryPurpose() *NodeUpdateOne {
+	nuo.mutation.ClearNodePrimaryPurpose()
 	return nuo
 }
 
-// RemovePrimaryPurposeIDs removes the "primary_purpose" edge to Purpose entities by IDs.
-func (nuo *NodeUpdateOne) RemovePrimaryPurposeIDs(ids ...int) *NodeUpdateOne {
-	nuo.mutation.RemovePrimaryPurposeIDs(ids...)
+// RemoveNodePrimaryPurposeIDs removes the "node_primary_purpose" edge to Purpose entities by IDs.
+func (nuo *NodeUpdateOne) RemoveNodePrimaryPurposeIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.RemoveNodePrimaryPurposeIDs(ids...)
 	return nuo
 }
 
-// RemovePrimaryPurpose removes "primary_purpose" edges to Purpose entities.
-func (nuo *NodeUpdateOne) RemovePrimaryPurpose(p ...*Purpose) *NodeUpdateOne {
+// RemoveNodePrimaryPurpose removes "node_primary_purpose" edges to Purpose entities.
+func (nuo *NodeUpdateOne) RemoveNodePrimaryPurpose(p ...*Purpose) *NodeUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nuo.RemovePrimaryPurposeIDs(ids...)
+	return nuo.RemoveNodePrimaryPurposeIDs(ids...)
+}
+
+// ClearNodes clears all "nodes" edges to the Node entity.
+func (nuo *NodeUpdateOne) ClearNodes() *NodeUpdateOne {
+	nuo.mutation.ClearNodes()
+	return nuo
+}
+
+// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
+func (nuo *NodeUpdateOne) RemoveNodeIDs(ids ...string) *NodeUpdateOne {
+	nuo.mutation.RemoveNodeIDs(ids...)
+	return nuo
+}
+
+// RemoveNodes removes "nodes" edges to Node entities.
+func (nuo *NodeUpdateOne) RemoveNodes(n ...*Node) *NodeUpdateOne {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return nuo.RemoveNodeIDs(ids...)
 }
 
 // ClearNodeList clears the "node_list" edge to the NodeList entity.
 func (nuo *NodeUpdateOne) ClearNodeList() *NodeUpdateOne {
 	nuo.mutation.ClearNodeList()
 	return nuo
+}
+
+// ClearEdgeTypes clears all "edge_types" edges to the EdgeType entity.
+func (nuo *NodeUpdateOne) ClearEdgeTypes() *NodeUpdateOne {
+	nuo.mutation.ClearEdgeTypes()
+	return nuo
+}
+
+// RemoveEdgeTypeIDs removes the "edge_types" edge to EdgeType entities by IDs.
+func (nuo *NodeUpdateOne) RemoveEdgeTypeIDs(ids ...int) *NodeUpdateOne {
+	nuo.mutation.RemoveEdgeTypeIDs(ids...)
+	return nuo
+}
+
+// RemoveEdgeTypes removes "edge_types" edges to EdgeType entities.
+func (nuo *NodeUpdateOne) RemoveEdgeTypes(e ...*EdgeType) *NodeUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return nuo.RemoveEdgeTypeIDs(ids...)
 }
 
 // Where appends a list predicates to the NodeUpdate builder.
@@ -1644,12 +2038,50 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 			sqljson.Append(u, node.FieldFileTypes, value)
 		})
 	}
-	if nuo.mutation.SuppliersCleared() {
+	if value, ok := nuo.mutation.Suppliers(); ok {
+		_spec.SetField(node.FieldSuppliers, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.AppendedSuppliers(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldSuppliers, value)
+		})
+	}
+	if value, ok := nuo.mutation.Originators(); ok {
+		_spec.SetField(node.FieldOriginators, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.AppendedOriginators(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldOriginators, value)
+		})
+	}
+	if value, ok := nuo.mutation.ExternalReferences(); ok {
+		_spec.SetField(node.FieldExternalReferences, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.AppendedExternalReferences(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldExternalReferences, value)
+		})
+	}
+	if value, ok := nuo.mutation.Hashes(); ok {
+		_spec.SetField(node.FieldHashes, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.Identifiers(); ok {
+		_spec.SetField(node.FieldIdentifiers, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.PrimaryPurpose(); ok {
+		_spec.SetField(node.FieldPrimaryPurpose, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.AppendedPrimaryPurpose(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, node.FieldPrimaryPurpose, value)
+		})
+	}
+	if nuo.mutation.NodeSuppliersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.SuppliersTable,
-			Columns: []string{node.SuppliersColumn},
+			Table:   node.NodeSuppliersTable,
+			Columns: []string{node.NodeSuppliersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -1657,12 +2089,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedSuppliersIDs(); len(nodes) > 0 && !nuo.mutation.SuppliersCleared() {
+	if nodes := nuo.mutation.RemovedNodeSuppliersIDs(); len(nodes) > 0 && !nuo.mutation.NodeSuppliersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.SuppliersTable,
-			Columns: []string{node.SuppliersColumn},
+			Table:   node.NodeSuppliersTable,
+			Columns: []string{node.NodeSuppliersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -1673,57 +2105,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.SuppliersIDs(); len(nodes) > 0 {
+	if nodes := nuo.mutation.NodeSuppliersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.SuppliersTable,
-			Columns: []string{node.SuppliersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if nuo.mutation.OriginatorsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.OriginatorsTable,
-			Columns: []string{node.OriginatorsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuo.mutation.RemovedOriginatorsIDs(); len(nodes) > 0 && !nuo.mutation.OriginatorsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.OriginatorsTable,
-			Columns: []string{node.OriginatorsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuo.mutation.OriginatorsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   node.OriginatorsTable,
-			Columns: []string{node.OriginatorsColumn},
+			Table:   node.NodeSuppliersTable,
+			Columns: []string{node.NodeSuppliersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -1734,12 +2121,57 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.ExternalReferencesCleared() {
+	if nuo.mutation.NodeOriginatorsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.ExternalReferencesTable,
-			Columns: []string{node.ExternalReferencesColumn},
+			Table:   node.NodeOriginatorsTable,
+			Columns: []string{node.NodeOriginatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.RemovedNodeOriginatorsIDs(); len(nodes) > 0 && !nuo.mutation.NodeOriginatorsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   node.NodeOriginatorsTable,
+			Columns: []string{node.NodeOriginatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.NodeOriginatorsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   node.NodeOriginatorsTable,
+			Columns: []string{node.NodeOriginatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nuo.mutation.NodeExternalReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   node.NodeExternalReferencesTable,
+			Columns: []string{node.NodeExternalReferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
@@ -1747,12 +2179,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedExternalReferencesIDs(); len(nodes) > 0 && !nuo.mutation.ExternalReferencesCleared() {
+	if nodes := nuo.mutation.RemovedNodeExternalReferencesIDs(); len(nodes) > 0 && !nuo.mutation.NodeExternalReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.ExternalReferencesTable,
-			Columns: []string{node.ExternalReferencesColumn},
+			Table:   node.NodeExternalReferencesTable,
+			Columns: []string{node.NodeExternalReferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
@@ -1763,12 +2195,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.ExternalReferencesIDs(); len(nodes) > 0 {
+	if nodes := nuo.mutation.NodeExternalReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.ExternalReferencesTable,
-			Columns: []string{node.ExternalReferencesColumn},
+			Table:   node.NodeExternalReferencesTable,
+			Columns: []string{node.NodeExternalReferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
@@ -1779,12 +2211,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.IdentifiersCleared() {
+	if nuo.mutation.NodeIdentifiersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.IdentifiersTable,
-			Columns: []string{node.IdentifiersColumn},
+			Table:   node.NodeIdentifiersTable,
+			Columns: []string{node.NodeIdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -1792,12 +2224,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedIdentifiersIDs(); len(nodes) > 0 && !nuo.mutation.IdentifiersCleared() {
+	if nodes := nuo.mutation.RemovedNodeIdentifiersIDs(); len(nodes) > 0 && !nuo.mutation.NodeIdentifiersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.IdentifiersTable,
-			Columns: []string{node.IdentifiersColumn},
+			Table:   node.NodeIdentifiersTable,
+			Columns: []string{node.NodeIdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -1808,12 +2240,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.IdentifiersIDs(); len(nodes) > 0 {
+	if nodes := nuo.mutation.NodeIdentifiersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.IdentifiersTable,
-			Columns: []string{node.IdentifiersColumn},
+			Table:   node.NodeIdentifiersTable,
+			Columns: []string{node.NodeIdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -1824,12 +2256,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.HashesCleared() {
+	if nuo.mutation.NodeHashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.HashesTable,
-			Columns: []string{node.HashesColumn},
+			Table:   node.NodeHashesTable,
+			Columns: []string{node.NodeHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -1837,12 +2269,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedHashesIDs(); len(nodes) > 0 && !nuo.mutation.HashesCleared() {
+	if nodes := nuo.mutation.RemovedNodeHashesIDs(); len(nodes) > 0 && !nuo.mutation.NodeHashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.HashesTable,
-			Columns: []string{node.HashesColumn},
+			Table:   node.NodeHashesTable,
+			Columns: []string{node.NodeHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -1853,12 +2285,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.HashesIDs(); len(nodes) > 0 {
+	if nodes := nuo.mutation.NodeHashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.HashesTable,
-			Columns: []string{node.HashesColumn},
+			Table:   node.NodeHashesTable,
+			Columns: []string{node.NodeHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -1869,12 +2301,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.PrimaryPurposeCleared() {
+	if nuo.mutation.NodePrimaryPurposeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.PrimaryPurposeTable,
-			Columns: node.PrimaryPurposePrimaryKey,
+			Table:   node.NodePrimaryPurposeTable,
+			Columns: node.NodePrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
@@ -1882,12 +2314,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedPrimaryPurposeIDs(); len(nodes) > 0 && !nuo.mutation.PrimaryPurposeCleared() {
+	if nodes := nuo.mutation.RemovedNodePrimaryPurposeIDs(); len(nodes) > 0 && !nuo.mutation.NodePrimaryPurposeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.PrimaryPurposeTable,
-			Columns: node.PrimaryPurposePrimaryKey,
+			Table:   node.NodePrimaryPurposeTable,
+			Columns: node.NodePrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
@@ -1898,15 +2330,60 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.PrimaryPurposeIDs(); len(nodes) > 0 {
+	if nodes := nuo.mutation.NodePrimaryPurposeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.PrimaryPurposeTable,
-			Columns: node.PrimaryPurposePrimaryKey,
+			Table:   node.NodePrimaryPurposeTable,
+			Columns: node.NodePrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nuo.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   node.NodesTable,
+			Columns: node.NodesPrimaryKey,
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !nuo.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   node.NodesTable,
+			Columns: node.NodesPrimaryKey,
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   node.NodesTable,
+			Columns: node.NodesPrimaryKey,
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1936,6 +2413,51 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(nodelist.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nuo.mutation.EdgeTypesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.EdgeTypesTable,
+			Columns: []string{node.EdgeTypesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(edgetype.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.RemovedEdgeTypesIDs(); len(nodes) > 0 && !nuo.mutation.EdgeTypesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.EdgeTypesTable,
+			Columns: []string{node.EdgeTypesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(edgetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.EdgeTypesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.EdgeTypesTable,
+			Columns: []string{node.EdgeTypesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(edgetype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

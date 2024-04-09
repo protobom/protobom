@@ -23,6 +23,8 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 type Metadata struct {
@@ -36,14 +38,17 @@ func (Metadata) Fields() []ent.Field {
 		field.String("name"),
 		field.Time("date"),
 		field.String("comment"),
+		field.JSON("tools", []*sbom.Tool{}),
+		field.JSON("authors", []*sbom.Person{}),
+		field.JSON("document_types", []*sbom.DocumentType{}),
 	}
 }
 
 func (Metadata) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("tools", Tool.Type),
-		edge.To("authors", Person.Type),
-		edge.To("document_types", DocumentType.Type),
+		edge.To("metadata_tools", Tool.Type),
+		edge.To("metadata_authors", Person.Type),
+		edge.To("metadata_document_types", DocumentType.Type),
 		edge.To("document", Document.Type).Unique(),
 	}
 }

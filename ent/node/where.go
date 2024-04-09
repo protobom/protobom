@@ -1077,21 +1077,21 @@ func ValidUntilDateLTE(v time.Time) predicate.Node {
 	return predicate.Node(sql.FieldLTE(FieldValidUntilDate, v))
 }
 
-// HasSuppliers applies the HasEdge predicate on the "suppliers" edge.
-func HasSuppliers() predicate.Node {
+// HasNodeSuppliers applies the HasEdge predicate on the "node_suppliers" edge.
+func HasNodeSuppliers() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SuppliersTable, SuppliersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodeSuppliersTable, NodeSuppliersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSuppliersWith applies the HasEdge predicate on the "suppliers" edge with a given conditions (other predicates).
-func HasSuppliersWith(preds ...predicate.Person) predicate.Node {
+// HasNodeSuppliersWith applies the HasEdge predicate on the "node_suppliers" edge with a given conditions (other predicates).
+func HasNodeSuppliersWith(preds ...predicate.Person) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
-		step := newSuppliersStep()
+		step := newNodeSuppliersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -1100,21 +1100,21 @@ func HasSuppliersWith(preds ...predicate.Person) predicate.Node {
 	})
 }
 
-// HasOriginators applies the HasEdge predicate on the "originators" edge.
-func HasOriginators() predicate.Node {
+// HasNodeOriginators applies the HasEdge predicate on the "node_originators" edge.
+func HasNodeOriginators() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, OriginatorsTable, OriginatorsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodeOriginatorsTable, NodeOriginatorsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasOriginatorsWith applies the HasEdge predicate on the "originators" edge with a given conditions (other predicates).
-func HasOriginatorsWith(preds ...predicate.Person) predicate.Node {
+// HasNodeOriginatorsWith applies the HasEdge predicate on the "node_originators" edge with a given conditions (other predicates).
+func HasNodeOriginatorsWith(preds ...predicate.Person) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
-		step := newOriginatorsStep()
+		step := newNodeOriginatorsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -1123,21 +1123,21 @@ func HasOriginatorsWith(preds ...predicate.Person) predicate.Node {
 	})
 }
 
-// HasExternalReferences applies the HasEdge predicate on the "external_references" edge.
-func HasExternalReferences() predicate.Node {
+// HasNodeExternalReferences applies the HasEdge predicate on the "node_external_references" edge.
+func HasNodeExternalReferences() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ExternalReferencesTable, ExternalReferencesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodeExternalReferencesTable, NodeExternalReferencesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasExternalReferencesWith applies the HasEdge predicate on the "external_references" edge with a given conditions (other predicates).
-func HasExternalReferencesWith(preds ...predicate.ExternalReference) predicate.Node {
+// HasNodeExternalReferencesWith applies the HasEdge predicate on the "node_external_references" edge with a given conditions (other predicates).
+func HasNodeExternalReferencesWith(preds ...predicate.ExternalReference) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
-		step := newExternalReferencesStep()
+		step := newNodeExternalReferencesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -1146,21 +1146,21 @@ func HasExternalReferencesWith(preds ...predicate.ExternalReference) predicate.N
 	})
 }
 
-// HasIdentifiers applies the HasEdge predicate on the "identifiers" edge.
-func HasIdentifiers() predicate.Node {
+// HasNodeIdentifiers applies the HasEdge predicate on the "node_identifiers" edge.
+func HasNodeIdentifiers() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, IdentifiersTable, IdentifiersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodeIdentifiersTable, NodeIdentifiersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasIdentifiersWith applies the HasEdge predicate on the "identifiers" edge with a given conditions (other predicates).
-func HasIdentifiersWith(preds ...predicate.IdentifiersEntry) predicate.Node {
+// HasNodeIdentifiersWith applies the HasEdge predicate on the "node_identifiers" edge with a given conditions (other predicates).
+func HasNodeIdentifiersWith(preds ...predicate.IdentifiersEntry) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
-		step := newIdentifiersStep()
+		step := newNodeIdentifiersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -1169,21 +1169,21 @@ func HasIdentifiersWith(preds ...predicate.IdentifiersEntry) predicate.Node {
 	})
 }
 
-// HasHashes applies the HasEdge predicate on the "hashes" edge.
-func HasHashes() predicate.Node {
+// HasNodeHashes applies the HasEdge predicate on the "node_hashes" edge.
+func HasNodeHashes() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodeHashesTable, NodeHashesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasHashesWith applies the HasEdge predicate on the "hashes" edge with a given conditions (other predicates).
-func HasHashesWith(preds ...predicate.HashesEntry) predicate.Node {
+// HasNodeHashesWith applies the HasEdge predicate on the "node_hashes" edge with a given conditions (other predicates).
+func HasNodeHashesWith(preds ...predicate.HashesEntry) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
-		step := newHashesStep()
+		step := newNodeHashesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -1192,21 +1192,44 @@ func HasHashesWith(preds ...predicate.HashesEntry) predicate.Node {
 	})
 }
 
-// HasPrimaryPurpose applies the HasEdge predicate on the "primary_purpose" edge.
-func HasPrimaryPurpose() predicate.Node {
+// HasNodePrimaryPurpose applies the HasEdge predicate on the "node_primary_purpose" edge.
+func HasNodePrimaryPurpose() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, PrimaryPurposeTable, PrimaryPurposePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, NodePrimaryPurposeTable, NodePrimaryPurposePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasPrimaryPurposeWith applies the HasEdge predicate on the "primary_purpose" edge with a given conditions (other predicates).
-func HasPrimaryPurposeWith(preds ...predicate.Purpose) predicate.Node {
+// HasNodePrimaryPurposeWith applies the HasEdge predicate on the "node_primary_purpose" edge with a given conditions (other predicates).
+func HasNodePrimaryPurposeWith(preds ...predicate.Purpose) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
-		step := newPrimaryPurposeStep()
+		step := newNodePrimaryPurposeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasNodes applies the HasEdge predicate on the "nodes" edge.
+func HasNodes() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, NodesTable, NodesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodesWith applies the HasEdge predicate on the "nodes" edge with a given conditions (other predicates).
+func HasNodesWith(preds ...predicate.Node) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newNodesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -1230,6 +1253,29 @@ func HasNodeList() predicate.Node {
 func HasNodeListWith(preds ...predicate.NodeList) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := newNodeListStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasEdgeTypes applies the HasEdge predicate on the "edge_types" edge.
+func HasEdgeTypes() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, EdgeTypesTable, EdgeTypesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEdgeTypesWith applies the HasEdge predicate on the "edge_types" edge with a given conditions (other predicates).
+func HasEdgeTypesWith(preds ...predicate.EdgeType) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newEdgeTypesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

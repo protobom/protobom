@@ -1,6 +1,6 @@
 // ------------------------------------------------------------------------
 // SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
-// SPDX-FileName: ent/schema/edge.go
+// SPDX-FileName: ent/schema/edge_type.go
 // SPDX-FileType: SOURCE
 // SPDX-License-Identifier: Apache-2.0
 // ------------------------------------------------------------------------
@@ -23,13 +23,14 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
-type Edge struct {
+type EdgeType struct {
 	ent.Schema
 }
 
-func (Edge) Fields() []ent.Field {
+func (EdgeType) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("type").Values(
 			"UNKNOWN",
@@ -78,15 +79,22 @@ func (Edge) Fields() []ent.Field {
 			"testTool",
 			"variant",
 		),
-		field.String("from"),
-		field.Strings("to"),
+		field.String("node_id"),
+		field.String("to_id"),
 	}
 }
 
-func (Edge) Edges() []ent.Edge {
+func (EdgeType) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("node_list", NodeList.Type).Ref("edges").Required().Unique(),
+		edge.To("from", Node.Type).Required().Unique().Field("node_id"),
+		edge.To("to", Node.Type).Required().Unique().Field("to_id"),
 	}
 }
 
-func (Edge) Annotations() []schema.Annotation { return nil }
+func (EdgeType) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("type").Edges("from", "to").Unique(),
+	}
+}
+
+func (EdgeType) Annotations() []schema.Annotation { return nil }

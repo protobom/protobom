@@ -23,6 +23,8 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 type Person struct {
@@ -36,14 +38,15 @@ func (Person) Fields() []ent.Field {
 		field.String("email"),
 		field.String("url"),
 		field.String("phone"),
+		field.JSON("contacts", []*sbom.Person{}),
 	}
 }
 
 func (Person) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("contacts", Person.Type).From("contact_owner").Unique(),
-		edge.From("metadata", Metadata.Type).Ref("authors").Unique(),
-		edge.From("node", Node.Type).Ref("suppliers").Unique().Ref("originators").Unique(),
+		edge.To("person_contacts", Person.Type).From("contact_owner").Unique(),
+		edge.From("metadata", Metadata.Type).Ref("metadata_authors").Unique(),
+		edge.From("node", Node.Type).Ref("node_suppliers").Unique().Ref("node_originators").Unique(),
 	}
 }
 

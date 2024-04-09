@@ -31,28 +31,21 @@ const (
 	FieldID = "id"
 	// FieldRootElements holds the string denoting the root_elements field in the database.
 	FieldRootElements = "root_elements"
-	// EdgeNodes holds the string denoting the nodes edge name in mutations.
-	EdgeNodes = "nodes"
-	// EdgeEdges holds the string denoting the edges edge name in mutations.
-	EdgeEdges = "edges"
+	// FieldNodes holds the string denoting the nodes field in the database.
+	FieldNodes = "nodes"
+	// EdgeNodeListNodes holds the string denoting the node_list_nodes edge name in mutations.
+	EdgeNodeListNodes = "node_list_nodes"
 	// EdgeDocument holds the string denoting the document edge name in mutations.
 	EdgeDocument = "document"
 	// Table holds the table name of the nodelist in the database.
 	Table = "node_lists"
-	// NodesTable is the table that holds the nodes relation/edge.
-	NodesTable = "nodes"
-	// NodesInverseTable is the table name for the Node entity.
+	// NodeListNodesTable is the table that holds the node_list_nodes relation/edge.
+	NodeListNodesTable = "nodes"
+	// NodeListNodesInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
-	NodesInverseTable = "nodes"
-	// NodesColumn is the table column denoting the nodes relation/edge.
-	NodesColumn = "node_list_nodes"
-	// EdgesTable is the table that holds the edges relation/edge.
-	EdgesTable = "edges"
-	// EdgesInverseTable is the table name for the Edge entity.
-	// It exists in this package in order to avoid circular dependency with the "edge" package.
-	EdgesInverseTable = "edges"
-	// EdgesColumn is the table column denoting the edges relation/edge.
-	EdgesColumn = "node_list_edges"
+	NodeListNodesInverseTable = "nodes"
+	// NodeListNodesColumn is the table column denoting the node_list_nodes relation/edge.
+	NodeListNodesColumn = "node_list_node_list_nodes"
 	// DocumentTable is the table that holds the document relation/edge.
 	DocumentTable = "documents"
 	// DocumentInverseTable is the table name for the Document entity.
@@ -66,6 +59,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldRootElements,
+	FieldNodes,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -86,31 +80,17 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByNodesCount orders the results by nodes count.
-func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByNodeListNodesCount orders the results by node_list_nodes count.
+func ByNodeListNodesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newNodeListNodesStep(), opts...)
 	}
 }
 
-// ByNodes orders the results by nodes terms.
-func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByNodeListNodes orders the results by node_list_nodes terms.
+func ByNodeListNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByEdgesCount orders the results by edges count.
-func ByEdgesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEdgesStep(), opts...)
-	}
-}
-
-// ByEdges orders the results by edges terms.
-func ByEdges(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEdgesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newNodeListNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -120,18 +100,11 @@ func ByDocumentField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newDocumentStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newNodesStep() *sqlgraph.Step {
+func newNodeListNodesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, NodesTable, NodesColumn),
-	)
-}
-func newEdgesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EdgesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EdgesTable, EdgesColumn),
+		sqlgraph.To(NodeListNodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, NodeListNodesTable, NodeListNodesColumn),
 	)
 }
 func newDocumentStep() *sqlgraph.Step {

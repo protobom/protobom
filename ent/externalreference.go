@@ -19,6 +19,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -41,44 +42,46 @@ type ExternalReference struct {
 	Authority string `json:"authority,omitempty"`
 	// Type holds the value of the "type" field.
 	Type externalreference.Type `json:"type,omitempty"`
+	// Hashes holds the value of the "hashes" field.
+	Hashes map[int32]string `json:"hashes,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ExternalReferenceQuery when eager-loading is set.
-	Edges                    ExternalReferenceEdges `json:"edges"`
-	node_external_references *string
-	selectValues             sql.SelectValues
+	Edges                         ExternalReferenceEdges `json:"edges"`
+	node_node_external_references *string
+	selectValues                  sql.SelectValues
 }
 
 // ExternalReferenceEdges holds the relations/edges for other nodes in the graph.
 type ExternalReferenceEdges struct {
-	// Hashes holds the value of the hashes edge.
-	Hashes []*HashesEntry `json:"hashes,omitempty"`
-	// Nodes holds the value of the nodes edge.
-	Nodes *Node `json:"nodes,omitempty"`
+	// ExternalReferenceHashes holds the value of the external_reference_hashes edge.
+	ExternalReferenceHashes []*HashesEntry `json:"external_reference_hashes,omitempty"`
+	// Node holds the value of the node edge.
+	Node *Node `json:"node,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// HashesOrErr returns the Hashes value or an error if the edge
+// ExternalReferenceHashesOrErr returns the ExternalReferenceHashes value or an error if the edge
 // was not loaded in eager-loading.
-func (e ExternalReferenceEdges) HashesOrErr() ([]*HashesEntry, error) {
+func (e ExternalReferenceEdges) ExternalReferenceHashesOrErr() ([]*HashesEntry, error) {
 	if e.loadedTypes[0] {
-		return e.Hashes, nil
+		return e.ExternalReferenceHashes, nil
 	}
-	return nil, &NotLoadedError{edge: "hashes"}
+	return nil, &NotLoadedError{edge: "external_reference_hashes"}
 }
 
-// NodesOrErr returns the Nodes value or an error if the edge
+// NodeOrErr returns the Node value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ExternalReferenceEdges) NodesOrErr() (*Node, error) {
+func (e ExternalReferenceEdges) NodeOrErr() (*Node, error) {
 	if e.loadedTypes[1] {
-		if e.Nodes == nil {
+		if e.Node == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: node.Label}
 		}
-		return e.Nodes, nil
+		return e.Node, nil
 	}
-	return nil, &NotLoadedError{edge: "nodes"}
+	return nil, &NotLoadedError{edge: "node"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -86,11 +89,13 @@ func (*ExternalReference) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case externalreference.FieldHashes:
+			values[i] = new([]byte)
 		case externalreference.FieldID:
 			values[i] = new(sql.NullInt64)
 		case externalreference.FieldURL, externalreference.FieldComment, externalreference.FieldAuthority, externalreference.FieldType:
 			values[i] = new(sql.NullString)
-		case externalreference.ForeignKeys[0]: // node_external_references
+		case externalreference.ForeignKeys[0]: // node_node_external_references
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -137,12 +142,20 @@ func (er *ExternalReference) assignValues(columns []string, values []any) error 
 			} else if value.Valid {
 				er.Type = externalreference.Type(value.String)
 			}
+		case externalreference.FieldHashes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field hashes", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &er.Hashes); err != nil {
+					return fmt.Errorf("unmarshal field hashes: %w", err)
+				}
+			}
 		case externalreference.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field node_external_references", values[i])
+				return fmt.Errorf("unexpected type %T for field node_node_external_references", values[i])
 			} else if value.Valid {
-				er.node_external_references = new(string)
-				*er.node_external_references = value.String
+				er.node_node_external_references = new(string)
+				*er.node_node_external_references = value.String
 			}
 		default:
 			er.selectValues.Set(columns[i], values[i])
@@ -157,14 +170,14 @@ func (er *ExternalReference) Value(name string) (ent.Value, error) {
 	return er.selectValues.Get(name)
 }
 
-// QueryHashes queries the "hashes" edge of the ExternalReference entity.
-func (er *ExternalReference) QueryHashes() *HashesEntryQuery {
-	return NewExternalReferenceClient(er.config).QueryHashes(er)
+// QueryExternalReferenceHashes queries the "external_reference_hashes" edge of the ExternalReference entity.
+func (er *ExternalReference) QueryExternalReferenceHashes() *HashesEntryQuery {
+	return NewExternalReferenceClient(er.config).QueryExternalReferenceHashes(er)
 }
 
-// QueryNodes queries the "nodes" edge of the ExternalReference entity.
-func (er *ExternalReference) QueryNodes() *NodeQuery {
-	return NewExternalReferenceClient(er.config).QueryNodes(er)
+// QueryNode queries the "node" edge of the ExternalReference entity.
+func (er *ExternalReference) QueryNode() *NodeQuery {
+	return NewExternalReferenceClient(er.config).QueryNode(er)
 }
 
 // Update returns a builder for updating this ExternalReference.
@@ -201,6 +214,9 @@ func (er *ExternalReference) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", er.Type))
+	builder.WriteString(", ")
+	builder.WriteString("hashes=")
+	builder.WriteString(fmt.Sprintf("%v", er.Hashes))
 	builder.WriteByte(')')
 	return builder.String()
 }

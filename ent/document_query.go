@@ -35,13 +35,13 @@ import (
 // DocumentQuery is the builder for querying Document entities.
 type DocumentQuery struct {
 	config
-	ctx          *QueryContext
-	order        []document.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Document
-	withMetadata *MetadataQuery
-	withNodeList *NodeListQuery
-	withFKs      bool
+	ctx                  *QueryContext
+	order                []document.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.Document
+	withDocumentMetadata *MetadataQuery
+	withDocumentNodeList *NodeListQuery
+	withFKs              bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,8 +78,8 @@ func (dq *DocumentQuery) Order(o ...document.OrderOption) *DocumentQuery {
 	return dq
 }
 
-// QueryMetadata chains the current query on the "metadata" edge.
-func (dq *DocumentQuery) QueryMetadata() *MetadataQuery {
+// QueryDocumentMetadata chains the current query on the "document_metadata" edge.
+func (dq *DocumentQuery) QueryDocumentMetadata() *MetadataQuery {
 	query := (&MetadataClient{config: dq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := dq.prepareQuery(ctx); err != nil {
@@ -92,7 +92,7 @@ func (dq *DocumentQuery) QueryMetadata() *MetadataQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(document.Table, document.FieldID, selector),
 			sqlgraph.To(metadata.Table, metadata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, document.MetadataTable, document.MetadataColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, document.DocumentMetadataTable, document.DocumentMetadataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -100,8 +100,8 @@ func (dq *DocumentQuery) QueryMetadata() *MetadataQuery {
 	return query
 }
 
-// QueryNodeList chains the current query on the "node_list" edge.
-func (dq *DocumentQuery) QueryNodeList() *NodeListQuery {
+// QueryDocumentNodeList chains the current query on the "document_node_list" edge.
+func (dq *DocumentQuery) QueryDocumentNodeList() *NodeListQuery {
 	query := (&NodeListClient{config: dq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := dq.prepareQuery(ctx); err != nil {
@@ -114,7 +114,7 @@ func (dq *DocumentQuery) QueryNodeList() *NodeListQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(document.Table, document.FieldID, selector),
 			sqlgraph.To(nodelist.Table, nodelist.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, document.NodeListTable, document.NodeListColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, document.DocumentNodeListTable, document.DocumentNodeListColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -309,43 +309,55 @@ func (dq *DocumentQuery) Clone() *DocumentQuery {
 		return nil
 	}
 	return &DocumentQuery{
-		config:       dq.config,
-		ctx:          dq.ctx.Clone(),
-		order:        append([]document.OrderOption{}, dq.order...),
-		inters:       append([]Interceptor{}, dq.inters...),
-		predicates:   append([]predicate.Document{}, dq.predicates...),
-		withMetadata: dq.withMetadata.Clone(),
-		withNodeList: dq.withNodeList.Clone(),
+		config:               dq.config,
+		ctx:                  dq.ctx.Clone(),
+		order:                append([]document.OrderOption{}, dq.order...),
+		inters:               append([]Interceptor{}, dq.inters...),
+		predicates:           append([]predicate.Document{}, dq.predicates...),
+		withDocumentMetadata: dq.withDocumentMetadata.Clone(),
+		withDocumentNodeList: dq.withDocumentNodeList.Clone(),
 		// clone intermediate query.
 		sql:  dq.sql.Clone(),
 		path: dq.path,
 	}
 }
 
-// WithMetadata tells the query-builder to eager-load the nodes that are connected to
-// the "metadata" edge. The optional arguments are used to configure the query builder of the edge.
-func (dq *DocumentQuery) WithMetadata(opts ...func(*MetadataQuery)) *DocumentQuery {
+// WithDocumentMetadata tells the query-builder to eager-load the nodes that are connected to
+// the "document_metadata" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DocumentQuery) WithDocumentMetadata(opts ...func(*MetadataQuery)) *DocumentQuery {
 	query := (&MetadataClient{config: dq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	dq.withMetadata = query
+	dq.withDocumentMetadata = query
 	return dq
 }
 
-// WithNodeList tells the query-builder to eager-load the nodes that are connected to
-// the "node_list" edge. The optional arguments are used to configure the query builder of the edge.
-func (dq *DocumentQuery) WithNodeList(opts ...func(*NodeListQuery)) *DocumentQuery {
+// WithDocumentNodeList tells the query-builder to eager-load the nodes that are connected to
+// the "document_node_list" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DocumentQuery) WithDocumentNodeList(opts ...func(*NodeListQuery)) *DocumentQuery {
 	query := (&NodeListClient{config: dq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	dq.withNodeList = query
+	dq.withDocumentNodeList = query
 	return dq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Metadata *sbom.Metadata `json:"metadata,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Document.Query().
+//		GroupBy(document.FieldMetadata).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (dq *DocumentQuery) GroupBy(field string, fields ...string) *DocumentGroupBy {
 	dq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &DocumentGroupBy{build: dq}
@@ -357,6 +369,16 @@ func (dq *DocumentQuery) GroupBy(field string, fields ...string) *DocumentGroupB
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Metadata *sbom.Metadata `json:"metadata,omitempty"`
+//	}
+//
+//	client.Document.Query().
+//		Select(document.FieldMetadata).
+//		Scan(ctx, &v)
 func (dq *DocumentQuery) Select(fields ...string) *DocumentSelect {
 	dq.ctx.Fields = append(dq.ctx.Fields, fields...)
 	sbuild := &DocumentSelect{DocumentQuery: dq}
@@ -402,11 +424,11 @@ func (dq *DocumentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Doc
 		withFKs     = dq.withFKs
 		_spec       = dq.querySpec()
 		loadedTypes = [2]bool{
-			dq.withMetadata != nil,
-			dq.withNodeList != nil,
+			dq.withDocumentMetadata != nil,
+			dq.withDocumentNodeList != nil,
 		}
 	)
-	if dq.withMetadata != nil || dq.withNodeList != nil {
+	if dq.withDocumentMetadata != nil || dq.withDocumentNodeList != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -430,22 +452,22 @@ func (dq *DocumentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Doc
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := dq.withMetadata; query != nil {
-		if err := dq.loadMetadata(ctx, query, nodes, nil,
-			func(n *Document, e *Metadata) { n.Edges.Metadata = e }); err != nil {
+	if query := dq.withDocumentMetadata; query != nil {
+		if err := dq.loadDocumentMetadata(ctx, query, nodes, nil,
+			func(n *Document, e *Metadata) { n.Edges.DocumentMetadata = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := dq.withNodeList; query != nil {
-		if err := dq.loadNodeList(ctx, query, nodes, nil,
-			func(n *Document, e *NodeList) { n.Edges.NodeList = e }); err != nil {
+	if query := dq.withDocumentNodeList; query != nil {
+		if err := dq.loadDocumentNodeList(ctx, query, nodes, nil,
+			func(n *Document, e *NodeList) { n.Edges.DocumentNodeList = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (dq *DocumentQuery) loadMetadata(ctx context.Context, query *MetadataQuery, nodes []*Document, init func(*Document), assign func(*Document, *Metadata)) error {
+func (dq *DocumentQuery) loadDocumentMetadata(ctx context.Context, query *MetadataQuery, nodes []*Document, init func(*Document), assign func(*Document, *Metadata)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Document)
 	for i := range nodes {
@@ -477,7 +499,7 @@ func (dq *DocumentQuery) loadMetadata(ctx context.Context, query *MetadataQuery,
 	}
 	return nil
 }
-func (dq *DocumentQuery) loadNodeList(ctx context.Context, query *NodeListQuery, nodes []*Document, init func(*Document), assign func(*Document, *NodeList)) error {
+func (dq *DocumentQuery) loadDocumentNodeList(ctx context.Context, query *NodeListQuery, nodes []*Document, init func(*Document), assign func(*Document, *NodeList)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Document)
 	for i := range nodes {

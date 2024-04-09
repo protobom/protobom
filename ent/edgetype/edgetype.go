@@ -17,7 +17,7 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-package edge
+package edgetype
 
 import (
 	"fmt"
@@ -27,52 +27,50 @@ import (
 )
 
 const (
-	// Label holds the string label denoting the edge type in the database.
-	Label = "edge"
+	// Label holds the string label denoting the edgetype type in the database.
+	Label = "edge_type"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldFrom holds the string denoting the from field in the database.
-	FieldFrom = "from"
-	// FieldTo holds the string denoting the to field in the database.
-	FieldTo = "to"
-	// EdgeNodeList holds the string denoting the node_list edge name in mutations.
-	EdgeNodeList = "node_list"
-	// Table holds the table name of the edge in the database.
-	Table = "edges"
-	// NodeListTable is the table that holds the node_list relation/edge.
-	NodeListTable = "edges"
-	// NodeListInverseTable is the table name for the NodeList entity.
-	// It exists in this package in order to avoid circular dependency with the "nodelist" package.
-	NodeListInverseTable = "node_lists"
-	// NodeListColumn is the table column denoting the node_list relation/edge.
-	NodeListColumn = "node_list_edges"
+	// FieldNodeID holds the string denoting the node_id field in the database.
+	FieldNodeID = "node_id"
+	// FieldToID holds the string denoting the to_id field in the database.
+	FieldToID = "to_id"
+	// EdgeFrom holds the string denoting the from edge name in mutations.
+	EdgeFrom = "from"
+	// EdgeTo holds the string denoting the to edge name in mutations.
+	EdgeTo = "to"
+	// Table holds the table name of the edgetype in the database.
+	Table = "edge_types"
+	// FromTable is the table that holds the from relation/edge.
+	FromTable = "edge_types"
+	// FromInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	FromInverseTable = "nodes"
+	// FromColumn is the table column denoting the from relation/edge.
+	FromColumn = "node_id"
+	// ToTable is the table that holds the to relation/edge.
+	ToTable = "edge_types"
+	// ToInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	ToInverseTable = "nodes"
+	// ToColumn is the table column denoting the to relation/edge.
+	ToColumn = "to_id"
 )
 
-// Columns holds all SQL columns for edge fields.
+// Columns holds all SQL columns for edgetype fields.
 var Columns = []string{
 	FieldID,
 	FieldType,
-	FieldFrom,
-	FieldTo,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "edges"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"node_list_edges",
+	FieldNodeID,
+	FieldToID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -141,11 +139,11 @@ func TypeValidator(_type Type) error {
 	case TypeUNKNOWN, TypeAmends, TypeAncestor, TypeBuildDependency, TypeBuildTool, TypeContains, TypeContainedBy, TypeCopy, TypeDataFile, TypeDependencyManifest, TypeDependsOn, TypeDependencyOf, TypeDescendant, TypeDescribes, TypeDescribedBy, TypeDevDependency, TypeDevTool, TypeDistributionArtifact, TypeDocumentation, TypeDynamicLink, TypeExample, TypeExpandedFromArchive, TypeFileAdded, TypeFileDeleted, TypeFileModified, TypeGenerates, TypeGeneratedFrom, TypeMetafile, TypeOptionalComponent, TypeOptionalDependency, TypeOther, TypePackages, TypePatch, TypePrerequisite, TypePrerequisiteFor, TypeProvidedDependency, TypeRequirementFor, TypeRuntimeDependency, TypeSpecificationFor, TypeStaticLink, TypeTest, TypeTestCase, TypeTestDependency, TypeTestTool, TypeVariant:
 		return nil
 	default:
-		return fmt.Errorf("edge: invalid enum value for type field: %q", _type)
+		return fmt.Errorf("edgetype: invalid enum value for type field: %q", _type)
 	}
 }
 
-// OrderOption defines the ordering options for the Edge queries.
+// OrderOption defines the ordering options for the EdgeType queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
@@ -158,21 +156,40 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
-// ByFrom orders the results by the from field.
-func ByFrom(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFrom, opts...).ToFunc()
+// ByNodeID orders the results by the node_id field.
+func ByNodeID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNodeID, opts...).ToFunc()
 }
 
-// ByNodeListField orders the results by node_list field.
-func ByNodeListField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByToID orders the results by the to_id field.
+func ByToID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldToID, opts...).ToFunc()
+}
+
+// ByFromField orders the results by from field.
+func ByFromField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeListStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newFromStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newNodeListStep() *sqlgraph.Step {
+
+// ByToField orders the results by to field.
+func ByToField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newToStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newFromStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodeListInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, NodeListTable, NodeListColumn),
+		sqlgraph.To(FromInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, FromTable, FromColumn),
+	)
+}
+func newToStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ToInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, ToTable, ToColumn),
 	)
 }

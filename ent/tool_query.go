@@ -428,10 +428,10 @@ func (tq *ToolQuery) loadMetadata(ctx context.Context, query *MetadataQuery, nod
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Tool)
 	for i := range nodes {
-		if nodes[i].metadata_tools == nil {
+		if nodes[i].metadata_metadata_tools == nil {
 			continue
 		}
-		fk := *nodes[i].metadata_tools
+		fk := *nodes[i].metadata_metadata_tools
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -448,7 +448,7 @@ func (tq *ToolQuery) loadMetadata(ctx context.Context, query *MetadataQuery, nod
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "metadata_tools" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "metadata_metadata_tools" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

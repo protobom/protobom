@@ -29,8 +29,8 @@ type Document func(*sql.Selector)
 // DocumentType is the predicate function for documenttype builders.
 type DocumentType func(*sql.Selector)
 
-// Edge is the predicate function for edge builders.
-type Edge func(*sql.Selector)
+// EdgeType is the predicate function for edgetype builders.
+type EdgeType func(*sql.Selector)
 
 // ExternalReference is the predicate function for externalreference builders.
 type ExternalReference func(*sql.Selector)

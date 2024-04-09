@@ -388,21 +388,21 @@ func HasContactOwnerWith(preds ...predicate.Person) predicate.Person {
 	})
 }
 
-// HasContacts applies the HasEdge predicate on the "contacts" edge.
-func HasContacts() predicate.Person {
+// HasPersonContacts applies the HasEdge predicate on the "person_contacts" edge.
+func HasPersonContacts() predicate.Person {
 	return predicate.Person(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ContactsTable, ContactsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, PersonContactsTable, PersonContactsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasContactsWith applies the HasEdge predicate on the "contacts" edge with a given conditions (other predicates).
-func HasContactsWith(preds ...predicate.Person) predicate.Person {
+// HasPersonContactsWith applies the HasEdge predicate on the "person_contacts" edge with a given conditions (other predicates).
+func HasPersonContactsWith(preds ...predicate.Person) predicate.Person {
 	return predicate.Person(func(s *sql.Selector) {
-		step := newContactsStep()
+		step := newPersonContactsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

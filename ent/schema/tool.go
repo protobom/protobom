@@ -39,7 +39,7 @@ func (Tool) Fields() []ent.Field {
 
 func (Tool) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("metadata", Metadata.Type).Ref("tools").Unique(),
+		edge.From("metadata", Metadata.Type).Ref("metadata_tools").Unique(),
 	}
 }
 

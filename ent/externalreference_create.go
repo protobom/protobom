@@ -57,36 +57,50 @@ func (erc *ExternalReferenceCreate) SetAuthority(s string) *ExternalReferenceCre
 	return erc
 }
 
+// SetNillableAuthority sets the "authority" field if the given value is not nil.
+func (erc *ExternalReferenceCreate) SetNillableAuthority(s *string) *ExternalReferenceCreate {
+	if s != nil {
+		erc.SetAuthority(*s)
+	}
+	return erc
+}
+
 // SetType sets the "type" field.
 func (erc *ExternalReferenceCreate) SetType(e externalreference.Type) *ExternalReferenceCreate {
 	erc.mutation.SetType(e)
 	return erc
 }
 
-// AddHashIDs adds the "hashes" edge to the HashesEntry entity by IDs.
-func (erc *ExternalReferenceCreate) AddHashIDs(ids ...int) *ExternalReferenceCreate {
-	erc.mutation.AddHashIDs(ids...)
+// SetHashes sets the "hashes" field.
+func (erc *ExternalReferenceCreate) SetHashes(m map[int32]string) *ExternalReferenceCreate {
+	erc.mutation.SetHashes(m)
 	return erc
 }
 
-// AddHashes adds the "hashes" edges to the HashesEntry entity.
-func (erc *ExternalReferenceCreate) AddHashes(h ...*HashesEntry) *ExternalReferenceCreate {
+// AddExternalReferenceHashIDs adds the "external_reference_hashes" edge to the HashesEntry entity by IDs.
+func (erc *ExternalReferenceCreate) AddExternalReferenceHashIDs(ids ...int) *ExternalReferenceCreate {
+	erc.mutation.AddExternalReferenceHashIDs(ids...)
+	return erc
+}
+
+// AddExternalReferenceHashes adds the "external_reference_hashes" edges to the HashesEntry entity.
+func (erc *ExternalReferenceCreate) AddExternalReferenceHashes(h ...*HashesEntry) *ExternalReferenceCreate {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return erc.AddHashIDs(ids...)
+	return erc.AddExternalReferenceHashIDs(ids...)
 }
 
-// SetNodesID sets the "nodes" edge to the Node entity by ID.
-func (erc *ExternalReferenceCreate) SetNodesID(id string) *ExternalReferenceCreate {
-	erc.mutation.SetNodesID(id)
+// SetNodeID sets the "node" edge to the Node entity by ID.
+func (erc *ExternalReferenceCreate) SetNodeID(id string) *ExternalReferenceCreate {
+	erc.mutation.SetNodeID(id)
 	return erc
 }
 
-// SetNodes sets the "nodes" edge to the Node entity.
-func (erc *ExternalReferenceCreate) SetNodes(n *Node) *ExternalReferenceCreate {
-	return erc.SetNodesID(n.ID)
+// SetNode sets the "node" edge to the Node entity.
+func (erc *ExternalReferenceCreate) SetNode(n *Node) *ExternalReferenceCreate {
+	return erc.SetNodeID(n.ID)
 }
 
 // Mutation returns the ExternalReferenceMutation object of the builder.
@@ -129,9 +143,6 @@ func (erc *ExternalReferenceCreate) check() error {
 	if _, ok := erc.mutation.Comment(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "ExternalReference.comment"`)}
 	}
-	if _, ok := erc.mutation.Authority(); !ok {
-		return &ValidationError{Name: "authority", err: errors.New(`ent: missing required field "ExternalReference.authority"`)}
-	}
 	if _, ok := erc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "ExternalReference.type"`)}
 	}
@@ -140,8 +151,11 @@ func (erc *ExternalReferenceCreate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "ExternalReference.type": %w`, err)}
 		}
 	}
-	if _, ok := erc.mutation.NodesID(); !ok {
-		return &ValidationError{Name: "nodes", err: errors.New(`ent: missing required edge "ExternalReference.nodes"`)}
+	if _, ok := erc.mutation.Hashes(); !ok {
+		return &ValidationError{Name: "hashes", err: errors.New(`ent: missing required field "ExternalReference.hashes"`)}
+	}
+	if _, ok := erc.mutation.NodeID(); !ok {
+		return &ValidationError{Name: "node", err: errors.New(`ent: missing required edge "ExternalReference.node"`)}
 	}
 	return nil
 }
@@ -186,12 +200,16 @@ func (erc *ExternalReferenceCreate) createSpec() (*ExternalReference, *sqlgraph.
 		_spec.SetField(externalreference.FieldType, field.TypeEnum, value)
 		_node.Type = value
 	}
-	if nodes := erc.mutation.HashesIDs(); len(nodes) > 0 {
+	if value, ok := erc.mutation.Hashes(); ok {
+		_spec.SetField(externalreference.FieldHashes, field.TypeJSON, value)
+		_node.Hashes = value
+	}
+	if nodes := erc.mutation.ExternalReferenceHashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Table:   externalreference.ExternalReferenceHashesTable,
+			Columns: []string{externalreference.ExternalReferenceHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -202,12 +220,12 @@ func (erc *ExternalReferenceCreate) createSpec() (*ExternalReference, *sqlgraph.
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := erc.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := erc.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   externalreference.NodesTable,
-			Columns: []string{externalreference.NodesColumn},
+			Table:   externalreference.NodeTable,
+			Columns: []string{externalreference.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -216,7 +234,7 @@ func (erc *ExternalReferenceCreate) createSpec() (*ExternalReference, *sqlgraph.
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.node_external_references = &nodes[0]
+		_node.node_node_external_references = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -307,6 +325,12 @@ func (u *ExternalReferenceUpsert) UpdateAuthority() *ExternalReferenceUpsert {
 	return u
 }
 
+// ClearAuthority clears the value of the "authority" field.
+func (u *ExternalReferenceUpsert) ClearAuthority() *ExternalReferenceUpsert {
+	u.SetNull(externalreference.FieldAuthority)
+	return u
+}
+
 // SetType sets the "type" field.
 func (u *ExternalReferenceUpsert) SetType(v externalreference.Type) *ExternalReferenceUpsert {
 	u.Set(externalreference.FieldType, v)
@@ -316,6 +340,18 @@ func (u *ExternalReferenceUpsert) SetType(v externalreference.Type) *ExternalRef
 // UpdateType sets the "type" field to the value that was provided on create.
 func (u *ExternalReferenceUpsert) UpdateType() *ExternalReferenceUpsert {
 	u.SetExcluded(externalreference.FieldType)
+	return u
+}
+
+// SetHashes sets the "hashes" field.
+func (u *ExternalReferenceUpsert) SetHashes(v map[int32]string) *ExternalReferenceUpsert {
+	u.Set(externalreference.FieldHashes, v)
+	return u
+}
+
+// UpdateHashes sets the "hashes" field to the value that was provided on create.
+func (u *ExternalReferenceUpsert) UpdateHashes() *ExternalReferenceUpsert {
+	u.SetExcluded(externalreference.FieldHashes)
 	return u
 }
 
@@ -401,6 +437,13 @@ func (u *ExternalReferenceUpsertOne) UpdateAuthority() *ExternalReferenceUpsertO
 	})
 }
 
+// ClearAuthority clears the value of the "authority" field.
+func (u *ExternalReferenceUpsertOne) ClearAuthority() *ExternalReferenceUpsertOne {
+	return u.Update(func(s *ExternalReferenceUpsert) {
+		s.ClearAuthority()
+	})
+}
+
 // SetType sets the "type" field.
 func (u *ExternalReferenceUpsertOne) SetType(v externalreference.Type) *ExternalReferenceUpsertOne {
 	return u.Update(func(s *ExternalReferenceUpsert) {
@@ -412,6 +455,20 @@ func (u *ExternalReferenceUpsertOne) SetType(v externalreference.Type) *External
 func (u *ExternalReferenceUpsertOne) UpdateType() *ExternalReferenceUpsertOne {
 	return u.Update(func(s *ExternalReferenceUpsert) {
 		s.UpdateType()
+	})
+}
+
+// SetHashes sets the "hashes" field.
+func (u *ExternalReferenceUpsertOne) SetHashes(v map[int32]string) *ExternalReferenceUpsertOne {
+	return u.Update(func(s *ExternalReferenceUpsert) {
+		s.SetHashes(v)
+	})
+}
+
+// UpdateHashes sets the "hashes" field to the value that was provided on create.
+func (u *ExternalReferenceUpsertOne) UpdateHashes() *ExternalReferenceUpsertOne {
+	return u.Update(func(s *ExternalReferenceUpsert) {
+		s.UpdateHashes()
 	})
 }
 
@@ -660,6 +717,13 @@ func (u *ExternalReferenceUpsertBulk) UpdateAuthority() *ExternalReferenceUpsert
 	})
 }
 
+// ClearAuthority clears the value of the "authority" field.
+func (u *ExternalReferenceUpsertBulk) ClearAuthority() *ExternalReferenceUpsertBulk {
+	return u.Update(func(s *ExternalReferenceUpsert) {
+		s.ClearAuthority()
+	})
+}
+
 // SetType sets the "type" field.
 func (u *ExternalReferenceUpsertBulk) SetType(v externalreference.Type) *ExternalReferenceUpsertBulk {
 	return u.Update(func(s *ExternalReferenceUpsert) {
@@ -671,6 +735,20 @@ func (u *ExternalReferenceUpsertBulk) SetType(v externalreference.Type) *Externa
 func (u *ExternalReferenceUpsertBulk) UpdateType() *ExternalReferenceUpsertBulk {
 	return u.Update(func(s *ExternalReferenceUpsert) {
 		s.UpdateType()
+	})
+}
+
+// SetHashes sets the "hashes" field.
+func (u *ExternalReferenceUpsertBulk) SetHashes(v map[int32]string) *ExternalReferenceUpsertBulk {
+	return u.Update(func(s *ExternalReferenceUpsert) {
+		s.SetHashes(v)
+	})
+}
+
+// UpdateHashes sets the "hashes" field to the value that was provided on create.
+func (u *ExternalReferenceUpsertBulk) UpdateHashes() *ExternalReferenceUpsertBulk {
+	return u.Update(func(s *ExternalReferenceUpsert) {
+		s.UpdateHashes()
 	})
 }
 

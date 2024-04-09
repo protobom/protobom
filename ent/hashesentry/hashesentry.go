@@ -47,14 +47,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "externalreference" package.
 	ExternalReferencesInverseTable = "external_references"
 	// ExternalReferencesColumn is the table column denoting the external_references relation/edge.
-	ExternalReferencesColumn = "external_reference_hashes"
+	ExternalReferencesColumn = "external_reference_external_reference_hashes"
 	// NodesTable is the table that holds the nodes relation/edge.
 	NodesTable = "hashes_entries"
 	// NodesInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodesInverseTable = "nodes"
 	// NodesColumn is the table column denoting the nodes relation/edge.
-	NodesColumn = "node_hashes"
+	NodesColumn = "node_node_hashes"
 )
 
 // Columns holds all SQL columns for hashesentry fields.
@@ -67,8 +67,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "hashes_entries"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"external_reference_hashes",
-	"node_hashes",
+	"external_reference_external_reference_hashes",
+	"node_node_hashes",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

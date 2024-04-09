@@ -29,7 +29,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/documenttype"
-	"github.com/bom-squad/protobom/ent/edge"
+	"github.com/bom-squad/protobom/ent/edgetype"
 	"github.com/bom-squad/protobom/ent/externalreference"
 	"github.com/bom-squad/protobom/ent/hashesentry"
 	"github.com/bom-squad/protobom/ent/identifiersentry"
@@ -40,6 +40,7 @@ import (
 	"github.com/bom-squad/protobom/ent/predicate"
 	"github.com/bom-squad/protobom/ent/purpose"
 	"github.com/bom-squad/protobom/ent/tool"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 const (
@@ -53,7 +54,7 @@ const (
 	// Node types.
 	TypeDocument          = "Document"
 	TypeDocumentType      = "DocumentType"
-	TypeEdge              = "Edge"
+	TypeEdgeType          = "EdgeType"
 	TypeExternalReference = "ExternalReference"
 	TypeHashesEntry       = "HashesEntry"
 	TypeIdentifiersEntry  = "IdentifiersEntry"
@@ -68,17 +69,19 @@ const (
 // DocumentMutation represents an operation that mutates the Document nodes in the graph.
 type DocumentMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *int
-	clearedFields    map[string]struct{}
-	metadata         *string
-	clearedmetadata  bool
-	node_list        *int
-	clearednode_list bool
-	done             bool
-	oldValue         func(context.Context) (*Document, error)
-	predicates       []predicate.Document
+	op                        Op
+	typ                       string
+	id                        *int
+	metadata                  **sbom.Metadata
+	node_list                 **sbom.NodeList
+	clearedFields             map[string]struct{}
+	document_metadata         *string
+	cleareddocument_metadata  bool
+	document_node_list        *int
+	cleareddocument_node_list bool
+	done                      bool
+	oldValue                  func(context.Context) (*Document, error)
+	predicates                []predicate.Document
 }
 
 var _ ent.Mutation = (*DocumentMutation)(nil)
@@ -179,82 +182,154 @@ func (m *DocumentMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetMetadataID sets the "metadata" edge to the Metadata entity by id.
-func (m *DocumentMutation) SetMetadataID(id string) {
-	m.metadata = &id
+// SetMetadata sets the "metadata" field.
+func (m *DocumentMutation) SetMetadata(s *sbom.Metadata) {
+	m.metadata = &s
 }
 
-// ClearMetadata clears the "metadata" edge to the Metadata entity.
-func (m *DocumentMutation) ClearMetadata() {
-	m.clearedmetadata = true
-}
-
-// MetadataCleared reports if the "metadata" edge to the Metadata entity was cleared.
-func (m *DocumentMutation) MetadataCleared() bool {
-	return m.clearedmetadata
-}
-
-// MetadataID returns the "metadata" edge ID in the mutation.
-func (m *DocumentMutation) MetadataID() (id string, exists bool) {
-	if m.metadata != nil {
-		return *m.metadata, true
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *DocumentMutation) Metadata() (r *sbom.Metadata, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
 	}
-	return
+	return *v, true
 }
 
-// MetadataIDs returns the "metadata" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// MetadataID instead. It exists only for internal usage by the builders.
-func (m *DocumentMutation) MetadataIDs() (ids []string) {
-	if id := m.metadata; id != nil {
-		ids = append(ids, *id)
+// OldMetadata returns the old "metadata" field's value of the Document entity.
+// If the Document object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DocumentMutation) OldMetadata(ctx context.Context) (v *sbom.Metadata, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
 	}
-	return
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
 }
 
-// ResetMetadata resets all changes to the "metadata" edge.
+// ResetMetadata resets all changes to the "metadata" field.
 func (m *DocumentMutation) ResetMetadata() {
 	m.metadata = nil
-	m.clearedmetadata = false
 }
 
-// SetNodeListID sets the "node_list" edge to the NodeList entity by id.
-func (m *DocumentMutation) SetNodeListID(id int) {
-	m.node_list = &id
+// SetNodeList sets the "node_list" field.
+func (m *DocumentMutation) SetNodeList(sl *sbom.NodeList) {
+	m.node_list = &sl
 }
 
-// ClearNodeList clears the "node_list" edge to the NodeList entity.
-func (m *DocumentMutation) ClearNodeList() {
-	m.clearednode_list = true
+// NodeList returns the value of the "node_list" field in the mutation.
+func (m *DocumentMutation) NodeList() (r *sbom.NodeList, exists bool) {
+	v := m.node_list
+	if v == nil {
+		return
+	}
+	return *v, true
 }
 
-// NodeListCleared reports if the "node_list" edge to the NodeList entity was cleared.
-func (m *DocumentMutation) NodeListCleared() bool {
-	return m.clearednode_list
+// OldNodeList returns the old "node_list" field's value of the Document entity.
+// If the Document object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DocumentMutation) OldNodeList(ctx context.Context) (v *sbom.NodeList, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNodeList is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNodeList requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNodeList: %w", err)
+	}
+	return oldValue.NodeList, nil
 }
 
-// NodeListID returns the "node_list" edge ID in the mutation.
-func (m *DocumentMutation) NodeListID() (id int, exists bool) {
-	if m.node_list != nil {
-		return *m.node_list, true
+// ResetNodeList resets all changes to the "node_list" field.
+func (m *DocumentMutation) ResetNodeList() {
+	m.node_list = nil
+}
+
+// SetDocumentMetadataID sets the "document_metadata" edge to the Metadata entity by id.
+func (m *DocumentMutation) SetDocumentMetadataID(id string) {
+	m.document_metadata = &id
+}
+
+// ClearDocumentMetadata clears the "document_metadata" edge to the Metadata entity.
+func (m *DocumentMutation) ClearDocumentMetadata() {
+	m.cleareddocument_metadata = true
+}
+
+// DocumentMetadataCleared reports if the "document_metadata" edge to the Metadata entity was cleared.
+func (m *DocumentMutation) DocumentMetadataCleared() bool {
+	return m.cleareddocument_metadata
+}
+
+// DocumentMetadataID returns the "document_metadata" edge ID in the mutation.
+func (m *DocumentMutation) DocumentMetadataID() (id string, exists bool) {
+	if m.document_metadata != nil {
+		return *m.document_metadata, true
 	}
 	return
 }
 
-// NodeListIDs returns the "node_list" edge IDs in the mutation.
+// DocumentMetadataIDs returns the "document_metadata" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// NodeListID instead. It exists only for internal usage by the builders.
-func (m *DocumentMutation) NodeListIDs() (ids []int) {
-	if id := m.node_list; id != nil {
+// DocumentMetadataID instead. It exists only for internal usage by the builders.
+func (m *DocumentMutation) DocumentMetadataIDs() (ids []string) {
+	if id := m.document_metadata; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetNodeList resets all changes to the "node_list" edge.
-func (m *DocumentMutation) ResetNodeList() {
-	m.node_list = nil
-	m.clearednode_list = false
+// ResetDocumentMetadata resets all changes to the "document_metadata" edge.
+func (m *DocumentMutation) ResetDocumentMetadata() {
+	m.document_metadata = nil
+	m.cleareddocument_metadata = false
+}
+
+// SetDocumentNodeListID sets the "document_node_list" edge to the NodeList entity by id.
+func (m *DocumentMutation) SetDocumentNodeListID(id int) {
+	m.document_node_list = &id
+}
+
+// ClearDocumentNodeList clears the "document_node_list" edge to the NodeList entity.
+func (m *DocumentMutation) ClearDocumentNodeList() {
+	m.cleareddocument_node_list = true
+}
+
+// DocumentNodeListCleared reports if the "document_node_list" edge to the NodeList entity was cleared.
+func (m *DocumentMutation) DocumentNodeListCleared() bool {
+	return m.cleareddocument_node_list
+}
+
+// DocumentNodeListID returns the "document_node_list" edge ID in the mutation.
+func (m *DocumentMutation) DocumentNodeListID() (id int, exists bool) {
+	if m.document_node_list != nil {
+		return *m.document_node_list, true
+	}
+	return
+}
+
+// DocumentNodeListIDs returns the "document_node_list" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DocumentNodeListID instead. It exists only for internal usage by the builders.
+func (m *DocumentMutation) DocumentNodeListIDs() (ids []int) {
+	if id := m.document_node_list; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDocumentNodeList resets all changes to the "document_node_list" edge.
+func (m *DocumentMutation) ResetDocumentNodeList() {
+	m.document_node_list = nil
+	m.cleareddocument_node_list = false
 }
 
 // Where appends a list predicates to the DocumentMutation builder.
@@ -291,7 +366,13 @@ func (m *DocumentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DocumentMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 2)
+	if m.metadata != nil {
+		fields = append(fields, document.FieldMetadata)
+	}
+	if m.node_list != nil {
+		fields = append(fields, document.FieldNodeList)
+	}
 	return fields
 }
 
@@ -299,6 +380,12 @@ func (m *DocumentMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *DocumentMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case document.FieldMetadata:
+		return m.Metadata()
+	case document.FieldNodeList:
+		return m.NodeList()
+	}
 	return nil, false
 }
 
@@ -306,6 +393,12 @@ func (m *DocumentMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *DocumentMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case document.FieldMetadata:
+		return m.OldMetadata(ctx)
+	case document.FieldNodeList:
+		return m.OldNodeList(ctx)
+	}
 	return nil, fmt.Errorf("unknown Document field %s", name)
 }
 
@@ -314,6 +407,20 @@ func (m *DocumentMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *DocumentMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case document.FieldMetadata:
+		v, ok := value.(*sbom.Metadata)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
+	case document.FieldNodeList:
+		v, ok := value.(*sbom.NodeList)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNodeList(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Document field %s", name)
 }
@@ -335,6 +442,8 @@ func (m *DocumentMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *DocumentMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Document numeric field %s", name)
 }
 
@@ -360,17 +469,25 @@ func (m *DocumentMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *DocumentMutation) ResetField(name string) error {
+	switch name {
+	case document.FieldMetadata:
+		m.ResetMetadata()
+		return nil
+	case document.FieldNodeList:
+		m.ResetNodeList()
+		return nil
+	}
 	return fmt.Errorf("unknown Document field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *DocumentMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.metadata != nil {
-		edges = append(edges, document.EdgeMetadata)
+	if m.document_metadata != nil {
+		edges = append(edges, document.EdgeDocumentMetadata)
 	}
-	if m.node_list != nil {
-		edges = append(edges, document.EdgeNodeList)
+	if m.document_node_list != nil {
+		edges = append(edges, document.EdgeDocumentNodeList)
 	}
 	return edges
 }
@@ -379,12 +496,12 @@ func (m *DocumentMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *DocumentMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case document.EdgeMetadata:
-		if id := m.metadata; id != nil {
+	case document.EdgeDocumentMetadata:
+		if id := m.document_metadata; id != nil {
 			return []ent.Value{*id}
 		}
-	case document.EdgeNodeList:
-		if id := m.node_list; id != nil {
+	case document.EdgeDocumentNodeList:
+		if id := m.document_node_list; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -406,11 +523,11 @@ func (m *DocumentMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *DocumentMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedmetadata {
-		edges = append(edges, document.EdgeMetadata)
+	if m.cleareddocument_metadata {
+		edges = append(edges, document.EdgeDocumentMetadata)
 	}
-	if m.clearednode_list {
-		edges = append(edges, document.EdgeNodeList)
+	if m.cleareddocument_node_list {
+		edges = append(edges, document.EdgeDocumentNodeList)
 	}
 	return edges
 }
@@ -419,10 +536,10 @@ func (m *DocumentMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *DocumentMutation) EdgeCleared(name string) bool {
 	switch name {
-	case document.EdgeMetadata:
-		return m.clearedmetadata
-	case document.EdgeNodeList:
-		return m.clearednode_list
+	case document.EdgeDocumentMetadata:
+		return m.cleareddocument_metadata
+	case document.EdgeDocumentNodeList:
+		return m.cleareddocument_node_list
 	}
 	return false
 }
@@ -431,11 +548,11 @@ func (m *DocumentMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *DocumentMutation) ClearEdge(name string) error {
 	switch name {
-	case document.EdgeMetadata:
-		m.ClearMetadata()
+	case document.EdgeDocumentMetadata:
+		m.ClearDocumentMetadata()
 		return nil
-	case document.EdgeNodeList:
-		m.ClearNodeList()
+	case document.EdgeDocumentNodeList:
+		m.ClearDocumentNodeList()
 		return nil
 	}
 	return fmt.Errorf("unknown Document unique edge %s", name)
@@ -445,11 +562,11 @@ func (m *DocumentMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *DocumentMutation) ResetEdge(name string) error {
 	switch name {
-	case document.EdgeMetadata:
-		m.ResetMetadata()
+	case document.EdgeDocumentMetadata:
+		m.ResetDocumentMetadata()
 		return nil
-	case document.EdgeNodeList:
-		m.ResetNodeList()
+	case document.EdgeDocumentNodeList:
+		m.ResetDocumentNodeList()
 		return nil
 	}
 	return fmt.Errorf("unknown Document edge %s", name)
@@ -587,7 +704,7 @@ func (m *DocumentTypeMutation) GetType() (r documenttype.Type, exists bool) {
 // OldType returns the old "type" field's value of the DocumentType entity.
 // If the DocumentType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DocumentTypeMutation) OldType(ctx context.Context) (v documenttype.Type, err error) {
+func (m *DocumentTypeMutation) OldType(ctx context.Context) (v *documenttype.Type, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldType is only allowed on UpdateOne operations")
 	}
@@ -636,7 +753,7 @@ func (m *DocumentTypeMutation) Name() (r string, exists bool) {
 // OldName returns the old "name" field's value of the DocumentType entity.
 // If the DocumentType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DocumentTypeMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *DocumentTypeMutation) OldName(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
@@ -685,7 +802,7 @@ func (m *DocumentTypeMutation) Description() (r string, exists bool) {
 // OldDescription returns the old "description" field's value of the DocumentType entity.
 // If the DocumentType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DocumentTypeMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *DocumentTypeMutation) OldDescription(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
@@ -1016,35 +1133,34 @@ func (m *DocumentTypeMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown DocumentType edge %s", name)
 }
 
-// EdgeMutation represents an operation that mutates the Edge nodes in the graph.
-type EdgeMutation struct {
+// EdgeTypeMutation represents an operation that mutates the EdgeType nodes in the graph.
+type EdgeTypeMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *int
-	_type            *edge.Type
-	from             *string
-	to               *[]string
-	appendto         []string
-	clearedFields    map[string]struct{}
-	node_list        *int
-	clearednode_list bool
-	done             bool
-	oldValue         func(context.Context) (*Edge, error)
-	predicates       []predicate.Edge
+	op            Op
+	typ           string
+	id            *int
+	_type         *edgetype.Type
+	clearedFields map[string]struct{}
+	from          *string
+	clearedfrom   bool
+	to            *string
+	clearedto     bool
+	done          bool
+	oldValue      func(context.Context) (*EdgeType, error)
+	predicates    []predicate.EdgeType
 }
 
-var _ ent.Mutation = (*EdgeMutation)(nil)
+var _ ent.Mutation = (*EdgeTypeMutation)(nil)
 
-// edgeOption allows management of the mutation configuration using functional options.
-type edgeOption func(*EdgeMutation)
+// edgetypeOption allows management of the mutation configuration using functional options.
+type edgetypeOption func(*EdgeTypeMutation)
 
-// newEdgeMutation creates new mutation for the Edge entity.
-func newEdgeMutation(c config, op Op, opts ...edgeOption) *EdgeMutation {
-	m := &EdgeMutation{
+// newEdgeTypeMutation creates new mutation for the EdgeType entity.
+func newEdgeTypeMutation(c config, op Op, opts ...edgetypeOption) *EdgeTypeMutation {
+	m := &EdgeTypeMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeEdge,
+		typ:           TypeEdgeType,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -1053,20 +1169,20 @@ func newEdgeMutation(c config, op Op, opts ...edgeOption) *EdgeMutation {
 	return m
 }
 
-// withEdgeID sets the ID field of the mutation.
-func withEdgeID(id int) edgeOption {
-	return func(m *EdgeMutation) {
+// withEdgeTypeID sets the ID field of the mutation.
+func withEdgeTypeID(id int) edgetypeOption {
+	return func(m *EdgeTypeMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Edge
+			value *EdgeType
 		)
-		m.oldValue = func(ctx context.Context) (*Edge, error) {
+		m.oldValue = func(ctx context.Context) (*EdgeType, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Edge.Get(ctx, id)
+					value, err = m.Client().EdgeType.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -1075,10 +1191,10 @@ func withEdgeID(id int) edgeOption {
 	}
 }
 
-// withEdge sets the old Edge of the mutation.
-func withEdge(node *Edge) edgeOption {
-	return func(m *EdgeMutation) {
-		m.oldValue = func(context.Context) (*Edge, error) {
+// withEdgeType sets the old EdgeType of the mutation.
+func withEdgeType(node *EdgeType) edgetypeOption {
+	return func(m *EdgeTypeMutation) {
+		m.oldValue = func(context.Context) (*EdgeType, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -1087,7 +1203,7 @@ func withEdge(node *Edge) edgeOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m EdgeMutation) Client() *Client {
+func (m EdgeTypeMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -1095,7 +1211,7 @@ func (m EdgeMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m EdgeMutation) Tx() (*Tx, error) {
+func (m EdgeTypeMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -1106,7 +1222,7 @@ func (m EdgeMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *EdgeMutation) ID() (id int, exists bool) {
+func (m *EdgeTypeMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1117,7 +1233,7 @@ func (m *EdgeMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *EdgeMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *EdgeTypeMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -1126,19 +1242,19 @@ func (m *EdgeMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Edge.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().EdgeType.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
 // SetType sets the "type" field.
-func (m *EdgeMutation) SetType(e edge.Type) {
+func (m *EdgeTypeMutation) SetType(e edgetype.Type) {
 	m._type = &e
 }
 
 // GetType returns the value of the "type" field in the mutation.
-func (m *EdgeMutation) GetType() (r edge.Type, exists bool) {
+func (m *EdgeTypeMutation) GetType() (r edgetype.Type, exists bool) {
 	v := m._type
 	if v == nil {
 		return
@@ -1146,10 +1262,10 @@ func (m *EdgeMutation) GetType() (r edge.Type, exists bool) {
 	return *v, true
 }
 
-// OldType returns the old "type" field's value of the Edge entity.
-// If the Edge object wasn't provided to the builder, the object is fetched from the database.
+// OldType returns the old "type" field's value of the EdgeType entity.
+// If the EdgeType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EdgeMutation) OldType(ctx context.Context) (v edge.Type, err error) {
+func (m *EdgeTypeMutation) OldType(ctx context.Context) (v edgetype.Type, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldType is only allowed on UpdateOne operations")
 	}
@@ -1164,17 +1280,17 @@ func (m *EdgeMutation) OldType(ctx context.Context) (v edge.Type, err error) {
 }
 
 // ResetType resets all changes to the "type" field.
-func (m *EdgeMutation) ResetType() {
+func (m *EdgeTypeMutation) ResetType() {
 	m._type = nil
 }
 
-// SetFrom sets the "from" field.
-func (m *EdgeMutation) SetFrom(s string) {
+// SetNodeID sets the "node_id" field.
+func (m *EdgeTypeMutation) SetNodeID(s string) {
 	m.from = &s
 }
 
-// From returns the value of the "from" field in the mutation.
-func (m *EdgeMutation) From() (r string, exists bool) {
+// NodeID returns the value of the "node_id" field in the mutation.
+func (m *EdgeTypeMutation) NodeID() (r string, exists bool) {
 	v := m.from
 	if v == nil {
 		return
@@ -1182,36 +1298,35 @@ func (m *EdgeMutation) From() (r string, exists bool) {
 	return *v, true
 }
 
-// OldFrom returns the old "from" field's value of the Edge entity.
-// If the Edge object wasn't provided to the builder, the object is fetched from the database.
+// OldNodeID returns the old "node_id" field's value of the EdgeType entity.
+// If the EdgeType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EdgeMutation) OldFrom(ctx context.Context) (v string, err error) {
+func (m *EdgeTypeMutation) OldNodeID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFrom is only allowed on UpdateOne operations")
+		return v, errors.New("OldNodeID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFrom requires an ID field in the mutation")
+		return v, errors.New("OldNodeID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFrom: %w", err)
+		return v, fmt.Errorf("querying old value for OldNodeID: %w", err)
 	}
-	return oldValue.From, nil
+	return oldValue.NodeID, nil
 }
 
-// ResetFrom resets all changes to the "from" field.
-func (m *EdgeMutation) ResetFrom() {
+// ResetNodeID resets all changes to the "node_id" field.
+func (m *EdgeTypeMutation) ResetNodeID() {
 	m.from = nil
 }
 
-// SetTo sets the "to" field.
-func (m *EdgeMutation) SetTo(s []string) {
+// SetToID sets the "to_id" field.
+func (m *EdgeTypeMutation) SetToID(s string) {
 	m.to = &s
-	m.appendto = nil
 }
 
-// To returns the value of the "to" field in the mutation.
-func (m *EdgeMutation) To() (r []string, exists bool) {
+// ToID returns the value of the "to_id" field in the mutation.
+func (m *EdgeTypeMutation) ToID() (r string, exists bool) {
 	v := m.to
 	if v == nil {
 		return
@@ -1219,90 +1334,104 @@ func (m *EdgeMutation) To() (r []string, exists bool) {
 	return *v, true
 }
 
-// OldTo returns the old "to" field's value of the Edge entity.
-// If the Edge object wasn't provided to the builder, the object is fetched from the database.
+// OldToID returns the old "to_id" field's value of the EdgeType entity.
+// If the EdgeType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EdgeMutation) OldTo(ctx context.Context) (v []string, err error) {
+func (m *EdgeTypeMutation) OldToID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTo is only allowed on UpdateOne operations")
+		return v, errors.New("OldToID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTo requires an ID field in the mutation")
+		return v, errors.New("OldToID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTo: %w", err)
+		return v, fmt.Errorf("querying old value for OldToID: %w", err)
 	}
-	return oldValue.To, nil
+	return oldValue.ToID, nil
 }
 
-// AppendTo adds s to the "to" field.
-func (m *EdgeMutation) AppendTo(s []string) {
-	m.appendto = append(m.appendto, s...)
-}
-
-// AppendedTo returns the list of values that were appended to the "to" field in this mutation.
-func (m *EdgeMutation) AppendedTo() ([]string, bool) {
-	if len(m.appendto) == 0 {
-		return nil, false
-	}
-	return m.appendto, true
-}
-
-// ResetTo resets all changes to the "to" field.
-func (m *EdgeMutation) ResetTo() {
+// ResetToID resets all changes to the "to_id" field.
+func (m *EdgeTypeMutation) ResetToID() {
 	m.to = nil
-	m.appendto = nil
 }
 
-// SetNodeListID sets the "node_list" edge to the NodeList entity by id.
-func (m *EdgeMutation) SetNodeListID(id int) {
-	m.node_list = &id
+// SetFromID sets the "from" edge to the Node entity by id.
+func (m *EdgeTypeMutation) SetFromID(id string) {
+	m.from = &id
 }
 
-// ClearNodeList clears the "node_list" edge to the NodeList entity.
-func (m *EdgeMutation) ClearNodeList() {
-	m.clearednode_list = true
+// ClearFrom clears the "from" edge to the Node entity.
+func (m *EdgeTypeMutation) ClearFrom() {
+	m.clearedfrom = true
+	m.clearedFields[edgetype.FieldNodeID] = struct{}{}
 }
 
-// NodeListCleared reports if the "node_list" edge to the NodeList entity was cleared.
-func (m *EdgeMutation) NodeListCleared() bool {
-	return m.clearednode_list
+// FromCleared reports if the "from" edge to the Node entity was cleared.
+func (m *EdgeTypeMutation) FromCleared() bool {
+	return m.clearedfrom
 }
 
-// NodeListID returns the "node_list" edge ID in the mutation.
-func (m *EdgeMutation) NodeListID() (id int, exists bool) {
-	if m.node_list != nil {
-		return *m.node_list, true
+// FromID returns the "from" edge ID in the mutation.
+func (m *EdgeTypeMutation) FromID() (id string, exists bool) {
+	if m.from != nil {
+		return *m.from, true
 	}
 	return
 }
 
-// NodeListIDs returns the "node_list" edge IDs in the mutation.
+// FromIDs returns the "from" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// NodeListID instead. It exists only for internal usage by the builders.
-func (m *EdgeMutation) NodeListIDs() (ids []int) {
-	if id := m.node_list; id != nil {
+// FromID instead. It exists only for internal usage by the builders.
+func (m *EdgeTypeMutation) FromIDs() (ids []string) {
+	if id := m.from; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetNodeList resets all changes to the "node_list" edge.
-func (m *EdgeMutation) ResetNodeList() {
-	m.node_list = nil
-	m.clearednode_list = false
+// ResetFrom resets all changes to the "from" edge.
+func (m *EdgeTypeMutation) ResetFrom() {
+	m.from = nil
+	m.clearedfrom = false
 }
 
-// Where appends a list predicates to the EdgeMutation builder.
-func (m *EdgeMutation) Where(ps ...predicate.Edge) {
+// ClearTo clears the "to" edge to the Node entity.
+func (m *EdgeTypeMutation) ClearTo() {
+	m.clearedto = true
+	m.clearedFields[edgetype.FieldToID] = struct{}{}
+}
+
+// ToCleared reports if the "to" edge to the Node entity was cleared.
+func (m *EdgeTypeMutation) ToCleared() bool {
+	return m.clearedto
+}
+
+// ToIDs returns the "to" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ToID instead. It exists only for internal usage by the builders.
+func (m *EdgeTypeMutation) ToIDs() (ids []string) {
+	if id := m.to; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTo resets all changes to the "to" edge.
+func (m *EdgeTypeMutation) ResetTo() {
+	m.to = nil
+	m.clearedto = false
+}
+
+// Where appends a list predicates to the EdgeTypeMutation builder.
+func (m *EdgeTypeMutation) Where(ps ...predicate.EdgeType) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the EdgeMutation builder. Using this method,
+// WhereP appends storage-level predicates to the EdgeTypeMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *EdgeMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Edge, len(ps))
+func (m *EdgeTypeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.EdgeType, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -1310,33 +1439,33 @@ func (m *EdgeMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *EdgeMutation) Op() Op {
+func (m *EdgeTypeMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *EdgeMutation) SetOp(op Op) {
+func (m *EdgeTypeMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (Edge).
-func (m *EdgeMutation) Type() string {
+// Type returns the node type of this mutation (EdgeType).
+func (m *EdgeTypeMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *EdgeMutation) Fields() []string {
+func (m *EdgeTypeMutation) Fields() []string {
 	fields := make([]string, 0, 3)
 	if m._type != nil {
-		fields = append(fields, edge.FieldType)
+		fields = append(fields, edgetype.FieldType)
 	}
 	if m.from != nil {
-		fields = append(fields, edge.FieldFrom)
+		fields = append(fields, edgetype.FieldNodeID)
 	}
 	if m.to != nil {
-		fields = append(fields, edge.FieldTo)
+		fields = append(fields, edgetype.FieldToID)
 	}
 	return fields
 }
@@ -1344,14 +1473,14 @@ func (m *EdgeMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *EdgeMutation) Field(name string) (ent.Value, bool) {
+func (m *EdgeTypeMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case edge.FieldType:
+	case edgetype.FieldType:
 		return m.GetType()
-	case edge.FieldFrom:
-		return m.From()
-	case edge.FieldTo:
-		return m.To()
+	case edgetype.FieldNodeID:
+		return m.NodeID()
+	case edgetype.FieldToID:
+		return m.ToID()
 	}
 	return nil, false
 }
@@ -1359,121 +1488,128 @@ func (m *EdgeMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *EdgeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *EdgeTypeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case edge.FieldType:
+	case edgetype.FieldType:
 		return m.OldType(ctx)
-	case edge.FieldFrom:
-		return m.OldFrom(ctx)
-	case edge.FieldTo:
-		return m.OldTo(ctx)
+	case edgetype.FieldNodeID:
+		return m.OldNodeID(ctx)
+	case edgetype.FieldToID:
+		return m.OldToID(ctx)
 	}
-	return nil, fmt.Errorf("unknown Edge field %s", name)
+	return nil, fmt.Errorf("unknown EdgeType field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *EdgeMutation) SetField(name string, value ent.Value) error {
+func (m *EdgeTypeMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case edge.FieldType:
-		v, ok := value.(edge.Type)
+	case edgetype.FieldType:
+		v, ok := value.(edgetype.Type)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetType(v)
 		return nil
-	case edge.FieldFrom:
+	case edgetype.FieldNodeID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetFrom(v)
+		m.SetNodeID(v)
 		return nil
-	case edge.FieldTo:
-		v, ok := value.([]string)
+	case edgetype.FieldToID:
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTo(v)
+		m.SetToID(v)
 		return nil
 	}
-	return fmt.Errorf("unknown Edge field %s", name)
+	return fmt.Errorf("unknown EdgeType field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *EdgeMutation) AddedFields() []string {
+func (m *EdgeTypeMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *EdgeMutation) AddedField(name string) (ent.Value, bool) {
+func (m *EdgeTypeMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *EdgeMutation) AddField(name string, value ent.Value) error {
+func (m *EdgeTypeMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown Edge numeric field %s", name)
+	return fmt.Errorf("unknown EdgeType numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *EdgeMutation) ClearedFields() []string {
+func (m *EdgeTypeMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *EdgeMutation) FieldCleared(name string) bool {
+func (m *EdgeTypeMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *EdgeMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Edge nullable field %s", name)
+func (m *EdgeTypeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown EdgeType nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *EdgeMutation) ResetField(name string) error {
+func (m *EdgeTypeMutation) ResetField(name string) error {
 	switch name {
-	case edge.FieldType:
+	case edgetype.FieldType:
 		m.ResetType()
 		return nil
-	case edge.FieldFrom:
-		m.ResetFrom()
+	case edgetype.FieldNodeID:
+		m.ResetNodeID()
 		return nil
-	case edge.FieldTo:
-		m.ResetTo()
+	case edgetype.FieldToID:
+		m.ResetToID()
 		return nil
 	}
-	return fmt.Errorf("unknown Edge field %s", name)
+	return fmt.Errorf("unknown EdgeType field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *EdgeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.node_list != nil {
-		edges = append(edges, edge.EdgeNodeList)
+func (m *EdgeTypeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.from != nil {
+		edges = append(edges, edgetype.EdgeFrom)
+	}
+	if m.to != nil {
+		edges = append(edges, edgetype.EdgeTo)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *EdgeMutation) AddedIDs(name string) []ent.Value {
+func (m *EdgeTypeMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case edge.EdgeNodeList:
-		if id := m.node_list; id != nil {
+	case edgetype.EdgeFrom:
+		if id := m.from; id != nil {
+			return []ent.Value{*id}
+		}
+	case edgetype.EdgeTo:
+		if id := m.to; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -1481,77 +1617,89 @@ func (m *EdgeMutation) AddedIDs(name string) []ent.Value {
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *EdgeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+func (m *EdgeTypeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *EdgeMutation) RemovedIDs(name string) []ent.Value {
+func (m *EdgeTypeMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *EdgeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearednode_list {
-		edges = append(edges, edge.EdgeNodeList)
+func (m *EdgeTypeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedfrom {
+		edges = append(edges, edgetype.EdgeFrom)
+	}
+	if m.clearedto {
+		edges = append(edges, edgetype.EdgeTo)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *EdgeMutation) EdgeCleared(name string) bool {
+func (m *EdgeTypeMutation) EdgeCleared(name string) bool {
 	switch name {
-	case edge.EdgeNodeList:
-		return m.clearednode_list
+	case edgetype.EdgeFrom:
+		return m.clearedfrom
+	case edgetype.EdgeTo:
+		return m.clearedto
 	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *EdgeMutation) ClearEdge(name string) error {
+func (m *EdgeTypeMutation) ClearEdge(name string) error {
 	switch name {
-	case edge.EdgeNodeList:
-		m.ClearNodeList()
+	case edgetype.EdgeFrom:
+		m.ClearFrom()
+		return nil
+	case edgetype.EdgeTo:
+		m.ClearTo()
 		return nil
 	}
-	return fmt.Errorf("unknown Edge unique edge %s", name)
+	return fmt.Errorf("unknown EdgeType unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *EdgeMutation) ResetEdge(name string) error {
+func (m *EdgeTypeMutation) ResetEdge(name string) error {
 	switch name {
-	case edge.EdgeNodeList:
-		m.ResetNodeList()
+	case edgetype.EdgeFrom:
+		m.ResetFrom()
+		return nil
+	case edgetype.EdgeTo:
+		m.ResetTo()
 		return nil
 	}
-	return fmt.Errorf("unknown Edge edge %s", name)
+	return fmt.Errorf("unknown EdgeType edge %s", name)
 }
 
 // ExternalReferenceMutation represents an operation that mutates the ExternalReference nodes in the graph.
 type ExternalReferenceMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	url           *string
-	comment       *string
-	authority     *string
-	_type         *externalreference.Type
-	clearedFields map[string]struct{}
-	hashes        map[int]struct{}
-	removedhashes map[int]struct{}
-	clearedhashes bool
-	nodes         *string
-	clearednodes  bool
-	done          bool
-	oldValue      func(context.Context) (*ExternalReference, error)
-	predicates    []predicate.ExternalReference
+	op                               Op
+	typ                              string
+	id                               *int
+	url                              *string
+	comment                          *string
+	authority                        *string
+	_type                            *externalreference.Type
+	hashes                           *map[int32]string
+	clearedFields                    map[string]struct{}
+	external_reference_hashes        map[int]struct{}
+	removedexternal_reference_hashes map[int]struct{}
+	clearedexternal_reference_hashes bool
+	node                             *string
+	clearednode                      bool
+	done                             bool
+	oldValue                         func(context.Context) (*ExternalReference, error)
+	predicates                       []predicate.ExternalReference
 }
 
 var _ ent.Mutation = (*ExternalReferenceMutation)(nil)
@@ -1755,9 +1903,22 @@ func (m *ExternalReferenceMutation) OldAuthority(ctx context.Context) (v string,
 	return oldValue.Authority, nil
 }
 
+// ClearAuthority clears the value of the "authority" field.
+func (m *ExternalReferenceMutation) ClearAuthority() {
+	m.authority = nil
+	m.clearedFields[externalreference.FieldAuthority] = struct{}{}
+}
+
+// AuthorityCleared returns if the "authority" field was cleared in this mutation.
+func (m *ExternalReferenceMutation) AuthorityCleared() bool {
+	_, ok := m.clearedFields[externalreference.FieldAuthority]
+	return ok
+}
+
 // ResetAuthority resets all changes to the "authority" field.
 func (m *ExternalReferenceMutation) ResetAuthority() {
 	m.authority = nil
+	delete(m.clearedFields, externalreference.FieldAuthority)
 }
 
 // SetType sets the "type" field.
@@ -1796,97 +1957,133 @@ func (m *ExternalReferenceMutation) ResetType() {
 	m._type = nil
 }
 
-// AddHashIDs adds the "hashes" edge to the HashesEntry entity by ids.
-func (m *ExternalReferenceMutation) AddHashIDs(ids ...int) {
-	if m.hashes == nil {
-		m.hashes = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.hashes[ids[i]] = struct{}{}
-	}
+// SetHashes sets the "hashes" field.
+func (m *ExternalReferenceMutation) SetHashes(value map[int32]string) {
+	m.hashes = &value
 }
 
-// ClearHashes clears the "hashes" edge to the HashesEntry entity.
-func (m *ExternalReferenceMutation) ClearHashes() {
-	m.clearedhashes = true
-}
-
-// HashesCleared reports if the "hashes" edge to the HashesEntry entity was cleared.
-func (m *ExternalReferenceMutation) HashesCleared() bool {
-	return m.clearedhashes
-}
-
-// RemoveHashIDs removes the "hashes" edge to the HashesEntry entity by IDs.
-func (m *ExternalReferenceMutation) RemoveHashIDs(ids ...int) {
-	if m.removedhashes == nil {
-		m.removedhashes = make(map[int]struct{})
+// Hashes returns the value of the "hashes" field in the mutation.
+func (m *ExternalReferenceMutation) Hashes() (r map[int32]string, exists bool) {
+	v := m.hashes
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		delete(m.hashes, ids[i])
-		m.removedhashes[ids[i]] = struct{}{}
-	}
+	return *v, true
 }
 
-// RemovedHashes returns the removed IDs of the "hashes" edge to the HashesEntry entity.
-func (m *ExternalReferenceMutation) RemovedHashesIDs() (ids []int) {
-	for id := range m.removedhashes {
-		ids = append(ids, id)
+// OldHashes returns the old "hashes" field's value of the ExternalReference entity.
+// If the ExternalReference object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExternalReferenceMutation) OldHashes(ctx context.Context) (v map[int32]string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHashes is only allowed on UpdateOne operations")
 	}
-	return
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHashes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHashes: %w", err)
+	}
+	return oldValue.Hashes, nil
 }
 
-// HashesIDs returns the "hashes" edge IDs in the mutation.
-func (m *ExternalReferenceMutation) HashesIDs() (ids []int) {
-	for id := range m.hashes {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetHashes resets all changes to the "hashes" edge.
+// ResetHashes resets all changes to the "hashes" field.
 func (m *ExternalReferenceMutation) ResetHashes() {
 	m.hashes = nil
-	m.clearedhashes = false
-	m.removedhashes = nil
 }
 
-// SetNodesID sets the "nodes" edge to the Node entity by id.
-func (m *ExternalReferenceMutation) SetNodesID(id string) {
-	m.nodes = &id
+// AddExternalReferenceHashIDs adds the "external_reference_hashes" edge to the HashesEntry entity by ids.
+func (m *ExternalReferenceMutation) AddExternalReferenceHashIDs(ids ...int) {
+	if m.external_reference_hashes == nil {
+		m.external_reference_hashes = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.external_reference_hashes[ids[i]] = struct{}{}
+	}
 }
 
-// ClearNodes clears the "nodes" edge to the Node entity.
-func (m *ExternalReferenceMutation) ClearNodes() {
-	m.clearednodes = true
+// ClearExternalReferenceHashes clears the "external_reference_hashes" edge to the HashesEntry entity.
+func (m *ExternalReferenceMutation) ClearExternalReferenceHashes() {
+	m.clearedexternal_reference_hashes = true
 }
 
-// NodesCleared reports if the "nodes" edge to the Node entity was cleared.
-func (m *ExternalReferenceMutation) NodesCleared() bool {
-	return m.clearednodes
+// ExternalReferenceHashesCleared reports if the "external_reference_hashes" edge to the HashesEntry entity was cleared.
+func (m *ExternalReferenceMutation) ExternalReferenceHashesCleared() bool {
+	return m.clearedexternal_reference_hashes
 }
 
-// NodesID returns the "nodes" edge ID in the mutation.
-func (m *ExternalReferenceMutation) NodesID() (id string, exists bool) {
-	if m.nodes != nil {
-		return *m.nodes, true
+// RemoveExternalReferenceHashIDs removes the "external_reference_hashes" edge to the HashesEntry entity by IDs.
+func (m *ExternalReferenceMutation) RemoveExternalReferenceHashIDs(ids ...int) {
+	if m.removedexternal_reference_hashes == nil {
+		m.removedexternal_reference_hashes = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.external_reference_hashes, ids[i])
+		m.removedexternal_reference_hashes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedExternalReferenceHashes returns the removed IDs of the "external_reference_hashes" edge to the HashesEntry entity.
+func (m *ExternalReferenceMutation) RemovedExternalReferenceHashesIDs() (ids []int) {
+	for id := range m.removedexternal_reference_hashes {
+		ids = append(ids, id)
 	}
 	return
 }
 
-// NodesIDs returns the "nodes" edge IDs in the mutation.
+// ExternalReferenceHashesIDs returns the "external_reference_hashes" edge IDs in the mutation.
+func (m *ExternalReferenceMutation) ExternalReferenceHashesIDs() (ids []int) {
+	for id := range m.external_reference_hashes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetExternalReferenceHashes resets all changes to the "external_reference_hashes" edge.
+func (m *ExternalReferenceMutation) ResetExternalReferenceHashes() {
+	m.external_reference_hashes = nil
+	m.clearedexternal_reference_hashes = false
+	m.removedexternal_reference_hashes = nil
+}
+
+// SetNodeID sets the "node" edge to the Node entity by id.
+func (m *ExternalReferenceMutation) SetNodeID(id string) {
+	m.node = &id
+}
+
+// ClearNode clears the "node" edge to the Node entity.
+func (m *ExternalReferenceMutation) ClearNode() {
+	m.clearednode = true
+}
+
+// NodeCleared reports if the "node" edge to the Node entity was cleared.
+func (m *ExternalReferenceMutation) NodeCleared() bool {
+	return m.clearednode
+}
+
+// NodeID returns the "node" edge ID in the mutation.
+func (m *ExternalReferenceMutation) NodeID() (id string, exists bool) {
+	if m.node != nil {
+		return *m.node, true
+	}
+	return
+}
+
+// NodeIDs returns the "node" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// NodesID instead. It exists only for internal usage by the builders.
-func (m *ExternalReferenceMutation) NodesIDs() (ids []string) {
-	if id := m.nodes; id != nil {
+// NodeID instead. It exists only for internal usage by the builders.
+func (m *ExternalReferenceMutation) NodeIDs() (ids []string) {
+	if id := m.node; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetNodes resets all changes to the "nodes" edge.
-func (m *ExternalReferenceMutation) ResetNodes() {
-	m.nodes = nil
-	m.clearednodes = false
+// ResetNode resets all changes to the "node" edge.
+func (m *ExternalReferenceMutation) ResetNode() {
+	m.node = nil
+	m.clearednode = false
 }
 
 // Where appends a list predicates to the ExternalReferenceMutation builder.
@@ -1923,7 +2120,7 @@ func (m *ExternalReferenceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExternalReferenceMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.url != nil {
 		fields = append(fields, externalreference.FieldURL)
 	}
@@ -1935,6 +2132,9 @@ func (m *ExternalReferenceMutation) Fields() []string {
 	}
 	if m._type != nil {
 		fields = append(fields, externalreference.FieldType)
+	}
+	if m.hashes != nil {
+		fields = append(fields, externalreference.FieldHashes)
 	}
 	return fields
 }
@@ -1952,6 +2152,8 @@ func (m *ExternalReferenceMutation) Field(name string) (ent.Value, bool) {
 		return m.Authority()
 	case externalreference.FieldType:
 		return m.GetType()
+	case externalreference.FieldHashes:
+		return m.Hashes()
 	}
 	return nil, false
 }
@@ -1969,6 +2171,8 @@ func (m *ExternalReferenceMutation) OldField(ctx context.Context, name string) (
 		return m.OldAuthority(ctx)
 	case externalreference.FieldType:
 		return m.OldType(ctx)
+	case externalreference.FieldHashes:
+		return m.OldHashes(ctx)
 	}
 	return nil, fmt.Errorf("unknown ExternalReference field %s", name)
 }
@@ -2006,6 +2210,13 @@ func (m *ExternalReferenceMutation) SetField(name string, value ent.Value) error
 		}
 		m.SetType(v)
 		return nil
+	case externalreference.FieldHashes:
+		v, ok := value.(map[int32]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHashes(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ExternalReference field %s", name)
 }
@@ -2035,7 +2246,11 @@ func (m *ExternalReferenceMutation) AddField(name string, value ent.Value) error
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ExternalReferenceMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(externalreference.FieldAuthority) {
+		fields = append(fields, externalreference.FieldAuthority)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2048,6 +2263,11 @@ func (m *ExternalReferenceMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ExternalReferenceMutation) ClearField(name string) error {
+	switch name {
+	case externalreference.FieldAuthority:
+		m.ClearAuthority()
+		return nil
+	}
 	return fmt.Errorf("unknown ExternalReference nullable field %s", name)
 }
 
@@ -2067,6 +2287,9 @@ func (m *ExternalReferenceMutation) ResetField(name string) error {
 	case externalreference.FieldType:
 		m.ResetType()
 		return nil
+	case externalreference.FieldHashes:
+		m.ResetHashes()
+		return nil
 	}
 	return fmt.Errorf("unknown ExternalReference field %s", name)
 }
@@ -2074,11 +2297,11 @@ func (m *ExternalReferenceMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ExternalReferenceMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.hashes != nil {
-		edges = append(edges, externalreference.EdgeHashes)
+	if m.external_reference_hashes != nil {
+		edges = append(edges, externalreference.EdgeExternalReferenceHashes)
 	}
-	if m.nodes != nil {
-		edges = append(edges, externalreference.EdgeNodes)
+	if m.node != nil {
+		edges = append(edges, externalreference.EdgeNode)
 	}
 	return edges
 }
@@ -2087,14 +2310,14 @@ func (m *ExternalReferenceMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ExternalReferenceMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case externalreference.EdgeHashes:
-		ids := make([]ent.Value, 0, len(m.hashes))
-		for id := range m.hashes {
+	case externalreference.EdgeExternalReferenceHashes:
+		ids := make([]ent.Value, 0, len(m.external_reference_hashes))
+		for id := range m.external_reference_hashes {
 			ids = append(ids, id)
 		}
 		return ids
-	case externalreference.EdgeNodes:
-		if id := m.nodes; id != nil {
+	case externalreference.EdgeNode:
+		if id := m.node; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -2104,8 +2327,8 @@ func (m *ExternalReferenceMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ExternalReferenceMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedhashes != nil {
-		edges = append(edges, externalreference.EdgeHashes)
+	if m.removedexternal_reference_hashes != nil {
+		edges = append(edges, externalreference.EdgeExternalReferenceHashes)
 	}
 	return edges
 }
@@ -2114,9 +2337,9 @@ func (m *ExternalReferenceMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *ExternalReferenceMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case externalreference.EdgeHashes:
-		ids := make([]ent.Value, 0, len(m.removedhashes))
-		for id := range m.removedhashes {
+	case externalreference.EdgeExternalReferenceHashes:
+		ids := make([]ent.Value, 0, len(m.removedexternal_reference_hashes))
+		for id := range m.removedexternal_reference_hashes {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2127,11 +2350,11 @@ func (m *ExternalReferenceMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ExternalReferenceMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedhashes {
-		edges = append(edges, externalreference.EdgeHashes)
+	if m.clearedexternal_reference_hashes {
+		edges = append(edges, externalreference.EdgeExternalReferenceHashes)
 	}
-	if m.clearednodes {
-		edges = append(edges, externalreference.EdgeNodes)
+	if m.clearednode {
+		edges = append(edges, externalreference.EdgeNode)
 	}
 	return edges
 }
@@ -2140,10 +2363,10 @@ func (m *ExternalReferenceMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ExternalReferenceMutation) EdgeCleared(name string) bool {
 	switch name {
-	case externalreference.EdgeHashes:
-		return m.clearedhashes
-	case externalreference.EdgeNodes:
-		return m.clearednodes
+	case externalreference.EdgeExternalReferenceHashes:
+		return m.clearedexternal_reference_hashes
+	case externalreference.EdgeNode:
+		return m.clearednode
 	}
 	return false
 }
@@ -2152,8 +2375,8 @@ func (m *ExternalReferenceMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ExternalReferenceMutation) ClearEdge(name string) error {
 	switch name {
-	case externalreference.EdgeNodes:
-		m.ClearNodes()
+	case externalreference.EdgeNode:
+		m.ClearNode()
 		return nil
 	}
 	return fmt.Errorf("unknown ExternalReference unique edge %s", name)
@@ -2163,11 +2386,11 @@ func (m *ExternalReferenceMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ExternalReferenceMutation) ResetEdge(name string) error {
 	switch name {
-	case externalreference.EdgeHashes:
-		m.ResetHashes()
+	case externalreference.EdgeExternalReferenceHashes:
+		m.ResetExternalReferenceHashes()
 		return nil
-	case externalreference.EdgeNodes:
-		m.ResetNodes()
+	case externalreference.EdgeNode:
+		m.ResetNode()
 		return nil
 	}
 	return fmt.Errorf("unknown ExternalReference edge %s", name)
@@ -3129,28 +3352,34 @@ func (m *IdentifiersEntryMutation) ResetEdge(name string) error {
 // MetadataMutation represents an operation that mutates the Metadata nodes in the graph.
 type MetadataMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *string
-	version               *string
-	name                  *string
-	date                  *time.Time
-	comment               *string
-	clearedFields         map[string]struct{}
-	tools                 map[int]struct{}
-	removedtools          map[int]struct{}
-	clearedtools          bool
-	authors               map[int]struct{}
-	removedauthors        map[int]struct{}
-	clearedauthors        bool
-	document_types        map[int]struct{}
-	removeddocument_types map[int]struct{}
-	cleareddocument_types bool
-	document              *int
-	cleareddocument       bool
-	done                  bool
-	oldValue              func(context.Context) (*Metadata, error)
-	predicates            []predicate.Metadata
+	op                             Op
+	typ                            string
+	id                             *string
+	version                        *string
+	name                           *string
+	date                           *time.Time
+	comment                        *string
+	tools                          *[]*sbom.Tool
+	appendtools                    []*sbom.Tool
+	authors                        *[]*sbom.Person
+	appendauthors                  []*sbom.Person
+	document_types                 *[]*sbom.DocumentType
+	appenddocument_types           []*sbom.DocumentType
+	clearedFields                  map[string]struct{}
+	metadata_tools                 map[int]struct{}
+	removedmetadata_tools          map[int]struct{}
+	clearedmetadata_tools          bool
+	metadata_authors               map[int]struct{}
+	removedmetadata_authors        map[int]struct{}
+	clearedmetadata_authors        bool
+	metadata_document_types        map[int]struct{}
+	removedmetadata_document_types map[int]struct{}
+	clearedmetadata_document_types bool
+	document                       *int
+	cleareddocument                bool
+	done                           bool
+	oldValue                       func(context.Context) (*Metadata, error)
+	predicates                     []predicate.Metadata
 }
 
 var _ ent.Mutation = (*MetadataMutation)(nil)
@@ -3401,166 +3630,319 @@ func (m *MetadataMutation) ResetComment() {
 	m.comment = nil
 }
 
-// AddToolIDs adds the "tools" edge to the Tool entity by ids.
-func (m *MetadataMutation) AddToolIDs(ids ...int) {
-	if m.tools == nil {
-		m.tools = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.tools[ids[i]] = struct{}{}
-	}
+// SetTools sets the "tools" field.
+func (m *MetadataMutation) SetTools(s []*sbom.Tool) {
+	m.tools = &s
+	m.appendtools = nil
 }
 
-// ClearTools clears the "tools" edge to the Tool entity.
-func (m *MetadataMutation) ClearTools() {
-	m.clearedtools = true
-}
-
-// ToolsCleared reports if the "tools" edge to the Tool entity was cleared.
-func (m *MetadataMutation) ToolsCleared() bool {
-	return m.clearedtools
-}
-
-// RemoveToolIDs removes the "tools" edge to the Tool entity by IDs.
-func (m *MetadataMutation) RemoveToolIDs(ids ...int) {
-	if m.removedtools == nil {
-		m.removedtools = make(map[int]struct{})
+// Tools returns the value of the "tools" field in the mutation.
+func (m *MetadataMutation) Tools() (r []*sbom.Tool, exists bool) {
+	v := m.tools
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		delete(m.tools, ids[i])
-		m.removedtools[ids[i]] = struct{}{}
-	}
+	return *v, true
 }
 
-// RemovedTools returns the removed IDs of the "tools" edge to the Tool entity.
-func (m *MetadataMutation) RemovedToolsIDs() (ids []int) {
-	for id := range m.removedtools {
-		ids = append(ids, id)
+// OldTools returns the old "tools" field's value of the Metadata entity.
+// If the Metadata object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MetadataMutation) OldTools(ctx context.Context) (v []*sbom.Tool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTools is only allowed on UpdateOne operations")
 	}
-	return
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTools requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTools: %w", err)
+	}
+	return oldValue.Tools, nil
 }
 
-// ToolsIDs returns the "tools" edge IDs in the mutation.
-func (m *MetadataMutation) ToolsIDs() (ids []int) {
-	for id := range m.tools {
-		ids = append(ids, id)
-	}
-	return
+// AppendTools adds s to the "tools" field.
+func (m *MetadataMutation) AppendTools(s []*sbom.Tool) {
+	m.appendtools = append(m.appendtools, s...)
 }
 
-// ResetTools resets all changes to the "tools" edge.
+// AppendedTools returns the list of values that were appended to the "tools" field in this mutation.
+func (m *MetadataMutation) AppendedTools() ([]*sbom.Tool, bool) {
+	if len(m.appendtools) == 0 {
+		return nil, false
+	}
+	return m.appendtools, true
+}
+
+// ResetTools resets all changes to the "tools" field.
 func (m *MetadataMutation) ResetTools() {
 	m.tools = nil
-	m.clearedtools = false
-	m.removedtools = nil
+	m.appendtools = nil
 }
 
-// AddAuthorIDs adds the "authors" edge to the Person entity by ids.
-func (m *MetadataMutation) AddAuthorIDs(ids ...int) {
-	if m.authors == nil {
-		m.authors = make(map[int]struct{})
+// SetAuthors sets the "authors" field.
+func (m *MetadataMutation) SetAuthors(s []*sbom.Person) {
+	m.authors = &s
+	m.appendauthors = nil
+}
+
+// Authors returns the value of the "authors" field in the mutation.
+func (m *MetadataMutation) Authors() (r []*sbom.Person, exists bool) {
+	v := m.authors
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		m.authors[ids[i]] = struct{}{}
+	return *v, true
+}
+
+// OldAuthors returns the old "authors" field's value of the Metadata entity.
+// If the Metadata object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MetadataMutation) OldAuthors(ctx context.Context) (v []*sbom.Person, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthors is only allowed on UpdateOne operations")
 	}
-}
-
-// ClearAuthors clears the "authors" edge to the Person entity.
-func (m *MetadataMutation) ClearAuthors() {
-	m.clearedauthors = true
-}
-
-// AuthorsCleared reports if the "authors" edge to the Person entity was cleared.
-func (m *MetadataMutation) AuthorsCleared() bool {
-	return m.clearedauthors
-}
-
-// RemoveAuthorIDs removes the "authors" edge to the Person entity by IDs.
-func (m *MetadataMutation) RemoveAuthorIDs(ids ...int) {
-	if m.removedauthors == nil {
-		m.removedauthors = make(map[int]struct{})
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthors requires an ID field in the mutation")
 	}
-	for i := range ids {
-		delete(m.authors, ids[i])
-		m.removedauthors[ids[i]] = struct{}{}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthors: %w", err)
 	}
+	return oldValue.Authors, nil
 }
 
-// RemovedAuthors returns the removed IDs of the "authors" edge to the Person entity.
-func (m *MetadataMutation) RemovedAuthorsIDs() (ids []int) {
-	for id := range m.removedauthors {
-		ids = append(ids, id)
-	}
-	return
+// AppendAuthors adds s to the "authors" field.
+func (m *MetadataMutation) AppendAuthors(s []*sbom.Person) {
+	m.appendauthors = append(m.appendauthors, s...)
 }
 
-// AuthorsIDs returns the "authors" edge IDs in the mutation.
-func (m *MetadataMutation) AuthorsIDs() (ids []int) {
-	for id := range m.authors {
-		ids = append(ids, id)
+// AppendedAuthors returns the list of values that were appended to the "authors" field in this mutation.
+func (m *MetadataMutation) AppendedAuthors() ([]*sbom.Person, bool) {
+	if len(m.appendauthors) == 0 {
+		return nil, false
 	}
-	return
+	return m.appendauthors, true
 }
 
-// ResetAuthors resets all changes to the "authors" edge.
+// ResetAuthors resets all changes to the "authors" field.
 func (m *MetadataMutation) ResetAuthors() {
 	m.authors = nil
-	m.clearedauthors = false
-	m.removedauthors = nil
+	m.appendauthors = nil
 }
 
-// AddDocumentTypeIDs adds the "document_types" edge to the DocumentType entity by ids.
-func (m *MetadataMutation) AddDocumentTypeIDs(ids ...int) {
-	if m.document_types == nil {
-		m.document_types = make(map[int]struct{})
+// SetDocumentTypes sets the "document_types" field.
+func (m *MetadataMutation) SetDocumentTypes(st []*sbom.DocumentType) {
+	m.document_types = &st
+	m.appenddocument_types = nil
+}
+
+// DocumentTypes returns the value of the "document_types" field in the mutation.
+func (m *MetadataMutation) DocumentTypes() (r []*sbom.DocumentType, exists bool) {
+	v := m.document_types
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		m.document_types[ids[i]] = struct{}{}
+	return *v, true
+}
+
+// OldDocumentTypes returns the old "document_types" field's value of the Metadata entity.
+// If the Metadata object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MetadataMutation) OldDocumentTypes(ctx context.Context) (v []*sbom.DocumentType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDocumentTypes is only allowed on UpdateOne operations")
 	}
-}
-
-// ClearDocumentTypes clears the "document_types" edge to the DocumentType entity.
-func (m *MetadataMutation) ClearDocumentTypes() {
-	m.cleareddocument_types = true
-}
-
-// DocumentTypesCleared reports if the "document_types" edge to the DocumentType entity was cleared.
-func (m *MetadataMutation) DocumentTypesCleared() bool {
-	return m.cleareddocument_types
-}
-
-// RemoveDocumentTypeIDs removes the "document_types" edge to the DocumentType entity by IDs.
-func (m *MetadataMutation) RemoveDocumentTypeIDs(ids ...int) {
-	if m.removeddocument_types == nil {
-		m.removeddocument_types = make(map[int]struct{})
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDocumentTypes requires an ID field in the mutation")
 	}
-	for i := range ids {
-		delete(m.document_types, ids[i])
-		m.removeddocument_types[ids[i]] = struct{}{}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDocumentTypes: %w", err)
 	}
+	return oldValue.DocumentTypes, nil
 }
 
-// RemovedDocumentTypes returns the removed IDs of the "document_types" edge to the DocumentType entity.
-func (m *MetadataMutation) RemovedDocumentTypesIDs() (ids []int) {
-	for id := range m.removeddocument_types {
-		ids = append(ids, id)
-	}
-	return
+// AppendDocumentTypes adds st to the "document_types" field.
+func (m *MetadataMutation) AppendDocumentTypes(st []*sbom.DocumentType) {
+	m.appenddocument_types = append(m.appenddocument_types, st...)
 }
 
-// DocumentTypesIDs returns the "document_types" edge IDs in the mutation.
-func (m *MetadataMutation) DocumentTypesIDs() (ids []int) {
-	for id := range m.document_types {
-		ids = append(ids, id)
+// AppendedDocumentTypes returns the list of values that were appended to the "document_types" field in this mutation.
+func (m *MetadataMutation) AppendedDocumentTypes() ([]*sbom.DocumentType, bool) {
+	if len(m.appenddocument_types) == 0 {
+		return nil, false
 	}
-	return
+	return m.appenddocument_types, true
 }
 
-// ResetDocumentTypes resets all changes to the "document_types" edge.
+// ResetDocumentTypes resets all changes to the "document_types" field.
 func (m *MetadataMutation) ResetDocumentTypes() {
 	m.document_types = nil
-	m.cleareddocument_types = false
-	m.removeddocument_types = nil
+	m.appenddocument_types = nil
+}
+
+// AddMetadataToolIDs adds the "metadata_tools" edge to the Tool entity by ids.
+func (m *MetadataMutation) AddMetadataToolIDs(ids ...int) {
+	if m.metadata_tools == nil {
+		m.metadata_tools = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.metadata_tools[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMetadataTools clears the "metadata_tools" edge to the Tool entity.
+func (m *MetadataMutation) ClearMetadataTools() {
+	m.clearedmetadata_tools = true
+}
+
+// MetadataToolsCleared reports if the "metadata_tools" edge to the Tool entity was cleared.
+func (m *MetadataMutation) MetadataToolsCleared() bool {
+	return m.clearedmetadata_tools
+}
+
+// RemoveMetadataToolIDs removes the "metadata_tools" edge to the Tool entity by IDs.
+func (m *MetadataMutation) RemoveMetadataToolIDs(ids ...int) {
+	if m.removedmetadata_tools == nil {
+		m.removedmetadata_tools = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.metadata_tools, ids[i])
+		m.removedmetadata_tools[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMetadataTools returns the removed IDs of the "metadata_tools" edge to the Tool entity.
+func (m *MetadataMutation) RemovedMetadataToolsIDs() (ids []int) {
+	for id := range m.removedmetadata_tools {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MetadataToolsIDs returns the "metadata_tools" edge IDs in the mutation.
+func (m *MetadataMutation) MetadataToolsIDs() (ids []int) {
+	for id := range m.metadata_tools {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMetadataTools resets all changes to the "metadata_tools" edge.
+func (m *MetadataMutation) ResetMetadataTools() {
+	m.metadata_tools = nil
+	m.clearedmetadata_tools = false
+	m.removedmetadata_tools = nil
+}
+
+// AddMetadataAuthorIDs adds the "metadata_authors" edge to the Person entity by ids.
+func (m *MetadataMutation) AddMetadataAuthorIDs(ids ...int) {
+	if m.metadata_authors == nil {
+		m.metadata_authors = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.metadata_authors[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMetadataAuthors clears the "metadata_authors" edge to the Person entity.
+func (m *MetadataMutation) ClearMetadataAuthors() {
+	m.clearedmetadata_authors = true
+}
+
+// MetadataAuthorsCleared reports if the "metadata_authors" edge to the Person entity was cleared.
+func (m *MetadataMutation) MetadataAuthorsCleared() bool {
+	return m.clearedmetadata_authors
+}
+
+// RemoveMetadataAuthorIDs removes the "metadata_authors" edge to the Person entity by IDs.
+func (m *MetadataMutation) RemoveMetadataAuthorIDs(ids ...int) {
+	if m.removedmetadata_authors == nil {
+		m.removedmetadata_authors = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.metadata_authors, ids[i])
+		m.removedmetadata_authors[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMetadataAuthors returns the removed IDs of the "metadata_authors" edge to the Person entity.
+func (m *MetadataMutation) RemovedMetadataAuthorsIDs() (ids []int) {
+	for id := range m.removedmetadata_authors {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MetadataAuthorsIDs returns the "metadata_authors" edge IDs in the mutation.
+func (m *MetadataMutation) MetadataAuthorsIDs() (ids []int) {
+	for id := range m.metadata_authors {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMetadataAuthors resets all changes to the "metadata_authors" edge.
+func (m *MetadataMutation) ResetMetadataAuthors() {
+	m.metadata_authors = nil
+	m.clearedmetadata_authors = false
+	m.removedmetadata_authors = nil
+}
+
+// AddMetadataDocumentTypeIDs adds the "metadata_document_types" edge to the DocumentType entity by ids.
+func (m *MetadataMutation) AddMetadataDocumentTypeIDs(ids ...int) {
+	if m.metadata_document_types == nil {
+		m.metadata_document_types = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.metadata_document_types[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMetadataDocumentTypes clears the "metadata_document_types" edge to the DocumentType entity.
+func (m *MetadataMutation) ClearMetadataDocumentTypes() {
+	m.clearedmetadata_document_types = true
+}
+
+// MetadataDocumentTypesCleared reports if the "metadata_document_types" edge to the DocumentType entity was cleared.
+func (m *MetadataMutation) MetadataDocumentTypesCleared() bool {
+	return m.clearedmetadata_document_types
+}
+
+// RemoveMetadataDocumentTypeIDs removes the "metadata_document_types" edge to the DocumentType entity by IDs.
+func (m *MetadataMutation) RemoveMetadataDocumentTypeIDs(ids ...int) {
+	if m.removedmetadata_document_types == nil {
+		m.removedmetadata_document_types = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.metadata_document_types, ids[i])
+		m.removedmetadata_document_types[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMetadataDocumentTypes returns the removed IDs of the "metadata_document_types" edge to the DocumentType entity.
+func (m *MetadataMutation) RemovedMetadataDocumentTypesIDs() (ids []int) {
+	for id := range m.removedmetadata_document_types {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MetadataDocumentTypesIDs returns the "metadata_document_types" edge IDs in the mutation.
+func (m *MetadataMutation) MetadataDocumentTypesIDs() (ids []int) {
+	for id := range m.metadata_document_types {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMetadataDocumentTypes resets all changes to the "metadata_document_types" edge.
+func (m *MetadataMutation) ResetMetadataDocumentTypes() {
+	m.metadata_document_types = nil
+	m.clearedmetadata_document_types = false
+	m.removedmetadata_document_types = nil
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by id.
@@ -3636,7 +4018,7 @@ func (m *MetadataMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MetadataMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 7)
 	if m.version != nil {
 		fields = append(fields, metadata.FieldVersion)
 	}
@@ -3648,6 +4030,15 @@ func (m *MetadataMutation) Fields() []string {
 	}
 	if m.comment != nil {
 		fields = append(fields, metadata.FieldComment)
+	}
+	if m.tools != nil {
+		fields = append(fields, metadata.FieldTools)
+	}
+	if m.authors != nil {
+		fields = append(fields, metadata.FieldAuthors)
+	}
+	if m.document_types != nil {
+		fields = append(fields, metadata.FieldDocumentTypes)
 	}
 	return fields
 }
@@ -3665,6 +4056,12 @@ func (m *MetadataMutation) Field(name string) (ent.Value, bool) {
 		return m.Date()
 	case metadata.FieldComment:
 		return m.Comment()
+	case metadata.FieldTools:
+		return m.Tools()
+	case metadata.FieldAuthors:
+		return m.Authors()
+	case metadata.FieldDocumentTypes:
+		return m.DocumentTypes()
 	}
 	return nil, false
 }
@@ -3682,6 +4079,12 @@ func (m *MetadataMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldDate(ctx)
 	case metadata.FieldComment:
 		return m.OldComment(ctx)
+	case metadata.FieldTools:
+		return m.OldTools(ctx)
+	case metadata.FieldAuthors:
+		return m.OldAuthors(ctx)
+	case metadata.FieldDocumentTypes:
+		return m.OldDocumentTypes(ctx)
 	}
 	return nil, fmt.Errorf("unknown Metadata field %s", name)
 }
@@ -3718,6 +4121,27 @@ func (m *MetadataMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetComment(v)
+		return nil
+	case metadata.FieldTools:
+		v, ok := value.([]*sbom.Tool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTools(v)
+		return nil
+	case metadata.FieldAuthors:
+		v, ok := value.([]*sbom.Person)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthors(v)
+		return nil
+	case metadata.FieldDocumentTypes:
+		v, ok := value.([]*sbom.DocumentType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDocumentTypes(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Metadata field %s", name)
@@ -3780,6 +4204,15 @@ func (m *MetadataMutation) ResetField(name string) error {
 	case metadata.FieldComment:
 		m.ResetComment()
 		return nil
+	case metadata.FieldTools:
+		m.ResetTools()
+		return nil
+	case metadata.FieldAuthors:
+		m.ResetAuthors()
+		return nil
+	case metadata.FieldDocumentTypes:
+		m.ResetDocumentTypes()
+		return nil
 	}
 	return fmt.Errorf("unknown Metadata field %s", name)
 }
@@ -3787,14 +4220,14 @@ func (m *MetadataMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MetadataMutation) AddedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.tools != nil {
-		edges = append(edges, metadata.EdgeTools)
+	if m.metadata_tools != nil {
+		edges = append(edges, metadata.EdgeMetadataTools)
 	}
-	if m.authors != nil {
-		edges = append(edges, metadata.EdgeAuthors)
+	if m.metadata_authors != nil {
+		edges = append(edges, metadata.EdgeMetadataAuthors)
 	}
-	if m.document_types != nil {
-		edges = append(edges, metadata.EdgeDocumentTypes)
+	if m.metadata_document_types != nil {
+		edges = append(edges, metadata.EdgeMetadataDocumentTypes)
 	}
 	if m.document != nil {
 		edges = append(edges, metadata.EdgeDocument)
@@ -3806,21 +4239,21 @@ func (m *MetadataMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *MetadataMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case metadata.EdgeTools:
-		ids := make([]ent.Value, 0, len(m.tools))
-		for id := range m.tools {
+	case metadata.EdgeMetadataTools:
+		ids := make([]ent.Value, 0, len(m.metadata_tools))
+		for id := range m.metadata_tools {
 			ids = append(ids, id)
 		}
 		return ids
-	case metadata.EdgeAuthors:
-		ids := make([]ent.Value, 0, len(m.authors))
-		for id := range m.authors {
+	case metadata.EdgeMetadataAuthors:
+		ids := make([]ent.Value, 0, len(m.metadata_authors))
+		for id := range m.metadata_authors {
 			ids = append(ids, id)
 		}
 		return ids
-	case metadata.EdgeDocumentTypes:
-		ids := make([]ent.Value, 0, len(m.document_types))
-		for id := range m.document_types {
+	case metadata.EdgeMetadataDocumentTypes:
+		ids := make([]ent.Value, 0, len(m.metadata_document_types))
+		for id := range m.metadata_document_types {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3835,14 +4268,14 @@ func (m *MetadataMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MetadataMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.removedtools != nil {
-		edges = append(edges, metadata.EdgeTools)
+	if m.removedmetadata_tools != nil {
+		edges = append(edges, metadata.EdgeMetadataTools)
 	}
-	if m.removedauthors != nil {
-		edges = append(edges, metadata.EdgeAuthors)
+	if m.removedmetadata_authors != nil {
+		edges = append(edges, metadata.EdgeMetadataAuthors)
 	}
-	if m.removeddocument_types != nil {
-		edges = append(edges, metadata.EdgeDocumentTypes)
+	if m.removedmetadata_document_types != nil {
+		edges = append(edges, metadata.EdgeMetadataDocumentTypes)
 	}
 	return edges
 }
@@ -3851,21 +4284,21 @@ func (m *MetadataMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *MetadataMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case metadata.EdgeTools:
-		ids := make([]ent.Value, 0, len(m.removedtools))
-		for id := range m.removedtools {
+	case metadata.EdgeMetadataTools:
+		ids := make([]ent.Value, 0, len(m.removedmetadata_tools))
+		for id := range m.removedmetadata_tools {
 			ids = append(ids, id)
 		}
 		return ids
-	case metadata.EdgeAuthors:
-		ids := make([]ent.Value, 0, len(m.removedauthors))
-		for id := range m.removedauthors {
+	case metadata.EdgeMetadataAuthors:
+		ids := make([]ent.Value, 0, len(m.removedmetadata_authors))
+		for id := range m.removedmetadata_authors {
 			ids = append(ids, id)
 		}
 		return ids
-	case metadata.EdgeDocumentTypes:
-		ids := make([]ent.Value, 0, len(m.removeddocument_types))
-		for id := range m.removeddocument_types {
+	case metadata.EdgeMetadataDocumentTypes:
+		ids := make([]ent.Value, 0, len(m.removedmetadata_document_types))
+		for id := range m.removedmetadata_document_types {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3876,14 +4309,14 @@ func (m *MetadataMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MetadataMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.clearedtools {
-		edges = append(edges, metadata.EdgeTools)
+	if m.clearedmetadata_tools {
+		edges = append(edges, metadata.EdgeMetadataTools)
 	}
-	if m.clearedauthors {
-		edges = append(edges, metadata.EdgeAuthors)
+	if m.clearedmetadata_authors {
+		edges = append(edges, metadata.EdgeMetadataAuthors)
 	}
-	if m.cleareddocument_types {
-		edges = append(edges, metadata.EdgeDocumentTypes)
+	if m.clearedmetadata_document_types {
+		edges = append(edges, metadata.EdgeMetadataDocumentTypes)
 	}
 	if m.cleareddocument {
 		edges = append(edges, metadata.EdgeDocument)
@@ -3895,12 +4328,12 @@ func (m *MetadataMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *MetadataMutation) EdgeCleared(name string) bool {
 	switch name {
-	case metadata.EdgeTools:
-		return m.clearedtools
-	case metadata.EdgeAuthors:
-		return m.clearedauthors
-	case metadata.EdgeDocumentTypes:
-		return m.cleareddocument_types
+	case metadata.EdgeMetadataTools:
+		return m.clearedmetadata_tools
+	case metadata.EdgeMetadataAuthors:
+		return m.clearedmetadata_authors
+	case metadata.EdgeMetadataDocumentTypes:
+		return m.clearedmetadata_document_types
 	case metadata.EdgeDocument:
 		return m.cleareddocument
 	}
@@ -3922,14 +4355,14 @@ func (m *MetadataMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *MetadataMutation) ResetEdge(name string) error {
 	switch name {
-	case metadata.EdgeTools:
-		m.ResetTools()
+	case metadata.EdgeMetadataTools:
+		m.ResetMetadataTools()
 		return nil
-	case metadata.EdgeAuthors:
-		m.ResetAuthors()
+	case metadata.EdgeMetadataAuthors:
+		m.ResetMetadataAuthors()
 		return nil
-	case metadata.EdgeDocumentTypes:
-		m.ResetDocumentTypes()
+	case metadata.EdgeMetadataDocumentTypes:
+		m.ResetMetadataDocumentTypes()
 		return nil
 	case metadata.EdgeDocument:
 		m.ResetDocument()
@@ -3941,55 +4374,71 @@ func (m *MetadataMutation) ResetEdge(name string) error {
 // NodeMutation represents an operation that mutates the Node nodes in the graph.
 type NodeMutation struct {
 	config
-	op                         Op
-	typ                        string
-	id                         *string
-	_type                      *node.Type
-	name                       *string
-	version                    *string
-	file_name                  *string
-	url_home                   *string
-	url_download               *string
-	licenses                   *[]string
-	appendlicenses             []string
-	license_concluded          *string
-	license_comments           *string
-	copyright                  *string
-	source_info                *string
-	comment                    *string
-	summary                    *string
-	description                *string
-	release_date               *time.Time
-	build_date                 *time.Time
-	valid_until_date           *time.Time
-	attribution                *[]string
-	appendattribution          []string
-	file_types                 *[]string
-	appendfile_types           []string
-	clearedFields              map[string]struct{}
-	suppliers                  map[int]struct{}
-	removedsuppliers           map[int]struct{}
-	clearedsuppliers           bool
-	originators                map[int]struct{}
-	removedoriginators         map[int]struct{}
-	clearedoriginators         bool
-	external_references        map[int]struct{}
-	removedexternal_references map[int]struct{}
-	clearedexternal_references bool
-	identifiers                map[int]struct{}
-	removedidentifiers         map[int]struct{}
-	clearedidentifiers         bool
-	hashes                     map[int]struct{}
-	removedhashes              map[int]struct{}
-	clearedhashes              bool
-	primary_purpose            map[int]struct{}
-	removedprimary_purpose     map[int]struct{}
-	clearedprimary_purpose     bool
-	node_list                  *int
-	clearednode_list           bool
-	done                       bool
-	oldValue                   func(context.Context) (*Node, error)
-	predicates                 []predicate.Node
+	op                              Op
+	typ                             string
+	id                              *string
+	_type                           *node.Type
+	name                            *string
+	version                         *string
+	file_name                       *string
+	url_home                        *string
+	url_download                    *string
+	licenses                        *[]string
+	appendlicenses                  []string
+	license_concluded               *string
+	license_comments                *string
+	copyright                       *string
+	source_info                     *string
+	comment                         *string
+	summary                         *string
+	description                     *string
+	release_date                    *time.Time
+	build_date                      *time.Time
+	valid_until_date                *time.Time
+	attribution                     *[]string
+	appendattribution               []string
+	file_types                      *[]string
+	appendfile_types                []string
+	suppliers                       *[]*sbom.Person
+	appendsuppliers                 []*sbom.Person
+	originators                     *[]*sbom.Person
+	appendoriginators               []*sbom.Person
+	external_references             *[]*sbom.ExternalReference
+	appendexternal_references       []*sbom.ExternalReference
+	hashes                          *map[int32]string
+	identifiers                     *map[int32]string
+	primary_purpose                 *[]sbom.Purpose
+	appendprimary_purpose           []sbom.Purpose
+	clearedFields                   map[string]struct{}
+	node_suppliers                  map[int]struct{}
+	removednode_suppliers           map[int]struct{}
+	clearednode_suppliers           bool
+	node_originators                map[int]struct{}
+	removednode_originators         map[int]struct{}
+	clearednode_originators         bool
+	node_external_references        map[int]struct{}
+	removednode_external_references map[int]struct{}
+	clearednode_external_references bool
+	node_identifiers                map[int]struct{}
+	removednode_identifiers         map[int]struct{}
+	clearednode_identifiers         bool
+	node_hashes                     map[int]struct{}
+	removednode_hashes              map[int]struct{}
+	clearednode_hashes              bool
+	node_primary_purpose            map[int]struct{}
+	removednode_primary_purpose     map[int]struct{}
+	clearednode_primary_purpose     bool
+	nodes                           map[string]struct{}
+	removednodes                    map[string]struct{}
+	clearednodes                    bool
+	node_list                       *int
+	clearednode_list                bool
+	edge_types                      map[int]struct{}
+	removededge_types               map[int]struct{}
+	clearededge_types               bool
+	done                            bool
+	oldValue                        func(context.Context) (*Node, error)
+	predicates                      []predicate.Node
 }
 
 var _ ent.Mutation = (*NodeMutation)(nil)
@@ -4825,328 +5274,658 @@ func (m *NodeMutation) ResetFileTypes() {
 	m.appendfile_types = nil
 }
 
-// AddSupplierIDs adds the "suppliers" edge to the Person entity by ids.
-func (m *NodeMutation) AddSupplierIDs(ids ...int) {
-	if m.suppliers == nil {
-		m.suppliers = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.suppliers[ids[i]] = struct{}{}
-	}
+// SetSuppliers sets the "suppliers" field.
+func (m *NodeMutation) SetSuppliers(s []*sbom.Person) {
+	m.suppliers = &s
+	m.appendsuppliers = nil
 }
 
-// ClearSuppliers clears the "suppliers" edge to the Person entity.
-func (m *NodeMutation) ClearSuppliers() {
-	m.clearedsuppliers = true
-}
-
-// SuppliersCleared reports if the "suppliers" edge to the Person entity was cleared.
-func (m *NodeMutation) SuppliersCleared() bool {
-	return m.clearedsuppliers
-}
-
-// RemoveSupplierIDs removes the "suppliers" edge to the Person entity by IDs.
-func (m *NodeMutation) RemoveSupplierIDs(ids ...int) {
-	if m.removedsuppliers == nil {
-		m.removedsuppliers = make(map[int]struct{})
+// Suppliers returns the value of the "suppliers" field in the mutation.
+func (m *NodeMutation) Suppliers() (r []*sbom.Person, exists bool) {
+	v := m.suppliers
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		delete(m.suppliers, ids[i])
-		m.removedsuppliers[ids[i]] = struct{}{}
-	}
+	return *v, true
 }
 
-// RemovedSuppliers returns the removed IDs of the "suppliers" edge to the Person entity.
-func (m *NodeMutation) RemovedSuppliersIDs() (ids []int) {
-	for id := range m.removedsuppliers {
-		ids = append(ids, id)
+// OldSuppliers returns the old "suppliers" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldSuppliers(ctx context.Context) (v []*sbom.Person, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSuppliers is only allowed on UpdateOne operations")
 	}
-	return
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSuppliers requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSuppliers: %w", err)
+	}
+	return oldValue.Suppliers, nil
 }
 
-// SuppliersIDs returns the "suppliers" edge IDs in the mutation.
-func (m *NodeMutation) SuppliersIDs() (ids []int) {
-	for id := range m.suppliers {
-		ids = append(ids, id)
-	}
-	return
+// AppendSuppliers adds s to the "suppliers" field.
+func (m *NodeMutation) AppendSuppliers(s []*sbom.Person) {
+	m.appendsuppliers = append(m.appendsuppliers, s...)
 }
 
-// ResetSuppliers resets all changes to the "suppliers" edge.
+// AppendedSuppliers returns the list of values that were appended to the "suppliers" field in this mutation.
+func (m *NodeMutation) AppendedSuppliers() ([]*sbom.Person, bool) {
+	if len(m.appendsuppliers) == 0 {
+		return nil, false
+	}
+	return m.appendsuppliers, true
+}
+
+// ResetSuppliers resets all changes to the "suppliers" field.
 func (m *NodeMutation) ResetSuppliers() {
 	m.suppliers = nil
-	m.clearedsuppliers = false
-	m.removedsuppliers = nil
+	m.appendsuppliers = nil
 }
 
-// AddOriginatorIDs adds the "originators" edge to the Person entity by ids.
-func (m *NodeMutation) AddOriginatorIDs(ids ...int) {
-	if m.originators == nil {
-		m.originators = make(map[int]struct{})
+// SetOriginators sets the "originators" field.
+func (m *NodeMutation) SetOriginators(s []*sbom.Person) {
+	m.originators = &s
+	m.appendoriginators = nil
+}
+
+// Originators returns the value of the "originators" field in the mutation.
+func (m *NodeMutation) Originators() (r []*sbom.Person, exists bool) {
+	v := m.originators
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		m.originators[ids[i]] = struct{}{}
+	return *v, true
+}
+
+// OldOriginators returns the old "originators" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldOriginators(ctx context.Context) (v []*sbom.Person, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOriginators is only allowed on UpdateOne operations")
 	}
-}
-
-// ClearOriginators clears the "originators" edge to the Person entity.
-func (m *NodeMutation) ClearOriginators() {
-	m.clearedoriginators = true
-}
-
-// OriginatorsCleared reports if the "originators" edge to the Person entity was cleared.
-func (m *NodeMutation) OriginatorsCleared() bool {
-	return m.clearedoriginators
-}
-
-// RemoveOriginatorIDs removes the "originators" edge to the Person entity by IDs.
-func (m *NodeMutation) RemoveOriginatorIDs(ids ...int) {
-	if m.removedoriginators == nil {
-		m.removedoriginators = make(map[int]struct{})
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOriginators requires an ID field in the mutation")
 	}
-	for i := range ids {
-		delete(m.originators, ids[i])
-		m.removedoriginators[ids[i]] = struct{}{}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOriginators: %w", err)
 	}
+	return oldValue.Originators, nil
 }
 
-// RemovedOriginators returns the removed IDs of the "originators" edge to the Person entity.
-func (m *NodeMutation) RemovedOriginatorsIDs() (ids []int) {
-	for id := range m.removedoriginators {
-		ids = append(ids, id)
-	}
-	return
+// AppendOriginators adds s to the "originators" field.
+func (m *NodeMutation) AppendOriginators(s []*sbom.Person) {
+	m.appendoriginators = append(m.appendoriginators, s...)
 }
 
-// OriginatorsIDs returns the "originators" edge IDs in the mutation.
-func (m *NodeMutation) OriginatorsIDs() (ids []int) {
-	for id := range m.originators {
-		ids = append(ids, id)
+// AppendedOriginators returns the list of values that were appended to the "originators" field in this mutation.
+func (m *NodeMutation) AppendedOriginators() ([]*sbom.Person, bool) {
+	if len(m.appendoriginators) == 0 {
+		return nil, false
 	}
-	return
+	return m.appendoriginators, true
 }
 
-// ResetOriginators resets all changes to the "originators" edge.
+// ResetOriginators resets all changes to the "originators" field.
 func (m *NodeMutation) ResetOriginators() {
 	m.originators = nil
-	m.clearedoriginators = false
-	m.removedoriginators = nil
+	m.appendoriginators = nil
 }
 
-// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by ids.
-func (m *NodeMutation) AddExternalReferenceIDs(ids ...int) {
-	if m.external_references == nil {
-		m.external_references = make(map[int]struct{})
+// SetExternalReferences sets the "external_references" field.
+func (m *NodeMutation) SetExternalReferences(sr []*sbom.ExternalReference) {
+	m.external_references = &sr
+	m.appendexternal_references = nil
+}
+
+// ExternalReferences returns the value of the "external_references" field in the mutation.
+func (m *NodeMutation) ExternalReferences() (r []*sbom.ExternalReference, exists bool) {
+	v := m.external_references
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		m.external_references[ids[i]] = struct{}{}
+	return *v, true
+}
+
+// OldExternalReferences returns the old "external_references" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldExternalReferences(ctx context.Context) (v []*sbom.ExternalReference, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExternalReferences is only allowed on UpdateOne operations")
 	}
-}
-
-// ClearExternalReferences clears the "external_references" edge to the ExternalReference entity.
-func (m *NodeMutation) ClearExternalReferences() {
-	m.clearedexternal_references = true
-}
-
-// ExternalReferencesCleared reports if the "external_references" edge to the ExternalReference entity was cleared.
-func (m *NodeMutation) ExternalReferencesCleared() bool {
-	return m.clearedexternal_references
-}
-
-// RemoveExternalReferenceIDs removes the "external_references" edge to the ExternalReference entity by IDs.
-func (m *NodeMutation) RemoveExternalReferenceIDs(ids ...int) {
-	if m.removedexternal_references == nil {
-		m.removedexternal_references = make(map[int]struct{})
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExternalReferences requires an ID field in the mutation")
 	}
-	for i := range ids {
-		delete(m.external_references, ids[i])
-		m.removedexternal_references[ids[i]] = struct{}{}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExternalReferences: %w", err)
 	}
+	return oldValue.ExternalReferences, nil
 }
 
-// RemovedExternalReferences returns the removed IDs of the "external_references" edge to the ExternalReference entity.
-func (m *NodeMutation) RemovedExternalReferencesIDs() (ids []int) {
-	for id := range m.removedexternal_references {
-		ids = append(ids, id)
-	}
-	return
+// AppendExternalReferences adds sr to the "external_references" field.
+func (m *NodeMutation) AppendExternalReferences(sr []*sbom.ExternalReference) {
+	m.appendexternal_references = append(m.appendexternal_references, sr...)
 }
 
-// ExternalReferencesIDs returns the "external_references" edge IDs in the mutation.
-func (m *NodeMutation) ExternalReferencesIDs() (ids []int) {
-	for id := range m.external_references {
-		ids = append(ids, id)
+// AppendedExternalReferences returns the list of values that were appended to the "external_references" field in this mutation.
+func (m *NodeMutation) AppendedExternalReferences() ([]*sbom.ExternalReference, bool) {
+	if len(m.appendexternal_references) == 0 {
+		return nil, false
 	}
-	return
+	return m.appendexternal_references, true
 }
 
-// ResetExternalReferences resets all changes to the "external_references" edge.
+// ResetExternalReferences resets all changes to the "external_references" field.
 func (m *NodeMutation) ResetExternalReferences() {
 	m.external_references = nil
-	m.clearedexternal_references = false
-	m.removedexternal_references = nil
+	m.appendexternal_references = nil
 }
 
-// AddIdentifierIDs adds the "identifiers" edge to the IdentifiersEntry entity by ids.
-func (m *NodeMutation) AddIdentifierIDs(ids ...int) {
-	if m.identifiers == nil {
-		m.identifiers = make(map[int]struct{})
+// SetHashes sets the "hashes" field.
+func (m *NodeMutation) SetHashes(value map[int32]string) {
+	m.hashes = &value
+}
+
+// Hashes returns the value of the "hashes" field in the mutation.
+func (m *NodeMutation) Hashes() (r map[int32]string, exists bool) {
+	v := m.hashes
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		m.identifiers[ids[i]] = struct{}{}
+	return *v, true
+}
+
+// OldHashes returns the old "hashes" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldHashes(ctx context.Context) (v map[int32]string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHashes is only allowed on UpdateOne operations")
 	}
-}
-
-// ClearIdentifiers clears the "identifiers" edge to the IdentifiersEntry entity.
-func (m *NodeMutation) ClearIdentifiers() {
-	m.clearedidentifiers = true
-}
-
-// IdentifiersCleared reports if the "identifiers" edge to the IdentifiersEntry entity was cleared.
-func (m *NodeMutation) IdentifiersCleared() bool {
-	return m.clearedidentifiers
-}
-
-// RemoveIdentifierIDs removes the "identifiers" edge to the IdentifiersEntry entity by IDs.
-func (m *NodeMutation) RemoveIdentifierIDs(ids ...int) {
-	if m.removedidentifiers == nil {
-		m.removedidentifiers = make(map[int]struct{})
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHashes requires an ID field in the mutation")
 	}
-	for i := range ids {
-		delete(m.identifiers, ids[i])
-		m.removedidentifiers[ids[i]] = struct{}{}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHashes: %w", err)
 	}
+	return oldValue.Hashes, nil
 }
 
-// RemovedIdentifiers returns the removed IDs of the "identifiers" edge to the IdentifiersEntry entity.
-func (m *NodeMutation) RemovedIdentifiersIDs() (ids []int) {
-	for id := range m.removedidentifiers {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// IdentifiersIDs returns the "identifiers" edge IDs in the mutation.
-func (m *NodeMutation) IdentifiersIDs() (ids []int) {
-	for id := range m.identifiers {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetIdentifiers resets all changes to the "identifiers" edge.
-func (m *NodeMutation) ResetIdentifiers() {
-	m.identifiers = nil
-	m.clearedidentifiers = false
-	m.removedidentifiers = nil
-}
-
-// AddHashIDs adds the "hashes" edge to the HashesEntry entity by ids.
-func (m *NodeMutation) AddHashIDs(ids ...int) {
-	if m.hashes == nil {
-		m.hashes = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.hashes[ids[i]] = struct{}{}
-	}
-}
-
-// ClearHashes clears the "hashes" edge to the HashesEntry entity.
-func (m *NodeMutation) ClearHashes() {
-	m.clearedhashes = true
-}
-
-// HashesCleared reports if the "hashes" edge to the HashesEntry entity was cleared.
-func (m *NodeMutation) HashesCleared() bool {
-	return m.clearedhashes
-}
-
-// RemoveHashIDs removes the "hashes" edge to the HashesEntry entity by IDs.
-func (m *NodeMutation) RemoveHashIDs(ids ...int) {
-	if m.removedhashes == nil {
-		m.removedhashes = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.hashes, ids[i])
-		m.removedhashes[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedHashes returns the removed IDs of the "hashes" edge to the HashesEntry entity.
-func (m *NodeMutation) RemovedHashesIDs() (ids []int) {
-	for id := range m.removedhashes {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// HashesIDs returns the "hashes" edge IDs in the mutation.
-func (m *NodeMutation) HashesIDs() (ids []int) {
-	for id := range m.hashes {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetHashes resets all changes to the "hashes" edge.
+// ResetHashes resets all changes to the "hashes" field.
 func (m *NodeMutation) ResetHashes() {
 	m.hashes = nil
-	m.clearedhashes = false
-	m.removedhashes = nil
 }
 
-// AddPrimaryPurposeIDs adds the "primary_purpose" edge to the Purpose entity by ids.
-func (m *NodeMutation) AddPrimaryPurposeIDs(ids ...int) {
-	if m.primary_purpose == nil {
-		m.primary_purpose = make(map[int]struct{})
+// SetIdentifiers sets the "identifiers" field.
+func (m *NodeMutation) SetIdentifiers(value map[int32]string) {
+	m.identifiers = &value
+}
+
+// Identifiers returns the value of the "identifiers" field in the mutation.
+func (m *NodeMutation) Identifiers() (r map[int32]string, exists bool) {
+	v := m.identifiers
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		m.primary_purpose[ids[i]] = struct{}{}
+	return *v, true
+}
+
+// OldIdentifiers returns the old "identifiers" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldIdentifiers(ctx context.Context) (v map[int32]string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIdentifiers is only allowed on UpdateOne operations")
 	}
-}
-
-// ClearPrimaryPurpose clears the "primary_purpose" edge to the Purpose entity.
-func (m *NodeMutation) ClearPrimaryPurpose() {
-	m.clearedprimary_purpose = true
-}
-
-// PrimaryPurposeCleared reports if the "primary_purpose" edge to the Purpose entity was cleared.
-func (m *NodeMutation) PrimaryPurposeCleared() bool {
-	return m.clearedprimary_purpose
-}
-
-// RemovePrimaryPurposeIDs removes the "primary_purpose" edge to the Purpose entity by IDs.
-func (m *NodeMutation) RemovePrimaryPurposeIDs(ids ...int) {
-	if m.removedprimary_purpose == nil {
-		m.removedprimary_purpose = make(map[int]struct{})
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIdentifiers requires an ID field in the mutation")
 	}
-	for i := range ids {
-		delete(m.primary_purpose, ids[i])
-		m.removedprimary_purpose[ids[i]] = struct{}{}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIdentifiers: %w", err)
 	}
+	return oldValue.Identifiers, nil
 }
 
-// RemovedPrimaryPurpose returns the removed IDs of the "primary_purpose" edge to the Purpose entity.
-func (m *NodeMutation) RemovedPrimaryPurposeIDs() (ids []int) {
-	for id := range m.removedprimary_purpose {
-		ids = append(ids, id)
-	}
-	return
+// ResetIdentifiers resets all changes to the "identifiers" field.
+func (m *NodeMutation) ResetIdentifiers() {
+	m.identifiers = nil
 }
 
-// PrimaryPurposeIDs returns the "primary_purpose" edge IDs in the mutation.
-func (m *NodeMutation) PrimaryPurposeIDs() (ids []int) {
-	for id := range m.primary_purpose {
-		ids = append(ids, id)
-	}
-	return
+// SetPrimaryPurpose sets the "primary_purpose" field.
+func (m *NodeMutation) SetPrimaryPurpose(s []sbom.Purpose) {
+	m.primary_purpose = &s
+	m.appendprimary_purpose = nil
 }
 
-// ResetPrimaryPurpose resets all changes to the "primary_purpose" edge.
+// PrimaryPurpose returns the value of the "primary_purpose" field in the mutation.
+func (m *NodeMutation) PrimaryPurpose() (r []sbom.Purpose, exists bool) {
+	v := m.primary_purpose
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrimaryPurpose returns the old "primary_purpose" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldPrimaryPurpose(ctx context.Context) (v []sbom.Purpose, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrimaryPurpose is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrimaryPurpose requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrimaryPurpose: %w", err)
+	}
+	return oldValue.PrimaryPurpose, nil
+}
+
+// AppendPrimaryPurpose adds s to the "primary_purpose" field.
+func (m *NodeMutation) AppendPrimaryPurpose(s []sbom.Purpose) {
+	m.appendprimary_purpose = append(m.appendprimary_purpose, s...)
+}
+
+// AppendedPrimaryPurpose returns the list of values that were appended to the "primary_purpose" field in this mutation.
+func (m *NodeMutation) AppendedPrimaryPurpose() ([]sbom.Purpose, bool) {
+	if len(m.appendprimary_purpose) == 0 {
+		return nil, false
+	}
+	return m.appendprimary_purpose, true
+}
+
+// ResetPrimaryPurpose resets all changes to the "primary_purpose" field.
 func (m *NodeMutation) ResetPrimaryPurpose() {
 	m.primary_purpose = nil
-	m.clearedprimary_purpose = false
-	m.removedprimary_purpose = nil
+	m.appendprimary_purpose = nil
+}
+
+// AddNodeSupplierIDs adds the "node_suppliers" edge to the Person entity by ids.
+func (m *NodeMutation) AddNodeSupplierIDs(ids ...int) {
+	if m.node_suppliers == nil {
+		m.node_suppliers = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.node_suppliers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeSuppliers clears the "node_suppliers" edge to the Person entity.
+func (m *NodeMutation) ClearNodeSuppliers() {
+	m.clearednode_suppliers = true
+}
+
+// NodeSuppliersCleared reports if the "node_suppliers" edge to the Person entity was cleared.
+func (m *NodeMutation) NodeSuppliersCleared() bool {
+	return m.clearednode_suppliers
+}
+
+// RemoveNodeSupplierIDs removes the "node_suppliers" edge to the Person entity by IDs.
+func (m *NodeMutation) RemoveNodeSupplierIDs(ids ...int) {
+	if m.removednode_suppliers == nil {
+		m.removednode_suppliers = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.node_suppliers, ids[i])
+		m.removednode_suppliers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeSuppliers returns the removed IDs of the "node_suppliers" edge to the Person entity.
+func (m *NodeMutation) RemovedNodeSuppliersIDs() (ids []int) {
+	for id := range m.removednode_suppliers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeSuppliersIDs returns the "node_suppliers" edge IDs in the mutation.
+func (m *NodeMutation) NodeSuppliersIDs() (ids []int) {
+	for id := range m.node_suppliers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeSuppliers resets all changes to the "node_suppliers" edge.
+func (m *NodeMutation) ResetNodeSuppliers() {
+	m.node_suppliers = nil
+	m.clearednode_suppliers = false
+	m.removednode_suppliers = nil
+}
+
+// AddNodeOriginatorIDs adds the "node_originators" edge to the Person entity by ids.
+func (m *NodeMutation) AddNodeOriginatorIDs(ids ...int) {
+	if m.node_originators == nil {
+		m.node_originators = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.node_originators[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeOriginators clears the "node_originators" edge to the Person entity.
+func (m *NodeMutation) ClearNodeOriginators() {
+	m.clearednode_originators = true
+}
+
+// NodeOriginatorsCleared reports if the "node_originators" edge to the Person entity was cleared.
+func (m *NodeMutation) NodeOriginatorsCleared() bool {
+	return m.clearednode_originators
+}
+
+// RemoveNodeOriginatorIDs removes the "node_originators" edge to the Person entity by IDs.
+func (m *NodeMutation) RemoveNodeOriginatorIDs(ids ...int) {
+	if m.removednode_originators == nil {
+		m.removednode_originators = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.node_originators, ids[i])
+		m.removednode_originators[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeOriginators returns the removed IDs of the "node_originators" edge to the Person entity.
+func (m *NodeMutation) RemovedNodeOriginatorsIDs() (ids []int) {
+	for id := range m.removednode_originators {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeOriginatorsIDs returns the "node_originators" edge IDs in the mutation.
+func (m *NodeMutation) NodeOriginatorsIDs() (ids []int) {
+	for id := range m.node_originators {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeOriginators resets all changes to the "node_originators" edge.
+func (m *NodeMutation) ResetNodeOriginators() {
+	m.node_originators = nil
+	m.clearednode_originators = false
+	m.removednode_originators = nil
+}
+
+// AddNodeExternalReferenceIDs adds the "node_external_references" edge to the ExternalReference entity by ids.
+func (m *NodeMutation) AddNodeExternalReferenceIDs(ids ...int) {
+	if m.node_external_references == nil {
+		m.node_external_references = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.node_external_references[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeExternalReferences clears the "node_external_references" edge to the ExternalReference entity.
+func (m *NodeMutation) ClearNodeExternalReferences() {
+	m.clearednode_external_references = true
+}
+
+// NodeExternalReferencesCleared reports if the "node_external_references" edge to the ExternalReference entity was cleared.
+func (m *NodeMutation) NodeExternalReferencesCleared() bool {
+	return m.clearednode_external_references
+}
+
+// RemoveNodeExternalReferenceIDs removes the "node_external_references" edge to the ExternalReference entity by IDs.
+func (m *NodeMutation) RemoveNodeExternalReferenceIDs(ids ...int) {
+	if m.removednode_external_references == nil {
+		m.removednode_external_references = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.node_external_references, ids[i])
+		m.removednode_external_references[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeExternalReferences returns the removed IDs of the "node_external_references" edge to the ExternalReference entity.
+func (m *NodeMutation) RemovedNodeExternalReferencesIDs() (ids []int) {
+	for id := range m.removednode_external_references {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeExternalReferencesIDs returns the "node_external_references" edge IDs in the mutation.
+func (m *NodeMutation) NodeExternalReferencesIDs() (ids []int) {
+	for id := range m.node_external_references {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeExternalReferences resets all changes to the "node_external_references" edge.
+func (m *NodeMutation) ResetNodeExternalReferences() {
+	m.node_external_references = nil
+	m.clearednode_external_references = false
+	m.removednode_external_references = nil
+}
+
+// AddNodeIdentifierIDs adds the "node_identifiers" edge to the IdentifiersEntry entity by ids.
+func (m *NodeMutation) AddNodeIdentifierIDs(ids ...int) {
+	if m.node_identifiers == nil {
+		m.node_identifiers = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.node_identifiers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeIdentifiers clears the "node_identifiers" edge to the IdentifiersEntry entity.
+func (m *NodeMutation) ClearNodeIdentifiers() {
+	m.clearednode_identifiers = true
+}
+
+// NodeIdentifiersCleared reports if the "node_identifiers" edge to the IdentifiersEntry entity was cleared.
+func (m *NodeMutation) NodeIdentifiersCleared() bool {
+	return m.clearednode_identifiers
+}
+
+// RemoveNodeIdentifierIDs removes the "node_identifiers" edge to the IdentifiersEntry entity by IDs.
+func (m *NodeMutation) RemoveNodeIdentifierIDs(ids ...int) {
+	if m.removednode_identifiers == nil {
+		m.removednode_identifiers = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.node_identifiers, ids[i])
+		m.removednode_identifiers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeIdentifiers returns the removed IDs of the "node_identifiers" edge to the IdentifiersEntry entity.
+func (m *NodeMutation) RemovedNodeIdentifiersIDs() (ids []int) {
+	for id := range m.removednode_identifiers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeIdentifiersIDs returns the "node_identifiers" edge IDs in the mutation.
+func (m *NodeMutation) NodeIdentifiersIDs() (ids []int) {
+	for id := range m.node_identifiers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeIdentifiers resets all changes to the "node_identifiers" edge.
+func (m *NodeMutation) ResetNodeIdentifiers() {
+	m.node_identifiers = nil
+	m.clearednode_identifiers = false
+	m.removednode_identifiers = nil
+}
+
+// AddNodeHashIDs adds the "node_hashes" edge to the HashesEntry entity by ids.
+func (m *NodeMutation) AddNodeHashIDs(ids ...int) {
+	if m.node_hashes == nil {
+		m.node_hashes = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.node_hashes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeHashes clears the "node_hashes" edge to the HashesEntry entity.
+func (m *NodeMutation) ClearNodeHashes() {
+	m.clearednode_hashes = true
+}
+
+// NodeHashesCleared reports if the "node_hashes" edge to the HashesEntry entity was cleared.
+func (m *NodeMutation) NodeHashesCleared() bool {
+	return m.clearednode_hashes
+}
+
+// RemoveNodeHashIDs removes the "node_hashes" edge to the HashesEntry entity by IDs.
+func (m *NodeMutation) RemoveNodeHashIDs(ids ...int) {
+	if m.removednode_hashes == nil {
+		m.removednode_hashes = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.node_hashes, ids[i])
+		m.removednode_hashes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeHashes returns the removed IDs of the "node_hashes" edge to the HashesEntry entity.
+func (m *NodeMutation) RemovedNodeHashesIDs() (ids []int) {
+	for id := range m.removednode_hashes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeHashesIDs returns the "node_hashes" edge IDs in the mutation.
+func (m *NodeMutation) NodeHashesIDs() (ids []int) {
+	for id := range m.node_hashes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeHashes resets all changes to the "node_hashes" edge.
+func (m *NodeMutation) ResetNodeHashes() {
+	m.node_hashes = nil
+	m.clearednode_hashes = false
+	m.removednode_hashes = nil
+}
+
+// AddNodePrimaryPurposeIDs adds the "node_primary_purpose" edge to the Purpose entity by ids.
+func (m *NodeMutation) AddNodePrimaryPurposeIDs(ids ...int) {
+	if m.node_primary_purpose == nil {
+		m.node_primary_purpose = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.node_primary_purpose[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodePrimaryPurpose clears the "node_primary_purpose" edge to the Purpose entity.
+func (m *NodeMutation) ClearNodePrimaryPurpose() {
+	m.clearednode_primary_purpose = true
+}
+
+// NodePrimaryPurposeCleared reports if the "node_primary_purpose" edge to the Purpose entity was cleared.
+func (m *NodeMutation) NodePrimaryPurposeCleared() bool {
+	return m.clearednode_primary_purpose
+}
+
+// RemoveNodePrimaryPurposeIDs removes the "node_primary_purpose" edge to the Purpose entity by IDs.
+func (m *NodeMutation) RemoveNodePrimaryPurposeIDs(ids ...int) {
+	if m.removednode_primary_purpose == nil {
+		m.removednode_primary_purpose = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.node_primary_purpose, ids[i])
+		m.removednode_primary_purpose[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodePrimaryPurpose returns the removed IDs of the "node_primary_purpose" edge to the Purpose entity.
+func (m *NodeMutation) RemovedNodePrimaryPurposeIDs() (ids []int) {
+	for id := range m.removednode_primary_purpose {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodePrimaryPurposeIDs returns the "node_primary_purpose" edge IDs in the mutation.
+func (m *NodeMutation) NodePrimaryPurposeIDs() (ids []int) {
+	for id := range m.node_primary_purpose {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodePrimaryPurpose resets all changes to the "node_primary_purpose" edge.
+func (m *NodeMutation) ResetNodePrimaryPurpose() {
+	m.node_primary_purpose = nil
+	m.clearednode_primary_purpose = false
+	m.removednode_primary_purpose = nil
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by ids.
+func (m *NodeMutation) AddNodeIDs(ids ...string) {
+	if m.nodes == nil {
+		m.nodes = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.nodes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodes clears the "nodes" edge to the Node entity.
+func (m *NodeMutation) ClearNodes() {
+	m.clearednodes = true
+}
+
+// NodesCleared reports if the "nodes" edge to the Node entity was cleared.
+func (m *NodeMutation) NodesCleared() bool {
+	return m.clearednodes
+}
+
+// RemoveNodeIDs removes the "nodes" edge to the Node entity by IDs.
+func (m *NodeMutation) RemoveNodeIDs(ids ...string) {
+	if m.removednodes == nil {
+		m.removednodes = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.nodes, ids[i])
+		m.removednodes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodes returns the removed IDs of the "nodes" edge to the Node entity.
+func (m *NodeMutation) RemovedNodesIDs() (ids []string) {
+	for id := range m.removednodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodesIDs returns the "nodes" edge IDs in the mutation.
+func (m *NodeMutation) NodesIDs() (ids []string) {
+	for id := range m.nodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodes resets all changes to the "nodes" edge.
+func (m *NodeMutation) ResetNodes() {
+	m.nodes = nil
+	m.clearednodes = false
+	m.removednodes = nil
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by id.
@@ -5188,6 +5967,60 @@ func (m *NodeMutation) ResetNodeList() {
 	m.clearednode_list = false
 }
 
+// AddEdgeTypeIDs adds the "edge_types" edge to the EdgeType entity by ids.
+func (m *NodeMutation) AddEdgeTypeIDs(ids ...int) {
+	if m.edge_types == nil {
+		m.edge_types = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.edge_types[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEdgeTypes clears the "edge_types" edge to the EdgeType entity.
+func (m *NodeMutation) ClearEdgeTypes() {
+	m.clearededge_types = true
+}
+
+// EdgeTypesCleared reports if the "edge_types" edge to the EdgeType entity was cleared.
+func (m *NodeMutation) EdgeTypesCleared() bool {
+	return m.clearededge_types
+}
+
+// RemoveEdgeTypeIDs removes the "edge_types" edge to the EdgeType entity by IDs.
+func (m *NodeMutation) RemoveEdgeTypeIDs(ids ...int) {
+	if m.removededge_types == nil {
+		m.removededge_types = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.edge_types, ids[i])
+		m.removededge_types[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEdgeTypes returns the removed IDs of the "edge_types" edge to the EdgeType entity.
+func (m *NodeMutation) RemovedEdgeTypesIDs() (ids []int) {
+	for id := range m.removededge_types {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EdgeTypesIDs returns the "edge_types" edge IDs in the mutation.
+func (m *NodeMutation) EdgeTypesIDs() (ids []int) {
+	for id := range m.edge_types {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEdgeTypes resets all changes to the "edge_types" edge.
+func (m *NodeMutation) ResetEdgeTypes() {
+	m.edge_types = nil
+	m.clearededge_types = false
+	m.removededge_types = nil
+}
+
 // Where appends a list predicates to the NodeMutation builder.
 func (m *NodeMutation) Where(ps ...predicate.Node) {
 	m.predicates = append(m.predicates, ps...)
@@ -5222,7 +6055,7 @@ func (m *NodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeMutation) Fields() []string {
-	fields := make([]string, 0, 19)
+	fields := make([]string, 0, 25)
 	if m._type != nil {
 		fields = append(fields, node.FieldType)
 	}
@@ -5280,6 +6113,24 @@ func (m *NodeMutation) Fields() []string {
 	if m.file_types != nil {
 		fields = append(fields, node.FieldFileTypes)
 	}
+	if m.suppliers != nil {
+		fields = append(fields, node.FieldSuppliers)
+	}
+	if m.originators != nil {
+		fields = append(fields, node.FieldOriginators)
+	}
+	if m.external_references != nil {
+		fields = append(fields, node.FieldExternalReferences)
+	}
+	if m.hashes != nil {
+		fields = append(fields, node.FieldHashes)
+	}
+	if m.identifiers != nil {
+		fields = append(fields, node.FieldIdentifiers)
+	}
+	if m.primary_purpose != nil {
+		fields = append(fields, node.FieldPrimaryPurpose)
+	}
 	return fields
 }
 
@@ -5326,6 +6177,18 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Attribution()
 	case node.FieldFileTypes:
 		return m.FileTypes()
+	case node.FieldSuppliers:
+		return m.Suppliers()
+	case node.FieldOriginators:
+		return m.Originators()
+	case node.FieldExternalReferences:
+		return m.ExternalReferences()
+	case node.FieldHashes:
+		return m.Hashes()
+	case node.FieldIdentifiers:
+		return m.Identifiers()
+	case node.FieldPrimaryPurpose:
+		return m.PrimaryPurpose()
 	}
 	return nil, false
 }
@@ -5373,6 +6236,18 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldAttribution(ctx)
 	case node.FieldFileTypes:
 		return m.OldFileTypes(ctx)
+	case node.FieldSuppliers:
+		return m.OldSuppliers(ctx)
+	case node.FieldOriginators:
+		return m.OldOriginators(ctx)
+	case node.FieldExternalReferences:
+		return m.OldExternalReferences(ctx)
+	case node.FieldHashes:
+		return m.OldHashes(ctx)
+	case node.FieldIdentifiers:
+		return m.OldIdentifiers(ctx)
+	case node.FieldPrimaryPurpose:
+		return m.OldPrimaryPurpose(ctx)
 	}
 	return nil, fmt.Errorf("unknown Node field %s", name)
 }
@@ -5515,6 +6390,48 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetFileTypes(v)
 		return nil
+	case node.FieldSuppliers:
+		v, ok := value.([]*sbom.Person)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSuppliers(v)
+		return nil
+	case node.FieldOriginators:
+		v, ok := value.([]*sbom.Person)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOriginators(v)
+		return nil
+	case node.FieldExternalReferences:
+		v, ok := value.([]*sbom.ExternalReference)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExternalReferences(v)
+		return nil
+	case node.FieldHashes:
+		v, ok := value.(map[int32]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHashes(v)
+		return nil
+	case node.FieldIdentifiers:
+		v, ok := value.(map[int32]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIdentifiers(v)
+		return nil
+	case node.FieldPrimaryPurpose:
+		v, ok := value.([]sbom.Purpose)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrimaryPurpose(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Node field %s", name)
 }
@@ -5621,33 +6538,57 @@ func (m *NodeMutation) ResetField(name string) error {
 	case node.FieldFileTypes:
 		m.ResetFileTypes()
 		return nil
+	case node.FieldSuppliers:
+		m.ResetSuppliers()
+		return nil
+	case node.FieldOriginators:
+		m.ResetOriginators()
+		return nil
+	case node.FieldExternalReferences:
+		m.ResetExternalReferences()
+		return nil
+	case node.FieldHashes:
+		m.ResetHashes()
+		return nil
+	case node.FieldIdentifiers:
+		m.ResetIdentifiers()
+		return nil
+	case node.FieldPrimaryPurpose:
+		m.ResetPrimaryPurpose()
+		return nil
 	}
 	return fmt.Errorf("unknown Node field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
-	if m.suppliers != nil {
-		edges = append(edges, node.EdgeSuppliers)
+	edges := make([]string, 0, 9)
+	if m.node_suppliers != nil {
+		edges = append(edges, node.EdgeNodeSuppliers)
 	}
-	if m.originators != nil {
-		edges = append(edges, node.EdgeOriginators)
+	if m.node_originators != nil {
+		edges = append(edges, node.EdgeNodeOriginators)
 	}
-	if m.external_references != nil {
-		edges = append(edges, node.EdgeExternalReferences)
+	if m.node_external_references != nil {
+		edges = append(edges, node.EdgeNodeExternalReferences)
 	}
-	if m.identifiers != nil {
-		edges = append(edges, node.EdgeIdentifiers)
+	if m.node_identifiers != nil {
+		edges = append(edges, node.EdgeNodeIdentifiers)
 	}
-	if m.hashes != nil {
-		edges = append(edges, node.EdgeHashes)
+	if m.node_hashes != nil {
+		edges = append(edges, node.EdgeNodeHashes)
 	}
-	if m.primary_purpose != nil {
-		edges = append(edges, node.EdgePrimaryPurpose)
+	if m.node_primary_purpose != nil {
+		edges = append(edges, node.EdgeNodePrimaryPurpose)
+	}
+	if m.nodes != nil {
+		edges = append(edges, node.EdgeNodes)
 	}
 	if m.node_list != nil {
 		edges = append(edges, node.EdgeNodeList)
+	}
+	if m.edge_types != nil {
+		edges = append(edges, node.EdgeEdgeTypes)
 	}
 	return edges
 }
@@ -5656,39 +6597,45 @@ func (m *NodeMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case node.EdgeSuppliers:
-		ids := make([]ent.Value, 0, len(m.suppliers))
-		for id := range m.suppliers {
+	case node.EdgeNodeSuppliers:
+		ids := make([]ent.Value, 0, len(m.node_suppliers))
+		for id := range m.node_suppliers {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeOriginators:
-		ids := make([]ent.Value, 0, len(m.originators))
-		for id := range m.originators {
+	case node.EdgeNodeOriginators:
+		ids := make([]ent.Value, 0, len(m.node_originators))
+		for id := range m.node_originators {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeExternalReferences:
-		ids := make([]ent.Value, 0, len(m.external_references))
-		for id := range m.external_references {
+	case node.EdgeNodeExternalReferences:
+		ids := make([]ent.Value, 0, len(m.node_external_references))
+		for id := range m.node_external_references {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeIdentifiers:
-		ids := make([]ent.Value, 0, len(m.identifiers))
-		for id := range m.identifiers {
+	case node.EdgeNodeIdentifiers:
+		ids := make([]ent.Value, 0, len(m.node_identifiers))
+		for id := range m.node_identifiers {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeHashes:
-		ids := make([]ent.Value, 0, len(m.hashes))
-		for id := range m.hashes {
+	case node.EdgeNodeHashes:
+		ids := make([]ent.Value, 0, len(m.node_hashes))
+		for id := range m.node_hashes {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgePrimaryPurpose:
-		ids := make([]ent.Value, 0, len(m.primary_purpose))
-		for id := range m.primary_purpose {
+	case node.EdgeNodePrimaryPurpose:
+		ids := make([]ent.Value, 0, len(m.node_primary_purpose))
+		for id := range m.node_primary_purpose {
+			ids = append(ids, id)
+		}
+		return ids
+	case node.EdgeNodes:
+		ids := make([]ent.Value, 0, len(m.nodes))
+		for id := range m.nodes {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5696,30 +6643,42 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.node_list; id != nil {
 			return []ent.Value{*id}
 		}
+	case node.EdgeEdgeTypes:
+		ids := make([]ent.Value, 0, len(m.edge_types))
+		for id := range m.edge_types {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
-	if m.removedsuppliers != nil {
-		edges = append(edges, node.EdgeSuppliers)
+	edges := make([]string, 0, 9)
+	if m.removednode_suppliers != nil {
+		edges = append(edges, node.EdgeNodeSuppliers)
 	}
-	if m.removedoriginators != nil {
-		edges = append(edges, node.EdgeOriginators)
+	if m.removednode_originators != nil {
+		edges = append(edges, node.EdgeNodeOriginators)
 	}
-	if m.removedexternal_references != nil {
-		edges = append(edges, node.EdgeExternalReferences)
+	if m.removednode_external_references != nil {
+		edges = append(edges, node.EdgeNodeExternalReferences)
 	}
-	if m.removedidentifiers != nil {
-		edges = append(edges, node.EdgeIdentifiers)
+	if m.removednode_identifiers != nil {
+		edges = append(edges, node.EdgeNodeIdentifiers)
 	}
-	if m.removedhashes != nil {
-		edges = append(edges, node.EdgeHashes)
+	if m.removednode_hashes != nil {
+		edges = append(edges, node.EdgeNodeHashes)
 	}
-	if m.removedprimary_purpose != nil {
-		edges = append(edges, node.EdgePrimaryPurpose)
+	if m.removednode_primary_purpose != nil {
+		edges = append(edges, node.EdgeNodePrimaryPurpose)
+	}
+	if m.removednodes != nil {
+		edges = append(edges, node.EdgeNodes)
+	}
+	if m.removededge_types != nil {
+		edges = append(edges, node.EdgeEdgeTypes)
 	}
 	return edges
 }
@@ -5728,39 +6687,51 @@ func (m *NodeMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case node.EdgeSuppliers:
-		ids := make([]ent.Value, 0, len(m.removedsuppliers))
-		for id := range m.removedsuppliers {
+	case node.EdgeNodeSuppliers:
+		ids := make([]ent.Value, 0, len(m.removednode_suppliers))
+		for id := range m.removednode_suppliers {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeOriginators:
-		ids := make([]ent.Value, 0, len(m.removedoriginators))
-		for id := range m.removedoriginators {
+	case node.EdgeNodeOriginators:
+		ids := make([]ent.Value, 0, len(m.removednode_originators))
+		for id := range m.removednode_originators {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeExternalReferences:
-		ids := make([]ent.Value, 0, len(m.removedexternal_references))
-		for id := range m.removedexternal_references {
+	case node.EdgeNodeExternalReferences:
+		ids := make([]ent.Value, 0, len(m.removednode_external_references))
+		for id := range m.removednode_external_references {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeIdentifiers:
-		ids := make([]ent.Value, 0, len(m.removedidentifiers))
-		for id := range m.removedidentifiers {
+	case node.EdgeNodeIdentifiers:
+		ids := make([]ent.Value, 0, len(m.removednode_identifiers))
+		for id := range m.removednode_identifiers {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeHashes:
-		ids := make([]ent.Value, 0, len(m.removedhashes))
-		for id := range m.removedhashes {
+	case node.EdgeNodeHashes:
+		ids := make([]ent.Value, 0, len(m.removednode_hashes))
+		for id := range m.removednode_hashes {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgePrimaryPurpose:
-		ids := make([]ent.Value, 0, len(m.removedprimary_purpose))
-		for id := range m.removedprimary_purpose {
+	case node.EdgeNodePrimaryPurpose:
+		ids := make([]ent.Value, 0, len(m.removednode_primary_purpose))
+		for id := range m.removednode_primary_purpose {
+			ids = append(ids, id)
+		}
+		return ids
+	case node.EdgeNodes:
+		ids := make([]ent.Value, 0, len(m.removednodes))
+		for id := range m.removednodes {
+			ids = append(ids, id)
+		}
+		return ids
+	case node.EdgeEdgeTypes:
+		ids := make([]ent.Value, 0, len(m.removededge_types))
+		for id := range m.removededge_types {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5770,27 +6741,33 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
-	if m.clearedsuppliers {
-		edges = append(edges, node.EdgeSuppliers)
+	edges := make([]string, 0, 9)
+	if m.clearednode_suppliers {
+		edges = append(edges, node.EdgeNodeSuppliers)
 	}
-	if m.clearedoriginators {
-		edges = append(edges, node.EdgeOriginators)
+	if m.clearednode_originators {
+		edges = append(edges, node.EdgeNodeOriginators)
 	}
-	if m.clearedexternal_references {
-		edges = append(edges, node.EdgeExternalReferences)
+	if m.clearednode_external_references {
+		edges = append(edges, node.EdgeNodeExternalReferences)
 	}
-	if m.clearedidentifiers {
-		edges = append(edges, node.EdgeIdentifiers)
+	if m.clearednode_identifiers {
+		edges = append(edges, node.EdgeNodeIdentifiers)
 	}
-	if m.clearedhashes {
-		edges = append(edges, node.EdgeHashes)
+	if m.clearednode_hashes {
+		edges = append(edges, node.EdgeNodeHashes)
 	}
-	if m.clearedprimary_purpose {
-		edges = append(edges, node.EdgePrimaryPurpose)
+	if m.clearednode_primary_purpose {
+		edges = append(edges, node.EdgeNodePrimaryPurpose)
+	}
+	if m.clearednodes {
+		edges = append(edges, node.EdgeNodes)
 	}
 	if m.clearednode_list {
 		edges = append(edges, node.EdgeNodeList)
+	}
+	if m.clearededge_types {
+		edges = append(edges, node.EdgeEdgeTypes)
 	}
 	return edges
 }
@@ -5799,20 +6776,24 @@ func (m *NodeMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *NodeMutation) EdgeCleared(name string) bool {
 	switch name {
-	case node.EdgeSuppliers:
-		return m.clearedsuppliers
-	case node.EdgeOriginators:
-		return m.clearedoriginators
-	case node.EdgeExternalReferences:
-		return m.clearedexternal_references
-	case node.EdgeIdentifiers:
-		return m.clearedidentifiers
-	case node.EdgeHashes:
-		return m.clearedhashes
-	case node.EdgePrimaryPurpose:
-		return m.clearedprimary_purpose
+	case node.EdgeNodeSuppliers:
+		return m.clearednode_suppliers
+	case node.EdgeNodeOriginators:
+		return m.clearednode_originators
+	case node.EdgeNodeExternalReferences:
+		return m.clearednode_external_references
+	case node.EdgeNodeIdentifiers:
+		return m.clearednode_identifiers
+	case node.EdgeNodeHashes:
+		return m.clearednode_hashes
+	case node.EdgeNodePrimaryPurpose:
+		return m.clearednode_primary_purpose
+	case node.EdgeNodes:
+		return m.clearednodes
 	case node.EdgeNodeList:
 		return m.clearednode_list
+	case node.EdgeEdgeTypes:
+		return m.clearededge_types
 	}
 	return false
 }
@@ -5832,26 +6813,32 @@ func (m *NodeMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *NodeMutation) ResetEdge(name string) error {
 	switch name {
-	case node.EdgeSuppliers:
-		m.ResetSuppliers()
+	case node.EdgeNodeSuppliers:
+		m.ResetNodeSuppliers()
 		return nil
-	case node.EdgeOriginators:
-		m.ResetOriginators()
+	case node.EdgeNodeOriginators:
+		m.ResetNodeOriginators()
 		return nil
-	case node.EdgeExternalReferences:
-		m.ResetExternalReferences()
+	case node.EdgeNodeExternalReferences:
+		m.ResetNodeExternalReferences()
 		return nil
-	case node.EdgeIdentifiers:
-		m.ResetIdentifiers()
+	case node.EdgeNodeIdentifiers:
+		m.ResetNodeIdentifiers()
 		return nil
-	case node.EdgeHashes:
-		m.ResetHashes()
+	case node.EdgeNodeHashes:
+		m.ResetNodeHashes()
 		return nil
-	case node.EdgePrimaryPurpose:
-		m.ResetPrimaryPurpose()
+	case node.EdgeNodePrimaryPurpose:
+		m.ResetNodePrimaryPurpose()
+		return nil
+	case node.EdgeNodes:
+		m.ResetNodes()
 		return nil
 	case node.EdgeNodeList:
 		m.ResetNodeList()
+		return nil
+	case node.EdgeEdgeTypes:
+		m.ResetEdgeTypes()
 		return nil
 	}
 	return fmt.Errorf("unknown Node edge %s", name)
@@ -5860,23 +6847,22 @@ func (m *NodeMutation) ResetEdge(name string) error {
 // NodeListMutation represents an operation that mutates the NodeList nodes in the graph.
 type NodeListMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	root_elements       *[]string
-	appendroot_elements []string
-	clearedFields       map[string]struct{}
-	nodes               map[string]struct{}
-	removednodes        map[string]struct{}
-	clearednodes        bool
-	edges               map[int]struct{}
-	removededges        map[int]struct{}
-	clearededges        bool
-	document            *int
-	cleareddocument     bool
-	done                bool
-	oldValue            func(context.Context) (*NodeList, error)
-	predicates          []predicate.NodeList
+	op                     Op
+	typ                    string
+	id                     *int
+	root_elements          *[]string
+	appendroot_elements    []string
+	nodes                  *[]*sbom.Node
+	appendnodes            []*sbom.Node
+	clearedFields          map[string]struct{}
+	node_list_nodes        map[string]struct{}
+	removednode_list_nodes map[string]struct{}
+	clearednode_list_nodes bool
+	document               *int
+	cleareddocument        bool
+	done                   bool
+	oldValue               func(context.Context) (*NodeList, error)
+	predicates             []predicate.NodeList
 }
 
 var _ ent.Mutation = (*NodeListMutation)(nil)
@@ -6028,112 +7014,109 @@ func (m *NodeListMutation) ResetRootElements() {
 	m.appendroot_elements = nil
 }
 
-// AddNodeIDs adds the "nodes" edge to the Node entity by ids.
-func (m *NodeListMutation) AddNodeIDs(ids ...string) {
-	if m.nodes == nil {
-		m.nodes = make(map[string]struct{})
-	}
-	for i := range ids {
-		m.nodes[ids[i]] = struct{}{}
-	}
+// SetNodes sets the "nodes" field.
+func (m *NodeListMutation) SetNodes(s []*sbom.Node) {
+	m.nodes = &s
+	m.appendnodes = nil
 }
 
-// ClearNodes clears the "nodes" edge to the Node entity.
-func (m *NodeListMutation) ClearNodes() {
-	m.clearednodes = true
-}
-
-// NodesCleared reports if the "nodes" edge to the Node entity was cleared.
-func (m *NodeListMutation) NodesCleared() bool {
-	return m.clearednodes
-}
-
-// RemoveNodeIDs removes the "nodes" edge to the Node entity by IDs.
-func (m *NodeListMutation) RemoveNodeIDs(ids ...string) {
-	if m.removednodes == nil {
-		m.removednodes = make(map[string]struct{})
+// Nodes returns the value of the "nodes" field in the mutation.
+func (m *NodeListMutation) Nodes() (r []*sbom.Node, exists bool) {
+	v := m.nodes
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		delete(m.nodes, ids[i])
-		m.removednodes[ids[i]] = struct{}{}
-	}
+	return *v, true
 }
 
-// RemovedNodes returns the removed IDs of the "nodes" edge to the Node entity.
-func (m *NodeListMutation) RemovedNodesIDs() (ids []string) {
-	for id := range m.removednodes {
-		ids = append(ids, id)
+// OldNodes returns the old "nodes" field's value of the NodeList entity.
+// If the NodeList object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeListMutation) OldNodes(ctx context.Context) (v []*sbom.Node, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNodes is only allowed on UpdateOne operations")
 	}
-	return
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNodes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNodes: %w", err)
+	}
+	return oldValue.Nodes, nil
 }
 
-// NodesIDs returns the "nodes" edge IDs in the mutation.
-func (m *NodeListMutation) NodesIDs() (ids []string) {
-	for id := range m.nodes {
-		ids = append(ids, id)
-	}
-	return
+// AppendNodes adds s to the "nodes" field.
+func (m *NodeListMutation) AppendNodes(s []*sbom.Node) {
+	m.appendnodes = append(m.appendnodes, s...)
 }
 
-// ResetNodes resets all changes to the "nodes" edge.
+// AppendedNodes returns the list of values that were appended to the "nodes" field in this mutation.
+func (m *NodeListMutation) AppendedNodes() ([]*sbom.Node, bool) {
+	if len(m.appendnodes) == 0 {
+		return nil, false
+	}
+	return m.appendnodes, true
+}
+
+// ResetNodes resets all changes to the "nodes" field.
 func (m *NodeListMutation) ResetNodes() {
 	m.nodes = nil
-	m.clearednodes = false
-	m.removednodes = nil
+	m.appendnodes = nil
 }
 
-// AddEdgeIDs adds the "edges" edge to the Edge entity by ids.
-func (m *NodeListMutation) AddEdgeIDs(ids ...int) {
-	if m.edges == nil {
-		m.edges = make(map[int]struct{})
+// AddNodeListNodeIDs adds the "node_list_nodes" edge to the Node entity by ids.
+func (m *NodeListMutation) AddNodeListNodeIDs(ids ...string) {
+	if m.node_list_nodes == nil {
+		m.node_list_nodes = make(map[string]struct{})
 	}
 	for i := range ids {
-		m.edges[ids[i]] = struct{}{}
+		m.node_list_nodes[ids[i]] = struct{}{}
 	}
 }
 
-// ClearEdges clears the "edges" edge to the Edge entity.
-func (m *NodeListMutation) ClearEdges() {
-	m.clearededges = true
+// ClearNodeListNodes clears the "node_list_nodes" edge to the Node entity.
+func (m *NodeListMutation) ClearNodeListNodes() {
+	m.clearednode_list_nodes = true
 }
 
-// EdgesCleared reports if the "edges" edge to the Edge entity was cleared.
-func (m *NodeListMutation) EdgesCleared() bool {
-	return m.clearededges
+// NodeListNodesCleared reports if the "node_list_nodes" edge to the Node entity was cleared.
+func (m *NodeListMutation) NodeListNodesCleared() bool {
+	return m.clearednode_list_nodes
 }
 
-// RemoveEdgeIDs removes the "edges" edge to the Edge entity by IDs.
-func (m *NodeListMutation) RemoveEdgeIDs(ids ...int) {
-	if m.removededges == nil {
-		m.removededges = make(map[int]struct{})
+// RemoveNodeListNodeIDs removes the "node_list_nodes" edge to the Node entity by IDs.
+func (m *NodeListMutation) RemoveNodeListNodeIDs(ids ...string) {
+	if m.removednode_list_nodes == nil {
+		m.removednode_list_nodes = make(map[string]struct{})
 	}
 	for i := range ids {
-		delete(m.edges, ids[i])
-		m.removededges[ids[i]] = struct{}{}
+		delete(m.node_list_nodes, ids[i])
+		m.removednode_list_nodes[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedEdges returns the removed IDs of the "edges" edge to the Edge entity.
-func (m *NodeListMutation) RemovedEdgesIDs() (ids []int) {
-	for id := range m.removededges {
+// RemovedNodeListNodes returns the removed IDs of the "node_list_nodes" edge to the Node entity.
+func (m *NodeListMutation) RemovedNodeListNodesIDs() (ids []string) {
+	for id := range m.removednode_list_nodes {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// EdgesIDs returns the "edges" edge IDs in the mutation.
-func (m *NodeListMutation) EdgesIDs() (ids []int) {
-	for id := range m.edges {
+// NodeListNodesIDs returns the "node_list_nodes" edge IDs in the mutation.
+func (m *NodeListMutation) NodeListNodesIDs() (ids []string) {
+	for id := range m.node_list_nodes {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetEdges resets all changes to the "edges" edge.
-func (m *NodeListMutation) ResetEdges() {
-	m.edges = nil
-	m.clearededges = false
-	m.removededges = nil
+// ResetNodeListNodes resets all changes to the "node_list_nodes" edge.
+func (m *NodeListMutation) ResetNodeListNodes() {
+	m.node_list_nodes = nil
+	m.clearednode_list_nodes = false
+	m.removednode_list_nodes = nil
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by id.
@@ -6209,9 +7192,12 @@ func (m *NodeListMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeListMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.root_elements != nil {
 		fields = append(fields, nodelist.FieldRootElements)
+	}
+	if m.nodes != nil {
+		fields = append(fields, nodelist.FieldNodes)
 	}
 	return fields
 }
@@ -6223,6 +7209,8 @@ func (m *NodeListMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case nodelist.FieldRootElements:
 		return m.RootElements()
+	case nodelist.FieldNodes:
+		return m.Nodes()
 	}
 	return nil, false
 }
@@ -6234,6 +7222,8 @@ func (m *NodeListMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case nodelist.FieldRootElements:
 		return m.OldRootElements(ctx)
+	case nodelist.FieldNodes:
+		return m.OldNodes(ctx)
 	}
 	return nil, fmt.Errorf("unknown NodeList field %s", name)
 }
@@ -6249,6 +7239,13 @@ func (m *NodeListMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRootElements(v)
+		return nil
+	case nodelist.FieldNodes:
+		v, ok := value.([]*sbom.Node)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNodes(v)
 		return nil
 	}
 	return fmt.Errorf("unknown NodeList field %s", name)
@@ -6302,18 +7299,18 @@ func (m *NodeListMutation) ResetField(name string) error {
 	case nodelist.FieldRootElements:
 		m.ResetRootElements()
 		return nil
+	case nodelist.FieldNodes:
+		m.ResetNodes()
+		return nil
 	}
 	return fmt.Errorf("unknown NodeList field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeListMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.nodes != nil {
-		edges = append(edges, nodelist.EdgeNodes)
-	}
-	if m.edges != nil {
-		edges = append(edges, nodelist.EdgeEdges)
+	edges := make([]string, 0, 2)
+	if m.node_list_nodes != nil {
+		edges = append(edges, nodelist.EdgeNodeListNodes)
 	}
 	if m.document != nil {
 		edges = append(edges, nodelist.EdgeDocument)
@@ -6325,15 +7322,9 @@ func (m *NodeListMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *NodeListMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case nodelist.EdgeNodes:
-		ids := make([]ent.Value, 0, len(m.nodes))
-		for id := range m.nodes {
-			ids = append(ids, id)
-		}
-		return ids
-	case nodelist.EdgeEdges:
-		ids := make([]ent.Value, 0, len(m.edges))
-		for id := range m.edges {
+	case nodelist.EdgeNodeListNodes:
+		ids := make([]ent.Value, 0, len(m.node_list_nodes))
+		for id := range m.node_list_nodes {
 			ids = append(ids, id)
 		}
 		return ids
@@ -6347,12 +7338,9 @@ func (m *NodeListMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeListMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.removednodes != nil {
-		edges = append(edges, nodelist.EdgeNodes)
-	}
-	if m.removededges != nil {
-		edges = append(edges, nodelist.EdgeEdges)
+	edges := make([]string, 0, 2)
+	if m.removednode_list_nodes != nil {
+		edges = append(edges, nodelist.EdgeNodeListNodes)
 	}
 	return edges
 }
@@ -6361,15 +7349,9 @@ func (m *NodeListMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *NodeListMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case nodelist.EdgeNodes:
-		ids := make([]ent.Value, 0, len(m.removednodes))
-		for id := range m.removednodes {
-			ids = append(ids, id)
-		}
-		return ids
-	case nodelist.EdgeEdges:
-		ids := make([]ent.Value, 0, len(m.removededges))
-		for id := range m.removededges {
+	case nodelist.EdgeNodeListNodes:
+		ids := make([]ent.Value, 0, len(m.removednode_list_nodes))
+		for id := range m.removednode_list_nodes {
 			ids = append(ids, id)
 		}
 		return ids
@@ -6379,12 +7361,9 @@ func (m *NodeListMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeListMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.clearednodes {
-		edges = append(edges, nodelist.EdgeNodes)
-	}
-	if m.clearededges {
-		edges = append(edges, nodelist.EdgeEdges)
+	edges := make([]string, 0, 2)
+	if m.clearednode_list_nodes {
+		edges = append(edges, nodelist.EdgeNodeListNodes)
 	}
 	if m.cleareddocument {
 		edges = append(edges, nodelist.EdgeDocument)
@@ -6396,10 +7375,8 @@ func (m *NodeListMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *NodeListMutation) EdgeCleared(name string) bool {
 	switch name {
-	case nodelist.EdgeNodes:
-		return m.clearednodes
-	case nodelist.EdgeEdges:
-		return m.clearededges
+	case nodelist.EdgeNodeListNodes:
+		return m.clearednode_list_nodes
 	case nodelist.EdgeDocument:
 		return m.cleareddocument
 	}
@@ -6421,11 +7398,8 @@ func (m *NodeListMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *NodeListMutation) ResetEdge(name string) error {
 	switch name {
-	case nodelist.EdgeNodes:
-		m.ResetNodes()
-		return nil
-	case nodelist.EdgeEdges:
-		m.ResetEdges()
+	case nodelist.EdgeNodeListNodes:
+		m.ResetNodeListNodes()
 		return nil
 	case nodelist.EdgeDocument:
 		m.ResetDocument()
@@ -6437,27 +7411,29 @@ func (m *NodeListMutation) ResetEdge(name string) error {
 // PersonMutation represents an operation that mutates the Person nodes in the graph.
 type PersonMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *int
-	name                 *string
-	is_org               *bool
-	email                *string
-	url                  *string
-	phone                *string
-	clearedFields        map[string]struct{}
-	contact_owner        *int
-	clearedcontact_owner bool
-	contacts             map[int]struct{}
-	removedcontacts      map[int]struct{}
-	clearedcontacts      bool
-	metadata             *string
-	clearedmetadata      bool
-	node                 *string
-	clearednode          bool
-	done                 bool
-	oldValue             func(context.Context) (*Person, error)
-	predicates           []predicate.Person
+	op                     Op
+	typ                    string
+	id                     *int
+	name                   *string
+	is_org                 *bool
+	email                  *string
+	url                    *string
+	phone                  *string
+	contacts               *[]*sbom.Person
+	appendcontacts         []*sbom.Person
+	clearedFields          map[string]struct{}
+	contact_owner          *int
+	clearedcontact_owner   bool
+	person_contacts        map[int]struct{}
+	removedperson_contacts map[int]struct{}
+	clearedperson_contacts bool
+	metadata               *string
+	clearedmetadata        bool
+	node                   *string
+	clearednode            bool
+	done                   bool
+	oldValue               func(context.Context) (*Person, error)
+	predicates             []predicate.Person
 }
 
 var _ ent.Mutation = (*PersonMutation)(nil)
@@ -6738,6 +7714,57 @@ func (m *PersonMutation) ResetPhone() {
 	m.phone = nil
 }
 
+// SetContacts sets the "contacts" field.
+func (m *PersonMutation) SetContacts(s []*sbom.Person) {
+	m.contacts = &s
+	m.appendcontacts = nil
+}
+
+// Contacts returns the value of the "contacts" field in the mutation.
+func (m *PersonMutation) Contacts() (r []*sbom.Person, exists bool) {
+	v := m.contacts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContacts returns the old "contacts" field's value of the Person entity.
+// If the Person object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PersonMutation) OldContacts(ctx context.Context) (v []*sbom.Person, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContacts is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContacts requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContacts: %w", err)
+	}
+	return oldValue.Contacts, nil
+}
+
+// AppendContacts adds s to the "contacts" field.
+func (m *PersonMutation) AppendContacts(s []*sbom.Person) {
+	m.appendcontacts = append(m.appendcontacts, s...)
+}
+
+// AppendedContacts returns the list of values that were appended to the "contacts" field in this mutation.
+func (m *PersonMutation) AppendedContacts() ([]*sbom.Person, bool) {
+	if len(m.appendcontacts) == 0 {
+		return nil, false
+	}
+	return m.appendcontacts, true
+}
+
+// ResetContacts resets all changes to the "contacts" field.
+func (m *PersonMutation) ResetContacts() {
+	m.contacts = nil
+	m.appendcontacts = nil
+}
+
 // SetContactOwnerID sets the "contact_owner" edge to the Person entity by id.
 func (m *PersonMutation) SetContactOwnerID(id int) {
 	m.contact_owner = &id
@@ -6777,58 +7804,58 @@ func (m *PersonMutation) ResetContactOwner() {
 	m.clearedcontact_owner = false
 }
 
-// AddContactIDs adds the "contacts" edge to the Person entity by ids.
-func (m *PersonMutation) AddContactIDs(ids ...int) {
-	if m.contacts == nil {
-		m.contacts = make(map[int]struct{})
+// AddPersonContactIDs adds the "person_contacts" edge to the Person entity by ids.
+func (m *PersonMutation) AddPersonContactIDs(ids ...int) {
+	if m.person_contacts == nil {
+		m.person_contacts = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.contacts[ids[i]] = struct{}{}
+		m.person_contacts[ids[i]] = struct{}{}
 	}
 }
 
-// ClearContacts clears the "contacts" edge to the Person entity.
-func (m *PersonMutation) ClearContacts() {
-	m.clearedcontacts = true
+// ClearPersonContacts clears the "person_contacts" edge to the Person entity.
+func (m *PersonMutation) ClearPersonContacts() {
+	m.clearedperson_contacts = true
 }
 
-// ContactsCleared reports if the "contacts" edge to the Person entity was cleared.
-func (m *PersonMutation) ContactsCleared() bool {
-	return m.clearedcontacts
+// PersonContactsCleared reports if the "person_contacts" edge to the Person entity was cleared.
+func (m *PersonMutation) PersonContactsCleared() bool {
+	return m.clearedperson_contacts
 }
 
-// RemoveContactIDs removes the "contacts" edge to the Person entity by IDs.
-func (m *PersonMutation) RemoveContactIDs(ids ...int) {
-	if m.removedcontacts == nil {
-		m.removedcontacts = make(map[int]struct{})
+// RemovePersonContactIDs removes the "person_contacts" edge to the Person entity by IDs.
+func (m *PersonMutation) RemovePersonContactIDs(ids ...int) {
+	if m.removedperson_contacts == nil {
+		m.removedperson_contacts = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.contacts, ids[i])
-		m.removedcontacts[ids[i]] = struct{}{}
+		delete(m.person_contacts, ids[i])
+		m.removedperson_contacts[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedContacts returns the removed IDs of the "contacts" edge to the Person entity.
-func (m *PersonMutation) RemovedContactsIDs() (ids []int) {
-	for id := range m.removedcontacts {
+// RemovedPersonContacts returns the removed IDs of the "person_contacts" edge to the Person entity.
+func (m *PersonMutation) RemovedPersonContactsIDs() (ids []int) {
+	for id := range m.removedperson_contacts {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ContactsIDs returns the "contacts" edge IDs in the mutation.
-func (m *PersonMutation) ContactsIDs() (ids []int) {
-	for id := range m.contacts {
+// PersonContactsIDs returns the "person_contacts" edge IDs in the mutation.
+func (m *PersonMutation) PersonContactsIDs() (ids []int) {
+	for id := range m.person_contacts {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetContacts resets all changes to the "contacts" edge.
-func (m *PersonMutation) ResetContacts() {
-	m.contacts = nil
-	m.clearedcontacts = false
-	m.removedcontacts = nil
+// ResetPersonContacts resets all changes to the "person_contacts" edge.
+func (m *PersonMutation) ResetPersonContacts() {
+	m.person_contacts = nil
+	m.clearedperson_contacts = false
+	m.removedperson_contacts = nil
 }
 
 // SetMetadataID sets the "metadata" edge to the Metadata entity by id.
@@ -6943,7 +7970,7 @@ func (m *PersonMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PersonMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.name != nil {
 		fields = append(fields, person.FieldName)
 	}
@@ -6958,6 +7985,9 @@ func (m *PersonMutation) Fields() []string {
 	}
 	if m.phone != nil {
 		fields = append(fields, person.FieldPhone)
+	}
+	if m.contacts != nil {
+		fields = append(fields, person.FieldContacts)
 	}
 	return fields
 }
@@ -6977,6 +8007,8 @@ func (m *PersonMutation) Field(name string) (ent.Value, bool) {
 		return m.URL()
 	case person.FieldPhone:
 		return m.Phone()
+	case person.FieldContacts:
+		return m.Contacts()
 	}
 	return nil, false
 }
@@ -6996,6 +8028,8 @@ func (m *PersonMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldURL(ctx)
 	case person.FieldPhone:
 		return m.OldPhone(ctx)
+	case person.FieldContacts:
+		return m.OldContacts(ctx)
 	}
 	return nil, fmt.Errorf("unknown Person field %s", name)
 }
@@ -7039,6 +8073,13 @@ func (m *PersonMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPhone(v)
+		return nil
+	case person.FieldContacts:
+		v, ok := value.([]*sbom.Person)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContacts(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Person field %s", name)
@@ -7104,6 +8145,9 @@ func (m *PersonMutation) ResetField(name string) error {
 	case person.FieldPhone:
 		m.ResetPhone()
 		return nil
+	case person.FieldContacts:
+		m.ResetContacts()
+		return nil
 	}
 	return fmt.Errorf("unknown Person field %s", name)
 }
@@ -7114,8 +8158,8 @@ func (m *PersonMutation) AddedEdges() []string {
 	if m.contact_owner != nil {
 		edges = append(edges, person.EdgeContactOwner)
 	}
-	if m.contacts != nil {
-		edges = append(edges, person.EdgeContacts)
+	if m.person_contacts != nil {
+		edges = append(edges, person.EdgePersonContacts)
 	}
 	if m.metadata != nil {
 		edges = append(edges, person.EdgeMetadata)
@@ -7134,9 +8178,9 @@ func (m *PersonMutation) AddedIDs(name string) []ent.Value {
 		if id := m.contact_owner; id != nil {
 			return []ent.Value{*id}
 		}
-	case person.EdgeContacts:
-		ids := make([]ent.Value, 0, len(m.contacts))
-		for id := range m.contacts {
+	case person.EdgePersonContacts:
+		ids := make([]ent.Value, 0, len(m.person_contacts))
+		for id := range m.person_contacts {
 			ids = append(ids, id)
 		}
 		return ids
@@ -7155,8 +8199,8 @@ func (m *PersonMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PersonMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.removedcontacts != nil {
-		edges = append(edges, person.EdgeContacts)
+	if m.removedperson_contacts != nil {
+		edges = append(edges, person.EdgePersonContacts)
 	}
 	return edges
 }
@@ -7165,9 +8209,9 @@ func (m *PersonMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *PersonMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case person.EdgeContacts:
-		ids := make([]ent.Value, 0, len(m.removedcontacts))
-		for id := range m.removedcontacts {
+	case person.EdgePersonContacts:
+		ids := make([]ent.Value, 0, len(m.removedperson_contacts))
+		for id := range m.removedperson_contacts {
 			ids = append(ids, id)
 		}
 		return ids
@@ -7181,8 +8225,8 @@ func (m *PersonMutation) ClearedEdges() []string {
 	if m.clearedcontact_owner {
 		edges = append(edges, person.EdgeContactOwner)
 	}
-	if m.clearedcontacts {
-		edges = append(edges, person.EdgeContacts)
+	if m.clearedperson_contacts {
+		edges = append(edges, person.EdgePersonContacts)
 	}
 	if m.clearedmetadata {
 		edges = append(edges, person.EdgeMetadata)
@@ -7199,8 +8243,8 @@ func (m *PersonMutation) EdgeCleared(name string) bool {
 	switch name {
 	case person.EdgeContactOwner:
 		return m.clearedcontact_owner
-	case person.EdgeContacts:
-		return m.clearedcontacts
+	case person.EdgePersonContacts:
+		return m.clearedperson_contacts
 	case person.EdgeMetadata:
 		return m.clearedmetadata
 	case person.EdgeNode:
@@ -7233,8 +8277,8 @@ func (m *PersonMutation) ResetEdge(name string) error {
 	case person.EdgeContactOwner:
 		m.ResetContactOwner()
 		return nil
-	case person.EdgeContacts:
-		m.ResetContacts()
+	case person.EdgePersonContacts:
+		m.ResetPersonContacts()
 		return nil
 	case person.EdgeMetadata:
 		m.ResetMetadata()

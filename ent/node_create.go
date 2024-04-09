@@ -28,6 +28,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/ent/edgetype"
 	"github.com/bom-squad/protobom/ent/externalreference"
 	"github.com/bom-squad/protobom/ent/hashesentry"
 	"github.com/bom-squad/protobom/ent/identifiersentry"
@@ -35,6 +36,7 @@ import (
 	"github.com/bom-squad/protobom/ent/nodelist"
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/purpose"
+	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // NodeCreate is the builder for creating a Node entity.
@@ -159,100 +161,151 @@ func (nc *NodeCreate) SetFileTypes(s []string) *NodeCreate {
 	return nc
 }
 
+// SetSuppliers sets the "suppliers" field.
+func (nc *NodeCreate) SetSuppliers(s []*sbom.Person) *NodeCreate {
+	nc.mutation.SetSuppliers(s)
+	return nc
+}
+
+// SetOriginators sets the "originators" field.
+func (nc *NodeCreate) SetOriginators(s []*sbom.Person) *NodeCreate {
+	nc.mutation.SetOriginators(s)
+	return nc
+}
+
+// SetExternalReferences sets the "external_references" field.
+func (nc *NodeCreate) SetExternalReferences(sr []*sbom.ExternalReference) *NodeCreate {
+	nc.mutation.SetExternalReferences(sr)
+	return nc
+}
+
+// SetHashes sets the "hashes" field.
+func (nc *NodeCreate) SetHashes(m map[int32]string) *NodeCreate {
+	nc.mutation.SetHashes(m)
+	return nc
+}
+
+// SetIdentifiers sets the "identifiers" field.
+func (nc *NodeCreate) SetIdentifiers(m map[int32]string) *NodeCreate {
+	nc.mutation.SetIdentifiers(m)
+	return nc
+}
+
+// SetPrimaryPurpose sets the "primary_purpose" field.
+func (nc *NodeCreate) SetPrimaryPurpose(s []sbom.Purpose) *NodeCreate {
+	nc.mutation.SetPrimaryPurpose(s)
+	return nc
+}
+
 // SetID sets the "id" field.
 func (nc *NodeCreate) SetID(s string) *NodeCreate {
 	nc.mutation.SetID(s)
 	return nc
 }
 
-// AddSupplierIDs adds the "suppliers" edge to the Person entity by IDs.
-func (nc *NodeCreate) AddSupplierIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddSupplierIDs(ids...)
+// AddNodeSupplierIDs adds the "node_suppliers" edge to the Person entity by IDs.
+func (nc *NodeCreate) AddNodeSupplierIDs(ids ...int) *NodeCreate {
+	nc.mutation.AddNodeSupplierIDs(ids...)
 	return nc
 }
 
-// AddSuppliers adds the "suppliers" edges to the Person entity.
-func (nc *NodeCreate) AddSuppliers(p ...*Person) *NodeCreate {
+// AddNodeSuppliers adds the "node_suppliers" edges to the Person entity.
+func (nc *NodeCreate) AddNodeSuppliers(p ...*Person) *NodeCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nc.AddSupplierIDs(ids...)
+	return nc.AddNodeSupplierIDs(ids...)
 }
 
-// AddOriginatorIDs adds the "originators" edge to the Person entity by IDs.
-func (nc *NodeCreate) AddOriginatorIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddOriginatorIDs(ids...)
+// AddNodeOriginatorIDs adds the "node_originators" edge to the Person entity by IDs.
+func (nc *NodeCreate) AddNodeOriginatorIDs(ids ...int) *NodeCreate {
+	nc.mutation.AddNodeOriginatorIDs(ids...)
 	return nc
 }
 
-// AddOriginators adds the "originators" edges to the Person entity.
-func (nc *NodeCreate) AddOriginators(p ...*Person) *NodeCreate {
+// AddNodeOriginators adds the "node_originators" edges to the Person entity.
+func (nc *NodeCreate) AddNodeOriginators(p ...*Person) *NodeCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nc.AddOriginatorIDs(ids...)
+	return nc.AddNodeOriginatorIDs(ids...)
 }
 
-// AddExternalReferenceIDs adds the "external_references" edge to the ExternalReference entity by IDs.
-func (nc *NodeCreate) AddExternalReferenceIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddExternalReferenceIDs(ids...)
+// AddNodeExternalReferenceIDs adds the "node_external_references" edge to the ExternalReference entity by IDs.
+func (nc *NodeCreate) AddNodeExternalReferenceIDs(ids ...int) *NodeCreate {
+	nc.mutation.AddNodeExternalReferenceIDs(ids...)
 	return nc
 }
 
-// AddExternalReferences adds the "external_references" edges to the ExternalReference entity.
-func (nc *NodeCreate) AddExternalReferences(e ...*ExternalReference) *NodeCreate {
+// AddNodeExternalReferences adds the "node_external_references" edges to the ExternalReference entity.
+func (nc *NodeCreate) AddNodeExternalReferences(e ...*ExternalReference) *NodeCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return nc.AddExternalReferenceIDs(ids...)
+	return nc.AddNodeExternalReferenceIDs(ids...)
 }
 
-// AddIdentifierIDs adds the "identifiers" edge to the IdentifiersEntry entity by IDs.
-func (nc *NodeCreate) AddIdentifierIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddIdentifierIDs(ids...)
+// AddNodeIdentifierIDs adds the "node_identifiers" edge to the IdentifiersEntry entity by IDs.
+func (nc *NodeCreate) AddNodeIdentifierIDs(ids ...int) *NodeCreate {
+	nc.mutation.AddNodeIdentifierIDs(ids...)
 	return nc
 }
 
-// AddIdentifiers adds the "identifiers" edges to the IdentifiersEntry entity.
-func (nc *NodeCreate) AddIdentifiers(i ...*IdentifiersEntry) *NodeCreate {
+// AddNodeIdentifiers adds the "node_identifiers" edges to the IdentifiersEntry entity.
+func (nc *NodeCreate) AddNodeIdentifiers(i ...*IdentifiersEntry) *NodeCreate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return nc.AddIdentifierIDs(ids...)
+	return nc.AddNodeIdentifierIDs(ids...)
 }
 
-// AddHashIDs adds the "hashes" edge to the HashesEntry entity by IDs.
-func (nc *NodeCreate) AddHashIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddHashIDs(ids...)
+// AddNodeHashIDs adds the "node_hashes" edge to the HashesEntry entity by IDs.
+func (nc *NodeCreate) AddNodeHashIDs(ids ...int) *NodeCreate {
+	nc.mutation.AddNodeHashIDs(ids...)
 	return nc
 }
 
-// AddHashes adds the "hashes" edges to the HashesEntry entity.
-func (nc *NodeCreate) AddHashes(h ...*HashesEntry) *NodeCreate {
+// AddNodeHashes adds the "node_hashes" edges to the HashesEntry entity.
+func (nc *NodeCreate) AddNodeHashes(h ...*HashesEntry) *NodeCreate {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return nc.AddHashIDs(ids...)
+	return nc.AddNodeHashIDs(ids...)
 }
 
-// AddPrimaryPurposeIDs adds the "primary_purpose" edge to the Purpose entity by IDs.
-func (nc *NodeCreate) AddPrimaryPurposeIDs(ids ...int) *NodeCreate {
-	nc.mutation.AddPrimaryPurposeIDs(ids...)
+// AddNodePrimaryPurposeIDs adds the "node_primary_purpose" edge to the Purpose entity by IDs.
+func (nc *NodeCreate) AddNodePrimaryPurposeIDs(ids ...int) *NodeCreate {
+	nc.mutation.AddNodePrimaryPurposeIDs(ids...)
 	return nc
 }
 
-// AddPrimaryPurpose adds the "primary_purpose" edges to the Purpose entity.
-func (nc *NodeCreate) AddPrimaryPurpose(p ...*Purpose) *NodeCreate {
+// AddNodePrimaryPurpose adds the "node_primary_purpose" edges to the Purpose entity.
+func (nc *NodeCreate) AddNodePrimaryPurpose(p ...*Purpose) *NodeCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return nc.AddPrimaryPurposeIDs(ids...)
+	return nc.AddNodePrimaryPurposeIDs(ids...)
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (nc *NodeCreate) AddNodeIDs(ids ...string) *NodeCreate {
+	nc.mutation.AddNodeIDs(ids...)
+	return nc
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (nc *NodeCreate) AddNodes(n ...*Node) *NodeCreate {
+	ids := make([]string, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return nc.AddNodeIDs(ids...)
 }
 
 // SetNodeListID sets the "node_list" edge to the NodeList entity by ID.
@@ -264,6 +317,21 @@ func (nc *NodeCreate) SetNodeListID(id int) *NodeCreate {
 // SetNodeList sets the "node_list" edge to the NodeList entity.
 func (nc *NodeCreate) SetNodeList(n *NodeList) *NodeCreate {
 	return nc.SetNodeListID(n.ID)
+}
+
+// AddEdgeTypeIDs adds the "edge_types" edge to the EdgeType entity by IDs.
+func (nc *NodeCreate) AddEdgeTypeIDs(ids ...int) *NodeCreate {
+	nc.mutation.AddEdgeTypeIDs(ids...)
+	return nc
+}
+
+// AddEdgeTypes adds the "edge_types" edges to the EdgeType entity.
+func (nc *NodeCreate) AddEdgeTypes(e ...*EdgeType) *NodeCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return nc.AddEdgeTypeIDs(ids...)
 }
 
 // Mutation returns the NodeMutation object of the builder.
@@ -361,6 +429,29 @@ func (nc *NodeCreate) check() error {
 	}
 	if _, ok := nc.mutation.FileTypes(); !ok {
 		return &ValidationError{Name: "file_types", err: errors.New(`ent: missing required field "Node.file_types"`)}
+	}
+	if _, ok := nc.mutation.Suppliers(); !ok {
+		return &ValidationError{Name: "suppliers", err: errors.New(`ent: missing required field "Node.suppliers"`)}
+	}
+	if _, ok := nc.mutation.Originators(); !ok {
+		return &ValidationError{Name: "originators", err: errors.New(`ent: missing required field "Node.originators"`)}
+	}
+	if _, ok := nc.mutation.ExternalReferences(); !ok {
+		return &ValidationError{Name: "external_references", err: errors.New(`ent: missing required field "Node.external_references"`)}
+	}
+	if _, ok := nc.mutation.Hashes(); !ok {
+		return &ValidationError{Name: "hashes", err: errors.New(`ent: missing required field "Node.hashes"`)}
+	}
+	if _, ok := nc.mutation.Identifiers(); !ok {
+		return &ValidationError{Name: "identifiers", err: errors.New(`ent: missing required field "Node.identifiers"`)}
+	}
+	if _, ok := nc.mutation.PrimaryPurpose(); !ok {
+		return &ValidationError{Name: "primary_purpose", err: errors.New(`ent: missing required field "Node.primary_purpose"`)}
+	}
+	if v, ok := nc.mutation.ID(); ok {
+		if err := node.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Node.id": %w`, err)}
+		}
 	}
 	if _, ok := nc.mutation.NodeListID(); !ok {
 		return &ValidationError{Name: "node_list", err: errors.New(`ent: missing required edge "Node.node_list"`)}
@@ -477,12 +568,36 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_spec.SetField(node.FieldFileTypes, field.TypeJSON, value)
 		_node.FileTypes = value
 	}
-	if nodes := nc.mutation.SuppliersIDs(); len(nodes) > 0 {
+	if value, ok := nc.mutation.Suppliers(); ok {
+		_spec.SetField(node.FieldSuppliers, field.TypeJSON, value)
+		_node.Suppliers = value
+	}
+	if value, ok := nc.mutation.Originators(); ok {
+		_spec.SetField(node.FieldOriginators, field.TypeJSON, value)
+		_node.Originators = value
+	}
+	if value, ok := nc.mutation.ExternalReferences(); ok {
+		_spec.SetField(node.FieldExternalReferences, field.TypeJSON, value)
+		_node.ExternalReferences = value
+	}
+	if value, ok := nc.mutation.Hashes(); ok {
+		_spec.SetField(node.FieldHashes, field.TypeJSON, value)
+		_node.Hashes = value
+	}
+	if value, ok := nc.mutation.Identifiers(); ok {
+		_spec.SetField(node.FieldIdentifiers, field.TypeJSON, value)
+		_node.Identifiers = value
+	}
+	if value, ok := nc.mutation.PrimaryPurpose(); ok {
+		_spec.SetField(node.FieldPrimaryPurpose, field.TypeJSON, value)
+		_node.PrimaryPurpose = value
+	}
+	if nodes := nc.mutation.NodeSuppliersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.SuppliersTable,
-			Columns: []string{node.SuppliersColumn},
+			Table:   node.NodeSuppliersTable,
+			Columns: []string{node.NodeSuppliersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -493,12 +608,12 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.OriginatorsIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.NodeOriginatorsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.OriginatorsTable,
-			Columns: []string{node.OriginatorsColumn},
+			Table:   node.NodeOriginatorsTable,
+			Columns: []string{node.NodeOriginatorsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -509,12 +624,12 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.ExternalReferencesIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.NodeExternalReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.ExternalReferencesTable,
-			Columns: []string{node.ExternalReferencesColumn},
+			Table:   node.NodeExternalReferencesTable,
+			Columns: []string{node.NodeExternalReferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(externalreference.FieldID, field.TypeInt),
@@ -525,12 +640,12 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.IdentifiersIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.NodeIdentifiersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.IdentifiersTable,
-			Columns: []string{node.IdentifiersColumn},
+			Table:   node.NodeIdentifiersTable,
+			Columns: []string{node.NodeIdentifiersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(identifiersentry.FieldID, field.TypeInt),
@@ -541,12 +656,12 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.HashesIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.NodeHashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   node.HashesTable,
-			Columns: []string{node.HashesColumn},
+			Table:   node.NodeHashesTable,
+			Columns: []string{node.NodeHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -557,15 +672,31 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.PrimaryPurposeIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.NodePrimaryPurposeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   node.PrimaryPurposeTable,
-			Columns: node.PrimaryPurposePrimaryKey,
+			Table:   node.NodePrimaryPurposeTable,
+			Columns: node.NodePrimaryPurposePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(purpose.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := nc.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   node.NodesTable,
+			Columns: node.NodesPrimaryKey,
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -587,7 +718,23 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.node_list_nodes = &nodes[0]
+		_node.node_list_node_list_nodes = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := nc.mutation.EdgeTypesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.EdgeTypesTable,
+			Columns: []string{node.EdgeTypesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(edgetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -867,6 +1014,78 @@ func (u *NodeUpsert) SetFileTypes(v []string) *NodeUpsert {
 // UpdateFileTypes sets the "file_types" field to the value that was provided on create.
 func (u *NodeUpsert) UpdateFileTypes() *NodeUpsert {
 	u.SetExcluded(node.FieldFileTypes)
+	return u
+}
+
+// SetSuppliers sets the "suppliers" field.
+func (u *NodeUpsert) SetSuppliers(v []*sbom.Person) *NodeUpsert {
+	u.Set(node.FieldSuppliers, v)
+	return u
+}
+
+// UpdateSuppliers sets the "suppliers" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateSuppliers() *NodeUpsert {
+	u.SetExcluded(node.FieldSuppliers)
+	return u
+}
+
+// SetOriginators sets the "originators" field.
+func (u *NodeUpsert) SetOriginators(v []*sbom.Person) *NodeUpsert {
+	u.Set(node.FieldOriginators, v)
+	return u
+}
+
+// UpdateOriginators sets the "originators" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateOriginators() *NodeUpsert {
+	u.SetExcluded(node.FieldOriginators)
+	return u
+}
+
+// SetExternalReferences sets the "external_references" field.
+func (u *NodeUpsert) SetExternalReferences(v []*sbom.ExternalReference) *NodeUpsert {
+	u.Set(node.FieldExternalReferences, v)
+	return u
+}
+
+// UpdateExternalReferences sets the "external_references" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateExternalReferences() *NodeUpsert {
+	u.SetExcluded(node.FieldExternalReferences)
+	return u
+}
+
+// SetHashes sets the "hashes" field.
+func (u *NodeUpsert) SetHashes(v map[int32]string) *NodeUpsert {
+	u.Set(node.FieldHashes, v)
+	return u
+}
+
+// UpdateHashes sets the "hashes" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateHashes() *NodeUpsert {
+	u.SetExcluded(node.FieldHashes)
+	return u
+}
+
+// SetIdentifiers sets the "identifiers" field.
+func (u *NodeUpsert) SetIdentifiers(v map[int32]string) *NodeUpsert {
+	u.Set(node.FieldIdentifiers, v)
+	return u
+}
+
+// UpdateIdentifiers sets the "identifiers" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateIdentifiers() *NodeUpsert {
+	u.SetExcluded(node.FieldIdentifiers)
+	return u
+}
+
+// SetPrimaryPurpose sets the "primary_purpose" field.
+func (u *NodeUpsert) SetPrimaryPurpose(v []sbom.Purpose) *NodeUpsert {
+	u.Set(node.FieldPrimaryPurpose, v)
+	return u
+}
+
+// UpdatePrimaryPurpose sets the "primary_purpose" field to the value that was provided on create.
+func (u *NodeUpsert) UpdatePrimaryPurpose() *NodeUpsert {
+	u.SetExcluded(node.FieldPrimaryPurpose)
 	return u
 }
 
@@ -1181,6 +1400,90 @@ func (u *NodeUpsertOne) SetFileTypes(v []string) *NodeUpsertOne {
 func (u *NodeUpsertOne) UpdateFileTypes() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateFileTypes()
+	})
+}
+
+// SetSuppliers sets the "suppliers" field.
+func (u *NodeUpsertOne) SetSuppliers(v []*sbom.Person) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetSuppliers(v)
+	})
+}
+
+// UpdateSuppliers sets the "suppliers" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateSuppliers() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateSuppliers()
+	})
+}
+
+// SetOriginators sets the "originators" field.
+func (u *NodeUpsertOne) SetOriginators(v []*sbom.Person) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetOriginators(v)
+	})
+}
+
+// UpdateOriginators sets the "originators" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateOriginators() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateOriginators()
+	})
+}
+
+// SetExternalReferences sets the "external_references" field.
+func (u *NodeUpsertOne) SetExternalReferences(v []*sbom.ExternalReference) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetExternalReferences(v)
+	})
+}
+
+// UpdateExternalReferences sets the "external_references" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateExternalReferences() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateExternalReferences()
+	})
+}
+
+// SetHashes sets the "hashes" field.
+func (u *NodeUpsertOne) SetHashes(v map[int32]string) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetHashes(v)
+	})
+}
+
+// UpdateHashes sets the "hashes" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateHashes() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateHashes()
+	})
+}
+
+// SetIdentifiers sets the "identifiers" field.
+func (u *NodeUpsertOne) SetIdentifiers(v map[int32]string) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetIdentifiers(v)
+	})
+}
+
+// UpdateIdentifiers sets the "identifiers" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateIdentifiers() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateIdentifiers()
+	})
+}
+
+// SetPrimaryPurpose sets the "primary_purpose" field.
+func (u *NodeUpsertOne) SetPrimaryPurpose(v []sbom.Purpose) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetPrimaryPurpose(v)
+	})
+}
+
+// UpdatePrimaryPurpose sets the "primary_purpose" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdatePrimaryPurpose() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdatePrimaryPurpose()
 	})
 }
 
@@ -1661,6 +1964,90 @@ func (u *NodeUpsertBulk) SetFileTypes(v []string) *NodeUpsertBulk {
 func (u *NodeUpsertBulk) UpdateFileTypes() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateFileTypes()
+	})
+}
+
+// SetSuppliers sets the "suppliers" field.
+func (u *NodeUpsertBulk) SetSuppliers(v []*sbom.Person) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetSuppliers(v)
+	})
+}
+
+// UpdateSuppliers sets the "suppliers" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateSuppliers() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateSuppliers()
+	})
+}
+
+// SetOriginators sets the "originators" field.
+func (u *NodeUpsertBulk) SetOriginators(v []*sbom.Person) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetOriginators(v)
+	})
+}
+
+// UpdateOriginators sets the "originators" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateOriginators() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateOriginators()
+	})
+}
+
+// SetExternalReferences sets the "external_references" field.
+func (u *NodeUpsertBulk) SetExternalReferences(v []*sbom.ExternalReference) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetExternalReferences(v)
+	})
+}
+
+// UpdateExternalReferences sets the "external_references" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateExternalReferences() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateExternalReferences()
+	})
+}
+
+// SetHashes sets the "hashes" field.
+func (u *NodeUpsertBulk) SetHashes(v map[int32]string) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetHashes(v)
+	})
+}
+
+// UpdateHashes sets the "hashes" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateHashes() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateHashes()
+	})
+}
+
+// SetIdentifiers sets the "identifiers" field.
+func (u *NodeUpsertBulk) SetIdentifiers(v map[int32]string) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetIdentifiers(v)
+	})
+}
+
+// UpdateIdentifiers sets the "identifiers" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateIdentifiers() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateIdentifiers()
+	})
+}
+
+// SetPrimaryPurpose sets the "primary_purpose" field.
+func (u *NodeUpsertBulk) SetPrimaryPurpose(v []sbom.Purpose) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetPrimaryPurpose(v)
+	})
+}
+
+// UpdatePrimaryPurpose sets the "primary_purpose" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdatePrimaryPurpose() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdatePrimaryPurpose()
 	})
 }
 

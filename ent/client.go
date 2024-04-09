@@ -33,7 +33,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/documenttype"
-	"github.com/bom-squad/protobom/ent/edge"
+	"github.com/bom-squad/protobom/ent/edgetype"
 	"github.com/bom-squad/protobom/ent/externalreference"
 	"github.com/bom-squad/protobom/ent/hashesentry"
 	"github.com/bom-squad/protobom/ent/identifiersentry"
@@ -54,8 +54,8 @@ type Client struct {
 	Document *DocumentClient
 	// DocumentType is the client for interacting with the DocumentType builders.
 	DocumentType *DocumentTypeClient
-	// Edge is the client for interacting with the Edge builders.
-	Edge *EdgeClient
+	// EdgeType is the client for interacting with the EdgeType builders.
+	EdgeType *EdgeTypeClient
 	// ExternalReference is the client for interacting with the ExternalReference builders.
 	ExternalReference *ExternalReferenceClient
 	// HashesEntry is the client for interacting with the HashesEntry builders.
@@ -87,7 +87,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Document = NewDocumentClient(c.config)
 	c.DocumentType = NewDocumentTypeClient(c.config)
-	c.Edge = NewEdgeClient(c.config)
+	c.EdgeType = NewEdgeTypeClient(c.config)
 	c.ExternalReference = NewExternalReferenceClient(c.config)
 	c.HashesEntry = NewHashesEntryClient(c.config)
 	c.IdentifiersEntry = NewIdentifiersEntryClient(c.config)
@@ -191,7 +191,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:            cfg,
 		Document:          NewDocumentClient(cfg),
 		DocumentType:      NewDocumentTypeClient(cfg),
-		Edge:              NewEdgeClient(cfg),
+		EdgeType:          NewEdgeTypeClient(cfg),
 		ExternalReference: NewExternalReferenceClient(cfg),
 		HashesEntry:       NewHashesEntryClient(cfg),
 		IdentifiersEntry:  NewIdentifiersEntryClient(cfg),
@@ -222,7 +222,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:            cfg,
 		Document:          NewDocumentClient(cfg),
 		DocumentType:      NewDocumentTypeClient(cfg),
-		Edge:              NewEdgeClient(cfg),
+		EdgeType:          NewEdgeTypeClient(cfg),
 		ExternalReference: NewExternalReferenceClient(cfg),
 		HashesEntry:       NewHashesEntryClient(cfg),
 		IdentifiersEntry:  NewIdentifiersEntryClient(cfg),
@@ -261,7 +261,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Document, c.DocumentType, c.Edge, c.ExternalReference, c.HashesEntry,
+		c.Document, c.DocumentType, c.EdgeType, c.ExternalReference, c.HashesEntry,
 		c.IdentifiersEntry, c.Metadata, c.Node, c.NodeList, c.Person, c.Purpose,
 		c.Tool,
 	} {
@@ -273,7 +273,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Document, c.DocumentType, c.Edge, c.ExternalReference, c.HashesEntry,
+		c.Document, c.DocumentType, c.EdgeType, c.ExternalReference, c.HashesEntry,
 		c.IdentifiersEntry, c.Metadata, c.Node, c.NodeList, c.Person, c.Purpose,
 		c.Tool,
 	} {
@@ -288,8 +288,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Document.mutate(ctx, m)
 	case *DocumentTypeMutation:
 		return c.DocumentType.mutate(ctx, m)
-	case *EdgeMutation:
-		return c.Edge.mutate(ctx, m)
+	case *EdgeTypeMutation:
+		return c.EdgeType.mutate(ctx, m)
 	case *ExternalReferenceMutation:
 		return c.ExternalReference.mutate(ctx, m)
 	case *HashesEntryMutation:
@@ -421,15 +421,15 @@ func (c *DocumentClient) GetX(ctx context.Context, id int) *Document {
 	return obj
 }
 
-// QueryMetadata queries the metadata edge of a Document.
-func (c *DocumentClient) QueryMetadata(d *Document) *MetadataQuery {
+// QueryDocumentMetadata queries the document_metadata edge of a Document.
+func (c *DocumentClient) QueryDocumentMetadata(d *Document) *MetadataQuery {
 	query := (&MetadataClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := d.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(document.Table, document.FieldID, id),
 			sqlgraph.To(metadata.Table, metadata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, document.MetadataTable, document.MetadataColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, document.DocumentMetadataTable, document.DocumentMetadataColumn),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil
@@ -437,15 +437,15 @@ func (c *DocumentClient) QueryMetadata(d *Document) *MetadataQuery {
 	return query
 }
 
-// QueryNodeList queries the node_list edge of a Document.
-func (c *DocumentClient) QueryNodeList(d *Document) *NodeListQuery {
+// QueryDocumentNodeList queries the document_node_list edge of a Document.
+func (c *DocumentClient) QueryDocumentNodeList(d *Document) *NodeListQuery {
 	query := (&NodeListClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := d.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(document.Table, document.FieldID, id),
 			sqlgraph.To(nodelist.Table, nodelist.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, document.NodeListTable, document.NodeListColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, document.DocumentNodeListTable, document.DocumentNodeListColumn),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil
@@ -627,107 +627,107 @@ func (c *DocumentTypeClient) mutate(ctx context.Context, m *DocumentTypeMutation
 	}
 }
 
-// EdgeClient is a client for the Edge schema.
-type EdgeClient struct {
+// EdgeTypeClient is a client for the EdgeType schema.
+type EdgeTypeClient struct {
 	config
 }
 
-// NewEdgeClient returns a client for the Edge from the given config.
-func NewEdgeClient(c config) *EdgeClient {
-	return &EdgeClient{config: c}
+// NewEdgeTypeClient returns a client for the EdgeType from the given config.
+func NewEdgeTypeClient(c config) *EdgeTypeClient {
+	return &EdgeTypeClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `edge.Hooks(f(g(h())))`.
-func (c *EdgeClient) Use(hooks ...Hook) {
-	c.hooks.Edge = append(c.hooks.Edge, hooks...)
+// A call to `Use(f, g, h)` equals to `edgetype.Hooks(f(g(h())))`.
+func (c *EdgeTypeClient) Use(hooks ...Hook) {
+	c.hooks.EdgeType = append(c.hooks.EdgeType, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `edge.Intercept(f(g(h())))`.
-func (c *EdgeClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Edge = append(c.inters.Edge, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `edgetype.Intercept(f(g(h())))`.
+func (c *EdgeTypeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EdgeType = append(c.inters.EdgeType, interceptors...)
 }
 
-// Create returns a builder for creating a Edge entity.
-func (c *EdgeClient) Create() *EdgeCreate {
-	mutation := newEdgeMutation(c.config, OpCreate)
-	return &EdgeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a EdgeType entity.
+func (c *EdgeTypeClient) Create() *EdgeTypeCreate {
+	mutation := newEdgeTypeMutation(c.config, OpCreate)
+	return &EdgeTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Edge entities.
-func (c *EdgeClient) CreateBulk(builders ...*EdgeCreate) *EdgeCreateBulk {
-	return &EdgeCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of EdgeType entities.
+func (c *EdgeTypeClient) CreateBulk(builders ...*EdgeTypeCreate) *EdgeTypeCreateBulk {
+	return &EdgeTypeCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *EdgeClient) MapCreateBulk(slice any, setFunc func(*EdgeCreate, int)) *EdgeCreateBulk {
+func (c *EdgeTypeClient) MapCreateBulk(slice any, setFunc func(*EdgeTypeCreate, int)) *EdgeTypeCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &EdgeCreateBulk{err: fmt.Errorf("calling to EdgeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &EdgeTypeCreateBulk{err: fmt.Errorf("calling to EdgeTypeClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*EdgeCreate, rv.Len())
+	builders := make([]*EdgeTypeCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &EdgeCreateBulk{config: c.config, builders: builders}
+	return &EdgeTypeCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Edge.
-func (c *EdgeClient) Update() *EdgeUpdate {
-	mutation := newEdgeMutation(c.config, OpUpdate)
-	return &EdgeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for EdgeType.
+func (c *EdgeTypeClient) Update() *EdgeTypeUpdate {
+	mutation := newEdgeTypeMutation(c.config, OpUpdate)
+	return &EdgeTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *EdgeClient) UpdateOne(e *Edge) *EdgeUpdateOne {
-	mutation := newEdgeMutation(c.config, OpUpdateOne, withEdge(e))
-	return &EdgeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EdgeTypeClient) UpdateOne(et *EdgeType) *EdgeTypeUpdateOne {
+	mutation := newEdgeTypeMutation(c.config, OpUpdateOne, withEdgeType(et))
+	return &EdgeTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EdgeClient) UpdateOneID(id int) *EdgeUpdateOne {
-	mutation := newEdgeMutation(c.config, OpUpdateOne, withEdgeID(id))
-	return &EdgeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EdgeTypeClient) UpdateOneID(id int) *EdgeTypeUpdateOne {
+	mutation := newEdgeTypeMutation(c.config, OpUpdateOne, withEdgeTypeID(id))
+	return &EdgeTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Edge.
-func (c *EdgeClient) Delete() *EdgeDelete {
-	mutation := newEdgeMutation(c.config, OpDelete)
-	return &EdgeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for EdgeType.
+func (c *EdgeTypeClient) Delete() *EdgeTypeDelete {
+	mutation := newEdgeTypeMutation(c.config, OpDelete)
+	return &EdgeTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *EdgeClient) DeleteOne(e *Edge) *EdgeDeleteOne {
-	return c.DeleteOneID(e.ID)
+func (c *EdgeTypeClient) DeleteOne(et *EdgeType) *EdgeTypeDeleteOne {
+	return c.DeleteOneID(et.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *EdgeClient) DeleteOneID(id int) *EdgeDeleteOne {
-	builder := c.Delete().Where(edge.ID(id))
+func (c *EdgeTypeClient) DeleteOneID(id int) *EdgeTypeDeleteOne {
+	builder := c.Delete().Where(edgetype.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &EdgeDeleteOne{builder}
+	return &EdgeTypeDeleteOne{builder}
 }
 
-// Query returns a query builder for Edge.
-func (c *EdgeClient) Query() *EdgeQuery {
-	return &EdgeQuery{
+// Query returns a query builder for EdgeType.
+func (c *EdgeTypeClient) Query() *EdgeTypeQuery {
+	return &EdgeTypeQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeEdge},
+		ctx:    &QueryContext{Type: TypeEdgeType},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Edge entity by its id.
-func (c *EdgeClient) Get(ctx context.Context, id int) (*Edge, error) {
-	return c.Query().Where(edge.ID(id)).Only(ctx)
+// Get returns a EdgeType entity by its id.
+func (c *EdgeTypeClient) Get(ctx context.Context, id int) (*EdgeType, error) {
+	return c.Query().Where(edgetype.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EdgeClient) GetX(ctx context.Context, id int) *Edge {
+func (c *EdgeTypeClient) GetX(ctx context.Context, id int) *EdgeType {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -735,44 +735,60 @@ func (c *EdgeClient) GetX(ctx context.Context, id int) *Edge {
 	return obj
 }
 
-// QueryNodeList queries the node_list edge of a Edge.
-func (c *EdgeClient) QueryNodeList(e *Edge) *NodeListQuery {
-	query := (&NodeListClient{config: c.config}).Query()
+// QueryFrom queries the from edge of a EdgeType.
+func (c *EdgeTypeClient) QueryFrom(et *EdgeType) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
+		id := et.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(edge.Table, edge.FieldID, id),
-			sqlgraph.To(nodelist.Table, nodelist.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, edge.NodeListTable, edge.NodeListColumn),
+			sqlgraph.From(edgetype.Table, edgetype.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, edgetype.FromTable, edgetype.FromColumn),
 		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(et.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTo queries the to edge of a EdgeType.
+func (c *EdgeTypeClient) QueryTo(et *EdgeType) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := et.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(edgetype.Table, edgetype.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, edgetype.ToTable, edgetype.ToColumn),
+		)
+		fromV = sqlgraph.Neighbors(et.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *EdgeClient) Hooks() []Hook {
-	return c.hooks.Edge
+func (c *EdgeTypeClient) Hooks() []Hook {
+	return c.hooks.EdgeType
 }
 
 // Interceptors returns the client interceptors.
-func (c *EdgeClient) Interceptors() []Interceptor {
-	return c.inters.Edge
+func (c *EdgeTypeClient) Interceptors() []Interceptor {
+	return c.inters.EdgeType
 }
 
-func (c *EdgeClient) mutate(ctx context.Context, m *EdgeMutation) (Value, error) {
+func (c *EdgeTypeClient) mutate(ctx context.Context, m *EdgeTypeMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&EdgeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EdgeTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&EdgeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EdgeTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&EdgeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EdgeTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&EdgeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&EdgeTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Edge mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown EdgeType mutation op: %q", m.Op())
 	}
 }
 
@@ -884,15 +900,15 @@ func (c *ExternalReferenceClient) GetX(ctx context.Context, id int) *ExternalRef
 	return obj
 }
 
-// QueryHashes queries the hashes edge of a ExternalReference.
-func (c *ExternalReferenceClient) QueryHashes(er *ExternalReference) *HashesEntryQuery {
+// QueryExternalReferenceHashes queries the external_reference_hashes edge of a ExternalReference.
+func (c *ExternalReferenceClient) QueryExternalReferenceHashes(er *ExternalReference) *HashesEntryQuery {
 	query := (&HashesEntryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := er.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(externalreference.Table, externalreference.FieldID, id),
 			sqlgraph.To(hashesentry.Table, hashesentry.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, externalreference.HashesTable, externalreference.HashesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, externalreference.ExternalReferenceHashesTable, externalreference.ExternalReferenceHashesColumn),
 		)
 		fromV = sqlgraph.Neighbors(er.driver.Dialect(), step)
 		return fromV, nil
@@ -900,15 +916,15 @@ func (c *ExternalReferenceClient) QueryHashes(er *ExternalReference) *HashesEntr
 	return query
 }
 
-// QueryNodes queries the nodes edge of a ExternalReference.
-func (c *ExternalReferenceClient) QueryNodes(er *ExternalReference) *NodeQuery {
+// QueryNode queries the node edge of a ExternalReference.
+func (c *ExternalReferenceClient) QueryNode(er *ExternalReference) *NodeQuery {
 	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := er.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(externalreference.Table, externalreference.FieldID, id),
 			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, externalreference.NodesTable, externalreference.NodesColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, externalreference.NodeTable, externalreference.NodeColumn),
 		)
 		fromV = sqlgraph.Neighbors(er.driver.Dialect(), step)
 		return fromV, nil
@@ -1363,15 +1379,15 @@ func (c *MetadataClient) GetX(ctx context.Context, id string) *Metadata {
 	return obj
 }
 
-// QueryTools queries the tools edge of a Metadata.
-func (c *MetadataClient) QueryTools(m *Metadata) *ToolQuery {
+// QueryMetadataTools queries the metadata_tools edge of a Metadata.
+func (c *MetadataClient) QueryMetadataTools(m *Metadata) *ToolQuery {
 	query := (&ToolClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(metadata.Table, metadata.FieldID, id),
 			sqlgraph.To(tool.Table, tool.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, metadata.ToolsTable, metadata.ToolsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, metadata.MetadataToolsTable, metadata.MetadataToolsColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -1379,15 +1395,15 @@ func (c *MetadataClient) QueryTools(m *Metadata) *ToolQuery {
 	return query
 }
 
-// QueryAuthors queries the authors edge of a Metadata.
-func (c *MetadataClient) QueryAuthors(m *Metadata) *PersonQuery {
+// QueryMetadataAuthors queries the metadata_authors edge of a Metadata.
+func (c *MetadataClient) QueryMetadataAuthors(m *Metadata) *PersonQuery {
 	query := (&PersonClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(metadata.Table, metadata.FieldID, id),
 			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, metadata.AuthorsTable, metadata.AuthorsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, metadata.MetadataAuthorsTable, metadata.MetadataAuthorsColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -1395,15 +1411,15 @@ func (c *MetadataClient) QueryAuthors(m *Metadata) *PersonQuery {
 	return query
 }
 
-// QueryDocumentTypes queries the document_types edge of a Metadata.
-func (c *MetadataClient) QueryDocumentTypes(m *Metadata) *DocumentTypeQuery {
+// QueryMetadataDocumentTypes queries the metadata_document_types edge of a Metadata.
+func (c *MetadataClient) QueryMetadataDocumentTypes(m *Metadata) *DocumentTypeQuery {
 	query := (&DocumentTypeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(metadata.Table, metadata.FieldID, id),
 			sqlgraph.To(documenttype.Table, documenttype.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, metadata.DocumentTypesTable, metadata.DocumentTypesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, metadata.MetadataDocumentTypesTable, metadata.MetadataDocumentTypesColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -1560,15 +1576,15 @@ func (c *NodeClient) GetX(ctx context.Context, id string) *Node {
 	return obj
 }
 
-// QuerySuppliers queries the suppliers edge of a Node.
-func (c *NodeClient) QuerySuppliers(n *Node) *PersonQuery {
+// QueryNodeSuppliers queries the node_suppliers edge of a Node.
+func (c *NodeClient) QueryNodeSuppliers(n *Node) *PersonQuery {
 	query := (&PersonClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.SuppliersTable, node.SuppliersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeSuppliersTable, node.NodeSuppliersColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1576,15 +1592,15 @@ func (c *NodeClient) QuerySuppliers(n *Node) *PersonQuery {
 	return query
 }
 
-// QueryOriginators queries the originators edge of a Node.
-func (c *NodeClient) QueryOriginators(n *Node) *PersonQuery {
+// QueryNodeOriginators queries the node_originators edge of a Node.
+func (c *NodeClient) QueryNodeOriginators(n *Node) *PersonQuery {
 	query := (&PersonClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.OriginatorsTable, node.OriginatorsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeOriginatorsTable, node.NodeOriginatorsColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1592,15 +1608,15 @@ func (c *NodeClient) QueryOriginators(n *Node) *PersonQuery {
 	return query
 }
 
-// QueryExternalReferences queries the external_references edge of a Node.
-func (c *NodeClient) QueryExternalReferences(n *Node) *ExternalReferenceQuery {
+// QueryNodeExternalReferences queries the node_external_references edge of a Node.
+func (c *NodeClient) QueryNodeExternalReferences(n *Node) *ExternalReferenceQuery {
 	query := (&ExternalReferenceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(externalreference.Table, externalreference.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.ExternalReferencesTable, node.ExternalReferencesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeExternalReferencesTable, node.NodeExternalReferencesColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1608,15 +1624,15 @@ func (c *NodeClient) QueryExternalReferences(n *Node) *ExternalReferenceQuery {
 	return query
 }
 
-// QueryIdentifiers queries the identifiers edge of a Node.
-func (c *NodeClient) QueryIdentifiers(n *Node) *IdentifiersEntryQuery {
+// QueryNodeIdentifiers queries the node_identifiers edge of a Node.
+func (c *NodeClient) QueryNodeIdentifiers(n *Node) *IdentifiersEntryQuery {
 	query := (&IdentifiersEntryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(identifiersentry.Table, identifiersentry.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.IdentifiersTable, node.IdentifiersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeIdentifiersTable, node.NodeIdentifiersColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1624,15 +1640,15 @@ func (c *NodeClient) QueryIdentifiers(n *Node) *IdentifiersEntryQuery {
 	return query
 }
 
-// QueryHashes queries the hashes edge of a Node.
-func (c *NodeClient) QueryHashes(n *Node) *HashesEntryQuery {
+// QueryNodeHashes queries the node_hashes edge of a Node.
+func (c *NodeClient) QueryNodeHashes(n *Node) *HashesEntryQuery {
 	query := (&HashesEntryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(hashesentry.Table, hashesentry.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.HashesTable, node.HashesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeHashesTable, node.NodeHashesColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1640,15 +1656,31 @@ func (c *NodeClient) QueryHashes(n *Node) *HashesEntryQuery {
 	return query
 }
 
-// QueryPrimaryPurpose queries the primary_purpose edge of a Node.
-func (c *NodeClient) QueryPrimaryPurpose(n *Node) *PurposeQuery {
+// QueryNodePrimaryPurpose queries the node_primary_purpose edge of a Node.
+func (c *NodeClient) QueryNodePrimaryPurpose(n *Node) *PurposeQuery {
 	query := (&PurposeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(purpose.Table, purpose.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, node.PrimaryPurposeTable, node.PrimaryPurposePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.NodePrimaryPurposeTable, node.NodePrimaryPurposePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNodes queries the nodes edge of a Node.
+func (c *NodeClient) QueryNodes(n *Node) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.NodesTable, node.NodesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1665,6 +1697,22 @@ func (c *NodeClient) QueryNodeList(n *Node) *NodeListQuery {
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(nodelist.Table, nodelist.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, node.NodeListTable, node.NodeListColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEdgeTypes queries the edge_types edge of a Node.
+func (c *NodeClient) QueryEdgeTypes(n *Node) *EdgeTypeQuery {
+	query := (&EdgeTypeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(edgetype.Table, edgetype.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, node.EdgeTypesTable, node.EdgeTypesColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -1805,31 +1853,15 @@ func (c *NodeListClient) GetX(ctx context.Context, id int) *NodeList {
 	return obj
 }
 
-// QueryNodes queries the nodes edge of a NodeList.
-func (c *NodeListClient) QueryNodes(nl *NodeList) *NodeQuery {
+// QueryNodeListNodes queries the node_list_nodes edge of a NodeList.
+func (c *NodeListClient) QueryNodeListNodes(nl *NodeList) *NodeQuery {
 	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := nl.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(nodelist.Table, nodelist.FieldID, id),
 			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, nodelist.NodesTable, nodelist.NodesColumn),
-		)
-		fromV = sqlgraph.Neighbors(nl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryEdges queries the edges edge of a NodeList.
-func (c *NodeListClient) QueryEdges(nl *NodeList) *EdgeQuery {
-	query := (&EdgeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := nl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(nodelist.Table, nodelist.FieldID, id),
-			sqlgraph.To(edge.Table, edge.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, nodelist.EdgesTable, nodelist.EdgesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, nodelist.NodeListNodesTable, nodelist.NodeListNodesColumn),
 		)
 		fromV = sqlgraph.Neighbors(nl.driver.Dialect(), step)
 		return fromV, nil
@@ -2002,15 +2034,15 @@ func (c *PersonClient) QueryContactOwner(pe *Person) *PersonQuery {
 	return query
 }
 
-// QueryContacts queries the contacts edge of a Person.
-func (c *PersonClient) QueryContacts(pe *Person) *PersonQuery {
+// QueryPersonContacts queries the person_contacts edge of a Person.
+func (c *PersonClient) QueryPersonContacts(pe *Person) *PersonQuery {
 	query := (&PersonClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pe.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(person.Table, person.FieldID, id),
 			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, person.ContactsTable, person.ContactsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, person.PersonContactsTable, person.PersonContactsColumn),
 		)
 		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
 		return fromV, nil
@@ -2376,11 +2408,12 @@ func (c *ToolClient) mutate(ctx context.Context, m *ToolMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Document, DocumentType, Edge, ExternalReference, HashesEntry, IdentifiersEntry,
-		Metadata, Node, NodeList, Person, Purpose, Tool []ent.Hook
+		Document, DocumentType, EdgeType, ExternalReference, HashesEntry,
+		IdentifiersEntry, Metadata, Node, NodeList, Person, Purpose, Tool []ent.Hook
 	}
 	inters struct {
-		Document, DocumentType, Edge, ExternalReference, HashesEntry, IdentifiersEntry,
-		Metadata, Node, NodeList, Person, Purpose, Tool []ent.Interceptor
+		Document, DocumentType, EdgeType, ExternalReference, HashesEntry,
+		IdentifiersEntry, Metadata, Node, NodeList, Person, Purpose,
+		Tool []ent.Interceptor
 	}
 )

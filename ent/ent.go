@@ -30,7 +30,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/documenttype"
-	"github.com/bom-squad/protobom/ent/edge"
+	"github.com/bom-squad/protobom/ent/edgetype"
 	"github.com/bom-squad/protobom/ent/externalreference"
 	"github.com/bom-squad/protobom/ent/hashesentry"
 	"github.com/bom-squad/protobom/ent/identifiersentry"
@@ -102,7 +102,7 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			document.Table:          document.ValidColumn,
 			documenttype.Table:      documenttype.ValidColumn,
-			edge.Table:              edge.ValidColumn,
+			edgetype.Table:          edgetype.ValidColumn,
 			externalreference.Table: externalreference.ValidColumn,
 			hashesentry.Table:       hashesentry.ValidColumn,
 			identifiersentry.Table:  identifiersentry.ValidColumn,

@@ -27,6 +27,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/bom-squad/protobom/ent/edgetype"
 	"github.com/bom-squad/protobom/ent/externalreference"
 	"github.com/bom-squad/protobom/ent/hashesentry"
 	"github.com/bom-squad/protobom/ent/identifiersentry"
@@ -40,18 +41,20 @@ import (
 // NodeQuery is the builder for querying Node entities.
 type NodeQuery struct {
 	config
-	ctx                    *QueryContext
-	order                  []node.OrderOption
-	inters                 []Interceptor
-	predicates             []predicate.Node
-	withSuppliers          *PersonQuery
-	withOriginators        *PersonQuery
-	withExternalReferences *ExternalReferenceQuery
-	withIdentifiers        *IdentifiersEntryQuery
-	withHashes             *HashesEntryQuery
-	withPrimaryPurpose     *PurposeQuery
-	withNodeList           *NodeListQuery
-	withFKs                bool
+	ctx                        *QueryContext
+	order                      []node.OrderOption
+	inters                     []Interceptor
+	predicates                 []predicate.Node
+	withNodeSuppliers          *PersonQuery
+	withNodeOriginators        *PersonQuery
+	withNodeExternalReferences *ExternalReferenceQuery
+	withNodeIdentifiers        *IdentifiersEntryQuery
+	withNodeHashes             *HashesEntryQuery
+	withNodePrimaryPurpose     *PurposeQuery
+	withNodes                  *NodeQuery
+	withNodeList               *NodeListQuery
+	withEdgeTypes              *EdgeTypeQuery
+	withFKs                    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -88,8 +91,8 @@ func (nq *NodeQuery) Order(o ...node.OrderOption) *NodeQuery {
 	return nq
 }
 
-// QuerySuppliers chains the current query on the "suppliers" edge.
-func (nq *NodeQuery) QuerySuppliers() *PersonQuery {
+// QueryNodeSuppliers chains the current query on the "node_suppliers" edge.
+func (nq *NodeQuery) QueryNodeSuppliers() *PersonQuery {
 	query := (&PersonClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
@@ -102,7 +105,7 @@ func (nq *NodeQuery) QuerySuppliers() *PersonQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.SuppliersTable, node.SuppliersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeSuppliersTable, node.NodeSuppliersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -110,8 +113,8 @@ func (nq *NodeQuery) QuerySuppliers() *PersonQuery {
 	return query
 }
 
-// QueryOriginators chains the current query on the "originators" edge.
-func (nq *NodeQuery) QueryOriginators() *PersonQuery {
+// QueryNodeOriginators chains the current query on the "node_originators" edge.
+func (nq *NodeQuery) QueryNodeOriginators() *PersonQuery {
 	query := (&PersonClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
@@ -124,7 +127,7 @@ func (nq *NodeQuery) QueryOriginators() *PersonQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.OriginatorsTable, node.OriginatorsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeOriginatorsTable, node.NodeOriginatorsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -132,8 +135,8 @@ func (nq *NodeQuery) QueryOriginators() *PersonQuery {
 	return query
 }
 
-// QueryExternalReferences chains the current query on the "external_references" edge.
-func (nq *NodeQuery) QueryExternalReferences() *ExternalReferenceQuery {
+// QueryNodeExternalReferences chains the current query on the "node_external_references" edge.
+func (nq *NodeQuery) QueryNodeExternalReferences() *ExternalReferenceQuery {
 	query := (&ExternalReferenceClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
@@ -146,7 +149,7 @@ func (nq *NodeQuery) QueryExternalReferences() *ExternalReferenceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(externalreference.Table, externalreference.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.ExternalReferencesTable, node.ExternalReferencesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeExternalReferencesTable, node.NodeExternalReferencesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -154,8 +157,8 @@ func (nq *NodeQuery) QueryExternalReferences() *ExternalReferenceQuery {
 	return query
 }
 
-// QueryIdentifiers chains the current query on the "identifiers" edge.
-func (nq *NodeQuery) QueryIdentifiers() *IdentifiersEntryQuery {
+// QueryNodeIdentifiers chains the current query on the "node_identifiers" edge.
+func (nq *NodeQuery) QueryNodeIdentifiers() *IdentifiersEntryQuery {
 	query := (&IdentifiersEntryClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
@@ -168,7 +171,7 @@ func (nq *NodeQuery) QueryIdentifiers() *IdentifiersEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(identifiersentry.Table, identifiersentry.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.IdentifiersTable, node.IdentifiersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeIdentifiersTable, node.NodeIdentifiersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -176,8 +179,8 @@ func (nq *NodeQuery) QueryIdentifiers() *IdentifiersEntryQuery {
 	return query
 }
 
-// QueryHashes chains the current query on the "hashes" edge.
-func (nq *NodeQuery) QueryHashes() *HashesEntryQuery {
+// QueryNodeHashes chains the current query on the "node_hashes" edge.
+func (nq *NodeQuery) QueryNodeHashes() *HashesEntryQuery {
 	query := (&HashesEntryClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
@@ -190,7 +193,7 @@ func (nq *NodeQuery) QueryHashes() *HashesEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(hashesentry.Table, hashesentry.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, node.HashesTable, node.HashesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodeHashesTable, node.NodeHashesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -198,8 +201,8 @@ func (nq *NodeQuery) QueryHashes() *HashesEntryQuery {
 	return query
 }
 
-// QueryPrimaryPurpose chains the current query on the "primary_purpose" edge.
-func (nq *NodeQuery) QueryPrimaryPurpose() *PurposeQuery {
+// QueryNodePrimaryPurpose chains the current query on the "node_primary_purpose" edge.
+func (nq *NodeQuery) QueryNodePrimaryPurpose() *PurposeQuery {
 	query := (&PurposeClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
@@ -212,7 +215,29 @@ func (nq *NodeQuery) QueryPrimaryPurpose() *PurposeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(purpose.Table, purpose.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, node.PrimaryPurposeTable, node.PrimaryPurposePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.NodePrimaryPurposeTable, node.NodePrimaryPurposePrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNodes chains the current query on the "nodes" edge.
+func (nq *NodeQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: nq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := nq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := nq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.NodesTable, node.NodesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -235,6 +260,28 @@ func (nq *NodeQuery) QueryNodeList() *NodeListQuery {
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(nodelist.Table, nodelist.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, node.NodeListTable, node.NodeListColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEdgeTypes chains the current query on the "edge_types" edge.
+func (nq *NodeQuery) QueryEdgeTypes() *EdgeTypeQuery {
+	query := (&EdgeTypeClient{config: nq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := nq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := nq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(edgetype.Table, edgetype.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, node.EdgeTypesTable, node.EdgeTypesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -429,87 +476,100 @@ func (nq *NodeQuery) Clone() *NodeQuery {
 		return nil
 	}
 	return &NodeQuery{
-		config:                 nq.config,
-		ctx:                    nq.ctx.Clone(),
-		order:                  append([]node.OrderOption{}, nq.order...),
-		inters:                 append([]Interceptor{}, nq.inters...),
-		predicates:             append([]predicate.Node{}, nq.predicates...),
-		withSuppliers:          nq.withSuppliers.Clone(),
-		withOriginators:        nq.withOriginators.Clone(),
-		withExternalReferences: nq.withExternalReferences.Clone(),
-		withIdentifiers:        nq.withIdentifiers.Clone(),
-		withHashes:             nq.withHashes.Clone(),
-		withPrimaryPurpose:     nq.withPrimaryPurpose.Clone(),
-		withNodeList:           nq.withNodeList.Clone(),
+		config:                     nq.config,
+		ctx:                        nq.ctx.Clone(),
+		order:                      append([]node.OrderOption{}, nq.order...),
+		inters:                     append([]Interceptor{}, nq.inters...),
+		predicates:                 append([]predicate.Node{}, nq.predicates...),
+		withNodeSuppliers:          nq.withNodeSuppliers.Clone(),
+		withNodeOriginators:        nq.withNodeOriginators.Clone(),
+		withNodeExternalReferences: nq.withNodeExternalReferences.Clone(),
+		withNodeIdentifiers:        nq.withNodeIdentifiers.Clone(),
+		withNodeHashes:             nq.withNodeHashes.Clone(),
+		withNodePrimaryPurpose:     nq.withNodePrimaryPurpose.Clone(),
+		withNodes:                  nq.withNodes.Clone(),
+		withNodeList:               nq.withNodeList.Clone(),
+		withEdgeTypes:              nq.withEdgeTypes.Clone(),
 		// clone intermediate query.
 		sql:  nq.sql.Clone(),
 		path: nq.path,
 	}
 }
 
-// WithSuppliers tells the query-builder to eager-load the nodes that are connected to
-// the "suppliers" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithSuppliers(opts ...func(*PersonQuery)) *NodeQuery {
+// WithNodeSuppliers tells the query-builder to eager-load the nodes that are connected to
+// the "node_suppliers" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithNodeSuppliers(opts ...func(*PersonQuery)) *NodeQuery {
 	query := (&PersonClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withSuppliers = query
+	nq.withNodeSuppliers = query
 	return nq
 }
 
-// WithOriginators tells the query-builder to eager-load the nodes that are connected to
-// the "originators" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithOriginators(opts ...func(*PersonQuery)) *NodeQuery {
+// WithNodeOriginators tells the query-builder to eager-load the nodes that are connected to
+// the "node_originators" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithNodeOriginators(opts ...func(*PersonQuery)) *NodeQuery {
 	query := (&PersonClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withOriginators = query
+	nq.withNodeOriginators = query
 	return nq
 }
 
-// WithExternalReferences tells the query-builder to eager-load the nodes that are connected to
-// the "external_references" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithExternalReferences(opts ...func(*ExternalReferenceQuery)) *NodeQuery {
+// WithNodeExternalReferences tells the query-builder to eager-load the nodes that are connected to
+// the "node_external_references" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithNodeExternalReferences(opts ...func(*ExternalReferenceQuery)) *NodeQuery {
 	query := (&ExternalReferenceClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withExternalReferences = query
+	nq.withNodeExternalReferences = query
 	return nq
 }
 
-// WithIdentifiers tells the query-builder to eager-load the nodes that are connected to
-// the "identifiers" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithIdentifiers(opts ...func(*IdentifiersEntryQuery)) *NodeQuery {
+// WithNodeIdentifiers tells the query-builder to eager-load the nodes that are connected to
+// the "node_identifiers" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithNodeIdentifiers(opts ...func(*IdentifiersEntryQuery)) *NodeQuery {
 	query := (&IdentifiersEntryClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withIdentifiers = query
+	nq.withNodeIdentifiers = query
 	return nq
 }
 
-// WithHashes tells the query-builder to eager-load the nodes that are connected to
-// the "hashes" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithHashes(opts ...func(*HashesEntryQuery)) *NodeQuery {
+// WithNodeHashes tells the query-builder to eager-load the nodes that are connected to
+// the "node_hashes" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithNodeHashes(opts ...func(*HashesEntryQuery)) *NodeQuery {
 	query := (&HashesEntryClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withHashes = query
+	nq.withNodeHashes = query
 	return nq
 }
 
-// WithPrimaryPurpose tells the query-builder to eager-load the nodes that are connected to
-// the "primary_purpose" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithPrimaryPurpose(opts ...func(*PurposeQuery)) *NodeQuery {
+// WithNodePrimaryPurpose tells the query-builder to eager-load the nodes that are connected to
+// the "node_primary_purpose" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithNodePrimaryPurpose(opts ...func(*PurposeQuery)) *NodeQuery {
 	query := (&PurposeClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withPrimaryPurpose = query
+	nq.withNodePrimaryPurpose = query
+	return nq
+}
+
+// WithNodes tells the query-builder to eager-load the nodes that are connected to
+// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithNodes(opts ...func(*NodeQuery)) *NodeQuery {
+	query := (&NodeClient{config: nq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	nq.withNodes = query
 	return nq
 }
 
@@ -521,6 +581,17 @@ func (nq *NodeQuery) WithNodeList(opts ...func(*NodeListQuery)) *NodeQuery {
 		opt(query)
 	}
 	nq.withNodeList = query
+	return nq
+}
+
+// WithEdgeTypes tells the query-builder to eager-load the nodes that are connected to
+// the "edge_types" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithEdgeTypes(opts ...func(*EdgeTypeQuery)) *NodeQuery {
+	query := (&EdgeTypeClient{config: nq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	nq.withEdgeTypes = query
 	return nq
 }
 
@@ -603,14 +674,16 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 		nodes       = []*Node{}
 		withFKs     = nq.withFKs
 		_spec       = nq.querySpec()
-		loadedTypes = [7]bool{
-			nq.withSuppliers != nil,
-			nq.withOriginators != nil,
-			nq.withExternalReferences != nil,
-			nq.withIdentifiers != nil,
-			nq.withHashes != nil,
-			nq.withPrimaryPurpose != nil,
+		loadedTypes = [9]bool{
+			nq.withNodeSuppliers != nil,
+			nq.withNodeOriginators != nil,
+			nq.withNodeExternalReferences != nil,
+			nq.withNodeIdentifiers != nil,
+			nq.withNodeHashes != nil,
+			nq.withNodePrimaryPurpose != nil,
+			nq.withNodes != nil,
 			nq.withNodeList != nil,
+			nq.withEdgeTypes != nil,
 		}
 	)
 	if nq.withNodeList != nil {
@@ -637,47 +710,54 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := nq.withSuppliers; query != nil {
-		if err := nq.loadSuppliers(ctx, query, nodes,
-			func(n *Node) { n.Edges.Suppliers = []*Person{} },
-			func(n *Node, e *Person) { n.Edges.Suppliers = append(n.Edges.Suppliers, e) }); err != nil {
+	if query := nq.withNodeSuppliers; query != nil {
+		if err := nq.loadNodeSuppliers(ctx, query, nodes,
+			func(n *Node) { n.Edges.NodeSuppliers = []*Person{} },
+			func(n *Node, e *Person) { n.Edges.NodeSuppliers = append(n.Edges.NodeSuppliers, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := nq.withOriginators; query != nil {
-		if err := nq.loadOriginators(ctx, query, nodes,
-			func(n *Node) { n.Edges.Originators = []*Person{} },
-			func(n *Node, e *Person) { n.Edges.Originators = append(n.Edges.Originators, e) }); err != nil {
+	if query := nq.withNodeOriginators; query != nil {
+		if err := nq.loadNodeOriginators(ctx, query, nodes,
+			func(n *Node) { n.Edges.NodeOriginators = []*Person{} },
+			func(n *Node, e *Person) { n.Edges.NodeOriginators = append(n.Edges.NodeOriginators, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := nq.withExternalReferences; query != nil {
-		if err := nq.loadExternalReferences(ctx, query, nodes,
-			func(n *Node) { n.Edges.ExternalReferences = []*ExternalReference{} },
+	if query := nq.withNodeExternalReferences; query != nil {
+		if err := nq.loadNodeExternalReferences(ctx, query, nodes,
+			func(n *Node) { n.Edges.NodeExternalReferences = []*ExternalReference{} },
 			func(n *Node, e *ExternalReference) {
-				n.Edges.ExternalReferences = append(n.Edges.ExternalReferences, e)
+				n.Edges.NodeExternalReferences = append(n.Edges.NodeExternalReferences, e)
 			}); err != nil {
 			return nil, err
 		}
 	}
-	if query := nq.withIdentifiers; query != nil {
-		if err := nq.loadIdentifiers(ctx, query, nodes,
-			func(n *Node) { n.Edges.Identifiers = []*IdentifiersEntry{} },
-			func(n *Node, e *IdentifiersEntry) { n.Edges.Identifiers = append(n.Edges.Identifiers, e) }); err != nil {
+	if query := nq.withNodeIdentifiers; query != nil {
+		if err := nq.loadNodeIdentifiers(ctx, query, nodes,
+			func(n *Node) { n.Edges.NodeIdentifiers = []*IdentifiersEntry{} },
+			func(n *Node, e *IdentifiersEntry) { n.Edges.NodeIdentifiers = append(n.Edges.NodeIdentifiers, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := nq.withHashes; query != nil {
-		if err := nq.loadHashes(ctx, query, nodes,
-			func(n *Node) { n.Edges.Hashes = []*HashesEntry{} },
-			func(n *Node, e *HashesEntry) { n.Edges.Hashes = append(n.Edges.Hashes, e) }); err != nil {
+	if query := nq.withNodeHashes; query != nil {
+		if err := nq.loadNodeHashes(ctx, query, nodes,
+			func(n *Node) { n.Edges.NodeHashes = []*HashesEntry{} },
+			func(n *Node, e *HashesEntry) { n.Edges.NodeHashes = append(n.Edges.NodeHashes, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := nq.withPrimaryPurpose; query != nil {
-		if err := nq.loadPrimaryPurpose(ctx, query, nodes,
-			func(n *Node) { n.Edges.PrimaryPurpose = []*Purpose{} },
-			func(n *Node, e *Purpose) { n.Edges.PrimaryPurpose = append(n.Edges.PrimaryPurpose, e) }); err != nil {
+	if query := nq.withNodePrimaryPurpose; query != nil {
+		if err := nq.loadNodePrimaryPurpose(ctx, query, nodes,
+			func(n *Node) { n.Edges.NodePrimaryPurpose = []*Purpose{} },
+			func(n *Node, e *Purpose) { n.Edges.NodePrimaryPurpose = append(n.Edges.NodePrimaryPurpose, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := nq.withNodes; query != nil {
+		if err := nq.loadNodes(ctx, query, nodes,
+			func(n *Node) { n.Edges.Nodes = []*Node{} },
+			func(n *Node, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -687,10 +767,17 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			return nil, err
 		}
 	}
+	if query := nq.withEdgeTypes; query != nil {
+		if err := nq.loadEdgeTypes(ctx, query, nodes,
+			func(n *Node) { n.Edges.EdgeTypes = []*EdgeType{} },
+			func(n *Node, e *EdgeType) { n.Edges.EdgeTypes = append(n.Edges.EdgeTypes, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
-func (nq *NodeQuery) loadSuppliers(ctx context.Context, query *PersonQuery, nodes []*Node, init func(*Node), assign func(*Node, *Person)) error {
+func (nq *NodeQuery) loadNodeSuppliers(ctx context.Context, query *PersonQuery, nodes []*Node, init func(*Node), assign func(*Node, *Person)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Node)
 	for i := range nodes {
@@ -702,26 +789,26 @@ func (nq *NodeQuery) loadSuppliers(ctx context.Context, query *PersonQuery, node
 	}
 	query.withFKs = true
 	query.Where(predicate.Person(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(node.SuppliersColumn), fks...))
+		s.Where(sql.InValues(s.C(node.NodeSuppliersColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.node_suppliers
+		fk := n.node_node_suppliers
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "node_suppliers" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "node_node_suppliers" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "node_suppliers" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "node_node_suppliers" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (nq *NodeQuery) loadOriginators(ctx context.Context, query *PersonQuery, nodes []*Node, init func(*Node), assign func(*Node, *Person)) error {
+func (nq *NodeQuery) loadNodeOriginators(ctx context.Context, query *PersonQuery, nodes []*Node, init func(*Node), assign func(*Node, *Person)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Node)
 	for i := range nodes {
@@ -733,26 +820,26 @@ func (nq *NodeQuery) loadOriginators(ctx context.Context, query *PersonQuery, no
 	}
 	query.withFKs = true
 	query.Where(predicate.Person(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(node.OriginatorsColumn), fks...))
+		s.Where(sql.InValues(s.C(node.NodeOriginatorsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.node_originators
+		fk := n.node_node_originators
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "node_originators" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "node_node_originators" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "node_originators" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "node_node_originators" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (nq *NodeQuery) loadExternalReferences(ctx context.Context, query *ExternalReferenceQuery, nodes []*Node, init func(*Node), assign func(*Node, *ExternalReference)) error {
+func (nq *NodeQuery) loadNodeExternalReferences(ctx context.Context, query *ExternalReferenceQuery, nodes []*Node, init func(*Node), assign func(*Node, *ExternalReference)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Node)
 	for i := range nodes {
@@ -764,26 +851,26 @@ func (nq *NodeQuery) loadExternalReferences(ctx context.Context, query *External
 	}
 	query.withFKs = true
 	query.Where(predicate.ExternalReference(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(node.ExternalReferencesColumn), fks...))
+		s.Where(sql.InValues(s.C(node.NodeExternalReferencesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.node_external_references
+		fk := n.node_node_external_references
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "node_external_references" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "node_node_external_references" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "node_external_references" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "node_node_external_references" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (nq *NodeQuery) loadIdentifiers(ctx context.Context, query *IdentifiersEntryQuery, nodes []*Node, init func(*Node), assign func(*Node, *IdentifiersEntry)) error {
+func (nq *NodeQuery) loadNodeIdentifiers(ctx context.Context, query *IdentifiersEntryQuery, nodes []*Node, init func(*Node), assign func(*Node, *IdentifiersEntry)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Node)
 	for i := range nodes {
@@ -795,26 +882,26 @@ func (nq *NodeQuery) loadIdentifiers(ctx context.Context, query *IdentifiersEntr
 	}
 	query.withFKs = true
 	query.Where(predicate.IdentifiersEntry(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(node.IdentifiersColumn), fks...))
+		s.Where(sql.InValues(s.C(node.NodeIdentifiersColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.node_identifiers
+		fk := n.node_node_identifiers
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "node_identifiers" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "node_node_identifiers" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "node_identifiers" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "node_node_identifiers" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (nq *NodeQuery) loadHashes(ctx context.Context, query *HashesEntryQuery, nodes []*Node, init func(*Node), assign func(*Node, *HashesEntry)) error {
+func (nq *NodeQuery) loadNodeHashes(ctx context.Context, query *HashesEntryQuery, nodes []*Node, init func(*Node), assign func(*Node, *HashesEntry)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Node)
 	for i := range nodes {
@@ -826,26 +913,26 @@ func (nq *NodeQuery) loadHashes(ctx context.Context, query *HashesEntryQuery, no
 	}
 	query.withFKs = true
 	query.Where(predicate.HashesEntry(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(node.HashesColumn), fks...))
+		s.Where(sql.InValues(s.C(node.NodeHashesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.node_hashes
+		fk := n.node_node_hashes
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "node_hashes" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "node_node_hashes" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "node_hashes" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "node_node_hashes" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (nq *NodeQuery) loadPrimaryPurpose(ctx context.Context, query *PurposeQuery, nodes []*Node, init func(*Node), assign func(*Node, *Purpose)) error {
+func (nq *NodeQuery) loadNodePrimaryPurpose(ctx context.Context, query *PurposeQuery, nodes []*Node, init func(*Node), assign func(*Node, *Purpose)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[string]*Node)
 	nids := make(map[int]map[*Node]struct{})
@@ -857,11 +944,11 @@ func (nq *NodeQuery) loadPrimaryPurpose(ctx context.Context, query *PurposeQuery
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(node.PrimaryPurposeTable)
-		s.Join(joinT).On(s.C(purpose.FieldID), joinT.C(node.PrimaryPurposePrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(node.PrimaryPurposePrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(node.NodePrimaryPurposeTable)
+		s.Join(joinT).On(s.C(purpose.FieldID), joinT.C(node.NodePrimaryPurposePrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(node.NodePrimaryPurposePrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(node.PrimaryPurposePrimaryKey[0]))
+		s.Select(joinT.C(node.NodePrimaryPurposePrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -898,7 +985,68 @@ func (nq *NodeQuery) loadPrimaryPurpose(ctx context.Context, query *PurposeQuery
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "primary_purpose" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "node_primary_purpose" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (nq *NodeQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Node, init func(*Node), assign func(*Node, *Node)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[string]*Node)
+	nids := make(map[string]map[*Node]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(node.NodesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(node.NodesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(node.NodesPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(node.NodesPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullString)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullString).String
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Node]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Node](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "nodes" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -910,10 +1058,10 @@ func (nq *NodeQuery) loadNodeList(ctx context.Context, query *NodeListQuery, nod
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Node)
 	for i := range nodes {
-		if nodes[i].node_list_nodes == nil {
+		if nodes[i].node_list_node_list_nodes == nil {
 			continue
 		}
-		fk := *nodes[i].node_list_nodes
+		fk := *nodes[i].node_list_node_list_nodes
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -930,11 +1078,41 @@ func (nq *NodeQuery) loadNodeList(ctx context.Context, query *NodeListQuery, nod
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "node_list_nodes" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "node_list_node_list_nodes" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (nq *NodeQuery) loadEdgeTypes(ctx context.Context, query *EdgeTypeQuery, nodes []*Node, init func(*Node), assign func(*Node, *EdgeType)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Node)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(edgetype.FieldNodeID)
+	}
+	query.Where(predicate.EdgeType(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(node.EdgeTypesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.NodeID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "node_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

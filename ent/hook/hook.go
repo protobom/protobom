@@ -50,16 +50,16 @@ func (f DocumentTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DocumentTypeMutation", m)
 }
 
-// The EdgeFunc type is an adapter to allow the use of ordinary
-// function as Edge mutator.
-type EdgeFunc func(context.Context, *ent.EdgeMutation) (ent.Value, error)
+// The EdgeTypeFunc type is an adapter to allow the use of ordinary
+// function as EdgeType mutator.
+type EdgeTypeFunc func(context.Context, *ent.EdgeTypeMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f EdgeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.EdgeMutation); ok {
+func (f EdgeTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EdgeTypeMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EdgeMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EdgeTypeMutation", m)
 }
 
 // The ExternalReferenceFunc type is an adapter to allow the use of ordinary

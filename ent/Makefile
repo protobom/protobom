@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------------
-ENT_ROOT_DIR   := ${abspath ${patsubst %/,%,${dir ${lastword ${MAKEFILE_LIST}}}}}
+ENT_ROOT_DIR := ${abspath ${patsubst %/,%,${dir ${lastword ${MAKEFILE_LIST}}}}}
 
 .PHONY: generate-ent
 .SILENT: generate-ent

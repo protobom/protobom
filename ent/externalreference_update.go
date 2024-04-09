@@ -87,6 +87,12 @@ func (eru *ExternalReferenceUpdate) SetNillableAuthority(s *string) *ExternalRef
 	return eru
 }
 
+// ClearAuthority clears the value of the "authority" field.
+func (eru *ExternalReferenceUpdate) ClearAuthority() *ExternalReferenceUpdate {
+	eru.mutation.ClearAuthority()
+	return eru
+}
+
 // SetType sets the "type" field.
 func (eru *ExternalReferenceUpdate) SetType(e externalreference.Type) *ExternalReferenceUpdate {
 	eru.mutation.SetType(e)
@@ -101,30 +107,36 @@ func (eru *ExternalReferenceUpdate) SetNillableType(e *externalreference.Type) *
 	return eru
 }
 
-// AddHashIDs adds the "hashes" edge to the HashesEntry entity by IDs.
-func (eru *ExternalReferenceUpdate) AddHashIDs(ids ...int) *ExternalReferenceUpdate {
-	eru.mutation.AddHashIDs(ids...)
+// SetHashes sets the "hashes" field.
+func (eru *ExternalReferenceUpdate) SetHashes(m map[int32]string) *ExternalReferenceUpdate {
+	eru.mutation.SetHashes(m)
 	return eru
 }
 
-// AddHashes adds the "hashes" edges to the HashesEntry entity.
-func (eru *ExternalReferenceUpdate) AddHashes(h ...*HashesEntry) *ExternalReferenceUpdate {
+// AddExternalReferenceHashIDs adds the "external_reference_hashes" edge to the HashesEntry entity by IDs.
+func (eru *ExternalReferenceUpdate) AddExternalReferenceHashIDs(ids ...int) *ExternalReferenceUpdate {
+	eru.mutation.AddExternalReferenceHashIDs(ids...)
+	return eru
+}
+
+// AddExternalReferenceHashes adds the "external_reference_hashes" edges to the HashesEntry entity.
+func (eru *ExternalReferenceUpdate) AddExternalReferenceHashes(h ...*HashesEntry) *ExternalReferenceUpdate {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return eru.AddHashIDs(ids...)
+	return eru.AddExternalReferenceHashIDs(ids...)
 }
 
-// SetNodesID sets the "nodes" edge to the Node entity by ID.
-func (eru *ExternalReferenceUpdate) SetNodesID(id string) *ExternalReferenceUpdate {
-	eru.mutation.SetNodesID(id)
+// SetNodeID sets the "node" edge to the Node entity by ID.
+func (eru *ExternalReferenceUpdate) SetNodeID(id string) *ExternalReferenceUpdate {
+	eru.mutation.SetNodeID(id)
 	return eru
 }
 
-// SetNodes sets the "nodes" edge to the Node entity.
-func (eru *ExternalReferenceUpdate) SetNodes(n *Node) *ExternalReferenceUpdate {
-	return eru.SetNodesID(n.ID)
+// SetNode sets the "node" edge to the Node entity.
+func (eru *ExternalReferenceUpdate) SetNode(n *Node) *ExternalReferenceUpdate {
+	return eru.SetNodeID(n.ID)
 }
 
 // Mutation returns the ExternalReferenceMutation object of the builder.
@@ -132,30 +144,30 @@ func (eru *ExternalReferenceUpdate) Mutation() *ExternalReferenceMutation {
 	return eru.mutation
 }
 
-// ClearHashes clears all "hashes" edges to the HashesEntry entity.
-func (eru *ExternalReferenceUpdate) ClearHashes() *ExternalReferenceUpdate {
-	eru.mutation.ClearHashes()
+// ClearExternalReferenceHashes clears all "external_reference_hashes" edges to the HashesEntry entity.
+func (eru *ExternalReferenceUpdate) ClearExternalReferenceHashes() *ExternalReferenceUpdate {
+	eru.mutation.ClearExternalReferenceHashes()
 	return eru
 }
 
-// RemoveHashIDs removes the "hashes" edge to HashesEntry entities by IDs.
-func (eru *ExternalReferenceUpdate) RemoveHashIDs(ids ...int) *ExternalReferenceUpdate {
-	eru.mutation.RemoveHashIDs(ids...)
+// RemoveExternalReferenceHashIDs removes the "external_reference_hashes" edge to HashesEntry entities by IDs.
+func (eru *ExternalReferenceUpdate) RemoveExternalReferenceHashIDs(ids ...int) *ExternalReferenceUpdate {
+	eru.mutation.RemoveExternalReferenceHashIDs(ids...)
 	return eru
 }
 
-// RemoveHashes removes "hashes" edges to HashesEntry entities.
-func (eru *ExternalReferenceUpdate) RemoveHashes(h ...*HashesEntry) *ExternalReferenceUpdate {
+// RemoveExternalReferenceHashes removes "external_reference_hashes" edges to HashesEntry entities.
+func (eru *ExternalReferenceUpdate) RemoveExternalReferenceHashes(h ...*HashesEntry) *ExternalReferenceUpdate {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return eru.RemoveHashIDs(ids...)
+	return eru.RemoveExternalReferenceHashIDs(ids...)
 }
 
-// ClearNodes clears the "nodes" edge to the Node entity.
-func (eru *ExternalReferenceUpdate) ClearNodes() *ExternalReferenceUpdate {
-	eru.mutation.ClearNodes()
+// ClearNode clears the "node" edge to the Node entity.
+func (eru *ExternalReferenceUpdate) ClearNode() *ExternalReferenceUpdate {
+	eru.mutation.ClearNode()
 	return eru
 }
 
@@ -193,8 +205,8 @@ func (eru *ExternalReferenceUpdate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "ExternalReference.type": %w`, err)}
 		}
 	}
-	if _, ok := eru.mutation.NodesID(); eru.mutation.NodesCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "ExternalReference.nodes"`)
+	if _, ok := eru.mutation.NodeID(); eru.mutation.NodeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ExternalReference.node"`)
 	}
 	return nil
 }
@@ -220,15 +232,21 @@ func (eru *ExternalReferenceUpdate) sqlSave(ctx context.Context) (n int, err err
 	if value, ok := eru.mutation.Authority(); ok {
 		_spec.SetField(externalreference.FieldAuthority, field.TypeString, value)
 	}
+	if eru.mutation.AuthorityCleared() {
+		_spec.ClearField(externalreference.FieldAuthority, field.TypeString)
+	}
 	if value, ok := eru.mutation.GetType(); ok {
 		_spec.SetField(externalreference.FieldType, field.TypeEnum, value)
 	}
-	if eru.mutation.HashesCleared() {
+	if value, ok := eru.mutation.Hashes(); ok {
+		_spec.SetField(externalreference.FieldHashes, field.TypeJSON, value)
+	}
+	if eru.mutation.ExternalReferenceHashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Table:   externalreference.ExternalReferenceHashesTable,
+			Columns: []string{externalreference.ExternalReferenceHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -236,12 +254,12 @@ func (eru *ExternalReferenceUpdate) sqlSave(ctx context.Context) (n int, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eru.mutation.RemovedHashesIDs(); len(nodes) > 0 && !eru.mutation.HashesCleared() {
+	if nodes := eru.mutation.RemovedExternalReferenceHashesIDs(); len(nodes) > 0 && !eru.mutation.ExternalReferenceHashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Table:   externalreference.ExternalReferenceHashesTable,
+			Columns: []string{externalreference.ExternalReferenceHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -252,12 +270,12 @@ func (eru *ExternalReferenceUpdate) sqlSave(ctx context.Context) (n int, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eru.mutation.HashesIDs(); len(nodes) > 0 {
+	if nodes := eru.mutation.ExternalReferenceHashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Table:   externalreference.ExternalReferenceHashesTable,
+			Columns: []string{externalreference.ExternalReferenceHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -268,12 +286,12 @@ func (eru *ExternalReferenceUpdate) sqlSave(ctx context.Context) (n int, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eru.mutation.NodesCleared() {
+	if eru.mutation.NodeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   externalreference.NodesTable,
-			Columns: []string{externalreference.NodesColumn},
+			Table:   externalreference.NodeTable,
+			Columns: []string{externalreference.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -281,12 +299,12 @@ func (eru *ExternalReferenceUpdate) sqlSave(ctx context.Context) (n int, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eru.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := eru.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   externalreference.NodesTable,
-			Columns: []string{externalreference.NodesColumn},
+			Table:   externalreference.NodeTable,
+			Columns: []string{externalreference.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -359,6 +377,12 @@ func (eruo *ExternalReferenceUpdateOne) SetNillableAuthority(s *string) *Externa
 	return eruo
 }
 
+// ClearAuthority clears the value of the "authority" field.
+func (eruo *ExternalReferenceUpdateOne) ClearAuthority() *ExternalReferenceUpdateOne {
+	eruo.mutation.ClearAuthority()
+	return eruo
+}
+
 // SetType sets the "type" field.
 func (eruo *ExternalReferenceUpdateOne) SetType(e externalreference.Type) *ExternalReferenceUpdateOne {
 	eruo.mutation.SetType(e)
@@ -373,30 +397,36 @@ func (eruo *ExternalReferenceUpdateOne) SetNillableType(e *externalreference.Typ
 	return eruo
 }
 
-// AddHashIDs adds the "hashes" edge to the HashesEntry entity by IDs.
-func (eruo *ExternalReferenceUpdateOne) AddHashIDs(ids ...int) *ExternalReferenceUpdateOne {
-	eruo.mutation.AddHashIDs(ids...)
+// SetHashes sets the "hashes" field.
+func (eruo *ExternalReferenceUpdateOne) SetHashes(m map[int32]string) *ExternalReferenceUpdateOne {
+	eruo.mutation.SetHashes(m)
 	return eruo
 }
 
-// AddHashes adds the "hashes" edges to the HashesEntry entity.
-func (eruo *ExternalReferenceUpdateOne) AddHashes(h ...*HashesEntry) *ExternalReferenceUpdateOne {
+// AddExternalReferenceHashIDs adds the "external_reference_hashes" edge to the HashesEntry entity by IDs.
+func (eruo *ExternalReferenceUpdateOne) AddExternalReferenceHashIDs(ids ...int) *ExternalReferenceUpdateOne {
+	eruo.mutation.AddExternalReferenceHashIDs(ids...)
+	return eruo
+}
+
+// AddExternalReferenceHashes adds the "external_reference_hashes" edges to the HashesEntry entity.
+func (eruo *ExternalReferenceUpdateOne) AddExternalReferenceHashes(h ...*HashesEntry) *ExternalReferenceUpdateOne {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return eruo.AddHashIDs(ids...)
+	return eruo.AddExternalReferenceHashIDs(ids...)
 }
 
-// SetNodesID sets the "nodes" edge to the Node entity by ID.
-func (eruo *ExternalReferenceUpdateOne) SetNodesID(id string) *ExternalReferenceUpdateOne {
-	eruo.mutation.SetNodesID(id)
+// SetNodeID sets the "node" edge to the Node entity by ID.
+func (eruo *ExternalReferenceUpdateOne) SetNodeID(id string) *ExternalReferenceUpdateOne {
+	eruo.mutation.SetNodeID(id)
 	return eruo
 }
 
-// SetNodes sets the "nodes" edge to the Node entity.
-func (eruo *ExternalReferenceUpdateOne) SetNodes(n *Node) *ExternalReferenceUpdateOne {
-	return eruo.SetNodesID(n.ID)
+// SetNode sets the "node" edge to the Node entity.
+func (eruo *ExternalReferenceUpdateOne) SetNode(n *Node) *ExternalReferenceUpdateOne {
+	return eruo.SetNodeID(n.ID)
 }
 
 // Mutation returns the ExternalReferenceMutation object of the builder.
@@ -404,30 +434,30 @@ func (eruo *ExternalReferenceUpdateOne) Mutation() *ExternalReferenceMutation {
 	return eruo.mutation
 }
 
-// ClearHashes clears all "hashes" edges to the HashesEntry entity.
-func (eruo *ExternalReferenceUpdateOne) ClearHashes() *ExternalReferenceUpdateOne {
-	eruo.mutation.ClearHashes()
+// ClearExternalReferenceHashes clears all "external_reference_hashes" edges to the HashesEntry entity.
+func (eruo *ExternalReferenceUpdateOne) ClearExternalReferenceHashes() *ExternalReferenceUpdateOne {
+	eruo.mutation.ClearExternalReferenceHashes()
 	return eruo
 }
 
-// RemoveHashIDs removes the "hashes" edge to HashesEntry entities by IDs.
-func (eruo *ExternalReferenceUpdateOne) RemoveHashIDs(ids ...int) *ExternalReferenceUpdateOne {
-	eruo.mutation.RemoveHashIDs(ids...)
+// RemoveExternalReferenceHashIDs removes the "external_reference_hashes" edge to HashesEntry entities by IDs.
+func (eruo *ExternalReferenceUpdateOne) RemoveExternalReferenceHashIDs(ids ...int) *ExternalReferenceUpdateOne {
+	eruo.mutation.RemoveExternalReferenceHashIDs(ids...)
 	return eruo
 }
 
-// RemoveHashes removes "hashes" edges to HashesEntry entities.
-func (eruo *ExternalReferenceUpdateOne) RemoveHashes(h ...*HashesEntry) *ExternalReferenceUpdateOne {
+// RemoveExternalReferenceHashes removes "external_reference_hashes" edges to HashesEntry entities.
+func (eruo *ExternalReferenceUpdateOne) RemoveExternalReferenceHashes(h ...*HashesEntry) *ExternalReferenceUpdateOne {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return eruo.RemoveHashIDs(ids...)
+	return eruo.RemoveExternalReferenceHashIDs(ids...)
 }
 
-// ClearNodes clears the "nodes" edge to the Node entity.
-func (eruo *ExternalReferenceUpdateOne) ClearNodes() *ExternalReferenceUpdateOne {
-	eruo.mutation.ClearNodes()
+// ClearNode clears the "node" edge to the Node entity.
+func (eruo *ExternalReferenceUpdateOne) ClearNode() *ExternalReferenceUpdateOne {
+	eruo.mutation.ClearNode()
 	return eruo
 }
 
@@ -478,8 +508,8 @@ func (eruo *ExternalReferenceUpdateOne) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "ExternalReference.type": %w`, err)}
 		}
 	}
-	if _, ok := eruo.mutation.NodesID(); eruo.mutation.NodesCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "ExternalReference.nodes"`)
+	if _, ok := eruo.mutation.NodeID(); eruo.mutation.NodeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ExternalReference.node"`)
 	}
 	return nil
 }
@@ -522,15 +552,21 @@ func (eruo *ExternalReferenceUpdateOne) sqlSave(ctx context.Context) (_node *Ext
 	if value, ok := eruo.mutation.Authority(); ok {
 		_spec.SetField(externalreference.FieldAuthority, field.TypeString, value)
 	}
+	if eruo.mutation.AuthorityCleared() {
+		_spec.ClearField(externalreference.FieldAuthority, field.TypeString)
+	}
 	if value, ok := eruo.mutation.GetType(); ok {
 		_spec.SetField(externalreference.FieldType, field.TypeEnum, value)
 	}
-	if eruo.mutation.HashesCleared() {
+	if value, ok := eruo.mutation.Hashes(); ok {
+		_spec.SetField(externalreference.FieldHashes, field.TypeJSON, value)
+	}
+	if eruo.mutation.ExternalReferenceHashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Table:   externalreference.ExternalReferenceHashesTable,
+			Columns: []string{externalreference.ExternalReferenceHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -538,12 +574,12 @@ func (eruo *ExternalReferenceUpdateOne) sqlSave(ctx context.Context) (_node *Ext
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eruo.mutation.RemovedHashesIDs(); len(nodes) > 0 && !eruo.mutation.HashesCleared() {
+	if nodes := eruo.mutation.RemovedExternalReferenceHashesIDs(); len(nodes) > 0 && !eruo.mutation.ExternalReferenceHashesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Table:   externalreference.ExternalReferenceHashesTable,
+			Columns: []string{externalreference.ExternalReferenceHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -554,12 +590,12 @@ func (eruo *ExternalReferenceUpdateOne) sqlSave(ctx context.Context) (_node *Ext
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eruo.mutation.HashesIDs(); len(nodes) > 0 {
+	if nodes := eruo.mutation.ExternalReferenceHashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   externalreference.HashesTable,
-			Columns: []string{externalreference.HashesColumn},
+			Table:   externalreference.ExternalReferenceHashesTable,
+			Columns: []string{externalreference.ExternalReferenceHashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -570,12 +606,12 @@ func (eruo *ExternalReferenceUpdateOne) sqlSave(ctx context.Context) (_node *Ext
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eruo.mutation.NodesCleared() {
+	if eruo.mutation.NodeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   externalreference.NodesTable,
-			Columns: []string{externalreference.NodesColumn},
+			Table:   externalreference.NodeTable,
+			Columns: []string{externalreference.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -583,12 +619,12 @@ func (eruo *ExternalReferenceUpdateOne) sqlSave(ctx context.Context) (_node *Ext
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eruo.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := eruo.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   externalreference.NodesTable,
-			Columns: []string{externalreference.NodesColumn},
+			Table:   externalreference.NodeTable,
+			Columns: []string{externalreference.NodeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),

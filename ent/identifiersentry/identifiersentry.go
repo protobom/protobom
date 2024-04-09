@@ -45,7 +45,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodesInverseTable = "nodes"
 	// NodesColumn is the table column denoting the nodes relation/edge.
-	NodesColumn = "node_node_identifiers"
+	NodesColumn = "node_identifiers"
 )
 
 // Columns holds all SQL columns for identifiersentry fields.
@@ -58,7 +58,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "identifiers_entries"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"node_node_identifiers",
+	"node_identifiers",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

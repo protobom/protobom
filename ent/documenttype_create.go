@@ -191,7 +191,7 @@ func (dtc *DocumentTypeCreate) createSpec() (*DocumentType, *sqlgraph.CreateSpec
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.metadata_metadata_document_types = &nodes[0]
+		_node.metadata_document_types = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

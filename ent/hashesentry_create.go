@@ -183,7 +183,7 @@ func (hec *HashesEntryCreate) createSpec() (*HashesEntry, *sqlgraph.CreateSpec) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.external_reference_external_reference_hashes = &nodes[0]
+		_node.external_reference_hashes = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := hec.mutation.NodesIDs(); len(nodes) > 0 {
@@ -200,7 +200,7 @@ func (hec *HashesEntryCreate) createSpec() (*HashesEntry, *sqlgraph.CreateSpec) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.node_node_hashes = &nodes[0]
+		_node.node_hashes = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

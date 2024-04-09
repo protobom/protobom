@@ -25,13 +25,11 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/predicate"
-	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // PersonUpdate is the builder for updating Person entities.
@@ -117,18 +115,6 @@ func (pu *PersonUpdate) SetNillablePhone(s *string) *PersonUpdate {
 	return pu
 }
 
-// SetContacts sets the "contacts" field.
-func (pu *PersonUpdate) SetContacts(s []*sbom.Person) *PersonUpdate {
-	pu.mutation.SetContacts(s)
-	return pu
-}
-
-// AppendContacts appends s to the "contacts" field.
-func (pu *PersonUpdate) AppendContacts(s []*sbom.Person) *PersonUpdate {
-	pu.mutation.AppendContacts(s)
-	return pu
-}
-
 // SetContactOwnerID sets the "contact_owner" edge to the Person entity by ID.
 func (pu *PersonUpdate) SetContactOwnerID(id int) *PersonUpdate {
 	pu.mutation.SetContactOwnerID(id)
@@ -148,19 +134,19 @@ func (pu *PersonUpdate) SetContactOwner(p *Person) *PersonUpdate {
 	return pu.SetContactOwnerID(p.ID)
 }
 
-// AddPersonContactIDs adds the "person_contacts" edge to the Person entity by IDs.
-func (pu *PersonUpdate) AddPersonContactIDs(ids ...int) *PersonUpdate {
-	pu.mutation.AddPersonContactIDs(ids...)
+// AddContactIDs adds the "contacts" edge to the Person entity by IDs.
+func (pu *PersonUpdate) AddContactIDs(ids ...int) *PersonUpdate {
+	pu.mutation.AddContactIDs(ids...)
 	return pu
 }
 
-// AddPersonContacts adds the "person_contacts" edges to the Person entity.
-func (pu *PersonUpdate) AddPersonContacts(p ...*Person) *PersonUpdate {
+// AddContacts adds the "contacts" edges to the Person entity.
+func (pu *PersonUpdate) AddContacts(p ...*Person) *PersonUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return pu.AddPersonContactIDs(ids...)
+	return pu.AddContactIDs(ids...)
 }
 
 // SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
@@ -212,25 +198,25 @@ func (pu *PersonUpdate) ClearContactOwner() *PersonUpdate {
 	return pu
 }
 
-// ClearPersonContacts clears all "person_contacts" edges to the Person entity.
-func (pu *PersonUpdate) ClearPersonContacts() *PersonUpdate {
-	pu.mutation.ClearPersonContacts()
+// ClearContacts clears all "contacts" edges to the Person entity.
+func (pu *PersonUpdate) ClearContacts() *PersonUpdate {
+	pu.mutation.ClearContacts()
 	return pu
 }
 
-// RemovePersonContactIDs removes the "person_contacts" edge to Person entities by IDs.
-func (pu *PersonUpdate) RemovePersonContactIDs(ids ...int) *PersonUpdate {
-	pu.mutation.RemovePersonContactIDs(ids...)
+// RemoveContactIDs removes the "contacts" edge to Person entities by IDs.
+func (pu *PersonUpdate) RemoveContactIDs(ids ...int) *PersonUpdate {
+	pu.mutation.RemoveContactIDs(ids...)
 	return pu
 }
 
-// RemovePersonContacts removes "person_contacts" edges to Person entities.
-func (pu *PersonUpdate) RemovePersonContacts(p ...*Person) *PersonUpdate {
+// RemoveContacts removes "contacts" edges to Person entities.
+func (pu *PersonUpdate) RemoveContacts(p ...*Person) *PersonUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return pu.RemovePersonContactIDs(ids...)
+	return pu.RemoveContactIDs(ids...)
 }
 
 // ClearMetadata clears the "metadata" edge to the Metadata entity.
@@ -296,14 +282,6 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.Phone(); ok {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
 	}
-	if value, ok := pu.mutation.Contacts(); ok {
-		_spec.SetField(person.FieldContacts, field.TypeJSON, value)
-	}
-	if value, ok := pu.mutation.AppendedContacts(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, person.FieldContacts, value)
-		})
-	}
 	if pu.mutation.ContactOwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -333,12 +311,12 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.PersonContactsCleared() {
+	if pu.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   person.PersonContactsTable,
-			Columns: []string{person.PersonContactsColumn},
+			Table:   person.ContactsTable,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -346,12 +324,12 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedPersonContactsIDs(); len(nodes) > 0 && !pu.mutation.PersonContactsCleared() {
+	if nodes := pu.mutation.RemovedContactsIDs(); len(nodes) > 0 && !pu.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   person.PersonContactsTable,
-			Columns: []string{person.PersonContactsColumn},
+			Table:   person.ContactsTable,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -362,12 +340,12 @@ func (pu *PersonUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.PersonContactsIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.ContactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   person.PersonContactsTable,
-			Columns: []string{person.PersonContactsColumn},
+			Table:   person.ContactsTable,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -526,18 +504,6 @@ func (puo *PersonUpdateOne) SetNillablePhone(s *string) *PersonUpdateOne {
 	return puo
 }
 
-// SetContacts sets the "contacts" field.
-func (puo *PersonUpdateOne) SetContacts(s []*sbom.Person) *PersonUpdateOne {
-	puo.mutation.SetContacts(s)
-	return puo
-}
-
-// AppendContacts appends s to the "contacts" field.
-func (puo *PersonUpdateOne) AppendContacts(s []*sbom.Person) *PersonUpdateOne {
-	puo.mutation.AppendContacts(s)
-	return puo
-}
-
 // SetContactOwnerID sets the "contact_owner" edge to the Person entity by ID.
 func (puo *PersonUpdateOne) SetContactOwnerID(id int) *PersonUpdateOne {
 	puo.mutation.SetContactOwnerID(id)
@@ -557,19 +523,19 @@ func (puo *PersonUpdateOne) SetContactOwner(p *Person) *PersonUpdateOne {
 	return puo.SetContactOwnerID(p.ID)
 }
 
-// AddPersonContactIDs adds the "person_contacts" edge to the Person entity by IDs.
-func (puo *PersonUpdateOne) AddPersonContactIDs(ids ...int) *PersonUpdateOne {
-	puo.mutation.AddPersonContactIDs(ids...)
+// AddContactIDs adds the "contacts" edge to the Person entity by IDs.
+func (puo *PersonUpdateOne) AddContactIDs(ids ...int) *PersonUpdateOne {
+	puo.mutation.AddContactIDs(ids...)
 	return puo
 }
 
-// AddPersonContacts adds the "person_contacts" edges to the Person entity.
-func (puo *PersonUpdateOne) AddPersonContacts(p ...*Person) *PersonUpdateOne {
+// AddContacts adds the "contacts" edges to the Person entity.
+func (puo *PersonUpdateOne) AddContacts(p ...*Person) *PersonUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return puo.AddPersonContactIDs(ids...)
+	return puo.AddContactIDs(ids...)
 }
 
 // SetMetadataID sets the "metadata" edge to the Metadata entity by ID.
@@ -621,25 +587,25 @@ func (puo *PersonUpdateOne) ClearContactOwner() *PersonUpdateOne {
 	return puo
 }
 
-// ClearPersonContacts clears all "person_contacts" edges to the Person entity.
-func (puo *PersonUpdateOne) ClearPersonContacts() *PersonUpdateOne {
-	puo.mutation.ClearPersonContacts()
+// ClearContacts clears all "contacts" edges to the Person entity.
+func (puo *PersonUpdateOne) ClearContacts() *PersonUpdateOne {
+	puo.mutation.ClearContacts()
 	return puo
 }
 
-// RemovePersonContactIDs removes the "person_contacts" edge to Person entities by IDs.
-func (puo *PersonUpdateOne) RemovePersonContactIDs(ids ...int) *PersonUpdateOne {
-	puo.mutation.RemovePersonContactIDs(ids...)
+// RemoveContactIDs removes the "contacts" edge to Person entities by IDs.
+func (puo *PersonUpdateOne) RemoveContactIDs(ids ...int) *PersonUpdateOne {
+	puo.mutation.RemoveContactIDs(ids...)
 	return puo
 }
 
-// RemovePersonContacts removes "person_contacts" edges to Person entities.
-func (puo *PersonUpdateOne) RemovePersonContacts(p ...*Person) *PersonUpdateOne {
+// RemoveContacts removes "contacts" edges to Person entities.
+func (puo *PersonUpdateOne) RemoveContacts(p ...*Person) *PersonUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return puo.RemovePersonContactIDs(ids...)
+	return puo.RemoveContactIDs(ids...)
 }
 
 // ClearMetadata clears the "metadata" edge to the Metadata entity.
@@ -735,14 +701,6 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 	if value, ok := puo.mutation.Phone(); ok {
 		_spec.SetField(person.FieldPhone, field.TypeString, value)
 	}
-	if value, ok := puo.mutation.Contacts(); ok {
-		_spec.SetField(person.FieldContacts, field.TypeJSON, value)
-	}
-	if value, ok := puo.mutation.AppendedContacts(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, person.FieldContacts, value)
-		})
-	}
 	if puo.mutation.ContactOwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -772,12 +730,12 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.PersonContactsCleared() {
+	if puo.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   person.PersonContactsTable,
-			Columns: []string{person.PersonContactsColumn},
+			Table:   person.ContactsTable,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -785,12 +743,12 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedPersonContactsIDs(); len(nodes) > 0 && !puo.mutation.PersonContactsCleared() {
+	if nodes := puo.mutation.RemovedContactsIDs(); len(nodes) > 0 && !puo.mutation.ContactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   person.PersonContactsTable,
-			Columns: []string{person.PersonContactsColumn},
+			Table:   person.ContactsTable,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -801,12 +759,12 @@ func (puo *PersonUpdateOne) sqlSave(ctx context.Context) (_node *Person, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.PersonContactsIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.ContactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   person.PersonContactsTable,
-			Columns: []string{person.PersonContactsColumn},
+			Table:   person.ContactsTable,
+			Columns: []string{person.ContactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),

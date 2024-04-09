@@ -23,8 +23,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-
-	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 type NodeList struct {
@@ -34,13 +32,12 @@ type NodeList struct {
 func (NodeList) Fields() []ent.Field {
 	return []ent.Field{
 		field.Strings("root_elements"),
-		field.JSON("nodes", []*sbom.Node{}),
 	}
 }
 
 func (NodeList) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("node_list_nodes", Node.Type),
+		edge.To("nodes", Node.Type),
 		edge.To("document", Document.Type).Unique(),
 	}
 }

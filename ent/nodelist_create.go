@@ -29,7 +29,6 @@ import (
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/nodelist"
-	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // NodeListCreate is the builder for creating a NodeList entity.
@@ -46,25 +45,19 @@ func (nlc *NodeListCreate) SetRootElements(s []string) *NodeListCreate {
 	return nlc
 }
 
-// SetNodes sets the "nodes" field.
-func (nlc *NodeListCreate) SetNodes(s []*sbom.Node) *NodeListCreate {
-	nlc.mutation.SetNodes(s)
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (nlc *NodeListCreate) AddNodeIDs(ids ...string) *NodeListCreate {
+	nlc.mutation.AddNodeIDs(ids...)
 	return nlc
 }
 
-// AddNodeListNodeIDs adds the "node_list_nodes" edge to the Node entity by IDs.
-func (nlc *NodeListCreate) AddNodeListNodeIDs(ids ...string) *NodeListCreate {
-	nlc.mutation.AddNodeListNodeIDs(ids...)
-	return nlc
-}
-
-// AddNodeListNodes adds the "node_list_nodes" edges to the Node entity.
-func (nlc *NodeListCreate) AddNodeListNodes(n ...*Node) *NodeListCreate {
+// AddNodes adds the "nodes" edges to the Node entity.
+func (nlc *NodeListCreate) AddNodes(n ...*Node) *NodeListCreate {
 	ids := make([]string, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
-	return nlc.AddNodeListNodeIDs(ids...)
+	return nlc.AddNodeIDs(ids...)
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by ID.
@@ -123,9 +116,6 @@ func (nlc *NodeListCreate) check() error {
 	if _, ok := nlc.mutation.RootElements(); !ok {
 		return &ValidationError{Name: "root_elements", err: errors.New(`ent: missing required field "NodeList.root_elements"`)}
 	}
-	if _, ok := nlc.mutation.Nodes(); !ok {
-		return &ValidationError{Name: "nodes", err: errors.New(`ent: missing required field "NodeList.nodes"`)}
-	}
 	return nil
 }
 
@@ -157,16 +147,12 @@ func (nlc *NodeListCreate) createSpec() (*NodeList, *sqlgraph.CreateSpec) {
 		_spec.SetField(nodelist.FieldRootElements, field.TypeJSON, value)
 		_node.RootElements = value
 	}
-	if value, ok := nlc.mutation.Nodes(); ok {
-		_spec.SetField(nodelist.FieldNodes, field.TypeJSON, value)
-		_node.Nodes = value
-	}
-	if nodes := nlc.mutation.NodeListNodesIDs(); len(nodes) > 0 {
+	if nodes := nlc.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   nodelist.NodeListNodesTable,
-			Columns: []string{nodelist.NodeListNodesColumn},
+			Table:   nodelist.NodesTable,
+			Columns: []string{nodelist.NodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -257,18 +243,6 @@ func (u *NodeListUpsert) UpdateRootElements() *NodeListUpsert {
 	return u
 }
 
-// SetNodes sets the "nodes" field.
-func (u *NodeListUpsert) SetNodes(v []*sbom.Node) *NodeListUpsert {
-	u.Set(nodelist.FieldNodes, v)
-	return u
-}
-
-// UpdateNodes sets the "nodes" field to the value that was provided on create.
-func (u *NodeListUpsert) UpdateNodes() *NodeListUpsert {
-	u.SetExcluded(nodelist.FieldNodes)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -320,20 +294,6 @@ func (u *NodeListUpsertOne) SetRootElements(v []string) *NodeListUpsertOne {
 func (u *NodeListUpsertOne) UpdateRootElements() *NodeListUpsertOne {
 	return u.Update(func(s *NodeListUpsert) {
 		s.UpdateRootElements()
-	})
-}
-
-// SetNodes sets the "nodes" field.
-func (u *NodeListUpsertOne) SetNodes(v []*sbom.Node) *NodeListUpsertOne {
-	return u.Update(func(s *NodeListUpsert) {
-		s.SetNodes(v)
-	})
-}
-
-// UpdateNodes sets the "nodes" field to the value that was provided on create.
-func (u *NodeListUpsertOne) UpdateNodes() *NodeListUpsertOne {
-	return u.Update(func(s *NodeListUpsert) {
-		s.UpdateNodes()
 	})
 }
 
@@ -551,20 +511,6 @@ func (u *NodeListUpsertBulk) SetRootElements(v []string) *NodeListUpsertBulk {
 func (u *NodeListUpsertBulk) UpdateRootElements() *NodeListUpsertBulk {
 	return u.Update(func(s *NodeListUpsert) {
 		s.UpdateRootElements()
-	})
-}
-
-// SetNodes sets the "nodes" field.
-func (u *NodeListUpsertBulk) SetNodes(v []*sbom.Node) *NodeListUpsertBulk {
-	return u.Update(func(s *NodeListUpsert) {
-		s.SetNodes(v)
-	})
-}
-
-// UpdateNodes sets the "nodes" field to the value that was provided on create.
-func (u *NodeListUpsertBulk) UpdateNodes() *NodeListUpsertBulk {
-	return u.Update(func(s *NodeListUpsert) {
-		s.UpdateNodes()
 	})
 }
 

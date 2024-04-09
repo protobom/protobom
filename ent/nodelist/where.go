@@ -70,21 +70,21 @@ func IDLTE(id int) predicate.NodeList {
 	return predicate.NodeList(sql.FieldLTE(FieldID, id))
 }
 
-// HasNodeListNodes applies the HasEdge predicate on the "node_list_nodes" edge.
-func HasNodeListNodes() predicate.NodeList {
+// HasNodes applies the HasEdge predicate on the "nodes" edge.
+func HasNodes() predicate.NodeList {
 	return predicate.NodeList(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, NodeListNodesTable, NodeListNodesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodesTable, NodesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasNodeListNodesWith applies the HasEdge predicate on the "node_list_nodes" edge with a given conditions (other predicates).
-func HasNodeListNodesWith(preds ...predicate.Node) predicate.NodeList {
+// HasNodesWith applies the HasEdge predicate on the "nodes" edge with a given conditions (other predicates).
+func HasNodesWith(preds ...predicate.Node) predicate.NodeList {
 	return predicate.NodeList(func(s *sql.Selector) {
-		step := newNodeListNodesStep()
+		step := newNodesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

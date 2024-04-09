@@ -19,7 +19,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -28,7 +27,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/metadata"
-	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // Metadata is the model entity for the Metadata schema.
@@ -44,12 +42,6 @@ type Metadata struct {
 	Date time.Time `json:"date,omitempty"`
 	// Comment holds the value of the "comment" field.
 	Comment string `json:"comment,omitempty"`
-	// Tools holds the value of the "tools" field.
-	Tools []*sbom.Tool `json:"tools,omitempty"`
-	// Authors holds the value of the "authors" field.
-	Authors []*sbom.Person `json:"authors,omitempty"`
-	// DocumentTypes holds the value of the "document_types" field.
-	DocumentTypes []*sbom.DocumentType `json:"document_types,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MetadataQuery when eager-loading is set.
 	Edges        MetadataEdges `json:"edges"`
@@ -58,12 +50,12 @@ type Metadata struct {
 
 // MetadataEdges holds the relations/edges for other nodes in the graph.
 type MetadataEdges struct {
-	// MetadataTools holds the value of the metadata_tools edge.
-	MetadataTools []*Tool `json:"metadata_tools,omitempty"`
-	// MetadataAuthors holds the value of the metadata_authors edge.
-	MetadataAuthors []*Person `json:"metadata_authors,omitempty"`
-	// MetadataDocumentTypes holds the value of the metadata_document_types edge.
-	MetadataDocumentTypes []*DocumentType `json:"metadata_document_types,omitempty"`
+	// Tools holds the value of the tools edge.
+	Tools []*Tool `json:"tools,omitempty"`
+	// Authors holds the value of the authors edge.
+	Authors []*Person `json:"authors,omitempty"`
+	// DocumentTypes holds the value of the document_types edge.
+	DocumentTypes []*DocumentType `json:"document_types,omitempty"`
 	// Document holds the value of the document edge.
 	Document *Document `json:"document,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -71,31 +63,31 @@ type MetadataEdges struct {
 	loadedTypes [4]bool
 }
 
-// MetadataToolsOrErr returns the MetadataTools value or an error if the edge
+// ToolsOrErr returns the Tools value or an error if the edge
 // was not loaded in eager-loading.
-func (e MetadataEdges) MetadataToolsOrErr() ([]*Tool, error) {
+func (e MetadataEdges) ToolsOrErr() ([]*Tool, error) {
 	if e.loadedTypes[0] {
-		return e.MetadataTools, nil
+		return e.Tools, nil
 	}
-	return nil, &NotLoadedError{edge: "metadata_tools"}
+	return nil, &NotLoadedError{edge: "tools"}
 }
 
-// MetadataAuthorsOrErr returns the MetadataAuthors value or an error if the edge
+// AuthorsOrErr returns the Authors value or an error if the edge
 // was not loaded in eager-loading.
-func (e MetadataEdges) MetadataAuthorsOrErr() ([]*Person, error) {
+func (e MetadataEdges) AuthorsOrErr() ([]*Person, error) {
 	if e.loadedTypes[1] {
-		return e.MetadataAuthors, nil
+		return e.Authors, nil
 	}
-	return nil, &NotLoadedError{edge: "metadata_authors"}
+	return nil, &NotLoadedError{edge: "authors"}
 }
 
-// MetadataDocumentTypesOrErr returns the MetadataDocumentTypes value or an error if the edge
+// DocumentTypesOrErr returns the DocumentTypes value or an error if the edge
 // was not loaded in eager-loading.
-func (e MetadataEdges) MetadataDocumentTypesOrErr() ([]*DocumentType, error) {
+func (e MetadataEdges) DocumentTypesOrErr() ([]*DocumentType, error) {
 	if e.loadedTypes[2] {
-		return e.MetadataDocumentTypes, nil
+		return e.DocumentTypes, nil
 	}
-	return nil, &NotLoadedError{edge: "metadata_document_types"}
+	return nil, &NotLoadedError{edge: "document_types"}
 }
 
 // DocumentOrErr returns the Document value or an error if the edge
@@ -116,8 +108,6 @@ func (*Metadata) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case metadata.FieldTools, metadata.FieldAuthors, metadata.FieldDocumentTypes:
-			values[i] = new([]byte)
 		case metadata.FieldID, metadata.FieldVersion, metadata.FieldName, metadata.FieldComment:
 			values[i] = new(sql.NullString)
 		case metadata.FieldDate:
@@ -167,30 +157,6 @@ func (m *Metadata) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.Comment = value.String
 			}
-		case metadata.FieldTools:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field tools", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &m.Tools); err != nil {
-					return fmt.Errorf("unmarshal field tools: %w", err)
-				}
-			}
-		case metadata.FieldAuthors:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field authors", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &m.Authors); err != nil {
-					return fmt.Errorf("unmarshal field authors: %w", err)
-				}
-			}
-		case metadata.FieldDocumentTypes:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field document_types", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &m.DocumentTypes); err != nil {
-					return fmt.Errorf("unmarshal field document_types: %w", err)
-				}
-			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -204,19 +170,19 @@ func (m *Metadata) Value(name string) (ent.Value, error) {
 	return m.selectValues.Get(name)
 }
 
-// QueryMetadataTools queries the "metadata_tools" edge of the Metadata entity.
-func (m *Metadata) QueryMetadataTools() *ToolQuery {
-	return NewMetadataClient(m.config).QueryMetadataTools(m)
+// QueryTools queries the "tools" edge of the Metadata entity.
+func (m *Metadata) QueryTools() *ToolQuery {
+	return NewMetadataClient(m.config).QueryTools(m)
 }
 
-// QueryMetadataAuthors queries the "metadata_authors" edge of the Metadata entity.
-func (m *Metadata) QueryMetadataAuthors() *PersonQuery {
-	return NewMetadataClient(m.config).QueryMetadataAuthors(m)
+// QueryAuthors queries the "authors" edge of the Metadata entity.
+func (m *Metadata) QueryAuthors() *PersonQuery {
+	return NewMetadataClient(m.config).QueryAuthors(m)
 }
 
-// QueryMetadataDocumentTypes queries the "metadata_document_types" edge of the Metadata entity.
-func (m *Metadata) QueryMetadataDocumentTypes() *DocumentTypeQuery {
-	return NewMetadataClient(m.config).QueryMetadataDocumentTypes(m)
+// QueryDocumentTypes queries the "document_types" edge of the Metadata entity.
+func (m *Metadata) QueryDocumentTypes() *DocumentTypeQuery {
+	return NewMetadataClient(m.config).QueryDocumentTypes(m)
 }
 
 // QueryDocument queries the "document" edge of the Metadata entity.
@@ -258,15 +224,6 @@ func (m *Metadata) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
 	builder.WriteString(m.Comment)
-	builder.WriteString(", ")
-	builder.WriteString("tools=")
-	builder.WriteString(fmt.Sprintf("%v", m.Tools))
-	builder.WriteString(", ")
-	builder.WriteString("authors=")
-	builder.WriteString(fmt.Sprintf("%v", m.Authors))
-	builder.WriteString(", ")
-	builder.WriteString("document_types=")
-	builder.WriteString(fmt.Sprintf("%v", m.DocumentTypes))
 	builder.WriteByte(')')
 	return builder.String()
 }

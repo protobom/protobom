@@ -28,8 +28,6 @@ var (
 	// DocumentsColumns holds the columns for the "documents" table.
 	DocumentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "metadata", Type: field.TypeJSON},
-		{Name: "node_list", Type: field.TypeJSON},
 		{Name: "metadata_document", Type: field.TypeString, Unique: true},
 		{Name: "node_list_document", Type: field.TypeInt, Unique: true},
 	}
@@ -41,13 +39,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "documents_metadata_document",
-				Columns:    []*schema.Column{DocumentsColumns[3]},
+				Columns:    []*schema.Column{DocumentsColumns[1]},
 				RefColumns: []*schema.Column{MetadataColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "documents_node_lists_document",
-				Columns:    []*schema.Column{DocumentsColumns[4]},
+				Columns:    []*schema.Column{DocumentsColumns[2]},
 				RefColumns: []*schema.Column{NodeListsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -56,7 +54,7 @@ var (
 			{
 				Name:    "document_metadata_document_node_list_document",
 				Unique:  true,
-				Columns: []*schema.Column{DocumentsColumns[3], DocumentsColumns[4]},
+				Columns: []*schema.Column{DocumentsColumns[1], DocumentsColumns[2]},
 			},
 		},
 	}
@@ -66,7 +64,7 @@ var (
 		{Name: "type", Type: field.TypeEnum, Nullable: true, Enums: []string{"OTHER", "DESIGN", "SOURCE", "BUILD", "ANALYZED", "DEPLOYED", "RUNTIME", "DISCOVERY", "DECOMISSION"}},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "metadata_metadata_document_types", Type: field.TypeString, Nullable: true},
+		{Name: "metadata_document_types", Type: field.TypeString, Nullable: true},
 	}
 	// DocumentTypesTable holds the schema information for the "document_types" table.
 	DocumentTypesTable = &schema.Table{
@@ -75,7 +73,7 @@ var (
 		PrimaryKey: []*schema.Column{DocumentTypesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "document_types_metadata_metadata_document_types",
+				Symbol:     "document_types_metadata_document_types",
 				Columns:    []*schema.Column{DocumentTypesColumns[4]},
 				RefColumns: []*schema.Column{MetadataColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -128,8 +126,7 @@ var (
 		{Name: "comment", Type: field.TypeString},
 		{Name: "authority", Type: field.TypeString, Nullable: true},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"UNKNOWN", "ATTESTATION", "BINARY", "BOM", "BOWER", "BUILD_META", "BUILD_SYSTEM", "CERTIFICATION_REPORT", "CHAT", "CODIFIED_INFRASTRUCTURE", "COMPONENT_ANALYSIS_REPORT", "CONFIGURATION", "DISTRIBUTION_INTAKE", "DOCUMENTATION", "DOWNLOAD", "DYNAMIC_ANALYSIS_REPORT", "EOL_NOTICE", "EVIDENCE", "EXPORT_CONTROL_ASSESSMENT", "FORMULATION", "FUNDING", "ISSUE_TRACKER", "LICENSE", "LOG", "MAILING_LIST", "MATURITY_REPORT", "MAVEN_CENTRAL", "METRICS", "MODEL_CARD", "NPM", "NUGET", "OTHER", "POAM", "PRIVACY_ASSESSMENT", "PRODUCT_METADATA", "PURCHASE_ORDER", "QUALITY_ASSESSMENT_REPORT", "QUALITY_METRICS", "RELEASE_HISTORY", "RELEASE_NOTES", "RISK_ASSESSMENT", "RUNTIME_ANALYSIS_REPORT", "SECURE_SOFTWARE_ATTESTATION", "SECURITY_ADVERSARY_MODEL", "SECURITY_ADVISORY", "SECURITY_CONTACT", "SECURITY_FIX", "SECURITY_OTHER", "SECURITY_PENTEST_REPORT", "SECURITY_POLICY", "SECURITY_SWID", "SECURITY_THREAT_MODEL", "SOCIAL", "SOURCE_ARTIFACT", "STATIC_ANALYSIS_REPORT", "SUPPORT", "VCS", "VULNERABILITY_ASSERTION", "VULNERABILITY_DISCLOSURE_REPORT", "VULNERABILITY_EXPLOITABILITY_ASSESSMENT", "WEBSITE"}},
-		{Name: "hashes", Type: field.TypeJSON},
-		{Name: "node_node_external_references", Type: field.TypeString},
+		{Name: "node_external_references", Type: field.TypeString},
 	}
 	// ExternalReferencesTable holds the schema information for the "external_references" table.
 	ExternalReferencesTable = &schema.Table{
@@ -138,8 +135,8 @@ var (
 		PrimaryKey: []*schema.Column{ExternalReferencesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "external_references_nodes_node_external_references",
-				Columns:    []*schema.Column{ExternalReferencesColumns[6]},
+				Symbol:     "external_references_nodes_external_references",
+				Columns:    []*schema.Column{ExternalReferencesColumns[5]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -150,8 +147,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "hash_algorithm_type", Type: field.TypeEnum, Enums: []string{"UNKNOWN", "MD5", "SHA1", "SHA256", "SHA384", "SHA512", "SHA3_256", "SHA3_384", "SHA3_512", "BLAKE2B_256", "BLAKE2B_384", "BLAKE2B_512", "BLAKE3", "MD2", "ADLER32", "MD4", "MD6", "SHA224"}},
 		{Name: "hash_data", Type: field.TypeString},
-		{Name: "external_reference_external_reference_hashes", Type: field.TypeInt, Nullable: true},
-		{Name: "node_node_hashes", Type: field.TypeString, Nullable: true},
+		{Name: "external_reference_hashes", Type: field.TypeInt, Nullable: true},
+		{Name: "node_hashes", Type: field.TypeString, Nullable: true},
 	}
 	// HashesEntriesTable holds the schema information for the "hashes_entries" table.
 	HashesEntriesTable = &schema.Table{
@@ -160,13 +157,13 @@ var (
 		PrimaryKey: []*schema.Column{HashesEntriesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "hashes_entries_external_references_external_reference_hashes",
+				Symbol:     "hashes_entries_external_references_hashes",
 				Columns:    []*schema.Column{HashesEntriesColumns[3]},
 				RefColumns: []*schema.Column{ExternalReferencesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "hashes_entries_nodes_node_hashes",
+				Symbol:     "hashes_entries_nodes_hashes",
 				Columns:    []*schema.Column{HashesEntriesColumns[4]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -185,7 +182,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "software_identifier_type", Type: field.TypeEnum, Enums: []string{"UNKNOWN_IDENTIFIER_TYPE", "PURL", "CPE22", "CPE23", "GITOID"}},
 		{Name: "software_identifier_value", Type: field.TypeString},
-		{Name: "node_node_identifiers", Type: field.TypeString, Nullable: true},
+		{Name: "node_identifiers", Type: field.TypeString, Nullable: true},
 	}
 	// IdentifiersEntriesTable holds the schema information for the "identifiers_entries" table.
 	IdentifiersEntriesTable = &schema.Table{
@@ -194,7 +191,7 @@ var (
 		PrimaryKey: []*schema.Column{IdentifiersEntriesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "identifiers_entries_nodes_node_identifiers",
+				Symbol:     "identifiers_entries_nodes_identifiers",
 				Columns:    []*schema.Column{IdentifiersEntriesColumns[3]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -215,9 +212,6 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "date", Type: field.TypeTime},
 		{Name: "comment", Type: field.TypeString},
-		{Name: "tools", Type: field.TypeJSON},
-		{Name: "authors", Type: field.TypeJSON},
-		{Name: "document_types", Type: field.TypeJSON},
 	}
 	// MetadataTable holds the schema information for the "metadata" table.
 	MetadataTable = &schema.Table{
@@ -247,13 +241,7 @@ var (
 		{Name: "valid_until_date", Type: field.TypeTime},
 		{Name: "attribution", Type: field.TypeJSON},
 		{Name: "file_types", Type: field.TypeJSON},
-		{Name: "suppliers", Type: field.TypeJSON},
-		{Name: "originators", Type: field.TypeJSON},
-		{Name: "external_references", Type: field.TypeJSON},
-		{Name: "hashes", Type: field.TypeJSON},
-		{Name: "identifiers", Type: field.TypeJSON},
-		{Name: "primary_purpose", Type: field.TypeJSON},
-		{Name: "node_list_node_list_nodes", Type: field.TypeInt},
+		{Name: "node_list_nodes", Type: field.TypeInt},
 	}
 	// NodesTable holds the schema information for the "nodes" table.
 	NodesTable = &schema.Table{
@@ -262,8 +250,8 @@ var (
 		PrimaryKey: []*schema.Column{NodesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "nodes_node_lists_node_list_nodes",
-				Columns:    []*schema.Column{NodesColumns[26]},
+				Symbol:     "nodes_node_lists_nodes",
+				Columns:    []*schema.Column{NodesColumns[20]},
 				RefColumns: []*schema.Column{NodeListsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -273,7 +261,6 @@ var (
 	NodeListsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "root_elements", Type: field.TypeJSON},
-		{Name: "nodes", Type: field.TypeJSON},
 	}
 	// NodeListsTable holds the schema information for the "node_lists" table.
 	NodeListsTable = &schema.Table{
@@ -289,11 +276,10 @@ var (
 		{Name: "email", Type: field.TypeString},
 		{Name: "url", Type: field.TypeString},
 		{Name: "phone", Type: field.TypeString},
-		{Name: "contacts", Type: field.TypeJSON},
-		{Name: "metadata_metadata_authors", Type: field.TypeString, Nullable: true},
-		{Name: "node_node_suppliers", Type: field.TypeString, Nullable: true},
-		{Name: "node_node_originators", Type: field.TypeString, Nullable: true},
-		{Name: "person_person_contacts", Type: field.TypeInt, Nullable: true},
+		{Name: "metadata_authors", Type: field.TypeString, Nullable: true},
+		{Name: "node_suppliers", Type: field.TypeString, Nullable: true},
+		{Name: "node_originators", Type: field.TypeString, Nullable: true},
+		{Name: "person_contacts", Type: field.TypeInt, Nullable: true},
 	}
 	// PersonsTable holds the schema information for the "persons" table.
 	PersonsTable = &schema.Table{
@@ -302,26 +288,26 @@ var (
 		PrimaryKey: []*schema.Column{PersonsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "persons_metadata_metadata_authors",
-				Columns:    []*schema.Column{PersonsColumns[7]},
+				Symbol:     "persons_metadata_authors",
+				Columns:    []*schema.Column{PersonsColumns[6]},
 				RefColumns: []*schema.Column{MetadataColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "persons_nodes_node_suppliers",
+				Symbol:     "persons_nodes_suppliers",
+				Columns:    []*schema.Column{PersonsColumns[7]},
+				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "persons_nodes_originators",
 				Columns:    []*schema.Column{PersonsColumns[8]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "persons_nodes_node_originators",
+				Symbol:     "persons_persons_contacts",
 				Columns:    []*schema.Column{PersonsColumns[9]},
-				RefColumns: []*schema.Column{NodesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "persons_persons_person_contacts",
-				Columns:    []*schema.Column{PersonsColumns[10]},
 				RefColumns: []*schema.Column{PersonsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -344,7 +330,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "version", Type: field.TypeString},
 		{Name: "vendor", Type: field.TypeString},
-		{Name: "metadata_metadata_tools", Type: field.TypeString, Nullable: true},
+		{Name: "metadata_tools", Type: field.TypeString, Nullable: true},
 	}
 	// ToolsTable holds the schema information for the "tools" table.
 	ToolsTable = &schema.Table{
@@ -353,33 +339,33 @@ var (
 		PrimaryKey: []*schema.Column{ToolsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "tools_metadata_metadata_tools",
+				Symbol:     "tools_metadata_tools",
 				Columns:    []*schema.Column{ToolsColumns[4]},
 				RefColumns: []*schema.Column{MetadataColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 	}
-	// NodeNodePrimaryPurposeColumns holds the columns for the "node_node_primary_purpose" table.
-	NodeNodePrimaryPurposeColumns = []*schema.Column{
+	// NodePrimaryPurposeColumns holds the columns for the "node_primary_purpose" table.
+	NodePrimaryPurposeColumns = []*schema.Column{
 		{Name: "node_id", Type: field.TypeString},
 		{Name: "purpose_id", Type: field.TypeInt},
 	}
-	// NodeNodePrimaryPurposeTable holds the schema information for the "node_node_primary_purpose" table.
-	NodeNodePrimaryPurposeTable = &schema.Table{
-		Name:       "node_node_primary_purpose",
-		Columns:    NodeNodePrimaryPurposeColumns,
-		PrimaryKey: []*schema.Column{NodeNodePrimaryPurposeColumns[0], NodeNodePrimaryPurposeColumns[1]},
+	// NodePrimaryPurposeTable holds the schema information for the "node_primary_purpose" table.
+	NodePrimaryPurposeTable = &schema.Table{
+		Name:       "node_primary_purpose",
+		Columns:    NodePrimaryPurposeColumns,
+		PrimaryKey: []*schema.Column{NodePrimaryPurposeColumns[0], NodePrimaryPurposeColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "node_node_primary_purpose_node_id",
-				Columns:    []*schema.Column{NodeNodePrimaryPurposeColumns[0]},
+				Symbol:     "node_primary_purpose_node_id",
+				Columns:    []*schema.Column{NodePrimaryPurposeColumns[0]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "node_node_primary_purpose_purpose_id",
-				Columns:    []*schema.Column{NodeNodePrimaryPurposeColumns[1]},
+				Symbol:     "node_primary_purpose_purpose_id",
+				Columns:    []*schema.Column{NodePrimaryPurposeColumns[1]},
 				RefColumns: []*schema.Column{PurposesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -399,7 +385,7 @@ var (
 		PersonsTable,
 		PurposesTable,
 		ToolsTable,
-		NodeNodePrimaryPurposeTable,
+		NodePrimaryPurposeTable,
 	}
 )
 
@@ -419,6 +405,6 @@ func init() {
 	PersonsTable.ForeignKeys[2].RefTable = NodesTable
 	PersonsTable.ForeignKeys[3].RefTable = PersonsTable
 	ToolsTable.ForeignKeys[0].RefTable = MetadataTable
-	NodeNodePrimaryPurposeTable.ForeignKeys[0].RefTable = NodesTable
-	NodeNodePrimaryPurposeTable.ForeignKeys[1].RefTable = PurposesTable
+	NodePrimaryPurposeTable.ForeignKeys[0].RefTable = NodesTable
+	NodePrimaryPurposeTable.ForeignKeys[1].RefTable = PurposesTable
 }

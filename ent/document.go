@@ -19,7 +19,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -28,18 +27,13 @@ import (
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/nodelist"
-	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // Document is the model entity for the Document schema.
 type Document struct {
-	config `json:"-"`
+	config
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Metadata holds the value of the "metadata" field.
-	Metadata *sbom.Metadata `json:"metadata,omitempty"`
-	// NodeList holds the value of the "node_list" field.
-	NodeList *sbom.NodeList `json:"node_list,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DocumentQuery when eager-loading is set.
 	Edges              DocumentEdges `json:"edges"`
@@ -50,39 +44,39 @@ type Document struct {
 
 // DocumentEdges holds the relations/edges for other nodes in the graph.
 type DocumentEdges struct {
-	// DocumentMetadata holds the value of the document_metadata edge.
-	DocumentMetadata *Metadata `json:"document_metadata,omitempty"`
-	// DocumentNodeList holds the value of the document_node_list edge.
-	DocumentNodeList *NodeList `json:"document_node_list,omitempty"`
+	// Metadata holds the value of the metadata edge.
+	Metadata *Metadata `json:"metadata,omitempty"`
+	// NodeList holds the value of the node_list edge.
+	NodeList *NodeList `json:"node_list,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// DocumentMetadataOrErr returns the DocumentMetadata value or an error if the edge
+// MetadataOrErr returns the Metadata value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e DocumentEdges) DocumentMetadataOrErr() (*Metadata, error) {
+func (e DocumentEdges) MetadataOrErr() (*Metadata, error) {
 	if e.loadedTypes[0] {
-		if e.DocumentMetadata == nil {
+		if e.Metadata == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: metadata.Label}
 		}
-		return e.DocumentMetadata, nil
+		return e.Metadata, nil
 	}
-	return nil, &NotLoadedError{edge: "document_metadata"}
+	return nil, &NotLoadedError{edge: "metadata"}
 }
 
-// DocumentNodeListOrErr returns the DocumentNodeList value or an error if the edge
+// NodeListOrErr returns the NodeList value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e DocumentEdges) DocumentNodeListOrErr() (*NodeList, error) {
+func (e DocumentEdges) NodeListOrErr() (*NodeList, error) {
 	if e.loadedTypes[1] {
-		if e.DocumentNodeList == nil {
+		if e.NodeList == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: nodelist.Label}
 		}
-		return e.DocumentNodeList, nil
+		return e.NodeList, nil
 	}
-	return nil, &NotLoadedError{edge: "document_node_list"}
+	return nil, &NotLoadedError{edge: "node_list"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -90,8 +84,6 @@ func (*Document) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case document.FieldMetadata, document.FieldNodeList:
-			values[i] = new([]byte)
 		case document.FieldID:
 			values[i] = new(sql.NullInt64)
 		case document.ForeignKeys[0]: // metadata_document
@@ -119,22 +111,6 @@ func (d *Document) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			d.ID = int(value.Int64)
-		case document.FieldMetadata:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field metadata", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &d.Metadata); err != nil {
-					return fmt.Errorf("unmarshal field metadata: %w", err)
-				}
-			}
-		case document.FieldNodeList:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field node_list", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &d.NodeList); err != nil {
-					return fmt.Errorf("unmarshal field node_list: %w", err)
-				}
-			}
 		case document.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata_document", values[i])
@@ -162,14 +138,14 @@ func (d *Document) Value(name string) (ent.Value, error) {
 	return d.selectValues.Get(name)
 }
 
-// QueryDocumentMetadata queries the "document_metadata" edge of the Document entity.
-func (d *Document) QueryDocumentMetadata() *MetadataQuery {
-	return NewDocumentClient(d.config).QueryDocumentMetadata(d)
+// QueryMetadata queries the "metadata" edge of the Document entity.
+func (d *Document) QueryMetadata() *MetadataQuery {
+	return NewDocumentClient(d.config).QueryMetadata(d)
 }
 
-// QueryDocumentNodeList queries the "document_node_list" edge of the Document entity.
-func (d *Document) QueryDocumentNodeList() *NodeListQuery {
-	return NewDocumentClient(d.config).QueryDocumentNodeList(d)
+// QueryNodeList queries the "node_list" edge of the Document entity.
+func (d *Document) QueryNodeList() *NodeListQuery {
+	return NewDocumentClient(d.config).QueryNodeList(d)
 }
 
 // Update returns a builder for updating this Document.
@@ -194,12 +170,7 @@ func (d *Document) Unwrap() *Document {
 func (d *Document) String() string {
 	var builder strings.Builder
 	builder.WriteString("Document(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", d.ID))
-	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", d.Metadata))
-	builder.WriteString(", ")
-	builder.WriteString("node_list=")
-	builder.WriteString(fmt.Sprintf("%v", d.NodeList))
+	builder.WriteString(fmt.Sprintf("id=%v", d.ID))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -37,43 +37,37 @@ const (
 	FieldDate = "date"
 	// FieldComment holds the string denoting the comment field in the database.
 	FieldComment = "comment"
-	// FieldTools holds the string denoting the tools field in the database.
-	FieldTools = "tools"
-	// FieldAuthors holds the string denoting the authors field in the database.
-	FieldAuthors = "authors"
-	// FieldDocumentTypes holds the string denoting the document_types field in the database.
-	FieldDocumentTypes = "document_types"
-	// EdgeMetadataTools holds the string denoting the metadata_tools edge name in mutations.
-	EdgeMetadataTools = "metadata_tools"
-	// EdgeMetadataAuthors holds the string denoting the metadata_authors edge name in mutations.
-	EdgeMetadataAuthors = "metadata_authors"
-	// EdgeMetadataDocumentTypes holds the string denoting the metadata_document_types edge name in mutations.
-	EdgeMetadataDocumentTypes = "metadata_document_types"
+	// EdgeTools holds the string denoting the tools edge name in mutations.
+	EdgeTools = "tools"
+	// EdgeAuthors holds the string denoting the authors edge name in mutations.
+	EdgeAuthors = "authors"
+	// EdgeDocumentTypes holds the string denoting the document_types edge name in mutations.
+	EdgeDocumentTypes = "document_types"
 	// EdgeDocument holds the string denoting the document edge name in mutations.
 	EdgeDocument = "document"
 	// Table holds the table name of the metadata in the database.
 	Table = "metadata"
-	// MetadataToolsTable is the table that holds the metadata_tools relation/edge.
-	MetadataToolsTable = "tools"
-	// MetadataToolsInverseTable is the table name for the Tool entity.
+	// ToolsTable is the table that holds the tools relation/edge.
+	ToolsTable = "tools"
+	// ToolsInverseTable is the table name for the Tool entity.
 	// It exists in this package in order to avoid circular dependency with the "tool" package.
-	MetadataToolsInverseTable = "tools"
-	// MetadataToolsColumn is the table column denoting the metadata_tools relation/edge.
-	MetadataToolsColumn = "metadata_metadata_tools"
-	// MetadataAuthorsTable is the table that holds the metadata_authors relation/edge.
-	MetadataAuthorsTable = "persons"
-	// MetadataAuthorsInverseTable is the table name for the Person entity.
+	ToolsInverseTable = "tools"
+	// ToolsColumn is the table column denoting the tools relation/edge.
+	ToolsColumn = "metadata_tools"
+	// AuthorsTable is the table that holds the authors relation/edge.
+	AuthorsTable = "persons"
+	// AuthorsInverseTable is the table name for the Person entity.
 	// It exists in this package in order to avoid circular dependency with the "person" package.
-	MetadataAuthorsInverseTable = "persons"
-	// MetadataAuthorsColumn is the table column denoting the metadata_authors relation/edge.
-	MetadataAuthorsColumn = "metadata_metadata_authors"
-	// MetadataDocumentTypesTable is the table that holds the metadata_document_types relation/edge.
-	MetadataDocumentTypesTable = "document_types"
-	// MetadataDocumentTypesInverseTable is the table name for the DocumentType entity.
+	AuthorsInverseTable = "persons"
+	// AuthorsColumn is the table column denoting the authors relation/edge.
+	AuthorsColumn = "metadata_authors"
+	// DocumentTypesTable is the table that holds the document_types relation/edge.
+	DocumentTypesTable = "document_types"
+	// DocumentTypesInverseTable is the table name for the DocumentType entity.
 	// It exists in this package in order to avoid circular dependency with the "documenttype" package.
-	MetadataDocumentTypesInverseTable = "document_types"
-	// MetadataDocumentTypesColumn is the table column denoting the metadata_document_types relation/edge.
-	MetadataDocumentTypesColumn = "metadata_metadata_document_types"
+	DocumentTypesInverseTable = "document_types"
+	// DocumentTypesColumn is the table column denoting the document_types relation/edge.
+	DocumentTypesColumn = "metadata_document_types"
 	// DocumentTable is the table that holds the document relation/edge.
 	DocumentTable = "documents"
 	// DocumentInverseTable is the table name for the Document entity.
@@ -90,9 +84,6 @@ var Columns = []string{
 	FieldName,
 	FieldDate,
 	FieldComment,
-	FieldTools,
-	FieldAuthors,
-	FieldDocumentTypes,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -133,45 +124,45 @@ func ByComment(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldComment, opts...).ToFunc()
 }
 
-// ByMetadataToolsCount orders the results by metadata_tools count.
-func ByMetadataToolsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByToolsCount orders the results by tools count.
+func ByToolsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newMetadataToolsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newToolsStep(), opts...)
 	}
 }
 
-// ByMetadataTools orders the results by metadata_tools terms.
-func ByMetadataTools(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByTools orders the results by tools terms.
+func ByTools(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newMetadataToolsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newToolsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByMetadataAuthorsCount orders the results by metadata_authors count.
-func ByMetadataAuthorsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByAuthorsCount orders the results by authors count.
+func ByAuthorsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newMetadataAuthorsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newAuthorsStep(), opts...)
 	}
 }
 
-// ByMetadataAuthors orders the results by metadata_authors terms.
-func ByMetadataAuthors(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByAuthors orders the results by authors terms.
+func ByAuthors(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newMetadataAuthorsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newAuthorsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByMetadataDocumentTypesCount orders the results by metadata_document_types count.
-func ByMetadataDocumentTypesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByDocumentTypesCount orders the results by document_types count.
+func ByDocumentTypesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newMetadataDocumentTypesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newDocumentTypesStep(), opts...)
 	}
 }
 
-// ByMetadataDocumentTypes orders the results by metadata_document_types terms.
-func ByMetadataDocumentTypes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByDocumentTypes orders the results by document_types terms.
+func ByDocumentTypes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newMetadataDocumentTypesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newDocumentTypesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -181,25 +172,25 @@ func ByDocumentField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newDocumentStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newMetadataToolsStep() *sqlgraph.Step {
+func newToolsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(MetadataToolsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, MetadataToolsTable, MetadataToolsColumn),
+		sqlgraph.To(ToolsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ToolsTable, ToolsColumn),
 	)
 }
-func newMetadataAuthorsStep() *sqlgraph.Step {
+func newAuthorsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(MetadataAuthorsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, MetadataAuthorsTable, MetadataAuthorsColumn),
+		sqlgraph.To(AuthorsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AuthorsTable, AuthorsColumn),
 	)
 }
-func newMetadataDocumentTypesStep() *sqlgraph.Step {
+func newDocumentTypesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(MetadataDocumentTypesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, MetadataDocumentTypesTable, MetadataDocumentTypesColumn),
+		sqlgraph.To(DocumentTypesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DocumentTypesTable, DocumentTypesColumn),
 	)
 }
 func newDocumentStep() *sqlgraph.Step {

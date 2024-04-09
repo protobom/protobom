@@ -29,37 +29,31 @@ const (
 	Label = "document"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldMetadata holds the string denoting the metadata field in the database.
-	FieldMetadata = "metadata"
-	// FieldNodeList holds the string denoting the node_list field in the database.
-	FieldNodeList = "node_list"
-	// EdgeDocumentMetadata holds the string denoting the document_metadata edge name in mutations.
-	EdgeDocumentMetadata = "document_metadata"
-	// EdgeDocumentNodeList holds the string denoting the document_node_list edge name in mutations.
-	EdgeDocumentNodeList = "document_node_list"
+	// EdgeMetadata holds the string denoting the metadata edge name in mutations.
+	EdgeMetadata = "metadata"
+	// EdgeNodeList holds the string denoting the node_list edge name in mutations.
+	EdgeNodeList = "node_list"
 	// Table holds the table name of the document in the database.
 	Table = "documents"
-	// DocumentMetadataTable is the table that holds the document_metadata relation/edge.
-	DocumentMetadataTable = "documents"
-	// DocumentMetadataInverseTable is the table name for the Metadata entity.
+	// MetadataTable is the table that holds the metadata relation/edge.
+	MetadataTable = "documents"
+	// MetadataInverseTable is the table name for the Metadata entity.
 	// It exists in this package in order to avoid circular dependency with the "metadata" package.
-	DocumentMetadataInverseTable = "metadata"
-	// DocumentMetadataColumn is the table column denoting the document_metadata relation/edge.
-	DocumentMetadataColumn = "metadata_document"
-	// DocumentNodeListTable is the table that holds the document_node_list relation/edge.
-	DocumentNodeListTable = "documents"
-	// DocumentNodeListInverseTable is the table name for the NodeList entity.
+	MetadataInverseTable = "metadata"
+	// MetadataColumn is the table column denoting the metadata relation/edge.
+	MetadataColumn = "metadata_document"
+	// NodeListTable is the table that holds the node_list relation/edge.
+	NodeListTable = "documents"
+	// NodeListInverseTable is the table name for the NodeList entity.
 	// It exists in this package in order to avoid circular dependency with the "nodelist" package.
-	DocumentNodeListInverseTable = "node_lists"
-	// DocumentNodeListColumn is the table column denoting the document_node_list relation/edge.
-	DocumentNodeListColumn = "node_list_document"
+	NodeListInverseTable = "node_lists"
+	// NodeListColumn is the table column denoting the node_list relation/edge.
+	NodeListColumn = "node_list_document"
 )
 
 // Columns holds all SQL columns for document fields.
 var Columns = []string{
 	FieldID,
-	FieldMetadata,
-	FieldNodeList,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "documents"
@@ -92,30 +86,30 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByDocumentMetadataField orders the results by document_metadata field.
-func ByDocumentMetadataField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByMetadataField orders the results by metadata field.
+func ByMetadataField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newDocumentMetadataStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newMetadataStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByDocumentNodeListField orders the results by document_node_list field.
-func ByDocumentNodeListField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByNodeListField orders the results by node_list field.
+func ByNodeListField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newDocumentNodeListStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newNodeListStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newDocumentMetadataStep() *sqlgraph.Step {
+func newMetadataStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DocumentMetadataInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, DocumentMetadataTable, DocumentMetadataColumn),
+		sqlgraph.To(MetadataInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, MetadataTable, MetadataColumn),
 	)
 }
-func newDocumentNodeListStep() *sqlgraph.Step {
+func newNodeListStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DocumentNodeListInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, DocumentNodeListTable, DocumentNodeListColumn),
+		sqlgraph.To(NodeListInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, NodeListTable, NodeListColumn),
 	)
 }

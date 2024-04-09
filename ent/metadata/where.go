@@ -337,21 +337,21 @@ func CommentContainsFold(v string) predicate.Metadata {
 	return predicate.Metadata(sql.FieldContainsFold(FieldComment, v))
 }
 
-// HasMetadataTools applies the HasEdge predicate on the "metadata_tools" edge.
-func HasMetadataTools() predicate.Metadata {
+// HasTools applies the HasEdge predicate on the "tools" edge.
+func HasTools() predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, MetadataToolsTable, MetadataToolsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ToolsTable, ToolsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasMetadataToolsWith applies the HasEdge predicate on the "metadata_tools" edge with a given conditions (other predicates).
-func HasMetadataToolsWith(preds ...predicate.Tool) predicate.Metadata {
+// HasToolsWith applies the HasEdge predicate on the "tools" edge with a given conditions (other predicates).
+func HasToolsWith(preds ...predicate.Tool) predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
-		step := newMetadataToolsStep()
+		step := newToolsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -360,21 +360,21 @@ func HasMetadataToolsWith(preds ...predicate.Tool) predicate.Metadata {
 	})
 }
 
-// HasMetadataAuthors applies the HasEdge predicate on the "metadata_authors" edge.
-func HasMetadataAuthors() predicate.Metadata {
+// HasAuthors applies the HasEdge predicate on the "authors" edge.
+func HasAuthors() predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, MetadataAuthorsTable, MetadataAuthorsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, AuthorsTable, AuthorsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasMetadataAuthorsWith applies the HasEdge predicate on the "metadata_authors" edge with a given conditions (other predicates).
-func HasMetadataAuthorsWith(preds ...predicate.Person) predicate.Metadata {
+// HasAuthorsWith applies the HasEdge predicate on the "authors" edge with a given conditions (other predicates).
+func HasAuthorsWith(preds ...predicate.Person) predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
-		step := newMetadataAuthorsStep()
+		step := newAuthorsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -383,21 +383,21 @@ func HasMetadataAuthorsWith(preds ...predicate.Person) predicate.Metadata {
 	})
 }
 
-// HasMetadataDocumentTypes applies the HasEdge predicate on the "metadata_document_types" edge.
-func HasMetadataDocumentTypes() predicate.Metadata {
+// HasDocumentTypes applies the HasEdge predicate on the "document_types" edge.
+func HasDocumentTypes() predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, MetadataDocumentTypesTable, MetadataDocumentTypesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, DocumentTypesTable, DocumentTypesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasMetadataDocumentTypesWith applies the HasEdge predicate on the "metadata_document_types" edge with a given conditions (other predicates).
-func HasMetadataDocumentTypesWith(preds ...predicate.DocumentType) predicate.Metadata {
+// HasDocumentTypesWith applies the HasEdge predicate on the "document_types" edge with a given conditions (other predicates).
+func HasDocumentTypesWith(preds ...predicate.DocumentType) predicate.Metadata {
 	return predicate.Metadata(func(s *sql.Selector) {
-		step := newMetadataDocumentTypesStep()
+		step := newDocumentTypesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

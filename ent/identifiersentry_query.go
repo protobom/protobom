@@ -428,10 +428,10 @@ func (ieq *IdentifiersEntryQuery) loadNodes(ctx context.Context, query *NodeQuer
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*IdentifiersEntry)
 	for i := range nodes {
-		if nodes[i].node_node_identifiers == nil {
+		if nodes[i].node_identifiers == nil {
 			continue
 		}
-		fk := *nodes[i].node_node_identifiers
+		fk := *nodes[i].node_identifiers
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -448,7 +448,7 @@ func (ieq *IdentifiersEntryQuery) loadNodes(ctx context.Context, query *NodeQuer
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "node_node_identifiers" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "node_identifiers" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

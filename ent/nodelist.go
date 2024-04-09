@@ -27,7 +27,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/nodelist"
-	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // NodeList is the model entity for the NodeList schema.
@@ -37,8 +36,6 @@ type NodeList struct {
 	ID int `json:"id,omitempty"`
 	// RootElements holds the value of the "root_elements" field.
 	RootElements []string `json:"root_elements,omitempty"`
-	// Nodes holds the value of the "nodes" field.
-	Nodes []*sbom.Node `json:"nodes,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NodeListQuery when eager-loading is set.
 	Edges        NodeListEdges `json:"edges"`
@@ -47,8 +44,8 @@ type NodeList struct {
 
 // NodeListEdges holds the relations/edges for other nodes in the graph.
 type NodeListEdges struct {
-	// NodeListNodes holds the value of the node_list_nodes edge.
-	NodeListNodes []*Node `json:"node_list_nodes,omitempty"`
+	// Nodes holds the value of the nodes edge.
+	Nodes []*Node `json:"nodes,omitempty"`
 	// Document holds the value of the document edge.
 	Document *Document `json:"document,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -56,13 +53,13 @@ type NodeListEdges struct {
 	loadedTypes [2]bool
 }
 
-// NodeListNodesOrErr returns the NodeListNodes value or an error if the edge
+// NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
-func (e NodeListEdges) NodeListNodesOrErr() ([]*Node, error) {
+func (e NodeListEdges) NodesOrErr() ([]*Node, error) {
 	if e.loadedTypes[0] {
-		return e.NodeListNodes, nil
+		return e.Nodes, nil
 	}
-	return nil, &NotLoadedError{edge: "node_list_nodes"}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // DocumentOrErr returns the Document value or an error if the edge
@@ -83,7 +80,7 @@ func (*NodeList) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case nodelist.FieldRootElements, nodelist.FieldNodes:
+		case nodelist.FieldRootElements:
 			values[i] = new([]byte)
 		case nodelist.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -116,14 +113,6 @@ func (nl *NodeList) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field root_elements: %w", err)
 				}
 			}
-		case nodelist.FieldNodes:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field nodes", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &nl.Nodes); err != nil {
-					return fmt.Errorf("unmarshal field nodes: %w", err)
-				}
-			}
 		default:
 			nl.selectValues.Set(columns[i], values[i])
 		}
@@ -137,9 +126,9 @@ func (nl *NodeList) Value(name string) (ent.Value, error) {
 	return nl.selectValues.Get(name)
 }
 
-// QueryNodeListNodes queries the "node_list_nodes" edge of the NodeList entity.
-func (nl *NodeList) QueryNodeListNodes() *NodeQuery {
-	return NewNodeListClient(nl.config).QueryNodeListNodes(nl)
+// QueryNodes queries the "nodes" edge of the NodeList entity.
+func (nl *NodeList) QueryNodes() *NodeQuery {
+	return NewNodeListClient(nl.config).QueryNodes(nl)
 }
 
 // QueryDocument queries the "document" edge of the NodeList entity.
@@ -172,9 +161,6 @@ func (nl *NodeList) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", nl.ID))
 	builder.WriteString("root_elements=")
 	builder.WriteString(fmt.Sprintf("%v", nl.RootElements))
-	builder.WriteString(", ")
-	builder.WriteString("nodes=")
-	builder.WriteString(fmt.Sprintf("%v", nl.Nodes))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -39,9 +39,9 @@ type IdentifiersEntry struct {
 	SoftwareIdentifierValue string `json:"software_identifier_value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the IdentifiersEntryQuery when eager-loading is set.
-	Edges                 IdentifiersEntryEdges `json:"edges"`
-	node_node_identifiers *string
-	selectValues          sql.SelectValues
+	Edges            IdentifiersEntryEdges `json:"edges"`
+	node_identifiers *string
+	selectValues     sql.SelectValues
 }
 
 // IdentifiersEntryEdges holds the relations/edges for other nodes in the graph.
@@ -75,7 +75,7 @@ func (*IdentifiersEntry) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case identifiersentry.FieldSoftwareIdentifierType, identifiersentry.FieldSoftwareIdentifierValue:
 			values[i] = new(sql.NullString)
-		case identifiersentry.ForeignKeys[0]: // node_node_identifiers
+		case identifiersentry.ForeignKeys[0]: // node_identifiers
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -112,10 +112,10 @@ func (ie *IdentifiersEntry) assignValues(columns []string, values []any) error {
 			}
 		case identifiersentry.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field node_node_identifiers", values[i])
+				return fmt.Errorf("unexpected type %T for field node_identifiers", values[i])
 			} else if value.Valid {
-				ie.node_node_identifiers = new(string)
-				*ie.node_node_identifiers = value.String
+				ie.node_identifiers = new(string)
+				*ie.node_identifiers = value.String
 			}
 		default:
 			ie.selectValues.Set(columns[i], values[i])

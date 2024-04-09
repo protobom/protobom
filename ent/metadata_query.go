@@ -38,14 +38,14 @@ import (
 // MetadataQuery is the builder for querying Metadata entities.
 type MetadataQuery struct {
 	config
-	ctx                       *QueryContext
-	order                     []metadata.OrderOption
-	inters                    []Interceptor
-	predicates                []predicate.Metadata
-	withMetadataTools         *ToolQuery
-	withMetadataAuthors       *PersonQuery
-	withMetadataDocumentTypes *DocumentTypeQuery
-	withDocument              *DocumentQuery
+	ctx               *QueryContext
+	order             []metadata.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.Metadata
+	withTools         *ToolQuery
+	withAuthors       *PersonQuery
+	withDocumentTypes *DocumentTypeQuery
+	withDocument      *DocumentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -82,8 +82,8 @@ func (mq *MetadataQuery) Order(o ...metadata.OrderOption) *MetadataQuery {
 	return mq
 }
 
-// QueryMetadataTools chains the current query on the "metadata_tools" edge.
-func (mq *MetadataQuery) QueryMetadataTools() *ToolQuery {
+// QueryTools chains the current query on the "tools" edge.
+func (mq *MetadataQuery) QueryTools() *ToolQuery {
 	query := (&ToolClient{config: mq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mq.prepareQuery(ctx); err != nil {
@@ -96,7 +96,7 @@ func (mq *MetadataQuery) QueryMetadataTools() *ToolQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(metadata.Table, metadata.FieldID, selector),
 			sqlgraph.To(tool.Table, tool.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, metadata.MetadataToolsTable, metadata.MetadataToolsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, metadata.ToolsTable, metadata.ToolsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -104,8 +104,8 @@ func (mq *MetadataQuery) QueryMetadataTools() *ToolQuery {
 	return query
 }
 
-// QueryMetadataAuthors chains the current query on the "metadata_authors" edge.
-func (mq *MetadataQuery) QueryMetadataAuthors() *PersonQuery {
+// QueryAuthors chains the current query on the "authors" edge.
+func (mq *MetadataQuery) QueryAuthors() *PersonQuery {
 	query := (&PersonClient{config: mq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mq.prepareQuery(ctx); err != nil {
@@ -118,7 +118,7 @@ func (mq *MetadataQuery) QueryMetadataAuthors() *PersonQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(metadata.Table, metadata.FieldID, selector),
 			sqlgraph.To(person.Table, person.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, metadata.MetadataAuthorsTable, metadata.MetadataAuthorsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, metadata.AuthorsTable, metadata.AuthorsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -126,8 +126,8 @@ func (mq *MetadataQuery) QueryMetadataAuthors() *PersonQuery {
 	return query
 }
 
-// QueryMetadataDocumentTypes chains the current query on the "metadata_document_types" edge.
-func (mq *MetadataQuery) QueryMetadataDocumentTypes() *DocumentTypeQuery {
+// QueryDocumentTypes chains the current query on the "document_types" edge.
+func (mq *MetadataQuery) QueryDocumentTypes() *DocumentTypeQuery {
 	query := (&DocumentTypeClient{config: mq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mq.prepareQuery(ctx); err != nil {
@@ -140,7 +140,7 @@ func (mq *MetadataQuery) QueryMetadataDocumentTypes() *DocumentTypeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(metadata.Table, metadata.FieldID, selector),
 			sqlgraph.To(documenttype.Table, documenttype.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, metadata.MetadataDocumentTypesTable, metadata.MetadataDocumentTypesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, metadata.DocumentTypesTable, metadata.DocumentTypesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -357,51 +357,51 @@ func (mq *MetadataQuery) Clone() *MetadataQuery {
 		return nil
 	}
 	return &MetadataQuery{
-		config:                    mq.config,
-		ctx:                       mq.ctx.Clone(),
-		order:                     append([]metadata.OrderOption{}, mq.order...),
-		inters:                    append([]Interceptor{}, mq.inters...),
-		predicates:                append([]predicate.Metadata{}, mq.predicates...),
-		withMetadataTools:         mq.withMetadataTools.Clone(),
-		withMetadataAuthors:       mq.withMetadataAuthors.Clone(),
-		withMetadataDocumentTypes: mq.withMetadataDocumentTypes.Clone(),
-		withDocument:              mq.withDocument.Clone(),
+		config:            mq.config,
+		ctx:               mq.ctx.Clone(),
+		order:             append([]metadata.OrderOption{}, mq.order...),
+		inters:            append([]Interceptor{}, mq.inters...),
+		predicates:        append([]predicate.Metadata{}, mq.predicates...),
+		withTools:         mq.withTools.Clone(),
+		withAuthors:       mq.withAuthors.Clone(),
+		withDocumentTypes: mq.withDocumentTypes.Clone(),
+		withDocument:      mq.withDocument.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
 	}
 }
 
-// WithMetadataTools tells the query-builder to eager-load the nodes that are connected to
-// the "metadata_tools" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MetadataQuery) WithMetadataTools(opts ...func(*ToolQuery)) *MetadataQuery {
+// WithTools tells the query-builder to eager-load the nodes that are connected to
+// the "tools" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MetadataQuery) WithTools(opts ...func(*ToolQuery)) *MetadataQuery {
 	query := (&ToolClient{config: mq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mq.withMetadataTools = query
+	mq.withTools = query
 	return mq
 }
 
-// WithMetadataAuthors tells the query-builder to eager-load the nodes that are connected to
-// the "metadata_authors" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MetadataQuery) WithMetadataAuthors(opts ...func(*PersonQuery)) *MetadataQuery {
+// WithAuthors tells the query-builder to eager-load the nodes that are connected to
+// the "authors" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MetadataQuery) WithAuthors(opts ...func(*PersonQuery)) *MetadataQuery {
 	query := (&PersonClient{config: mq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mq.withMetadataAuthors = query
+	mq.withAuthors = query
 	return mq
 }
 
-// WithMetadataDocumentTypes tells the query-builder to eager-load the nodes that are connected to
-// the "metadata_document_types" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MetadataQuery) WithMetadataDocumentTypes(opts ...func(*DocumentTypeQuery)) *MetadataQuery {
+// WithDocumentTypes tells the query-builder to eager-load the nodes that are connected to
+// the "document_types" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MetadataQuery) WithDocumentTypes(opts ...func(*DocumentTypeQuery)) *MetadataQuery {
 	query := (&DocumentTypeClient{config: mq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mq.withMetadataDocumentTypes = query
+	mq.withDocumentTypes = query
 	return mq
 }
 
@@ -495,9 +495,9 @@ func (mq *MetadataQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Met
 		nodes       = []*Metadata{}
 		_spec       = mq.querySpec()
 		loadedTypes = [4]bool{
-			mq.withMetadataTools != nil,
-			mq.withMetadataAuthors != nil,
-			mq.withMetadataDocumentTypes != nil,
+			mq.withTools != nil,
+			mq.withAuthors != nil,
+			mq.withDocumentTypes != nil,
 			mq.withDocument != nil,
 		}
 	)
@@ -519,26 +519,24 @@ func (mq *MetadataQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Met
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := mq.withMetadataTools; query != nil {
-		if err := mq.loadMetadataTools(ctx, query, nodes,
-			func(n *Metadata) { n.Edges.MetadataTools = []*Tool{} },
-			func(n *Metadata, e *Tool) { n.Edges.MetadataTools = append(n.Edges.MetadataTools, e) }); err != nil {
+	if query := mq.withTools; query != nil {
+		if err := mq.loadTools(ctx, query, nodes,
+			func(n *Metadata) { n.Edges.Tools = []*Tool{} },
+			func(n *Metadata, e *Tool) { n.Edges.Tools = append(n.Edges.Tools, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := mq.withMetadataAuthors; query != nil {
-		if err := mq.loadMetadataAuthors(ctx, query, nodes,
-			func(n *Metadata) { n.Edges.MetadataAuthors = []*Person{} },
-			func(n *Metadata, e *Person) { n.Edges.MetadataAuthors = append(n.Edges.MetadataAuthors, e) }); err != nil {
+	if query := mq.withAuthors; query != nil {
+		if err := mq.loadAuthors(ctx, query, nodes,
+			func(n *Metadata) { n.Edges.Authors = []*Person{} },
+			func(n *Metadata, e *Person) { n.Edges.Authors = append(n.Edges.Authors, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := mq.withMetadataDocumentTypes; query != nil {
-		if err := mq.loadMetadataDocumentTypes(ctx, query, nodes,
-			func(n *Metadata) { n.Edges.MetadataDocumentTypes = []*DocumentType{} },
-			func(n *Metadata, e *DocumentType) {
-				n.Edges.MetadataDocumentTypes = append(n.Edges.MetadataDocumentTypes, e)
-			}); err != nil {
+	if query := mq.withDocumentTypes; query != nil {
+		if err := mq.loadDocumentTypes(ctx, query, nodes,
+			func(n *Metadata) { n.Edges.DocumentTypes = []*DocumentType{} },
+			func(n *Metadata, e *DocumentType) { n.Edges.DocumentTypes = append(n.Edges.DocumentTypes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -551,7 +549,7 @@ func (mq *MetadataQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Met
 	return nodes, nil
 }
 
-func (mq *MetadataQuery) loadMetadataTools(ctx context.Context, query *ToolQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *Tool)) error {
+func (mq *MetadataQuery) loadTools(ctx context.Context, query *ToolQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *Tool)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Metadata)
 	for i := range nodes {
@@ -563,26 +561,26 @@ func (mq *MetadataQuery) loadMetadataTools(ctx context.Context, query *ToolQuery
 	}
 	query.withFKs = true
 	query.Where(predicate.Tool(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(metadata.MetadataToolsColumn), fks...))
+		s.Where(sql.InValues(s.C(metadata.ToolsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.metadata_metadata_tools
+		fk := n.metadata_tools
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "metadata_metadata_tools" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "metadata_tools" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "metadata_metadata_tools" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "metadata_tools" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (mq *MetadataQuery) loadMetadataAuthors(ctx context.Context, query *PersonQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *Person)) error {
+func (mq *MetadataQuery) loadAuthors(ctx context.Context, query *PersonQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *Person)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Metadata)
 	for i := range nodes {
@@ -594,26 +592,26 @@ func (mq *MetadataQuery) loadMetadataAuthors(ctx context.Context, query *PersonQ
 	}
 	query.withFKs = true
 	query.Where(predicate.Person(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(metadata.MetadataAuthorsColumn), fks...))
+		s.Where(sql.InValues(s.C(metadata.AuthorsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.metadata_metadata_authors
+		fk := n.metadata_authors
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "metadata_metadata_authors" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "metadata_authors" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "metadata_metadata_authors" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "metadata_authors" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (mq *MetadataQuery) loadMetadataDocumentTypes(ctx context.Context, query *DocumentTypeQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *DocumentType)) error {
+func (mq *MetadataQuery) loadDocumentTypes(ctx context.Context, query *DocumentTypeQuery, nodes []*Metadata, init func(*Metadata), assign func(*Metadata, *DocumentType)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Metadata)
 	for i := range nodes {
@@ -625,20 +623,20 @@ func (mq *MetadataQuery) loadMetadataDocumentTypes(ctx context.Context, query *D
 	}
 	query.withFKs = true
 	query.Where(predicate.DocumentType(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(metadata.MetadataDocumentTypesColumn), fks...))
+		s.Where(sql.InValues(s.C(metadata.DocumentTypesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.metadata_metadata_document_types
+		fk := n.metadata_document_types
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "metadata_metadata_document_types" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "metadata_document_types" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "metadata_metadata_document_types" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "metadata_document_types" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

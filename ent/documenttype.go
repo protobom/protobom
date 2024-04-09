@@ -41,9 +41,9 @@ type DocumentType struct {
 	Description *string `json:"description,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DocumentTypeQuery when eager-loading is set.
-	Edges                            DocumentTypeEdges `json:"edges"`
-	metadata_metadata_document_types *string
-	selectValues                     sql.SelectValues
+	Edges                   DocumentTypeEdges `json:"edges"`
+	metadata_document_types *string
+	selectValues            sql.SelectValues
 }
 
 // DocumentTypeEdges holds the relations/edges for other nodes in the graph.
@@ -77,7 +77,7 @@ func (*DocumentType) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case documenttype.FieldType, documenttype.FieldName, documenttype.FieldDescription:
 			values[i] = new(sql.NullString)
-		case documenttype.ForeignKeys[0]: // metadata_metadata_document_types
+		case documenttype.ForeignKeys[0]: // metadata_document_types
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -123,10 +123,10 @@ func (dt *DocumentType) assignValues(columns []string, values []any) error {
 			}
 		case documenttype.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field metadata_metadata_document_types", values[i])
+				return fmt.Errorf("unexpected type %T for field metadata_document_types", values[i])
 			} else if value.Valid {
-				dt.metadata_metadata_document_types = new(string)
-				*dt.metadata_metadata_document_types = value.String
+				dt.metadata_document_types = new(string)
+				*dt.metadata_document_types = value.String
 			}
 		default:
 			dt.selectValues.Set(columns[i], values[i])

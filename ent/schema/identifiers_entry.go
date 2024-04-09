@@ -45,7 +45,7 @@ func (IdentifiersEntry) Fields() []ent.Field {
 
 func (IdentifiersEntry) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("nodes", Node.Type).Ref("node_identifiers").Unique(),
+		edge.From("nodes", Node.Type).Ref("identifiers").Unique(),
 	}
 }
 

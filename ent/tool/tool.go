@@ -45,7 +45,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "metadata" package.
 	MetadataInverseTable = "metadata"
 	// MetadataColumn is the table column denoting the metadata relation/edge.
-	MetadataColumn = "metadata_metadata_tools"
+	MetadataColumn = "metadata_tools"
 )
 
 // Columns holds all SQL columns for tool fields.
@@ -59,7 +59,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "tools"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"metadata_metadata_tools",
+	"metadata_tools",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

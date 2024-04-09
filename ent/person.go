@@ -19,7 +19,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -28,7 +27,6 @@ import (
 	"github.com/bom-squad/protobom/ent/metadata"
 	"github.com/bom-squad/protobom/ent/node"
 	"github.com/bom-squad/protobom/ent/person"
-	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // Person is the model entity for the Person schema.
@@ -46,24 +44,22 @@ type Person struct {
 	URL string `json:"url,omitempty"`
 	// Phone holds the value of the "phone" field.
 	Phone string `json:"phone,omitempty"`
-	// Contacts holds the value of the "contacts" field.
-	Contacts []*sbom.Person `json:"contacts,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PersonQuery when eager-loading is set.
-	Edges                     PersonEdges `json:"edges"`
-	metadata_metadata_authors *string
-	node_node_suppliers       *string
-	node_node_originators     *string
-	person_person_contacts    *int
-	selectValues              sql.SelectValues
+	Edges            PersonEdges `json:"edges"`
+	metadata_authors *string
+	node_suppliers   *string
+	node_originators *string
+	person_contacts  *int
+	selectValues     sql.SelectValues
 }
 
 // PersonEdges holds the relations/edges for other nodes in the graph.
 type PersonEdges struct {
 	// ContactOwner holds the value of the contact_owner edge.
 	ContactOwner *Person `json:"contact_owner,omitempty"`
-	// PersonContacts holds the value of the person_contacts edge.
-	PersonContacts []*Person `json:"person_contacts,omitempty"`
+	// Contacts holds the value of the contacts edge.
+	Contacts []*Person `json:"contacts,omitempty"`
 	// Metadata holds the value of the metadata edge.
 	Metadata *Metadata `json:"metadata,omitempty"`
 	// Node holds the value of the node edge.
@@ -86,13 +82,13 @@ func (e PersonEdges) ContactOwnerOrErr() (*Person, error) {
 	return nil, &NotLoadedError{edge: "contact_owner"}
 }
 
-// PersonContactsOrErr returns the PersonContacts value or an error if the edge
+// ContactsOrErr returns the Contacts value or an error if the edge
 // was not loaded in eager-loading.
-func (e PersonEdges) PersonContactsOrErr() ([]*Person, error) {
+func (e PersonEdges) ContactsOrErr() ([]*Person, error) {
 	if e.loadedTypes[1] {
-		return e.PersonContacts, nil
+		return e.Contacts, nil
 	}
-	return nil, &NotLoadedError{edge: "person_contacts"}
+	return nil, &NotLoadedError{edge: "contacts"}
 }
 
 // MetadataOrErr returns the Metadata value or an error if the edge
@@ -126,21 +122,19 @@ func (*Person) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case person.FieldContacts:
-			values[i] = new([]byte)
 		case person.FieldIsOrg:
 			values[i] = new(sql.NullBool)
 		case person.FieldID:
 			values[i] = new(sql.NullInt64)
 		case person.FieldName, person.FieldEmail, person.FieldURL, person.FieldPhone:
 			values[i] = new(sql.NullString)
-		case person.ForeignKeys[0]: // metadata_metadata_authors
+		case person.ForeignKeys[0]: // metadata_authors
 			values[i] = new(sql.NullString)
-		case person.ForeignKeys[1]: // node_node_suppliers
+		case person.ForeignKeys[1]: // node_suppliers
 			values[i] = new(sql.NullString)
-		case person.ForeignKeys[2]: // node_node_originators
+		case person.ForeignKeys[2]: // node_originators
 			values[i] = new(sql.NullString)
-		case person.ForeignKeys[3]: // person_person_contacts
+		case person.ForeignKeys[3]: // person_contacts
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -193,41 +187,33 @@ func (pe *Person) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pe.Phone = value.String
 			}
-		case person.FieldContacts:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field contacts", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &pe.Contacts); err != nil {
-					return fmt.Errorf("unmarshal field contacts: %w", err)
-				}
-			}
 		case person.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field metadata_metadata_authors", values[i])
+				return fmt.Errorf("unexpected type %T for field metadata_authors", values[i])
 			} else if value.Valid {
-				pe.metadata_metadata_authors = new(string)
-				*pe.metadata_metadata_authors = value.String
+				pe.metadata_authors = new(string)
+				*pe.metadata_authors = value.String
 			}
 		case person.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field node_node_suppliers", values[i])
+				return fmt.Errorf("unexpected type %T for field node_suppliers", values[i])
 			} else if value.Valid {
-				pe.node_node_suppliers = new(string)
-				*pe.node_node_suppliers = value.String
+				pe.node_suppliers = new(string)
+				*pe.node_suppliers = value.String
 			}
 		case person.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field node_node_originators", values[i])
+				return fmt.Errorf("unexpected type %T for field node_originators", values[i])
 			} else if value.Valid {
-				pe.node_node_originators = new(string)
-				*pe.node_node_originators = value.String
+				pe.node_originators = new(string)
+				*pe.node_originators = value.String
 			}
 		case person.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field person_person_contacts", value)
+				return fmt.Errorf("unexpected type %T for edge-field person_contacts", value)
 			} else if value.Valid {
-				pe.person_person_contacts = new(int)
-				*pe.person_person_contacts = int(value.Int64)
+				pe.person_contacts = new(int)
+				*pe.person_contacts = int(value.Int64)
 			}
 		default:
 			pe.selectValues.Set(columns[i], values[i])
@@ -247,9 +233,9 @@ func (pe *Person) QueryContactOwner() *PersonQuery {
 	return NewPersonClient(pe.config).QueryContactOwner(pe)
 }
 
-// QueryPersonContacts queries the "person_contacts" edge of the Person entity.
-func (pe *Person) QueryPersonContacts() *PersonQuery {
-	return NewPersonClient(pe.config).QueryPersonContacts(pe)
+// QueryContacts queries the "contacts" edge of the Person entity.
+func (pe *Person) QueryContacts() *PersonQuery {
+	return NewPersonClient(pe.config).QueryContacts(pe)
 }
 
 // QueryMetadata queries the "metadata" edge of the Person entity.
@@ -299,9 +285,6 @@ func (pe *Person) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("phone=")
 	builder.WriteString(pe.Phone)
-	builder.WriteString(", ")
-	builder.WriteString("contacts=")
-	builder.WriteString(fmt.Sprintf("%v", pe.Contacts))
 	builder.WriteByte(')')
 	return builder.String()
 }

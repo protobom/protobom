@@ -310,21 +310,21 @@ func TypeNotIn(vs ...Type) predicate.ExternalReference {
 	return predicate.ExternalReference(sql.FieldNotIn(FieldType, vs...))
 }
 
-// HasExternalReferenceHashes applies the HasEdge predicate on the "external_reference_hashes" edge.
-func HasExternalReferenceHashes() predicate.ExternalReference {
+// HasHashes applies the HasEdge predicate on the "hashes" edge.
+func HasHashes() predicate.ExternalReference {
 	return predicate.ExternalReference(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ExternalReferenceHashesTable, ExternalReferenceHashesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasExternalReferenceHashesWith applies the HasEdge predicate on the "external_reference_hashes" edge with a given conditions (other predicates).
-func HasExternalReferenceHashesWith(preds ...predicate.HashesEntry) predicate.ExternalReference {
+// HasHashesWith applies the HasEdge predicate on the "hashes" edge with a given conditions (other predicates).
+func HasHashesWith(preds ...predicate.HashesEntry) predicate.ExternalReference {
 	return predicate.ExternalReference(func(s *sql.Selector) {
-		step := newExternalReferenceHashesStep()
+		step := newHashesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

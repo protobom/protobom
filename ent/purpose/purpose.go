@@ -38,7 +38,7 @@ const (
 	// Table holds the table name of the purpose in the database.
 	Table = "purposes"
 	// NodeTable is the table that holds the node relation/edge. The primary key declared below.
-	NodeTable = "node_node_primary_purpose"
+	NodeTable = "node_primary_purpose"
 	// NodeInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodeInverseTable = "nodes"

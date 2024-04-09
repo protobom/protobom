@@ -163,7 +163,7 @@ func (iec *IdentifiersEntryCreate) createSpec() (*IdentifiersEntry, *sqlgraph.Cr
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.node_node_identifiers = &nodes[0]
+		_node.node_identifiers = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

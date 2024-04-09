@@ -26,7 +26,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/bom-squad/protobom/ent/document"
 	"github.com/bom-squad/protobom/ent/documenttype"
@@ -34,7 +33,6 @@ import (
 	"github.com/bom-squad/protobom/ent/person"
 	"github.com/bom-squad/protobom/ent/predicate"
 	"github.com/bom-squad/protobom/ent/tool"
-	"github.com/bom-squad/protobom/pkg/sbom"
 )
 
 // MetadataUpdate is the builder for updating Metadata entities.
@@ -106,85 +104,49 @@ func (mu *MetadataUpdate) SetNillableComment(s *string) *MetadataUpdate {
 	return mu
 }
 
-// SetTools sets the "tools" field.
-func (mu *MetadataUpdate) SetTools(s []*sbom.Tool) *MetadataUpdate {
-	mu.mutation.SetTools(s)
+// AddToolIDs adds the "tools" edge to the Tool entity by IDs.
+func (mu *MetadataUpdate) AddToolIDs(ids ...int) *MetadataUpdate {
+	mu.mutation.AddToolIDs(ids...)
 	return mu
 }
 
-// AppendTools appends s to the "tools" field.
-func (mu *MetadataUpdate) AppendTools(s []*sbom.Tool) *MetadataUpdate {
-	mu.mutation.AppendTools(s)
-	return mu
-}
-
-// SetAuthors sets the "authors" field.
-func (mu *MetadataUpdate) SetAuthors(s []*sbom.Person) *MetadataUpdate {
-	mu.mutation.SetAuthors(s)
-	return mu
-}
-
-// AppendAuthors appends s to the "authors" field.
-func (mu *MetadataUpdate) AppendAuthors(s []*sbom.Person) *MetadataUpdate {
-	mu.mutation.AppendAuthors(s)
-	return mu
-}
-
-// SetDocumentTypes sets the "document_types" field.
-func (mu *MetadataUpdate) SetDocumentTypes(st []*sbom.DocumentType) *MetadataUpdate {
-	mu.mutation.SetDocumentTypes(st)
-	return mu
-}
-
-// AppendDocumentTypes appends st to the "document_types" field.
-func (mu *MetadataUpdate) AppendDocumentTypes(st []*sbom.DocumentType) *MetadataUpdate {
-	mu.mutation.AppendDocumentTypes(st)
-	return mu
-}
-
-// AddMetadataToolIDs adds the "metadata_tools" edge to the Tool entity by IDs.
-func (mu *MetadataUpdate) AddMetadataToolIDs(ids ...int) *MetadataUpdate {
-	mu.mutation.AddMetadataToolIDs(ids...)
-	return mu
-}
-
-// AddMetadataTools adds the "metadata_tools" edges to the Tool entity.
-func (mu *MetadataUpdate) AddMetadataTools(t ...*Tool) *MetadataUpdate {
+// AddTools adds the "tools" edges to the Tool entity.
+func (mu *MetadataUpdate) AddTools(t ...*Tool) *MetadataUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return mu.AddMetadataToolIDs(ids...)
+	return mu.AddToolIDs(ids...)
 }
 
-// AddMetadataAuthorIDs adds the "metadata_authors" edge to the Person entity by IDs.
-func (mu *MetadataUpdate) AddMetadataAuthorIDs(ids ...int) *MetadataUpdate {
-	mu.mutation.AddMetadataAuthorIDs(ids...)
+// AddAuthorIDs adds the "authors" edge to the Person entity by IDs.
+func (mu *MetadataUpdate) AddAuthorIDs(ids ...int) *MetadataUpdate {
+	mu.mutation.AddAuthorIDs(ids...)
 	return mu
 }
 
-// AddMetadataAuthors adds the "metadata_authors" edges to the Person entity.
-func (mu *MetadataUpdate) AddMetadataAuthors(p ...*Person) *MetadataUpdate {
+// AddAuthors adds the "authors" edges to the Person entity.
+func (mu *MetadataUpdate) AddAuthors(p ...*Person) *MetadataUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return mu.AddMetadataAuthorIDs(ids...)
+	return mu.AddAuthorIDs(ids...)
 }
 
-// AddMetadataDocumentTypeIDs adds the "metadata_document_types" edge to the DocumentType entity by IDs.
-func (mu *MetadataUpdate) AddMetadataDocumentTypeIDs(ids ...int) *MetadataUpdate {
-	mu.mutation.AddMetadataDocumentTypeIDs(ids...)
+// AddDocumentTypeIDs adds the "document_types" edge to the DocumentType entity by IDs.
+func (mu *MetadataUpdate) AddDocumentTypeIDs(ids ...int) *MetadataUpdate {
+	mu.mutation.AddDocumentTypeIDs(ids...)
 	return mu
 }
 
-// AddMetadataDocumentTypes adds the "metadata_document_types" edges to the DocumentType entity.
-func (mu *MetadataUpdate) AddMetadataDocumentTypes(d ...*DocumentType) *MetadataUpdate {
+// AddDocumentTypes adds the "document_types" edges to the DocumentType entity.
+func (mu *MetadataUpdate) AddDocumentTypes(d ...*DocumentType) *MetadataUpdate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return mu.AddMetadataDocumentTypeIDs(ids...)
+	return mu.AddDocumentTypeIDs(ids...)
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by ID.
@@ -211,67 +173,67 @@ func (mu *MetadataUpdate) Mutation() *MetadataMutation {
 	return mu.mutation
 }
 
-// ClearMetadataTools clears all "metadata_tools" edges to the Tool entity.
-func (mu *MetadataUpdate) ClearMetadataTools() *MetadataUpdate {
-	mu.mutation.ClearMetadataTools()
+// ClearTools clears all "tools" edges to the Tool entity.
+func (mu *MetadataUpdate) ClearTools() *MetadataUpdate {
+	mu.mutation.ClearTools()
 	return mu
 }
 
-// RemoveMetadataToolIDs removes the "metadata_tools" edge to Tool entities by IDs.
-func (mu *MetadataUpdate) RemoveMetadataToolIDs(ids ...int) *MetadataUpdate {
-	mu.mutation.RemoveMetadataToolIDs(ids...)
+// RemoveToolIDs removes the "tools" edge to Tool entities by IDs.
+func (mu *MetadataUpdate) RemoveToolIDs(ids ...int) *MetadataUpdate {
+	mu.mutation.RemoveToolIDs(ids...)
 	return mu
 }
 
-// RemoveMetadataTools removes "metadata_tools" edges to Tool entities.
-func (mu *MetadataUpdate) RemoveMetadataTools(t ...*Tool) *MetadataUpdate {
+// RemoveTools removes "tools" edges to Tool entities.
+func (mu *MetadataUpdate) RemoveTools(t ...*Tool) *MetadataUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return mu.RemoveMetadataToolIDs(ids...)
+	return mu.RemoveToolIDs(ids...)
 }
 
-// ClearMetadataAuthors clears all "metadata_authors" edges to the Person entity.
-func (mu *MetadataUpdate) ClearMetadataAuthors() *MetadataUpdate {
-	mu.mutation.ClearMetadataAuthors()
+// ClearAuthors clears all "authors" edges to the Person entity.
+func (mu *MetadataUpdate) ClearAuthors() *MetadataUpdate {
+	mu.mutation.ClearAuthors()
 	return mu
 }
 
-// RemoveMetadataAuthorIDs removes the "metadata_authors" edge to Person entities by IDs.
-func (mu *MetadataUpdate) RemoveMetadataAuthorIDs(ids ...int) *MetadataUpdate {
-	mu.mutation.RemoveMetadataAuthorIDs(ids...)
+// RemoveAuthorIDs removes the "authors" edge to Person entities by IDs.
+func (mu *MetadataUpdate) RemoveAuthorIDs(ids ...int) *MetadataUpdate {
+	mu.mutation.RemoveAuthorIDs(ids...)
 	return mu
 }
 
-// RemoveMetadataAuthors removes "metadata_authors" edges to Person entities.
-func (mu *MetadataUpdate) RemoveMetadataAuthors(p ...*Person) *MetadataUpdate {
+// RemoveAuthors removes "authors" edges to Person entities.
+func (mu *MetadataUpdate) RemoveAuthors(p ...*Person) *MetadataUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return mu.RemoveMetadataAuthorIDs(ids...)
+	return mu.RemoveAuthorIDs(ids...)
 }
 
-// ClearMetadataDocumentTypes clears all "metadata_document_types" edges to the DocumentType entity.
-func (mu *MetadataUpdate) ClearMetadataDocumentTypes() *MetadataUpdate {
-	mu.mutation.ClearMetadataDocumentTypes()
+// ClearDocumentTypes clears all "document_types" edges to the DocumentType entity.
+func (mu *MetadataUpdate) ClearDocumentTypes() *MetadataUpdate {
+	mu.mutation.ClearDocumentTypes()
 	return mu
 }
 
-// RemoveMetadataDocumentTypeIDs removes the "metadata_document_types" edge to DocumentType entities by IDs.
-func (mu *MetadataUpdate) RemoveMetadataDocumentTypeIDs(ids ...int) *MetadataUpdate {
-	mu.mutation.RemoveMetadataDocumentTypeIDs(ids...)
+// RemoveDocumentTypeIDs removes the "document_types" edge to DocumentType entities by IDs.
+func (mu *MetadataUpdate) RemoveDocumentTypeIDs(ids ...int) *MetadataUpdate {
+	mu.mutation.RemoveDocumentTypeIDs(ids...)
 	return mu
 }
 
-// RemoveMetadataDocumentTypes removes "metadata_document_types" edges to DocumentType entities.
-func (mu *MetadataUpdate) RemoveMetadataDocumentTypes(d ...*DocumentType) *MetadataUpdate {
+// RemoveDocumentTypes removes "document_types" edges to DocumentType entities.
+func (mu *MetadataUpdate) RemoveDocumentTypes(d ...*DocumentType) *MetadataUpdate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return mu.RemoveMetadataDocumentTypeIDs(ids...)
+	return mu.RemoveDocumentTypeIDs(ids...)
 }
 
 // ClearDocument clears the "document" edge to the Document entity.
@@ -328,36 +290,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.Comment(); ok {
 		_spec.SetField(metadata.FieldComment, field.TypeString, value)
 	}
-	if value, ok := mu.mutation.Tools(); ok {
-		_spec.SetField(metadata.FieldTools, field.TypeJSON, value)
-	}
-	if value, ok := mu.mutation.AppendedTools(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, metadata.FieldTools, value)
-		})
-	}
-	if value, ok := mu.mutation.Authors(); ok {
-		_spec.SetField(metadata.FieldAuthors, field.TypeJSON, value)
-	}
-	if value, ok := mu.mutation.AppendedAuthors(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, metadata.FieldAuthors, value)
-		})
-	}
-	if value, ok := mu.mutation.DocumentTypes(); ok {
-		_spec.SetField(metadata.FieldDocumentTypes, field.TypeJSON, value)
-	}
-	if value, ok := mu.mutation.AppendedDocumentTypes(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, metadata.FieldDocumentTypes, value)
-		})
-	}
-	if mu.mutation.MetadataToolsCleared() {
+	if mu.mutation.ToolsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataToolsTable,
-			Columns: []string{metadata.MetadataToolsColumn},
+			Table:   metadata.ToolsTable,
+			Columns: []string{metadata.ToolsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
@@ -365,12 +303,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.RemovedMetadataToolsIDs(); len(nodes) > 0 && !mu.mutation.MetadataToolsCleared() {
+	if nodes := mu.mutation.RemovedToolsIDs(); len(nodes) > 0 && !mu.mutation.ToolsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataToolsTable,
-			Columns: []string{metadata.MetadataToolsColumn},
+			Table:   metadata.ToolsTable,
+			Columns: []string{metadata.ToolsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
@@ -381,12 +319,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.MetadataToolsIDs(); len(nodes) > 0 {
+	if nodes := mu.mutation.ToolsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataToolsTable,
-			Columns: []string{metadata.MetadataToolsColumn},
+			Table:   metadata.ToolsTable,
+			Columns: []string{metadata.ToolsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
@@ -397,12 +335,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mu.mutation.MetadataAuthorsCleared() {
+	if mu.mutation.AuthorsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataAuthorsTable,
-			Columns: []string{metadata.MetadataAuthorsColumn},
+			Table:   metadata.AuthorsTable,
+			Columns: []string{metadata.AuthorsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -410,12 +348,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.RemovedMetadataAuthorsIDs(); len(nodes) > 0 && !mu.mutation.MetadataAuthorsCleared() {
+	if nodes := mu.mutation.RemovedAuthorsIDs(); len(nodes) > 0 && !mu.mutation.AuthorsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataAuthorsTable,
-			Columns: []string{metadata.MetadataAuthorsColumn},
+			Table:   metadata.AuthorsTable,
+			Columns: []string{metadata.AuthorsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -426,12 +364,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.MetadataAuthorsIDs(); len(nodes) > 0 {
+	if nodes := mu.mutation.AuthorsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataAuthorsTable,
-			Columns: []string{metadata.MetadataAuthorsColumn},
+			Table:   metadata.AuthorsTable,
+			Columns: []string{metadata.AuthorsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -442,12 +380,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mu.mutation.MetadataDocumentTypesCleared() {
+	if mu.mutation.DocumentTypesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataDocumentTypesTable,
-			Columns: []string{metadata.MetadataDocumentTypesColumn},
+			Table:   metadata.DocumentTypesTable,
+			Columns: []string{metadata.DocumentTypesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(documenttype.FieldID, field.TypeInt),
@@ -455,12 +393,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.RemovedMetadataDocumentTypesIDs(); len(nodes) > 0 && !mu.mutation.MetadataDocumentTypesCleared() {
+	if nodes := mu.mutation.RemovedDocumentTypesIDs(); len(nodes) > 0 && !mu.mutation.DocumentTypesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataDocumentTypesTable,
-			Columns: []string{metadata.MetadataDocumentTypesColumn},
+			Table:   metadata.DocumentTypesTable,
+			Columns: []string{metadata.DocumentTypesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(documenttype.FieldID, field.TypeInt),
@@ -471,12 +409,12 @@ func (mu *MetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.MetadataDocumentTypesIDs(); len(nodes) > 0 {
+	if nodes := mu.mutation.DocumentTypesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataDocumentTypesTable,
-			Columns: []string{metadata.MetadataDocumentTypesColumn},
+			Table:   metadata.DocumentTypesTable,
+			Columns: []string{metadata.DocumentTypesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(documenttype.FieldID, field.TypeInt),
@@ -592,85 +530,49 @@ func (muo *MetadataUpdateOne) SetNillableComment(s *string) *MetadataUpdateOne {
 	return muo
 }
 
-// SetTools sets the "tools" field.
-func (muo *MetadataUpdateOne) SetTools(s []*sbom.Tool) *MetadataUpdateOne {
-	muo.mutation.SetTools(s)
+// AddToolIDs adds the "tools" edge to the Tool entity by IDs.
+func (muo *MetadataUpdateOne) AddToolIDs(ids ...int) *MetadataUpdateOne {
+	muo.mutation.AddToolIDs(ids...)
 	return muo
 }
 
-// AppendTools appends s to the "tools" field.
-func (muo *MetadataUpdateOne) AppendTools(s []*sbom.Tool) *MetadataUpdateOne {
-	muo.mutation.AppendTools(s)
-	return muo
-}
-
-// SetAuthors sets the "authors" field.
-func (muo *MetadataUpdateOne) SetAuthors(s []*sbom.Person) *MetadataUpdateOne {
-	muo.mutation.SetAuthors(s)
-	return muo
-}
-
-// AppendAuthors appends s to the "authors" field.
-func (muo *MetadataUpdateOne) AppendAuthors(s []*sbom.Person) *MetadataUpdateOne {
-	muo.mutation.AppendAuthors(s)
-	return muo
-}
-
-// SetDocumentTypes sets the "document_types" field.
-func (muo *MetadataUpdateOne) SetDocumentTypes(st []*sbom.DocumentType) *MetadataUpdateOne {
-	muo.mutation.SetDocumentTypes(st)
-	return muo
-}
-
-// AppendDocumentTypes appends st to the "document_types" field.
-func (muo *MetadataUpdateOne) AppendDocumentTypes(st []*sbom.DocumentType) *MetadataUpdateOne {
-	muo.mutation.AppendDocumentTypes(st)
-	return muo
-}
-
-// AddMetadataToolIDs adds the "metadata_tools" edge to the Tool entity by IDs.
-func (muo *MetadataUpdateOne) AddMetadataToolIDs(ids ...int) *MetadataUpdateOne {
-	muo.mutation.AddMetadataToolIDs(ids...)
-	return muo
-}
-
-// AddMetadataTools adds the "metadata_tools" edges to the Tool entity.
-func (muo *MetadataUpdateOne) AddMetadataTools(t ...*Tool) *MetadataUpdateOne {
+// AddTools adds the "tools" edges to the Tool entity.
+func (muo *MetadataUpdateOne) AddTools(t ...*Tool) *MetadataUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return muo.AddMetadataToolIDs(ids...)
+	return muo.AddToolIDs(ids...)
 }
 
-// AddMetadataAuthorIDs adds the "metadata_authors" edge to the Person entity by IDs.
-func (muo *MetadataUpdateOne) AddMetadataAuthorIDs(ids ...int) *MetadataUpdateOne {
-	muo.mutation.AddMetadataAuthorIDs(ids...)
+// AddAuthorIDs adds the "authors" edge to the Person entity by IDs.
+func (muo *MetadataUpdateOne) AddAuthorIDs(ids ...int) *MetadataUpdateOne {
+	muo.mutation.AddAuthorIDs(ids...)
 	return muo
 }
 
-// AddMetadataAuthors adds the "metadata_authors" edges to the Person entity.
-func (muo *MetadataUpdateOne) AddMetadataAuthors(p ...*Person) *MetadataUpdateOne {
+// AddAuthors adds the "authors" edges to the Person entity.
+func (muo *MetadataUpdateOne) AddAuthors(p ...*Person) *MetadataUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return muo.AddMetadataAuthorIDs(ids...)
+	return muo.AddAuthorIDs(ids...)
 }
 
-// AddMetadataDocumentTypeIDs adds the "metadata_document_types" edge to the DocumentType entity by IDs.
-func (muo *MetadataUpdateOne) AddMetadataDocumentTypeIDs(ids ...int) *MetadataUpdateOne {
-	muo.mutation.AddMetadataDocumentTypeIDs(ids...)
+// AddDocumentTypeIDs adds the "document_types" edge to the DocumentType entity by IDs.
+func (muo *MetadataUpdateOne) AddDocumentTypeIDs(ids ...int) *MetadataUpdateOne {
+	muo.mutation.AddDocumentTypeIDs(ids...)
 	return muo
 }
 
-// AddMetadataDocumentTypes adds the "metadata_document_types" edges to the DocumentType entity.
-func (muo *MetadataUpdateOne) AddMetadataDocumentTypes(d ...*DocumentType) *MetadataUpdateOne {
+// AddDocumentTypes adds the "document_types" edges to the DocumentType entity.
+func (muo *MetadataUpdateOne) AddDocumentTypes(d ...*DocumentType) *MetadataUpdateOne {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return muo.AddMetadataDocumentTypeIDs(ids...)
+	return muo.AddDocumentTypeIDs(ids...)
 }
 
 // SetDocumentID sets the "document" edge to the Document entity by ID.
@@ -697,67 +599,67 @@ func (muo *MetadataUpdateOne) Mutation() *MetadataMutation {
 	return muo.mutation
 }
 
-// ClearMetadataTools clears all "metadata_tools" edges to the Tool entity.
-func (muo *MetadataUpdateOne) ClearMetadataTools() *MetadataUpdateOne {
-	muo.mutation.ClearMetadataTools()
+// ClearTools clears all "tools" edges to the Tool entity.
+func (muo *MetadataUpdateOne) ClearTools() *MetadataUpdateOne {
+	muo.mutation.ClearTools()
 	return muo
 }
 
-// RemoveMetadataToolIDs removes the "metadata_tools" edge to Tool entities by IDs.
-func (muo *MetadataUpdateOne) RemoveMetadataToolIDs(ids ...int) *MetadataUpdateOne {
-	muo.mutation.RemoveMetadataToolIDs(ids...)
+// RemoveToolIDs removes the "tools" edge to Tool entities by IDs.
+func (muo *MetadataUpdateOne) RemoveToolIDs(ids ...int) *MetadataUpdateOne {
+	muo.mutation.RemoveToolIDs(ids...)
 	return muo
 }
 
-// RemoveMetadataTools removes "metadata_tools" edges to Tool entities.
-func (muo *MetadataUpdateOne) RemoveMetadataTools(t ...*Tool) *MetadataUpdateOne {
+// RemoveTools removes "tools" edges to Tool entities.
+func (muo *MetadataUpdateOne) RemoveTools(t ...*Tool) *MetadataUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return muo.RemoveMetadataToolIDs(ids...)
+	return muo.RemoveToolIDs(ids...)
 }
 
-// ClearMetadataAuthors clears all "metadata_authors" edges to the Person entity.
-func (muo *MetadataUpdateOne) ClearMetadataAuthors() *MetadataUpdateOne {
-	muo.mutation.ClearMetadataAuthors()
+// ClearAuthors clears all "authors" edges to the Person entity.
+func (muo *MetadataUpdateOne) ClearAuthors() *MetadataUpdateOne {
+	muo.mutation.ClearAuthors()
 	return muo
 }
 
-// RemoveMetadataAuthorIDs removes the "metadata_authors" edge to Person entities by IDs.
-func (muo *MetadataUpdateOne) RemoveMetadataAuthorIDs(ids ...int) *MetadataUpdateOne {
-	muo.mutation.RemoveMetadataAuthorIDs(ids...)
+// RemoveAuthorIDs removes the "authors" edge to Person entities by IDs.
+func (muo *MetadataUpdateOne) RemoveAuthorIDs(ids ...int) *MetadataUpdateOne {
+	muo.mutation.RemoveAuthorIDs(ids...)
 	return muo
 }
 
-// RemoveMetadataAuthors removes "metadata_authors" edges to Person entities.
-func (muo *MetadataUpdateOne) RemoveMetadataAuthors(p ...*Person) *MetadataUpdateOne {
+// RemoveAuthors removes "authors" edges to Person entities.
+func (muo *MetadataUpdateOne) RemoveAuthors(p ...*Person) *MetadataUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return muo.RemoveMetadataAuthorIDs(ids...)
+	return muo.RemoveAuthorIDs(ids...)
 }
 
-// ClearMetadataDocumentTypes clears all "metadata_document_types" edges to the DocumentType entity.
-func (muo *MetadataUpdateOne) ClearMetadataDocumentTypes() *MetadataUpdateOne {
-	muo.mutation.ClearMetadataDocumentTypes()
+// ClearDocumentTypes clears all "document_types" edges to the DocumentType entity.
+func (muo *MetadataUpdateOne) ClearDocumentTypes() *MetadataUpdateOne {
+	muo.mutation.ClearDocumentTypes()
 	return muo
 }
 
-// RemoveMetadataDocumentTypeIDs removes the "metadata_document_types" edge to DocumentType entities by IDs.
-func (muo *MetadataUpdateOne) RemoveMetadataDocumentTypeIDs(ids ...int) *MetadataUpdateOne {
-	muo.mutation.RemoveMetadataDocumentTypeIDs(ids...)
+// RemoveDocumentTypeIDs removes the "document_types" edge to DocumentType entities by IDs.
+func (muo *MetadataUpdateOne) RemoveDocumentTypeIDs(ids ...int) *MetadataUpdateOne {
+	muo.mutation.RemoveDocumentTypeIDs(ids...)
 	return muo
 }
 
-// RemoveMetadataDocumentTypes removes "metadata_document_types" edges to DocumentType entities.
-func (muo *MetadataUpdateOne) RemoveMetadataDocumentTypes(d ...*DocumentType) *MetadataUpdateOne {
+// RemoveDocumentTypes removes "document_types" edges to DocumentType entities.
+func (muo *MetadataUpdateOne) RemoveDocumentTypes(d ...*DocumentType) *MetadataUpdateOne {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return muo.RemoveMetadataDocumentTypeIDs(ids...)
+	return muo.RemoveDocumentTypeIDs(ids...)
 }
 
 // ClearDocument clears the "document" edge to the Document entity.
@@ -844,36 +746,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 	if value, ok := muo.mutation.Comment(); ok {
 		_spec.SetField(metadata.FieldComment, field.TypeString, value)
 	}
-	if value, ok := muo.mutation.Tools(); ok {
-		_spec.SetField(metadata.FieldTools, field.TypeJSON, value)
-	}
-	if value, ok := muo.mutation.AppendedTools(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, metadata.FieldTools, value)
-		})
-	}
-	if value, ok := muo.mutation.Authors(); ok {
-		_spec.SetField(metadata.FieldAuthors, field.TypeJSON, value)
-	}
-	if value, ok := muo.mutation.AppendedAuthors(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, metadata.FieldAuthors, value)
-		})
-	}
-	if value, ok := muo.mutation.DocumentTypes(); ok {
-		_spec.SetField(metadata.FieldDocumentTypes, field.TypeJSON, value)
-	}
-	if value, ok := muo.mutation.AppendedDocumentTypes(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, metadata.FieldDocumentTypes, value)
-		})
-	}
-	if muo.mutation.MetadataToolsCleared() {
+	if muo.mutation.ToolsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataToolsTable,
-			Columns: []string{metadata.MetadataToolsColumn},
+			Table:   metadata.ToolsTable,
+			Columns: []string{metadata.ToolsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
@@ -881,12 +759,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.RemovedMetadataToolsIDs(); len(nodes) > 0 && !muo.mutation.MetadataToolsCleared() {
+	if nodes := muo.mutation.RemovedToolsIDs(); len(nodes) > 0 && !muo.mutation.ToolsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataToolsTable,
-			Columns: []string{metadata.MetadataToolsColumn},
+			Table:   metadata.ToolsTable,
+			Columns: []string{metadata.ToolsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
@@ -897,12 +775,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.MetadataToolsIDs(); len(nodes) > 0 {
+	if nodes := muo.mutation.ToolsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataToolsTable,
-			Columns: []string{metadata.MetadataToolsColumn},
+			Table:   metadata.ToolsTable,
+			Columns: []string{metadata.ToolsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
@@ -913,12 +791,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if muo.mutation.MetadataAuthorsCleared() {
+	if muo.mutation.AuthorsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataAuthorsTable,
-			Columns: []string{metadata.MetadataAuthorsColumn},
+			Table:   metadata.AuthorsTable,
+			Columns: []string{metadata.AuthorsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -926,12 +804,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.RemovedMetadataAuthorsIDs(); len(nodes) > 0 && !muo.mutation.MetadataAuthorsCleared() {
+	if nodes := muo.mutation.RemovedAuthorsIDs(); len(nodes) > 0 && !muo.mutation.AuthorsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataAuthorsTable,
-			Columns: []string{metadata.MetadataAuthorsColumn},
+			Table:   metadata.AuthorsTable,
+			Columns: []string{metadata.AuthorsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -942,12 +820,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.MetadataAuthorsIDs(); len(nodes) > 0 {
+	if nodes := muo.mutation.AuthorsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataAuthorsTable,
-			Columns: []string{metadata.MetadataAuthorsColumn},
+			Table:   metadata.AuthorsTable,
+			Columns: []string{metadata.AuthorsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(person.FieldID, field.TypeInt),
@@ -958,12 +836,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if muo.mutation.MetadataDocumentTypesCleared() {
+	if muo.mutation.DocumentTypesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataDocumentTypesTable,
-			Columns: []string{metadata.MetadataDocumentTypesColumn},
+			Table:   metadata.DocumentTypesTable,
+			Columns: []string{metadata.DocumentTypesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(documenttype.FieldID, field.TypeInt),
@@ -971,12 +849,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.RemovedMetadataDocumentTypesIDs(); len(nodes) > 0 && !muo.mutation.MetadataDocumentTypesCleared() {
+	if nodes := muo.mutation.RemovedDocumentTypesIDs(); len(nodes) > 0 && !muo.mutation.DocumentTypesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataDocumentTypesTable,
-			Columns: []string{metadata.MetadataDocumentTypesColumn},
+			Table:   metadata.DocumentTypesTable,
+			Columns: []string{metadata.DocumentTypesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(documenttype.FieldID, field.TypeInt),
@@ -987,12 +865,12 @@ func (muo *MetadataUpdateOne) sqlSave(ctx context.Context) (_node *Metadata, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.MetadataDocumentTypesIDs(); len(nodes) > 0 {
+	if nodes := muo.mutation.DocumentTypesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   metadata.MetadataDocumentTypesTable,
-			Columns: []string{metadata.MetadataDocumentTypesColumn},
+			Table:   metadata.DocumentTypesTable,
+			Columns: []string{metadata.DocumentTypesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(documenttype.FieldID, field.TypeInt),

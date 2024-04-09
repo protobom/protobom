@@ -428,10 +428,10 @@ func (dtq *DocumentTypeQuery) loadMetadata(ctx context.Context, query *MetadataQ
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*DocumentType)
 	for i := range nodes {
-		if nodes[i].metadata_metadata_document_types == nil {
+		if nodes[i].metadata_document_types == nil {
 			continue
 		}
-		fk := *nodes[i].metadata_metadata_document_types
+		fk := *nodes[i].metadata_document_types
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -448,7 +448,7 @@ func (dtq *DocumentTypeQuery) loadMetadata(ctx context.Context, query *MetadataQ
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "metadata_metadata_document_types" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "metadata_document_types" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

@@ -71,25 +71,19 @@ func (erc *ExternalReferenceCreate) SetType(e externalreference.Type) *ExternalR
 	return erc
 }
 
-// SetHashes sets the "hashes" field.
-func (erc *ExternalReferenceCreate) SetHashes(m map[int32]string) *ExternalReferenceCreate {
-	erc.mutation.SetHashes(m)
+// AddHashIDs adds the "hashes" edge to the HashesEntry entity by IDs.
+func (erc *ExternalReferenceCreate) AddHashIDs(ids ...int) *ExternalReferenceCreate {
+	erc.mutation.AddHashIDs(ids...)
 	return erc
 }
 
-// AddExternalReferenceHashIDs adds the "external_reference_hashes" edge to the HashesEntry entity by IDs.
-func (erc *ExternalReferenceCreate) AddExternalReferenceHashIDs(ids ...int) *ExternalReferenceCreate {
-	erc.mutation.AddExternalReferenceHashIDs(ids...)
-	return erc
-}
-
-// AddExternalReferenceHashes adds the "external_reference_hashes" edges to the HashesEntry entity.
-func (erc *ExternalReferenceCreate) AddExternalReferenceHashes(h ...*HashesEntry) *ExternalReferenceCreate {
+// AddHashes adds the "hashes" edges to the HashesEntry entity.
+func (erc *ExternalReferenceCreate) AddHashes(h ...*HashesEntry) *ExternalReferenceCreate {
 	ids := make([]int, len(h))
 	for i := range h {
 		ids[i] = h[i].ID
 	}
-	return erc.AddExternalReferenceHashIDs(ids...)
+	return erc.AddHashIDs(ids...)
 }
 
 // SetNodeID sets the "node" edge to the Node entity by ID.
@@ -151,9 +145,6 @@ func (erc *ExternalReferenceCreate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "ExternalReference.type": %w`, err)}
 		}
 	}
-	if _, ok := erc.mutation.Hashes(); !ok {
-		return &ValidationError{Name: "hashes", err: errors.New(`ent: missing required field "ExternalReference.hashes"`)}
-	}
 	if _, ok := erc.mutation.NodeID(); !ok {
 		return &ValidationError{Name: "node", err: errors.New(`ent: missing required edge "ExternalReference.node"`)}
 	}
@@ -200,16 +191,12 @@ func (erc *ExternalReferenceCreate) createSpec() (*ExternalReference, *sqlgraph.
 		_spec.SetField(externalreference.FieldType, field.TypeEnum, value)
 		_node.Type = value
 	}
-	if value, ok := erc.mutation.Hashes(); ok {
-		_spec.SetField(externalreference.FieldHashes, field.TypeJSON, value)
-		_node.Hashes = value
-	}
-	if nodes := erc.mutation.ExternalReferenceHashesIDs(); len(nodes) > 0 {
+	if nodes := erc.mutation.HashesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   externalreference.ExternalReferenceHashesTable,
-			Columns: []string{externalreference.ExternalReferenceHashesColumn},
+			Table:   externalreference.HashesTable,
+			Columns: []string{externalreference.HashesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(hashesentry.FieldID, field.TypeInt),
@@ -234,7 +221,7 @@ func (erc *ExternalReferenceCreate) createSpec() (*ExternalReference, *sqlgraph.
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.node_node_external_references = &nodes[0]
+		_node.node_external_references = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -343,18 +330,6 @@ func (u *ExternalReferenceUpsert) UpdateType() *ExternalReferenceUpsert {
 	return u
 }
 
-// SetHashes sets the "hashes" field.
-func (u *ExternalReferenceUpsert) SetHashes(v map[int32]string) *ExternalReferenceUpsert {
-	u.Set(externalreference.FieldHashes, v)
-	return u
-}
-
-// UpdateHashes sets the "hashes" field to the value that was provided on create.
-func (u *ExternalReferenceUpsert) UpdateHashes() *ExternalReferenceUpsert {
-	u.SetExcluded(externalreference.FieldHashes)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -455,20 +430,6 @@ func (u *ExternalReferenceUpsertOne) SetType(v externalreference.Type) *External
 func (u *ExternalReferenceUpsertOne) UpdateType() *ExternalReferenceUpsertOne {
 	return u.Update(func(s *ExternalReferenceUpsert) {
 		s.UpdateType()
-	})
-}
-
-// SetHashes sets the "hashes" field.
-func (u *ExternalReferenceUpsertOne) SetHashes(v map[int32]string) *ExternalReferenceUpsertOne {
-	return u.Update(func(s *ExternalReferenceUpsert) {
-		s.SetHashes(v)
-	})
-}
-
-// UpdateHashes sets the "hashes" field to the value that was provided on create.
-func (u *ExternalReferenceUpsertOne) UpdateHashes() *ExternalReferenceUpsertOne {
-	return u.Update(func(s *ExternalReferenceUpsert) {
-		s.UpdateHashes()
 	})
 }
 
@@ -735,20 +696,6 @@ func (u *ExternalReferenceUpsertBulk) SetType(v externalreference.Type) *Externa
 func (u *ExternalReferenceUpsertBulk) UpdateType() *ExternalReferenceUpsertBulk {
 	return u.Update(func(s *ExternalReferenceUpsert) {
 		s.UpdateType()
-	})
-}
-
-// SetHashes sets the "hashes" field.
-func (u *ExternalReferenceUpsertBulk) SetHashes(v map[int32]string) *ExternalReferenceUpsertBulk {
-	return u.Update(func(s *ExternalReferenceUpsert) {
-		s.SetHashes(v)
-	})
-}
-
-// UpdateHashes sets the "hashes" field to the value that was provided on create.
-func (u *ExternalReferenceUpsertBulk) UpdateHashes() *ExternalReferenceUpsertBulk {
-	return u.Update(func(s *ExternalReferenceUpsert) {
-		s.UpdateHashes()
 	})
 }
 

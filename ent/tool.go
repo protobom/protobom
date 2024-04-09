@@ -41,9 +41,9 @@ type Tool struct {
 	Vendor string `json:"vendor,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ToolQuery when eager-loading is set.
-	Edges                   ToolEdges `json:"edges"`
-	metadata_metadata_tools *string
-	selectValues            sql.SelectValues
+	Edges          ToolEdges `json:"edges"`
+	metadata_tools *string
+	selectValues   sql.SelectValues
 }
 
 // ToolEdges holds the relations/edges for other nodes in the graph.
@@ -77,7 +77,7 @@ func (*Tool) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case tool.FieldName, tool.FieldVersion, tool.FieldVendor:
 			values[i] = new(sql.NullString)
-		case tool.ForeignKeys[0]: // metadata_metadata_tools
+		case tool.ForeignKeys[0]: // metadata_tools
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -120,10 +120,10 @@ func (t *Tool) assignValues(columns []string, values []any) error {
 			}
 		case tool.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field metadata_metadata_tools", values[i])
+				return fmt.Errorf("unexpected type %T for field metadata_tools", values[i])
 			} else if value.Valid {
-				t.metadata_metadata_tools = new(string)
-				*t.metadata_metadata_tools = value.String
+				t.metadata_tools = new(string)
+				*t.metadata_tools = value.String
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])

@@ -171,7 +171,7 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.metadata_metadata_tools = &nodes[0]
+		_node.metadata_tools = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

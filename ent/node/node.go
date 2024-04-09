@@ -69,30 +69,18 @@ const (
 	FieldAttribution = "attribution"
 	// FieldFileTypes holds the string denoting the file_types field in the database.
 	FieldFileTypes = "file_types"
-	// FieldSuppliers holds the string denoting the suppliers field in the database.
-	FieldSuppliers = "suppliers"
-	// FieldOriginators holds the string denoting the originators field in the database.
-	FieldOriginators = "originators"
-	// FieldExternalReferences holds the string denoting the external_references field in the database.
-	FieldExternalReferences = "external_references"
-	// FieldHashes holds the string denoting the hashes field in the database.
-	FieldHashes = "hashes"
-	// FieldIdentifiers holds the string denoting the identifiers field in the database.
-	FieldIdentifiers = "identifiers"
-	// FieldPrimaryPurpose holds the string denoting the primary_purpose field in the database.
-	FieldPrimaryPurpose = "primary_purpose"
-	// EdgeNodeSuppliers holds the string denoting the node_suppliers edge name in mutations.
-	EdgeNodeSuppliers = "node_suppliers"
-	// EdgeNodeOriginators holds the string denoting the node_originators edge name in mutations.
-	EdgeNodeOriginators = "node_originators"
-	// EdgeNodeExternalReferences holds the string denoting the node_external_references edge name in mutations.
-	EdgeNodeExternalReferences = "node_external_references"
-	// EdgeNodeIdentifiers holds the string denoting the node_identifiers edge name in mutations.
-	EdgeNodeIdentifiers = "node_identifiers"
-	// EdgeNodeHashes holds the string denoting the node_hashes edge name in mutations.
-	EdgeNodeHashes = "node_hashes"
-	// EdgeNodePrimaryPurpose holds the string denoting the node_primary_purpose edge name in mutations.
-	EdgeNodePrimaryPurpose = "node_primary_purpose"
+	// EdgeSuppliers holds the string denoting the suppliers edge name in mutations.
+	EdgeSuppliers = "suppliers"
+	// EdgeOriginators holds the string denoting the originators edge name in mutations.
+	EdgeOriginators = "originators"
+	// EdgeExternalReferences holds the string denoting the external_references edge name in mutations.
+	EdgeExternalReferences = "external_references"
+	// EdgeIdentifiers holds the string denoting the identifiers edge name in mutations.
+	EdgeIdentifiers = "identifiers"
+	// EdgeHashes holds the string denoting the hashes edge name in mutations.
+	EdgeHashes = "hashes"
+	// EdgePrimaryPurpose holds the string denoting the primary_purpose edge name in mutations.
+	EdgePrimaryPurpose = "primary_purpose"
 	// EdgeNodes holds the string denoting the nodes edge name in mutations.
 	EdgeNodes = "nodes"
 	// EdgeNodeList holds the string denoting the node_list edge name in mutations.
@@ -101,46 +89,46 @@ const (
 	EdgeEdgeTypes = "edge_types"
 	// Table holds the table name of the node in the database.
 	Table = "nodes"
-	// NodeSuppliersTable is the table that holds the node_suppliers relation/edge.
-	NodeSuppliersTable = "persons"
-	// NodeSuppliersInverseTable is the table name for the Person entity.
+	// SuppliersTable is the table that holds the suppliers relation/edge.
+	SuppliersTable = "persons"
+	// SuppliersInverseTable is the table name for the Person entity.
 	// It exists in this package in order to avoid circular dependency with the "person" package.
-	NodeSuppliersInverseTable = "persons"
-	// NodeSuppliersColumn is the table column denoting the node_suppliers relation/edge.
-	NodeSuppliersColumn = "node_node_suppliers"
-	// NodeOriginatorsTable is the table that holds the node_originators relation/edge.
-	NodeOriginatorsTable = "persons"
-	// NodeOriginatorsInverseTable is the table name for the Person entity.
+	SuppliersInverseTable = "persons"
+	// SuppliersColumn is the table column denoting the suppliers relation/edge.
+	SuppliersColumn = "node_suppliers"
+	// OriginatorsTable is the table that holds the originators relation/edge.
+	OriginatorsTable = "persons"
+	// OriginatorsInverseTable is the table name for the Person entity.
 	// It exists in this package in order to avoid circular dependency with the "person" package.
-	NodeOriginatorsInverseTable = "persons"
-	// NodeOriginatorsColumn is the table column denoting the node_originators relation/edge.
-	NodeOriginatorsColumn = "node_node_originators"
-	// NodeExternalReferencesTable is the table that holds the node_external_references relation/edge.
-	NodeExternalReferencesTable = "external_references"
-	// NodeExternalReferencesInverseTable is the table name for the ExternalReference entity.
+	OriginatorsInverseTable = "persons"
+	// OriginatorsColumn is the table column denoting the originators relation/edge.
+	OriginatorsColumn = "node_originators"
+	// ExternalReferencesTable is the table that holds the external_references relation/edge.
+	ExternalReferencesTable = "external_references"
+	// ExternalReferencesInverseTable is the table name for the ExternalReference entity.
 	// It exists in this package in order to avoid circular dependency with the "externalreference" package.
-	NodeExternalReferencesInverseTable = "external_references"
-	// NodeExternalReferencesColumn is the table column denoting the node_external_references relation/edge.
-	NodeExternalReferencesColumn = "node_node_external_references"
-	// NodeIdentifiersTable is the table that holds the node_identifiers relation/edge.
-	NodeIdentifiersTable = "identifiers_entries"
-	// NodeIdentifiersInverseTable is the table name for the IdentifiersEntry entity.
+	ExternalReferencesInverseTable = "external_references"
+	// ExternalReferencesColumn is the table column denoting the external_references relation/edge.
+	ExternalReferencesColumn = "node_external_references"
+	// IdentifiersTable is the table that holds the identifiers relation/edge.
+	IdentifiersTable = "identifiers_entries"
+	// IdentifiersInverseTable is the table name for the IdentifiersEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "identifiersentry" package.
-	NodeIdentifiersInverseTable = "identifiers_entries"
-	// NodeIdentifiersColumn is the table column denoting the node_identifiers relation/edge.
-	NodeIdentifiersColumn = "node_node_identifiers"
-	// NodeHashesTable is the table that holds the node_hashes relation/edge.
-	NodeHashesTable = "hashes_entries"
-	// NodeHashesInverseTable is the table name for the HashesEntry entity.
+	IdentifiersInverseTable = "identifiers_entries"
+	// IdentifiersColumn is the table column denoting the identifiers relation/edge.
+	IdentifiersColumn = "node_identifiers"
+	// HashesTable is the table that holds the hashes relation/edge.
+	HashesTable = "hashes_entries"
+	// HashesInverseTable is the table name for the HashesEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "hashesentry" package.
-	NodeHashesInverseTable = "hashes_entries"
-	// NodeHashesColumn is the table column denoting the node_hashes relation/edge.
-	NodeHashesColumn = "node_node_hashes"
-	// NodePrimaryPurposeTable is the table that holds the node_primary_purpose relation/edge. The primary key declared below.
-	NodePrimaryPurposeTable = "node_node_primary_purpose"
-	// NodePrimaryPurposeInverseTable is the table name for the Purpose entity.
+	HashesInverseTable = "hashes_entries"
+	// HashesColumn is the table column denoting the hashes relation/edge.
+	HashesColumn = "node_hashes"
+	// PrimaryPurposeTable is the table that holds the primary_purpose relation/edge. The primary key declared below.
+	PrimaryPurposeTable = "node_primary_purpose"
+	// PrimaryPurposeInverseTable is the table name for the Purpose entity.
 	// It exists in this package in order to avoid circular dependency with the "purpose" package.
-	NodePrimaryPurposeInverseTable = "purposes"
+	PrimaryPurposeInverseTable = "purposes"
 	// NodesTable is the table that holds the nodes relation/edge. The primary key declared below.
 	NodesTable = "edge_types"
 	// NodeListTable is the table that holds the node_list relation/edge.
@@ -149,7 +137,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "nodelist" package.
 	NodeListInverseTable = "node_lists"
 	// NodeListColumn is the table column denoting the node_list relation/edge.
-	NodeListColumn = "node_list_node_list_nodes"
+	NodeListColumn = "node_list_nodes"
 	// EdgeTypesTable is the table that holds the edge_types relation/edge.
 	EdgeTypesTable = "edge_types"
 	// EdgeTypesInverseTable is the table name for the EdgeType entity.
@@ -181,24 +169,18 @@ var Columns = []string{
 	FieldValidUntilDate,
 	FieldAttribution,
 	FieldFileTypes,
-	FieldSuppliers,
-	FieldOriginators,
-	FieldExternalReferences,
-	FieldHashes,
-	FieldIdentifiers,
-	FieldPrimaryPurpose,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "nodes"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"node_list_node_list_nodes",
+	"node_list_nodes",
 }
 
 var (
-	// NodePrimaryPurposePrimaryKey and NodePrimaryPurposeColumn2 are the table columns denoting the
-	// primary key for the node_primary_purpose relation (M2M).
-	NodePrimaryPurposePrimaryKey = []string{"node_id", "purpose_id"}
+	// PrimaryPurposePrimaryKey and PrimaryPurposeColumn2 are the table columns denoting the
+	// primary key for the primary_purpose relation (M2M).
+	PrimaryPurposePrimaryKey = []string{"node_id", "purpose_id"}
 	// NodesPrimaryKey and NodesColumn2 are the table columns denoting the
 	// primary key for the nodes relation (M2M).
 	NodesPrimaryKey = []string{"node_id", "node_id"}
@@ -335,87 +317,87 @@ func ByValidUntilDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldValidUntilDate, opts...).ToFunc()
 }
 
-// ByNodeSuppliersCount orders the results by node_suppliers count.
-func ByNodeSuppliersCount(opts ...sql.OrderTermOption) OrderOption {
+// BySuppliersCount orders the results by suppliers count.
+func BySuppliersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodeSuppliersStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newSuppliersStep(), opts...)
 	}
 }
 
-// ByNodeSuppliers orders the results by node_suppliers terms.
-func ByNodeSuppliers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// BySuppliers orders the results by suppliers terms.
+func BySuppliers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeSuppliersStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newSuppliersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByNodeOriginatorsCount orders the results by node_originators count.
-func ByNodeOriginatorsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByOriginatorsCount orders the results by originators count.
+func ByOriginatorsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodeOriginatorsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newOriginatorsStep(), opts...)
 	}
 }
 
-// ByNodeOriginators orders the results by node_originators terms.
-func ByNodeOriginators(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByOriginators orders the results by originators terms.
+func ByOriginators(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeOriginatorsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newOriginatorsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByNodeExternalReferencesCount orders the results by node_external_references count.
-func ByNodeExternalReferencesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByExternalReferencesCount orders the results by external_references count.
+func ByExternalReferencesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodeExternalReferencesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newExternalReferencesStep(), opts...)
 	}
 }
 
-// ByNodeExternalReferences orders the results by node_external_references terms.
-func ByNodeExternalReferences(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByExternalReferences orders the results by external_references terms.
+func ByExternalReferences(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeExternalReferencesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newExternalReferencesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByNodeIdentifiersCount orders the results by node_identifiers count.
-func ByNodeIdentifiersCount(opts ...sql.OrderTermOption) OrderOption {
+// ByIdentifiersCount orders the results by identifiers count.
+func ByIdentifiersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodeIdentifiersStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newIdentifiersStep(), opts...)
 	}
 }
 
-// ByNodeIdentifiers orders the results by node_identifiers terms.
-func ByNodeIdentifiers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByIdentifiers orders the results by identifiers terms.
+func ByIdentifiers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeIdentifiersStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newIdentifiersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByNodeHashesCount orders the results by node_hashes count.
-func ByNodeHashesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByHashesCount orders the results by hashes count.
+func ByHashesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodeHashesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newHashesStep(), opts...)
 	}
 }
 
-// ByNodeHashes orders the results by node_hashes terms.
-func ByNodeHashes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByHashes orders the results by hashes terms.
+func ByHashes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodeHashesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newHashesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByNodePrimaryPurposeCount orders the results by node_primary_purpose count.
-func ByNodePrimaryPurposeCount(opts ...sql.OrderTermOption) OrderOption {
+// ByPrimaryPurposeCount orders the results by primary_purpose count.
+func ByPrimaryPurposeCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newNodePrimaryPurposeStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newPrimaryPurposeStep(), opts...)
 	}
 }
 
-// ByNodePrimaryPurpose orders the results by node_primary_purpose terms.
-func ByNodePrimaryPurpose(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByPrimaryPurpose orders the results by primary_purpose terms.
+func ByPrimaryPurpose(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newNodePrimaryPurposeStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newPrimaryPurposeStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -453,46 +435,46 @@ func ByEdgeTypes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEdgeTypesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newNodeSuppliersStep() *sqlgraph.Step {
+func newSuppliersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodeSuppliersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, NodeSuppliersTable, NodeSuppliersColumn),
+		sqlgraph.To(SuppliersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SuppliersTable, SuppliersColumn),
 	)
 }
-func newNodeOriginatorsStep() *sqlgraph.Step {
+func newOriginatorsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodeOriginatorsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, NodeOriginatorsTable, NodeOriginatorsColumn),
+		sqlgraph.To(OriginatorsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OriginatorsTable, OriginatorsColumn),
 	)
 }
-func newNodeExternalReferencesStep() *sqlgraph.Step {
+func newExternalReferencesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodeExternalReferencesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, NodeExternalReferencesTable, NodeExternalReferencesColumn),
+		sqlgraph.To(ExternalReferencesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ExternalReferencesTable, ExternalReferencesColumn),
 	)
 }
-func newNodeIdentifiersStep() *sqlgraph.Step {
+func newIdentifiersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodeIdentifiersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, NodeIdentifiersTable, NodeIdentifiersColumn),
+		sqlgraph.To(IdentifiersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, IdentifiersTable, IdentifiersColumn),
 	)
 }
-func newNodeHashesStep() *sqlgraph.Step {
+func newHashesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodeHashesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, NodeHashesTable, NodeHashesColumn),
+		sqlgraph.To(HashesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, HashesTable, HashesColumn),
 	)
 }
-func newNodePrimaryPurposeStep() *sqlgraph.Step {
+func newPrimaryPurposeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(NodePrimaryPurposeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, NodePrimaryPurposeTable, NodePrimaryPurposePrimaryKey...),
+		sqlgraph.To(PrimaryPurposeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, PrimaryPurposeTable, PrimaryPurposePrimaryKey...),
 	)
 }
 func newNodesStep() *sqlgraph.Step {

@@ -471,10 +471,10 @@ func (heq *HashesEntryQuery) loadExternalReferences(ctx context.Context, query *
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*HashesEntry)
 	for i := range nodes {
-		if nodes[i].external_reference_external_reference_hashes == nil {
+		if nodes[i].external_reference_hashes == nil {
 			continue
 		}
-		fk := *nodes[i].external_reference_external_reference_hashes
+		fk := *nodes[i].external_reference_hashes
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -491,7 +491,7 @@ func (heq *HashesEntryQuery) loadExternalReferences(ctx context.Context, query *
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "external_reference_external_reference_hashes" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "external_reference_hashes" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -503,10 +503,10 @@ func (heq *HashesEntryQuery) loadNodes(ctx context.Context, query *NodeQuery, no
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*HashesEntry)
 	for i := range nodes {
-		if nodes[i].node_node_hashes == nil {
+		if nodes[i].node_hashes == nil {
 			continue
 		}
-		fk := *nodes[i].node_node_hashes
+		fk := *nodes[i].node_hashes
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -523,7 +523,7 @@ func (heq *HashesEntryQuery) loadNodes(ctx context.Context, query *NodeQuery, no
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "node_node_hashes" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "node_hashes" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

@@ -54,7 +54,7 @@ ix. coordinating any marketing, events, or communications regarding the Project.
 
 a. While the Project aims to operate as a consensus-based community, if any TSC decision requires a vote to move the Project forward, the voting members of the TSC will vote on a one vote per voting member basis.
 
-b. Quorum for TSC meetings requires at least fifty percent of all voting members of the TSC to be present. The TSC may continue to meet if quorum is not met but will be prevented from making any decisions at the meeting.
+b. Quorum for TSC meetings requires at least fifty percent of all voting members of the TSC to be present. If a TSC member misses any two consecutive TSC meetings, such member shall not be counted against the quorum for voting purposes until that member next attends a TSC meeting. The TSC may continue to meet if quorum is not met, but will be prevented from making any decisions at the meeting. 
 
 c. Except as provided in Section 7.c. and 8.a, decisions by vote at a meeting require a majority vote of those in attendance, provided quorum is met. Decisions made by electronic vote without a meeting require a majority vote of all voting members of the TSC.
 

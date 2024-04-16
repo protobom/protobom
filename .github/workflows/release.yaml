@@ -23,4 +23,3 @@ jobs:
         uses: kubernetes-sigs/release-actions/publish-release@ef6d340ddd115f41dc26c18893b41d9c79cdc7d2 # main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        

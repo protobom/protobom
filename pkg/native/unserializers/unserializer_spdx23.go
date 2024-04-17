@@ -101,21 +101,23 @@ func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interf
 // packageToNode assigns the data from an SPDX package into a new Node
 func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	n := &sbom.Node{
-		Id:              string(p.PackageSPDXIdentifier),
-		Type:            sbom.Node_PACKAGE,
-		Name:            p.PackageName,
-		Version:         p.PackageVersion,
-		FileName:        p.PackageFileName,
-		UrlHome:         p.PackageHomePage,
-		UrlDownload:     p.PackageDownloadLocation,
-		LicenseComments: p.PackageLicenseComments,
-		Copyright:       p.PackageCopyrightText,
-		SourceInfo:      p.PackageSourceInfo,
-		Comment:         p.PackageComment,
-		Summary:         p.PackageSummary,
-		Description:     p.PackageDescription,
-		Attribution:     p.PackageAttributionTexts,
-		Identifiers:     map[int32]string{},
+		Id:               string(p.PackageSPDXIdentifier),
+		Type:             sbom.Node_PACKAGE,
+		Name:             p.PackageName,
+		Version:          p.PackageVersion,
+		FileName:         p.PackageFileName,
+		UrlHome:          p.PackageHomePage,
+		UrlDownload:      p.PackageDownloadLocation,
+		LicenseComments:  p.PackageLicenseComments,
+		LicenseConcluded: p.PackageLicenseConcluded,
+		Licenses:         []string{p.PackageLicenseDeclared},
+		Copyright:        p.PackageCopyrightText,
+		SourceInfo:       p.PackageSourceInfo,
+		Comment:          p.PackageComment,
+		Summary:          p.PackageSummary,
+		Description:      p.PackageDescription,
+		Attribution:      p.PackageAttributionTexts,
+		Identifiers:      map[int32]string{},
 	}
 
 	// SPDX 2.3 PrimaryPackagePurpose types: APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER

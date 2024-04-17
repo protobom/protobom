@@ -8,10 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/protobom/protobom/pkg/formats"
-	"github.com/protobom/protobom/pkg/native"
-	"github.com/protobom/protobom/pkg/sbom"
-	"github.com/protobom/protobom/pkg/writer"
+	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/bom-squad/protobom/pkg/formats/spdx"
+	"github.com/bom-squad/protobom/pkg/native"
+	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/bom-squad/protobom/pkg/writer"
 )
 
 var _ native.Serializer = &SPDX3{}
@@ -92,6 +93,8 @@ type pkg struct {
 	DownloadLocation   string              `json:"downloadLocation,omitempty"`
 	PackageUrl         string              `json:"packageUrl,omitempty"`
 	HomePage           string              `json:"homepage,omitempty"`
+	LicenseConcluded   string              `json:"licenseConcluded"`
+	LicenseDeclared    string              `json:"licenseDeclared"`
 	Purpose            []string            `json:"purpose,omitempty"`
 	ContentIdentifier  string              `json:"contentIdentifier,omitempty"`
 	OriginatedBy       []string            `json:"originatedBy,omitempty"`
@@ -199,6 +202,13 @@ func (spdx3 *SPDX3) nodeToPackage(n *sbom.Node) (pkg, error) {
 		SuppliedBy:         []string{},
 		VerifiedUsing:      []hashList{},
 		ExternalReferences: []externalReference{},
+		LicenseConcluded:   n.LicenseConcluded,
+	}
+
+	if len(n.Licenses) > 0 {
+		p.LicenseDeclared = strings.Join(n.Licenses, " AND ")
+	} else {
+		p.LicenseDeclared = spdx.NOASSERTION
 	}
 
 	for algo, h := range n.Hashes {

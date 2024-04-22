@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spdx/tools-golang v0.5.3
+	github.com/spdx/tools-golang v0.5.4
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/protobuf v1.33.0
 	sigs.k8s.io/release-utils v0.8.1

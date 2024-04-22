@@ -125,9 +125,10 @@ func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
 	return w.WriteStreamWithOptions(bom, wr, w.Options)
 }
 
-// WriteFile takes an sbom.Document and writes it to the file at path
+// WriteFile takes an sbom.Document and writes it to the file at the specified
+// path. If the file exists it will be truncated.
 func (w *Writer) WriteFileWithOptions(bom *sbom.Document, path string, o *Options) error {
-	f, err := os.Open(path)
+	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}

@@ -3,7 +3,7 @@ package writer_test
 import (
 	"bufio"
 	"fmt"
-	"os"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -304,17 +304,12 @@ func TestWriteFile(t *testing.T) {
 				writer.WithFormatOptions(fakeKey, tt.fo),
 			)
 
-			file, err := os.Create(tt.path)
-			defer func() {
-				err := err
-				if err == nil {
-					os.Remove(file.Name())
-				}
-			}()
-
 			r.NotNil(w)
 
-			err = w.WriteFile(bom, tt.path)
+			tmpDir := t.TempDir()
+			p := path.Join(tmpDir, tt.path)
+
+			err := w.WriteFile(bom, p)
 			if tt.wantErr {
 				r.Error(err)
 			} else {
@@ -379,15 +374,10 @@ func TestWriteFileWithOptions(t *testing.T) {
 			)
 			r.NotNil(w)
 
-			file, err := os.Create(tt.path)
-			defer func() {
-				err := err
-				if err == nil {
-					os.Remove(file.Name())
-				}
-			}()
+			tmpDir := t.TempDir()
+			p := path.Join(tmpDir, tt.path)
 
-			err = w.WriteFileWithOptions(bom, tt.path, tt.options)
+			err := w.WriteFileWithOptions(bom, p, tt.options)
 			if tt.wantErr {
 				r.Error(err)
 			} else {

@@ -3,11 +3,10 @@ package writer
 import (
 	"fmt"
 
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
 	storage "github.com/protobom/storage/model/v1/storage"
 	sopts "github.com/protobom/storage/pkg/options"
-
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
 )
 
 type WriterOption func(*Writer)

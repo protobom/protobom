@@ -3,7 +3,7 @@ package sbom
 import (
 	"testing"
 
-	"github.com/bom-squad/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/stretchr/testify/require"
 )
 

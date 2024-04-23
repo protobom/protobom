@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "sbom/";
-package bomsquad.protobom;
+package protobom.protobom;
 
 // Document is the top-level structure representing the entire Software Bill of Materials (SBOM).
 // It serves as the core neutral ground for the SBOM translation process, encapsulating metadata,
@@ -36,7 +36,7 @@ message Node {
     string copyright = 11;            // Copyright information applicable to the software component.
 
     // field 12 was the old hashes string map.
-    // Removed, see https://github.com/bom-squad/protobom/issues/89
+    // Removed, see https://github.com/protobom/protobom/issues/89
     // map<string,string> hashes = 12;
 
     // This field is intended to capture details related to the source or origin of the software component.
@@ -44,7 +44,7 @@ message Node {
     string source_info = 13;
 
     // field 14 was the old string primary_purpose.
-    // Removed, see https://github.com/bom-squad/protobom/issues/124
+    // Removed, see https://github.com/protobom/protobom/issues/124
     // string primary_purpose = 14;   // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
 
     string comment = 15;              // Comments on the software component.
@@ -62,7 +62,7 @@ message Node {
     repeated ExternalReference external_references = 24; // External references associated with the software component.
 
     // field 25 was the old identifier list.
-    // Removed, see https://github.com/bom-squad/protobom/issues/64
+    // Removed, see https://github.com/protobom/protobom/issues/64
     // repeated Identifier identifiers = 25;
 
     repeated string file_types = 27;     // File types associated with the component
@@ -159,10 +159,10 @@ message Edge {
 // ExternalReference is an entry linking an element to a resource defined outside the SBOM standard.
 message ExternalReference {
     string url = 1; // URL providing reference to an external resource.
-    // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/bom-squad/protobom/issues/148..
+    // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/protobom/protobom/issues/148..
     string comment = 3; // Comments associated with the external reference.
     string authority = 4; // Authority responsible for the external reference.
-    // string type = 5; // Deprecated (string map) use hashes field instead, see https://github.com/bom-squad/protobom/issues/89.
+    // string type = 5; // Deprecated (string map) use hashes field instead, see https://github.com/protobom/protobom/issues/89.
     map<int32,string> hashes = 6;  // Hashes associated with the external reference, Replaced field 5.
     ExternalReferenceType type = 7;  // Type of the external reference, Replaced field 2.
 

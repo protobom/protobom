@@ -1,4 +1,4 @@
-module github.com/bom-squad/protobom
+module github.com/protobom/protobom
 
 go 1.22.0
 

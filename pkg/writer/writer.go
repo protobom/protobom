@@ -7,11 +7,11 @@ import (
 	"os"
 	"sync"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
-	drivers "github.com/bom-squad/protobom/pkg/native/serializers"
-	"github.com/bom-squad/protobom/pkg/sbom"
-	fstore "github.com/bom-squad/protobom/pkg/storage"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
+	drivers "github.com/protobom/protobom/pkg/native/serializers"
+	"github.com/protobom/protobom/pkg/sbom"
+	fstore "github.com/protobom/protobom/pkg/storage"
 	storage "github.com/protobom/storage/model/v1/storage"
 	soptions "github.com/protobom/storage/pkg/options"
 )

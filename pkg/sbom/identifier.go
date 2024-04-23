@@ -3,7 +3,7 @@ package sbom
 import (
 	"strings"
 
-	"github.com/bom-squad/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/formats/spdx"
 )
 
 // SoftwareIdentifierTypeFromString resolves a string into one of our built-in

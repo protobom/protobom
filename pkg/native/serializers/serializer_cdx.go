@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
-	cdxformats "github.com/bom-squad/protobom/pkg/formats/cyclonedx"
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/sbom"
+	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
 )
 

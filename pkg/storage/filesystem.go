@@ -53,15 +53,16 @@ func (fs *FileSystem) Store(bom *sbom.Document, opts *soptions.StoreOptions) err
 	}
 
 	i, err := os.Stat(fs.Options.Path)
+	switch {
 	// Check if the data directory exists
-	if err != nil && errors.Is(err, os.ErrNotExist) {
+	case err != nil && errors.Is(err, os.ErrNotExist):
 		if err := os.MkdirAll(fs.Options.Path, os.FileMode(0o644)); err != nil {
 			return fmt.Errorf("error creating filesystem backend storage directory")
 		}
-	} else if err != nil {
+	case err != nil:
 		// Any other errors are a true error
 		return fmt.Errorf("checking filesystem backend path directory: %w", err)
-	} else if !i.IsDir() {
+	case !i.IsDir():
 		return fmt.Errorf("the specified filsystem backend patch is not a directory")
 	}
 

@@ -11,9 +11,12 @@ import (
 	"github.com/bom-squad/protobom/pkg/native"
 	drivers "github.com/bom-squad/protobom/pkg/native/serializers"
 	"github.com/bom-squad/protobom/pkg/sbom"
+	storage "github.com/protobom/storage/model/v1/storage"
+	soptions "github.com/protobom/storage/pkg/options"
 )
 
 type Writer struct {
+	Storage storage.Backend
 	Options *Options
 }
 
@@ -25,6 +28,7 @@ var (
 			Indent: 4,
 		},
 		SerializeOptions: &native.SerializeOptions{},
+		StoreOptions:     &soptions.StoreOptions{},
 		formatOptions:    map[string]interface{}{},
 	}
 )
@@ -140,4 +144,27 @@ func (w *Writer) WriteFileWithOptions(bom *sbom.Document, path string, o *Option
 func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
 	return w.WriteFileWithOptions(
 		bom, path, w.Options)
+}
+
+// Store persists a protobom document to disk using the default options
+func (w *Writer) Store(bom *sbom.Document) error {
+	return w.StoreWithOptions(bom, defaultOptions)
+}
+
+// StoreWithOptions stores a protobom document using the configured storage
+// backend. This is the Store() variant that takes an options set.
+func (w *Writer) StoreWithOptions(bom *sbom.Document, o *Options) error {
+	if bom == nil {
+		return fmt.Errorf("writing document")
+	}
+
+	if w.Storage == nil {
+		return fmt.Errorf("no storage backend configured")
+	}
+
+	if err := w.Storage.Store(bom, o.StoreOptions); err != nil {
+		return fmt.Errorf("calling backend store: %w", err)
+	}
+
+	return nil
 }

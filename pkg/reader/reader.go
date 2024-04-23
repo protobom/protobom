@@ -15,6 +15,7 @@ import (
 	"github.com/bom-squad/protobom/pkg/native"
 	drivers "github.com/bom-squad/protobom/pkg/native/unserializers"
 	"github.com/bom-squad/protobom/pkg/sbom"
+	fstore "github.com/bom-squad/protobom/pkg/storage"
 )
 
 var (
@@ -76,6 +77,7 @@ var defaultOptions = &Options{
 func New(opts ...ReaderOption) *Reader {
 	r := &Reader{
 		sniffer: &formats.Sniffer{},
+		Storage: fstore.NewFileSystem(),
 		Options: defaultOptions,
 	}
 

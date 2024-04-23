@@ -11,6 +11,7 @@ import (
 	"github.com/bom-squad/protobom/pkg/native"
 	drivers "github.com/bom-squad/protobom/pkg/native/serializers"
 	"github.com/bom-squad/protobom/pkg/sbom"
+	fstore "github.com/bom-squad/protobom/pkg/storage"
 	storage "github.com/protobom/storage/model/v1/storage"
 	soptions "github.com/protobom/storage/pkg/options"
 )
@@ -35,6 +36,7 @@ var (
 
 func New(opts ...WriterOption) *Writer {
 	w := &Writer{
+		Storage: fstore.NewFileSystem(),
 		Options: defaultOptions,
 	}
 

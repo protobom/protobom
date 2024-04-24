@@ -16,6 +16,7 @@ import (
 	drivers "github.com/bom-squad/protobom/pkg/native/unserializers"
 	"github.com/bom-squad/protobom/pkg/sbom"
 	fstore "github.com/bom-squad/protobom/pkg/storage"
+	"github.com/protobom/storage/model/v1/storage"
 )
 
 var (
@@ -60,6 +61,7 @@ func GetFormatUnserializer(format formats.Format) (native.Unserializer, error) {
 
 type Reader struct {
 	sniffer Sniffer
+	Storage storage.Backend
 	Options *Options
 }
 
@@ -151,4 +153,29 @@ func (r *Reader) detectFormat(rs io.ReadSeeker) (formats.Format, error) {
 		return "", fmt.Errorf("detecting format: %w", err)
 	}
 	return format, nil
+}
+
+// Retrieve reads a document from the configured storage backend using the
+// default options.
+func (r *Reader) Retrieve(id string, o *Options) (*sbom.Document, error) {
+	return r.RetrieveWithOptions(id, defaultOptions)
+}
+
+// RetrieveWithOptions retrieves a document from the configured storage backend
+// using a set of options.
+func (r *Reader) RetrieveWithOptions(id string, o *Options) (*sbom.Document, error) {
+	if id == "" {
+		return nil, fmt.Errorf("unable to retrieve document, no document identifier specified")
+	}
+
+	if r.Storage == nil {
+		return nil, fmt.Errorf("unable to retrieve document, no storage backend configured")
+	}
+
+	doc, err := r.Storage.Retrieve(id, o.RetrieveOptions)
+	if err != nil {
+		return nil, fmt.Errorf("calling backend store: %w", err)
+	}
+
+	return doc, nil
 }

@@ -1,7 +1,6 @@
 package sbom
 
 import (
-	"regexp"
 	"sort"
 	"strings"
 )
@@ -118,14 +117,6 @@ func (nl *NodeList) diffRootElements(nl2 *NodeList) NodeListRootElementDiff {
 	return diff
 }
 
-func stripQualifiers(url string) string {
-	// Define a regular expression pattern to match everything after "?"
-	pattern := regexp.MustCompile(`\?.*`)
-	// Substitute the matched pattern with an empty string to remove it
-	strippedURL := pattern.ReplaceAllString(url, "")
-	return strippedURL
-}
-
 func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 	diff := NodeListDiffNodes{}
 
@@ -193,10 +184,10 @@ func (nl *NodeList) diffEdges(nl2 *NodeList) NodeListDiffEdges {
 
 	// Sort both edge lists
 	sort.Slice(nlEdges, func(i, j int) bool {
-		return compareEdges(nlEdges[i], nlEdges[j]) <= 0
+		return nlEdges[i].Equal(nlEdges[j])
 	})
 	sort.Slice(nl2Edges, func(i, j int) bool {
-		return compareEdges(nl2Edges[i], nl2Edges[j]) <= 0
+		return nl2Edges[i].Equal(nl2Edges[j])
 	})
 
 	index1, index2 := 0, 0
@@ -227,10 +218,10 @@ func (nl *NodeList) diffEdges(nl2 *NodeList) NodeListDiffEdges {
 	}
 
 	sort.Slice(diff.Added, func(i, j int) bool {
-		return compareEdges(diff.Added[i], diff.Added[j]) <= 0
+		return diff.Added[i].Equal(diff.Added[j])
 	})
 	sort.Slice(diff.Removed, func(i, j int) bool {
-		return compareEdges(diff.Removed[i], diff.Removed[j]) <= 0
+		return diff.Removed[i].Equal(diff.Removed[j])
 	})
 
 	return diff

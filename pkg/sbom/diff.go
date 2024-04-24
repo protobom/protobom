@@ -34,6 +34,7 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 	nd.Added.Name = a
 	nd.Removed.Name = r
 	nd.DiffCount += c
+
 	a, r, c = diff(n.Version, n2.Version)
 	nd.Added.Version = a
 	nd.Removed.Version = r

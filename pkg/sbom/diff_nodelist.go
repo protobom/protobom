@@ -70,7 +70,7 @@ type NodeListRootElementDiff struct {
 // that are different in nl2 from nl.
 func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 	return NodeListDiff{
-		NodesDiff:         nl.diffNodes(nl2, false),
+		NodesDiff:         nl.diffNodes(nl2),
 		EdgesDiff:         nl.diffEdges(nl2),
 		RootElmementsDiff: nl.diffRootElements(nl2),
 	}
@@ -78,9 +78,9 @@ func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 
 // DiffWithStripQulifiers analyses a NodeList and returns a NodeList populated with all fields
 // that are different in nl2 from nl after stripping identifier Quilifiers.
-func (nl *NodeList) DiffWithStripQulifiers(nl2 *NodeList, strip bool) NodeListDiff {
+func (nl *NodeList) DiffWithStripQulifiers(nl2 *NodeList) NodeListDiff {
 	return NodeListDiff{
-		NodesDiff:         nl.diffNodes(nl2, strip),
+		NodesDiff:         nl.diffNodes(nl),
 		EdgesDiff:         nl.diffEdges(nl2),
 		RootElmementsDiff: nl.diffRootElements(nl2),
 	}
@@ -126,16 +126,7 @@ func stripQualifiers(url string) string {
 	return strippedURL
 }
 
-func stripNodeQualifiers(n *Node) {
-	n.Id = stripQualifiers(n.Id)
-	newNIds := make(map[int32]string, len(n.Identifiers))
-	for u, id := range n.Identifiers {
-		newNIds[u] = stripQualifiers(id)
-	}
-	n.Identifiers = newNIds
-}
-
-func (nl *NodeList) diffNodes(nl2 *NodeList, strip bool) NodeListDiffNodes {
+func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 	diff := NodeListDiffNodes{}
 
 	nlNodes := nl.Nodes
@@ -155,10 +146,6 @@ func (nl *NodeList) diffNodes(nl2 *NodeList, strip bool) NodeListDiffNodes {
 	for index1 < len(nlNodes) || index2 < len(nl2Nodes) {
 		if index1 < len(nlNodes) && index2 < len(nl2Nodes) {
 			n, n2 := nlNodes[index1], nl2Nodes[index2]
-			if strip {
-				stripNodeQualifiers(n)
-				stripNodeQualifiers(n2)
-			}
 			switch strings.Compare(n.Id, n2.Id) { // Use ID to decide if to compare
 			case 0: // Nodes are equal
 				index1++

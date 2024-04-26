@@ -135,7 +135,8 @@ func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 
 	// Iterate through both sorted node lists
 	for index1 < len(nlNodes) || index2 < len(nl2Nodes) {
-		if index1 < len(nlNodes) && index2 < len(nl2Nodes) {
+		switch {
+		case index1 < len(nlNodes) && index2 < len(nl2Nodes):
 			n, n2 := nlNodes[index1], nl2Nodes[index2]
 			switch strings.Compare(n.Id, n2.Id) { // Use ID to decide if to compare
 			case 0: // Nodes are equal
@@ -149,14 +150,13 @@ func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 				diff.Removed = append(diff.Removed, n)
 				index1++
 			case 1: // Node1 is greater than Node2
-
 				diff.Added = append(diff.Added, n2)
 				index2++
 			}
-		} else if index1 < len(nlNodes) {
+		case index1 < len(nlNodes):
 			diff.Removed = append(diff.Removed, nlNodes[index1])
 			index1++
-		} else {
+		default:
 			diff.Added = append(diff.Added, nl2Nodes[index2])
 			index2++
 		}
@@ -194,9 +194,9 @@ func (nl *NodeList) diffEdges(nl2 *NodeList) NodeListDiffEdges {
 
 	// Iterate through both sorted edge lists
 	for index1 < len(nlEdges) || index2 < len(nl2Edges) {
-		if index1 < len(nlEdges) && index2 < len(nl2Edges) {
+		switch {
+		case index1 < len(nlEdges) && index2 < len(nl2Edges):
 			e, e2 := nlEdges[index1], nl2Edges[index2]
-
 			switch compareEdges(e, e2) {
 			case 0: // Edges are equal
 				index1++
@@ -208,10 +208,10 @@ func (nl *NodeList) diffEdges(nl2 *NodeList) NodeListDiffEdges {
 				diff.Added = append(diff.Added, e2)
 				index2++
 			}
-		} else if index1 < len(nlEdges) {
+		case index1 < len(nlEdges):
 			diff.Removed = append(diff.Removed, nlEdges[index1])
 			index1++
-		} else {
+		default:
 			diff.Added = append(diff.Added, nl2Edges[index2])
 			index2++
 		}

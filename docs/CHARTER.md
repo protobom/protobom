@@ -1,6 +1,6 @@
 # Technical Charter (the “Charter”) for protobom a Series of LF Projects, LLC
 
-**Adopted [April 10th, 2024](https://docs.google.com/document/d/14mEp4L6DJCVhlxip6yfTsu_34hO2o8eEp8wP5Tn1plI/edit#heading=h.4wdpuu2dxsel)**
+**Adopted [April 12th, 2024](https://docs.google.com/document/d/14mEp4L6DJCVhlxip6yfTsu_34hO2o8eEp8wP5Tn1plI/edit#heading=h.4wdpuu2dxsel)**
 
 This Charter sets forth the responsibilities and procedures for technical contribution to, and oversight of, the protobom open source project, which has been established as protobom a Series of LF Projects, LLC (the “Project”).  LF Projects, LLC (“LF Projects”) is a Delaware series limited liability company. All contributors (including committers, maintainers, and other technical positions) and other participants in the Project (collectively, “Collaborators”) must comply with the terms of this Charter. 
 
@@ -100,7 +100,7 @@ ii. All new inbound code contributions must also be accompanied by a Developer C
 
 iii. All outbound code will be made available under the Project License.
 
-iv. Documentation will be received and made available by the Project under the Creative Commons Attribution 4.0 International License (available at [http://creativecommons.org/licenses/by/4.0/](http://creativecommons.org/licenses/by/4.0/)). To the extent a contribution includes or consists of data, any rights in such data shall be made available under the CDLA-Permissive 2.0 License, available at https://cdla.dev/permissive-2-0.
+iv. Documentation will be received and made available by the Project under the Creative Commons Attribution 4.0 International License (available at [http://creativecommons.org/licenses/by/4.0/](http://creativecommons.org/licenses/by/4.0/)). 
 
 v. The Project may seek to integrate and contribute back to other open source projects (“Upstream Projects”). In such cases, the Project will conform to all license requirements of the Upstream Projects, including dependencies, leveraged by the Project.  Upstream Project code contributions not stored within the Project’s main code repository will comply with the contribution process and license terms for the applicable Upstream Project.
 

@@ -3,6 +3,9 @@ package writer
 import (
 	"fmt"
 
+	storage "github.com/protobom/storage/model/v1/storage"
+	sopts "github.com/protobom/storage/pkg/options"
+
 	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/native"
 )
@@ -37,10 +40,27 @@ func WithFormat(f formats.Format) WriterOption {
 	}
 }
 
+func WithStorageBackend(sb storage.Backend) WriterOption {
+	return func(w *Writer) {
+		if sb != nil {
+			w.Storage = sb
+		}
+	}
+}
+
+func WithStoreOptions(ro *sopts.StoreOptions) WriterOption {
+	return func(w *Writer) {
+		if ro != nil {
+			w.Options.StoreOptions = ro
+		}
+	}
+}
+
 type Options struct {
 	Format           formats.Format
 	RenderOptions    *native.RenderOptions
 	SerializeOptions *native.SerializeOptions
+	StoreOptions     *sopts.StoreOptions
 	formatOptions    map[string]interface{}
 }
 

@@ -6,13 +6,13 @@ import (
 	"path"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/bom-squad/protobom/pkg/formats"
 	"github.com/bom-squad/protobom/pkg/native"
 	"github.com/bom-squad/protobom/pkg/native/nativefakes"
 	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/bom-squad/protobom/pkg/storage"
 	"github.com/bom-squad/protobom/pkg/writer"
+	"github.com/stretchr/testify/require"
 )
 
 type fakeWriteCloser struct {
@@ -426,6 +426,61 @@ func TestSerializerRegistry(t *testing.T) {
 				r.Equal(serializer, got)
 				r.NoError(err)
 			}
+		})
+	}
+}
+
+func TestStore(t *testing.T) {
+	t.Parallel()
+	w := writer.New()
+	w.Storage = &storage.Fake{}
+	defaultOpts := &writer.Options{}
+
+	for _, tc := range []struct {
+		name    string
+		opts    *writer.Options
+		mustErr bool
+		prepare func(w *writer.Writer)
+	}{
+		{
+			name:    "no-errors",
+			opts:    defaultOpts,
+			mustErr: false,
+			prepare: func(r *writer.Writer) {
+				t.Helper()
+				w.Storage.(*storage.Fake).StoreReturns = nil
+			},
+		},
+		{
+			name:    "no-backend",
+			opts:    defaultOpts,
+			mustErr: true,
+			prepare: func(w *writer.Writer) {
+				t.Helper()
+				w.Storage = nil
+			},
+		},
+		{
+			name:    "retrieve-fails",
+			opts:    defaultOpts,
+			mustErr: true,
+			prepare: func(w *writer.Writer) {
+				t.Helper()
+				w.Storage.(*storage.Fake).StoreReturns = fmt.Errorf("fallo todo")
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			w := *w
+			tc.prepare(&w)
+			err := w.StoreWithOptions(sbom.NewDocument(), tc.opts)
+			if tc.mustErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
 		})
 	}
 }

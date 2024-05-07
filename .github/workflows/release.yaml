@@ -17,9 +17,9 @@ jobs:
 
     steps:
       - name: Install publish-release
-        uses: kubernetes-sigs/release-actions/setup-publish-release@841d76a188a7c121231a863572e27012805715a2 # v0.1.4
+        uses: kubernetes-sigs/release-actions/setup-publish-release@2f8b9ec22aedc9ce15039b6c7716aa6c2907df1c # v0.2.0
 
       - name: Publish Release
-        uses: kubernetes-sigs/release-actions/publish-release@841d76a188a7c121231a863572e27012805715a2 # v0.1.4
+        uses: kubernetes-sigs/release-actions/publish-release@2f8b9ec22aedc9ce15039b6c7716aa6c2907df1c # v0.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

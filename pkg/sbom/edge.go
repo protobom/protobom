@@ -248,3 +248,21 @@ func (e *Edge) flatString() string {
 	sort.Strings(tos)
 	return e.From + ":" + e.Type.String() + ":" + strings.Join(tos, "+")
 }
+
+// AddDestinationById adds identifiers to the destination list of the edge. The
+// new destination identifiers are guaranteed to be added only once and will
+// not be duplicated if there is already a destination with the same ID.
+func (e *Edge) AddDestinationById(ids ...string) {
+	dests := map[string]struct{}{}
+	for _, id := range e.To {
+		dests[id] = struct{}{}
+	}
+
+	for _, id := range ids {
+		if _, ok := dests[id]; ok {
+			continue
+		}
+		dests[id] = struct{}{}
+		e.To = append(e.To, id)
+	}
+}

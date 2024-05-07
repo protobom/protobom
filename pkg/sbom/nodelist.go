@@ -666,7 +666,7 @@ func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Ed
 		nl.Edges = append(nl.Edges, edge)
 	} else {
 		// Perhaps we should filter these
-		edge.To = append(edge.To, nl2.RootElements...)
+		edge.AddDestinationById(nl2.RootElements...)
 	}
 
 	for _, n := range nl2.Nodes {
@@ -674,6 +674,21 @@ func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Ed
 			continue
 		}
 		nl.AddNode(n)
+	}
+
+	// Copy the remaining edges from n2
+	for _, e := range nl2.Edges {
+		// Check if we have an edge of the samer type already in the
+		// nodelist and if so, reuse it:
+		if _, ok := nlEdges[e.From]; ok {
+			if _, ok2 := nlEdges[e.From][e.Type]; ok2 {
+				nlEdges[e.From][e.Type][0].AddDestinationById(e.To...)
+				continue
+			}
+		}
+
+		// If the node was not found, add a copy
+		nl.Edges = append(nl.Edges, e.Copy())
 	}
 
 	return nil

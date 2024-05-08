@@ -233,6 +233,12 @@ func (s *SPDX23) buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //
 			// Files:                       []*v2_3.File{},
 		}
 
+		if len(node.Licenses) > 0 {
+			p.PackageLicenseDeclared = strings.Join(node.Licenses, " AND ")
+		} else {
+			p.PackageLicenseDeclared = protospdx.NOASSERTION
+		}
+
 		if len(node.PrimaryPurpose) > 0 && (node.PrimaryPurpose[0] != sbom.Purpose_UNKNOWN_PURPOSE) {
 			// Allowed values: APPLICATION, FRAMEWORK, LIBRARY, CONTAINER, OPERATING-SYSTEM, DEVICE, FIRMWARE, SOURCE, ARCHIVE, FILE, INSTALL, OTHER
 

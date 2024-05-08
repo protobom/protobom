@@ -6,12 +6,12 @@ import (
 	"path"
 	"testing"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/native/nativefakes"
-	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/storage"
-	"github.com/bom-squad/protobom/pkg/writer"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/native/nativefakes"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/storage"
+	"github.com/protobom/protobom/pkg/writer"
 	"github.com/stretchr/testify/require"
 )
 

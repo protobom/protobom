@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	protospdx "github.com/bom-squad/protobom/pkg/formats/spdx"
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/sbom"
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 

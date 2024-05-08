@@ -7,17 +7,16 @@ import (
 	"os"
 	"sync"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
-	drivers "github.com/bom-squad/protobom/pkg/native/serializers"
-	"github.com/bom-squad/protobom/pkg/sbom"
-	fstore "github.com/bom-squad/protobom/pkg/storage"
-	storage "github.com/protobom/storage/model/v1/storage"
-	soptions "github.com/protobom/storage/pkg/options"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
+	drivers "github.com/protobom/protobom/pkg/native/serializers"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/storage"
+	fstore "github.com/protobom/protobom/pkg/storage"
 )
 
 type Writer struct {
-	Storage storage.Backend
+	Storage storage.StoreRetriever[sbom.Document]
 	Options *Options
 }
 
@@ -29,7 +28,7 @@ var (
 			Indent: 4,
 		},
 		SerializeOptions: &native.SerializeOptions{},
-		StoreOptions:     &soptions.StoreOptions{},
+		StoreOptions:     &storage.StoreOptions{},
 		formatOptions:    map[string]interface{}{},
 	}
 )

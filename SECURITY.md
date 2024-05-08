@@ -2,7 +2,7 @@
 
 To report as security issue in the protobom family of projects, please use
 the GitHub
-[private vulnerability reporting](https://github.com/bom-squad/protobom/security/advisories/new)
+[private vulnerability reporting](https://github.com/protobom/protobom/security/advisories/new)
 tool. The maintainers will give your report the maximum priority possible
 and will try to triage it right away. We will also credit you if protobom choses
 to issue a formal advisory.

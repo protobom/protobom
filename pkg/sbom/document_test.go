@@ -1,6 +1,6 @@
 package sbom_test
 
-import "github.com/bom-squad/protobom/pkg/sbom"
+import "github.com/protobom/protobom/pkg/sbom"
 
 // Demonstrates how to create a new protobom document and add multiple root nodes representing different software applications.
 // Each root node has distinct properties such as ID, name, version, licenses, etc. These root nodes are then attached to the document.

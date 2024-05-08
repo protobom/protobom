@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
-	cdxformats "github.com/bom-squad/protobom/pkg/formats/cyclonedx"
+	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 var _ native.Unserializer = &CDX{}

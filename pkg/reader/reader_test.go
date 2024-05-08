@@ -8,13 +8,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/native/nativefakes"
-	"github.com/bom-squad/protobom/pkg/reader"
-	"github.com/bom-squad/protobom/pkg/reader/readerfakes"
-	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/storage"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/native/nativefakes"
+	"github.com/protobom/protobom/pkg/reader"
+	"github.com/protobom/protobom/pkg/reader/readerfakes"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/storage"
 	"github.com/stretchr/testify/require"
 )
 

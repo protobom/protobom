@@ -3,7 +3,7 @@ package sbom
 import (
 	"fmt"
 
-	"github.com/bom-squad/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/formats/spdx"
 )
 
 // ToSPDX2ClientString converts the person to an SPDX actor string (not valid for

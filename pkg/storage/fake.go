@@ -1,8 +1,7 @@
 package storage
 
 import (
-	"github.com/bom-squad/protobom/pkg/sbom"
-	soptions "github.com/protobom/storage/pkg/options"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 // Fake is a mock implementation of a storage backend that can be programmed
@@ -16,10 +15,10 @@ type Fake struct {
 	}
 }
 
-func (f *Fake) Store(doc *sbom.Document, opts *soptions.StoreOptions) error {
+func (f *Fake) Store(doc *sbom.Document, opts *StoreOptions) error {
 	return f.StoreReturns
 }
 
-func (f *Fake) Retrieve(id string, opts *soptions.RetrieveOptions) (*sbom.Document, error) {
+func (f *Fake) Retrieve(id string, opts *RetrieveOptions) (*sbom.Document, error) {
 	return f.RetrieveReturns.Document, f.RetrieveReturns.Error
 }

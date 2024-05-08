@@ -7,16 +7,13 @@ import (
 	"os"
 	"path/filepath"
 
-	protostorage "github.com/protobom/storage/model/v1/storage"
-
-	"github.com/bom-squad/protobom/pkg/sbom"
-	soptions "github.com/protobom/storage/pkg/options"
+	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/release-utils/util"
 )
 
-var _ protostorage.Backend = (*FileSystem)(nil)
+var _ StoreRetriever[sbom.Document] = (*FileSystem)(nil)
 
 type FileSystemOptions struct {
 	// Path is the path top the directory where the storage
@@ -46,10 +43,10 @@ func generateDocFileName(documentId string) (string, error) {
 
 // Store implements the backend driver Store method. It stores a marshalled protobom
 // in binary form to a data directory.
-func (fs *FileSystem) Store(bom *sbom.Document, opts *soptions.StoreOptions) error {
+func (fs *FileSystem) Store(bom *sbom.Document, opts *StoreOptions) error {
 	// Support nil options
 	if opts == nil {
-		opts = &soptions.StoreOptions{}
+		opts = &StoreOptions{}
 	}
 
 	i, err := os.Stat(fs.Options.Path)
@@ -94,7 +91,7 @@ func (fs *FileSystem) Store(bom *sbom.Document, opts *soptions.StoreOptions) err
 
 // Retrieve implements the storage backend Retrieve interface. It looks for a
 // protobom document in a directory
-func (fs *FileSystem) Retrieve(id string, _ *soptions.RetrieveOptions) (*sbom.Document, error) {
+func (fs *FileSystem) Retrieve(id string, _ *RetrieveOptions) (*sbom.Document, error) {
 	if fs.Options.Path == "" {
 		return nil, fmt.Errorf("unable to retrieve SBOM data: filesystem backend data dir not set")
 	}

@@ -3,17 +3,16 @@ package reader
 import (
 	"fmt"
 
-	"github.com/protobom/storage/model/v1/storage"
-	sopts "github.com/protobom/storage/pkg/options"
-
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/storage"
 )
 
 type Options struct {
 	Format             formats.Format
 	UnserializeOptions *native.UnserializeOptions
-	RetrieveOptions    *sopts.RetrieveOptions
+	RetrieveOptions    *storage.RetrieveOptions
 	formatOptions      map[string]interface{}
 }
 
@@ -71,7 +70,7 @@ func WithSniffer(s Sniffer) ReaderOption {
 	}
 }
 
-func WithStorageBackend(sb storage.Backend) ReaderOption {
+func WithStoreRetriever(sb storage.StoreRetriever[sbom.Document]) ReaderOption {
 	return func(r *Reader) {
 		if sb != nil {
 			r.Storage = sb
@@ -79,7 +78,7 @@ func WithStorageBackend(sb storage.Backend) ReaderOption {
 	}
 }
 
-func WithRetrieveOptions(ro *sopts.RetrieveOptions) ReaderOption {
+func WithRetrieveOptions(ro *storage.RetrieveOptions) ReaderOption {
 	return func(r *Reader) {
 		if ro != nil {
 			r.Options.RetrieveOptions = ro

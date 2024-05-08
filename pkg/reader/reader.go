@@ -15,8 +15,7 @@ import (
 	"github.com/protobom/protobom/pkg/native"
 	drivers "github.com/protobom/protobom/pkg/native/unserializers"
 	"github.com/protobom/protobom/pkg/sbom"
-	fstore "github.com/protobom/protobom/pkg/storage"
-	"github.com/protobom/storage/model/v1/storage"
+	"github.com/protobom/protobom/pkg/storage"
 )
 
 var (
@@ -61,7 +60,7 @@ func GetFormatUnserializer(format formats.Format) (native.Unserializer, error) {
 
 type Reader struct {
 	sniffer Sniffer
-	Storage storage.Backend
+	Storage storage.StoreRetriever[sbom.Document]
 	Options *Options
 }
 
@@ -79,7 +78,7 @@ var defaultOptions = &Options{
 func New(opts ...ReaderOption) *Reader {
 	r := &Reader{
 		sniffer: &formats.Sniffer{},
-		Storage: fstore.NewFileSystem(),
+		Storage: storage.NewFileSystem(),
 		Options: defaultOptions,
 	}
 

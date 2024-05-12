@@ -25,8 +25,12 @@ type (
 		Retrieve(string, *RetrieveOptions) (T, error)
 	}
 
-	Backend[T ProtobomType] interface {
+	StoreRetriever[T ProtobomType] interface {
 		Storer[T]
 		Retriever[T]
+	}
+
+	Backend[T ProtobomType] interface {
+		StoreRetriever[T]
 	}
 )

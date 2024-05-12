@@ -16,7 +16,7 @@ import (
 )
 
 type Writer struct {
-	Storage storage.StoreRetriever[sbom.Document]
+	Storage storage.Backend[*sbom.Document]
 	Options *Options
 }
 

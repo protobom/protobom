@@ -70,7 +70,7 @@ func WithSniffer(s Sniffer) ReaderOption {
 	}
 }
 
-func WithStoreRetriever(sb storage.StoreRetriever[sbom.Document]) ReaderOption {
+func WithStoreRetriever(sb storage.Backend[*sbom.Document]) ReaderOption {
 	return func(r *Reader) {
 		if sb != nil {
 			r.Storage = sb

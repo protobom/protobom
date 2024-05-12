@@ -12,17 +12,21 @@ import (
 
 type (
 	ProtobomType interface {
-		sbom.Document | sbom.DocumentType | sbom.Edge | sbom.ExternalReference |
-			sbom.Metadata | sbom.Node | sbom.NodeList | sbom.Person | sbom.Purpose | sbom.Tool |
+		*sbom.Document | *sbom.DocumentType | *sbom.Edge | *sbom.ExternalReference |
+			*sbom.Metadata | *sbom.Node | *sbom.NodeList | *sbom.Person | *sbom.Purpose | *sbom.Tool |
 			map[sbom.HashAlgorithm]string | map[sbom.SoftwareIdentifierType]string
 	}
 
-	StoreRetriever[T ProtobomType] interface {
-		Store(*T, *StoreOptions) error
-		Retrieve(string, *RetrieveOptions) (*T, error)
+	Storer[T ProtobomType] interface {
+		Store(T, *StoreOptions) error
+	}
+
+	Retriever[T ProtobomType] interface {
+		Retrieve(string, *RetrieveOptions) (T, error)
 	}
 
 	Backend[T ProtobomType] interface {
-		StoreRetriever[T]
+		Storer[T]
+		Retriever[T]
 	}
 )

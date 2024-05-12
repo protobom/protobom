@@ -60,7 +60,7 @@ func GetFormatUnserializer(format formats.Format) (native.Unserializer, error) {
 
 type Reader struct {
 	sniffer Sniffer
-	Storage storage.StoreRetriever[sbom.Document]
+	Storage storage.Backend[*sbom.Document]
 	Options *Options
 }
 

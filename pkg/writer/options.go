@@ -39,7 +39,7 @@ func WithFormat(f formats.Format) WriterOption {
 	}
 }
 
-func WithStoreRetriever(sb storage.StoreRetriever[sbom.Document]) WriterOption {
+func WithStoreRetriever(sb storage.StoreRetriever[*sbom.Document]) WriterOption {
 	return func(w *Writer) {
 		if sb != nil {
 			w.Storage = sb

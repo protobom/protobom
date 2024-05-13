@@ -13,7 +13,7 @@ import (
 	"sigs.k8s.io/release-utils/util"
 )
 
-var _ StoreRetriever[sbom.Document] = (*FileSystem)(nil)
+var _ StoreRetriever[*sbom.Document] = (*FileSystem)(nil)
 
 type FileSystemOptions struct {
 	// Path is the path top the directory where the storage

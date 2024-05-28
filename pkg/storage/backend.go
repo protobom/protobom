@@ -6,15 +6,38 @@
 
 package storage
 
-import (
-	"github.com/protobom/protobom/pkg/sbom"
-)
+import "github.com/protobom/protobom/pkg/sbom"
 
 type (
+	Document           = *sbom.Document
+	DocumentType       = *sbom.DocumentType
+	DocumentTypes      = []DocumentType
+	Edge               = *sbom.Edge
+	Edges              = []Edge
+	ExternalReference  = *sbom.ExternalReference
+	ExternalReferences = []ExternalReference
+	Metadata           = *sbom.Metadata
+	Node               = *sbom.Node
+	NodeList           = *sbom.NodeList
+	Nodes              = []Node
+	Person             = *sbom.Person
+	Persons            = []Person
+	Purpose            = sbom.Purpose
+	Purposes           = []Purpose
+	Tool               = *sbom.Tool
+	Tools              = []Tool
+
 	ProtobomType interface {
-		*sbom.Document | *sbom.DocumentType | *sbom.Edge | *sbom.ExternalReference |
-			*sbom.Metadata | *sbom.Node | *sbom.NodeList | *sbom.Person | *sbom.Purpose | *sbom.Tool |
-			map[sbom.HashAlgorithm]string | map[sbom.SoftwareIdentifierType]string
+		Document | Metadata | NodeList |
+			DocumentType | DocumentTypes |
+			Edge | Edges |
+			ExternalReference | ExternalReferences |
+			Node | Nodes |
+			Person | Persons |
+			Purpose | Purposes |
+			Tool | Tools |
+			map[sbom.HashAlgorithm]string |
+			map[sbom.SoftwareIdentifierType]string
 	}
 
 	Storer[T ProtobomType] interface {

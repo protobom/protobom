@@ -22,7 +22,7 @@ type (
 	Nodes              = []Node
 	Person             = *sbom.Person
 	Persons            = []Person
-	Purpose            = sbom.Purpose
+	Purpose            = *sbom.Purpose
 	Purposes           = []Purpose
 	Tool               = *sbom.Tool
 	Tools              = []Tool

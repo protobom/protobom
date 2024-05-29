@@ -5,7 +5,6 @@ import (
 
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/native"
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 )
 
@@ -70,7 +69,7 @@ func WithSniffer(s Sniffer) ReaderOption {
 	}
 }
 
-func WithStoreRetriever(sb storage.StoreRetriever[*sbom.Document]) ReaderOption {
+func WithStoreRetriever(sb storage.StoreRetriever) ReaderOption {
 	return func(r *Reader) {
 		if sb != nil {
 			r.Storage = sb

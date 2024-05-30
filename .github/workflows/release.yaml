@@ -13,13 +13,32 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write # needed to write releases
+      contents: write # needed to write releases 
 
     steps:
-      - name: Install publish-release
-        uses: kubernetes-sigs/release-actions/setup-publish-release@2f8b9ec22aedc9ce15039b6c7716aa6c2907df1c # v0.2.0
-
+      - name: Set tag name
+        shell: bash
+        run: |
+          echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v3
+        with:
+          go-version: '1.22'
+          check-latest: true
+  
+      - name: Check out code
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          fetch-depth: 1
+      - name: Install bom
+        uses: kubernetes-sigs/release-actions/setup-bom@2f8b9ec22aedc9ce15039b6c7716aa6c2907df1c # v0.2.0
+      - name: Generate SBOM
+        shell: bash
+        run: |
+          bom generate --format=json -o /tmp/protobom-$TAG.spdx.json .
       - name: Publish Release
         uses: kubernetes-sigs/release-actions/publish-release@2f8b9ec22aedc9ce15039b6c7716aa6c2907df1c # v0.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          assets: "/tmp/protobom-$TAG.spdx.json"
+          sbom: false

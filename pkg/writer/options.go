@@ -5,7 +5,6 @@ import (
 
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/native"
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 )
 
@@ -39,7 +38,7 @@ func WithFormat(f formats.Format) WriterOption {
 	}
 }
 
-func WithStoreRetriever(sb storage.StoreRetriever[*sbom.Document]) WriterOption {
+func WithStoreRetriever(sb storage.StoreRetriever) WriterOption {
 	return func(w *Writer) {
 		if sb != nil {
 			w.Storage = sb

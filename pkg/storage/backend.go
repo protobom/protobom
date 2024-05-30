@@ -6,31 +6,23 @@
 
 package storage
 
-import (
-	"github.com/protobom/protobom/pkg/sbom"
-)
+import "github.com/protobom/protobom/pkg/sbom"
 
 type (
-	ProtobomType interface {
-		*sbom.Document | *sbom.DocumentType | *sbom.Edge | *sbom.ExternalReference |
-			*sbom.Metadata | *sbom.Node | *sbom.NodeList | *sbom.Person | *sbom.Purpose | *sbom.Tool |
-			map[sbom.HashAlgorithm]string | map[sbom.SoftwareIdentifierType]string
+	Storer interface {
+		Store(*sbom.Document, *StoreOptions) error
 	}
 
-	Storer[T ProtobomType] interface {
-		Store(T, *StoreOptions) error
+	Retriever interface {
+		Retrieve(string, *RetrieveOptions) (*sbom.Document, error)
 	}
 
-	Retriever[T ProtobomType] interface {
-		Retrieve(string, *RetrieveOptions) (T, error)
+	StoreRetriever interface {
+		Storer
+		Retriever
 	}
 
-	StoreRetriever[T ProtobomType] interface {
-		Storer[T]
-		Retriever[T]
-	}
-
-	Backend[T ProtobomType] interface {
-		StoreRetriever[T]
+	Backend interface {
+		StoreRetriever
 	}
 )

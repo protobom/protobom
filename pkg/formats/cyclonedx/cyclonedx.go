@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/CycloneDX/cyclonedx-go"
-	"github.com/bom-squad/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/formats"
 )
 
 func ParseVersion(version string) (cyclonedx.SpecVersion, error) {

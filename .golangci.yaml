@@ -11,15 +11,6 @@ issues:
         - golint
         - dupl
 
-    - path: .*(\.pb|\.gorm)\.go
-      linters:
-        - dupl
-        - gocritic
-        - gofumpt
-        - goimports
-        - gosimple
-        - govet
-
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
 
@@ -107,7 +98,7 @@ linters-settings:
     sections:
       - standard
       - default
-      - prefix(github.com/bom-squad/protobom)
+      - prefix(github.com/protobom/protobom)
 
     section-separators:
       - newLine

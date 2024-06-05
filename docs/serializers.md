@@ -16,7 +16,7 @@ SBOM as an `interface{}` so it needs to know how to cast the SBOM into the
 expected type.
 
 Both tasks of the serializer are invoked by the `Writer` object when calling
-the [`WriteStream()` function](https://github.com/bom-squad/protobom/blob/ca25413addfc841c1c91ee667ee1296194c231b0/pkg/writer/writer.go#L30C18-L44).
+the [`WriteStream()` function](https://github.com/protobom/protobom/blob/ca25413addfc841c1c91ee667ee1296194c231b0/pkg/writer/writer.go#L30C18-L44).
 
 ## Writing New Serializers
 
@@ -33,19 +33,19 @@ etc) to any stream that implements `io.Writer`.
 
 The initial POC of protobom shows a simple example on how to write a serializer:
 
-1. A [type is defined](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L19) to implement the interface (`SerializerCDX14`).
+1. A [type is defined](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L19) to implement the interface (`SerializerCDX14`).
 2. It `defines the Serialize` method:
-    - The basic job of this function is [creating a standard SBOM object](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L21)
+    - The basic job of this function is [creating a standard SBOM object](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L21)
     (a CycloneDX 1.4 document in this case) and populate its fields from the protobom
     data.
     - The main parts to note in this example are how it first [creates all the
-    CycloneDX components from the protobom Nodes](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L47-L55). Then, it [reads the edges from the
-    graph](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L85)
-    and [based on the relationship kind](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L98), either [assigns the nodes to the
-    components tree](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L99-L111) or just [notes them on the dependency tree](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#LL125C10-L128C7).
+    CycloneDX components from the protobom Nodes](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L47-L55). Then, it [reads the edges from the
+    graph](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L85)
+    and [based on the relationship kind](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L98), either [assigns the nodes to the
+    components tree](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L99-L111) or just [notes them on the dependency tree](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#LL125C10-L128C7).
 3. Note that the code has notes on where data degradation or loss is done
-([example 1](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L77-L78) [example 2](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L132) ). These
+([example 1](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L77-L78) [example 2](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L132) ). These
 comments need to be documented and will become the degradation stargey doc that
 users can then read to understand when data loss due to translation occurs.
-4. Finally, it [implements the `Render()` method](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L155). In the POC the method is very simple, it just [creates a json.Encoder() and writes the
-cast SBOM object to the writer](https://github.com/bom-squad/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L159).
+4. Finally, it [implements the `Render()` method](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L155). In the POC the method is very simple, it just [creates a json.Encoder() and writes the
+cast SBOM object to the writer](https://github.com/protobom/protobom/blob/ec58d8485c3df0f516a4c1896124e505c2d4bc9c/pkg/writer/serializer_cdx14.go#L159).

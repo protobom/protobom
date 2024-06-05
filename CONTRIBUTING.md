@@ -45,7 +45,7 @@ The purpose of conformance testing is to ensure that the system or software meet
 
 ## Issue Tracker
 
-If you encounter any issues or have suggestions for improvements, please open an issue on the [issue tracker](https://github.com/bom-squad/protobom/issues).
+If you encounter any issues or have suggestions for improvements, please open an issue on the [issue tracker](https://github.com/protobom/protobom/issues).
 
 ## License
 

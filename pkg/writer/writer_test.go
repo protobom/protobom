@@ -3,16 +3,16 @@ package writer_test
 import (
 	"bufio"
 	"fmt"
-	"os"
+	"path"
 	"testing"
 
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/native/nativefakes"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/storage"
+	"github.com/protobom/protobom/pkg/writer"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/native/nativefakes"
-	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/writer"
 )
 
 type fakeWriteCloser struct {
@@ -304,17 +304,12 @@ func TestWriteFile(t *testing.T) {
 				writer.WithFormatOptions(fakeKey, tt.fo),
 			)
 
-			file, err := os.Create(tt.path)
-			defer func() {
-				err := err
-				if err == nil {
-					os.Remove(file.Name())
-				}
-			}()
-
 			r.NotNil(w)
 
-			err = w.WriteFile(bom, tt.path)
+			tmpDir := t.TempDir()
+			p := path.Join(tmpDir, tt.path)
+
+			err := w.WriteFile(bom, p)
 			if tt.wantErr {
 				r.Error(err)
 			} else {
@@ -379,15 +374,10 @@ func TestWriteFileWithOptions(t *testing.T) {
 			)
 			r.NotNil(w)
 
-			file, err := os.Create(tt.path)
-			defer func() {
-				err := err
-				if err == nil {
-					os.Remove(file.Name())
-				}
-			}()
+			tmpDir := t.TempDir()
+			p := path.Join(tmpDir, tt.path)
 
-			err = w.WriteFileWithOptions(bom, tt.path, tt.options)
+			err := w.WriteFileWithOptions(bom, p, tt.options)
 			if tt.wantErr {
 				r.Error(err)
 			} else {
@@ -436,6 +426,61 @@ func TestSerializerRegistry(t *testing.T) {
 				r.Equal(serializer, got)
 				r.NoError(err)
 			}
+		})
+	}
+}
+
+func TestStore(t *testing.T) {
+	t.Parallel()
+	w := writer.New()
+	w.Storage = &storage.Fake{}
+	defaultOpts := &writer.Options{}
+
+	for _, tc := range []struct {
+		name    string
+		opts    *writer.Options
+		mustErr bool
+		prepare func(w *writer.Writer)
+	}{
+		{
+			name:    "no-errors",
+			opts:    defaultOpts,
+			mustErr: false,
+			prepare: func(r *writer.Writer) {
+				t.Helper()
+				w.Storage.(*storage.Fake).StoreReturns = nil
+			},
+		},
+		{
+			name:    "no-backend",
+			opts:    defaultOpts,
+			mustErr: true,
+			prepare: func(w *writer.Writer) {
+				t.Helper()
+				w.Storage = nil
+			},
+		},
+		{
+			name:    "retrieve-fails",
+			opts:    defaultOpts,
+			mustErr: true,
+			prepare: func(w *writer.Writer) {
+				t.Helper()
+				w.Storage.(*storage.Fake).StoreReturns = fmt.Errorf("fallo todo")
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			w := *w
+			tc.prepare(&w)
+			err := w.StoreWithOptions(sbom.NewDocument(), tc.opts)
+			if tc.mustErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
 		})
 	}
 }

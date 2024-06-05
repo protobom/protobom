@@ -3,13 +3,15 @@ package reader
 import (
 	"fmt"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/storage"
 )
 
 type Options struct {
 	Format             formats.Format
 	UnserializeOptions *native.UnserializeOptions
+	RetrieveOptions    *storage.RetrieveOptions
 	formatOptions      map[string]interface{}
 }
 
@@ -63,6 +65,22 @@ func WithSniffer(s Sniffer) ReaderOption {
 	return func(r *Reader) {
 		if s != nil {
 			r.sniffer = s
+		}
+	}
+}
+
+func WithStoreRetriever(sb storage.StoreRetriever) ReaderOption {
+	return func(r *Reader) {
+		if sb != nil {
+			r.Storage = sb
+		}
+	}
+}
+
+func WithRetrieveOptions(ro *storage.RetrieveOptions) ReaderOption {
+	return func(r *Reader) {
+		if ro != nil {
+			r.Options.RetrieveOptions = ro
 		}
 	}
 }

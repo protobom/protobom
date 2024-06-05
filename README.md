@@ -37,7 +37,7 @@ The `protobom` library can be used to read in and write out SBOM documents in an
 
 ### Example 1:  The sbom-convert project
 
-https://github.com/bom-squad/sbom-convert provides a complete example of using the library to ingest an SBOM into the protobom intermediate format and then write out a new SBOM document in a different format.
+https://github.com/protobom/sbom-convert provides a complete example of using the library to ingest an SBOM into the protobom intermediate format and then write out a new SBOM document in a different format.
 
 ### Example 2:  Read in SBOM document to work with specific field(s)
 
@@ -51,7 +51,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/bom-squad/protobom/pkg/reader"
+	"github.com/protobom/protobom/pkg/reader"
 )
 
 func main() {
@@ -72,7 +72,7 @@ func main() {
 
 ### Example 3:  Generate an SBOM document programmatically
 
-Developers can use the `protobom` library to generate SBOM documents based on the content of a separate SBOM document, as shown by the sbom-convert project (https://github.com/bom-squad/sbom-convert).
+Developers can use the `protobom` library to generate SBOM documents based on the content of a separate SBOM document, as shown by the sbom-convert project (https://github.com/protobom/sbom-convert).
 
 However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The protobom v0.2.0 release includes five registered serializer formats for Writer.New(): SPDX23JSON, CDX12JSON, CDX13JSON, CDX14JSON, and CDX15JSON.
 
@@ -82,9 +82,9 @@ package main
 import (
 	"os"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/writer"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/writer"
 )
 
 func main() {

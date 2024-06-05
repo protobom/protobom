@@ -5,7 +5,7 @@ package native
 import (
 	"io"
 
-	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 //counterfeiter:generate . Unserializer

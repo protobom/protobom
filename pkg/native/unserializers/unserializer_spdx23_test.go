@@ -2,10 +2,12 @@ package unserializers
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
-	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/spdx/tools-golang/spdx"
+	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"github.com/stretchr/testify/require"
 )
 
@@ -113,5 +115,40 @@ func TestExtRefTypeToIdentifierType(t *testing.T) {
 	} {
 		identifier := s23.extRefTypeToIdentifierType(tc.sut)
 		require.Equal(t, tc.expected, identifier)
+	}
+}
+
+func TestBuildDocumentIdentifier(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		name  string
+		sut   *spdx23.Document
+		match func(string) bool
+	}{
+		{
+			name: "normal",
+			sut: &spdx23.Document{
+				SPDXIdentifier:    "DOCUMENT",
+				DocumentNamespace: "https://example.com/document",
+			},
+			match: func(s string) bool { return s == "https://example.com/document#DOCUMENT" },
+		},
+		{
+			name: "no-namespace",
+			sut: &spdx23.Document{
+				SPDXIdentifier:    "DOCUMENT",
+				DocumentNamespace: "",
+			},
+			match: func(s string) bool {
+				r := regexp.MustCompile(`^https://spdx.org/spdxdocs/protobom-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}#DOCUMENT$`)
+				return r.MatchString(s)
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			identifier := buildDocumentIdentifier(tc.sut)
+			require.True(t, tc.match(identifier), identifier)
+		})
 	}
 }

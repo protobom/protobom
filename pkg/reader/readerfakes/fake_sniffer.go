@@ -5,8 +5,8 @@ import (
 	"io"
 	"sync"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/reader"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/reader"
 )
 
 type FakeSniffer struct {

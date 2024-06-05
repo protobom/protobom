@@ -8,12 +8,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/native/nativefakes"
-	"github.com/bom-squad/protobom/pkg/reader"
-	"github.com/bom-squad/protobom/pkg/reader/readerfakes"
-	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/native/nativefakes"
+	"github.com/protobom/protobom/pkg/reader"
+	"github.com/protobom/protobom/pkg/reader/readerfakes"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/storage"
 	"github.com/stretchr/testify/require"
 )
 
@@ -396,6 +397,68 @@ func TestUnserializerRegistry(t *testing.T) {
 				r.Equal(unserializer, got)
 				r.NoError(err)
 			}
+		})
+	}
+}
+
+func TestRetrieve(t *testing.T) {
+	t.Parallel()
+	r := reader.New()
+	r.Storage = &storage.Fake{}
+	defaultOpts := &reader.Options{}
+
+	for _, tc := range []struct {
+		name    string
+		opts    *reader.Options
+		mustErr bool
+		prepare func(r *reader.Reader)
+	}{
+		{
+			name:    "no-errors",
+			opts:    defaultOpts,
+			mustErr: false,
+			prepare: func(r *reader.Reader) {
+				t.Helper()
+				r.Storage.(*storage.Fake).RetrieveReturns = struct {
+					Document *sbom.Document
+					Error    error
+				}{sbom.NewDocument(), nil}
+			},
+		},
+		{
+			name:    "no-backend",
+			opts:    defaultOpts,
+			mustErr: true,
+			prepare: func(r *reader.Reader) {
+				t.Helper()
+				r.Storage = nil
+			},
+		},
+		{
+			name:    "retrieve-fails",
+			opts:    defaultOpts,
+			mustErr: true,
+			prepare: func(r *reader.Reader) {
+				t.Helper()
+				r.Storage.(*storage.Fake).RetrieveReturns = struct {
+					Document *sbom.Document
+					Error    error
+				}{nil, fmt.Errorf("fallo todo")}
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			r := *r
+			tc.prepare(&r)
+			doc, err := r.RetrieveWithOptions("test", tc.opts)
+			if tc.mustErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.NotNil(t, doc)
 		})
 	}
 }

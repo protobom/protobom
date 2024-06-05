@@ -259,9 +259,18 @@ func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
 
 // copyEdgeList is a utility function that deep copies a list of edges
 func copyEdgeList(original []*Edge) []*Edge {
-	nodeCopy := []*Edge{}
+	edgeCopy := []*Edge{}
 	for _, e := range original {
-		nodeCopy = append(nodeCopy, e.Copy())
+		edgeCopy = append(edgeCopy, e.Copy())
+	}
+	return edgeCopy
+}
+
+// copyNodeSlice is a utility function that deep copies a list of nodes
+func copyNodeSlice(original []*Node) []*Node {
+	nodeCopy := []*Node{}
+	for _, n := range original {
+		nodeCopy = append(nodeCopy, n.Copy())
 	}
 	return nodeCopy
 }
@@ -270,12 +279,8 @@ func copyEdgeList(original []*Edge) []*Edge {
 func (nl *NodeList) Copy() *NodeList {
 	nlo := &NodeList{}
 
-	for _, n := range nl.Nodes {
-		nlo.Nodes = append(nlo.Nodes, n.Copy())
-	}
-	for _, e := range nl.Edges {
-		nlo.Edges = append(nlo.Edges, e.Copy())
-	}
+	nlo.Nodes = copyNodeSlice(nl.Nodes)
+	nlo.Edges = copyEdgeList(nl.Edges)
 
 	nlo.RootElements = append(nlo.RootElements, nl.RootElements...)
 
@@ -661,7 +666,7 @@ func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Ed
 		nl.Edges = append(nl.Edges, edge)
 	} else {
 		// Perhaps we should filter these
-		edge.To = append(edge.To, nl2.RootElements...)
+		edge.AddDestinationById(nl2.RootElements...)
 	}
 
 	for _, n := range nl2.Nodes {
@@ -669,6 +674,21 @@ func (nl *NodeList) RelateNodeListAtID(nl2 *NodeList, nodeID string, edgeType Ed
 			continue
 		}
 		nl.AddNode(n)
+	}
+
+	// Copy the remaining edges from n2
+	for _, e := range nl2.Edges {
+		// Check if we have an edge of the samer type already in the
+		// nodelist and if so, reuse it:
+		if _, ok := nlEdges[e.From]; ok {
+			if _, ok2 := nlEdges[e.From][e.Type]; ok2 {
+				nlEdges[e.From][e.Type][0].AddDestinationById(e.To...)
+				continue
+			}
+		}
+
+		// If the node was not found, add a copy
+		nl.Edges = append(nl.Edges, e.Copy())
 	}
 
 	return nil

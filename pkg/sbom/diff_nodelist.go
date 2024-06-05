@@ -79,15 +79,8 @@ func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 func (nl *NodeList) diffRootElements(nl2 *NodeList) RootElementsDiff {
 	diff := RootElementsDiff{}
 
-	nlRoots := make(map[string]struct{}) // map to store root elements of nl
-	for _, root := range nl.RootElements {
-		nlRoots[root] = struct{}{}
-	}
-
-	nl2Roots := make(map[string]struct{}) // map to store root elements of nl2
-	for _, root := range nl2.RootElements {
-		nl2Roots[root] = struct{}{}
-	}
+	nlRoots := nl.indexRootElements()
+	nl2Roots := nl2.indexRootElements()
 
 	// Compare root elements and populate the diff
 	for root := range nlRoots {

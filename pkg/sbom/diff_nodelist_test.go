@@ -30,7 +30,7 @@ func TestNodeListDiff(t *testing.T) {
 			sut:  &NodeList{},
 			node: &NodeList{},
 			expected: &NodeListDiff{
-				NodesDiff: NodeListDiffNodes{
+				Nodes: NodeSetDiff{
 					Added: []*Node{
 						{
 							Id: "added",
@@ -53,7 +53,7 @@ func TestNodeListDiff(t *testing.T) {
 			sut:  &NodeList{},
 			node: &NodeList{},
 			expected: &NodeListDiff{
-				NodesDiff: NodeListDiffNodes{
+				Nodes: NodeSetDiff{
 					Removed: []*Node{
 						{
 							Id: "node1",
@@ -77,7 +77,7 @@ func TestNodeListDiff(t *testing.T) {
 			sut:  &NodeList{},
 			node: &NodeList{},
 			expected: &NodeListDiff{
-				NodesDiff: NodeListDiffNodes{
+				Nodes: NodeSetDiff{
 					NodeDiff: []*NodeDiff{
 						{
 							Removed: &Node{},
@@ -102,7 +102,7 @@ func TestNodeListDiff(t *testing.T) {
 			}
 
 			require.NotNil(t, result)
-			compareNodeListDiff(t, tc.expected.NodesDiff, result.NodesDiff)
+			compareNodeListDiff(t, tc.expected.Nodes, result.Nodes)
 		})
 	}
 }
@@ -139,7 +139,7 @@ func TestNodeListDiffEdge(t *testing.T) {
 			sut:  &NodeList{},
 			node: &NodeList{},
 			expected: &NodeListDiff{
-				EdgesDiff: NodeListDiffEdges{
+				Edges: EdgeSetDiff{
 					Added: []*Edge{
 						{
 							From: "added",
@@ -163,7 +163,7 @@ func TestNodeListDiffEdge(t *testing.T) {
 			sut:  &NodeList{},
 			node: &NodeList{},
 			expected: &NodeListDiff{
-				EdgesDiff: NodeListDiffEdges{
+				Edges: EdgeSetDiff{
 					Removed: []*Edge{
 						{
 							From: "test1",
@@ -189,7 +189,7 @@ func TestNodeListDiffEdge(t *testing.T) {
 			}
 			require.NotNil(t, result)
 
-			compareEdgesDiff(t, tc.expected.EdgesDiff, result.EdgesDiff)
+			compareEdgesDiff(t, tc.expected.Edges, result.Edges)
 		})
 	}
 }
@@ -216,7 +216,7 @@ func TestNodeListDiffRootElements(t *testing.T) {
 				RootElements: []string{"root1", "root2", "root3"},
 			},
 			expected: &NodeListDiff{
-				RootElmementsDiff: NodeListRootElementDiff{
+				RootElements: RootElementsDiff{
 					Added: []string{"added"},
 				},
 			},
@@ -237,7 +237,7 @@ func TestNodeListDiffRootElements(t *testing.T) {
 				RootElements: []string{"root1", "root2", "root3"},
 			},
 			expected: &NodeListDiff{
-				RootElmementsDiff: NodeListRootElementDiff{
+				RootElements: RootElementsDiff{
 					Removed: []string{"root1"},
 				},
 			},
@@ -250,7 +250,7 @@ func TestNodeListDiffRootElements(t *testing.T) {
 			result := tc.sut.Diff(tc.node)
 			require.NotNil(t, result)
 
-			compareNodeListRootElementDiff(t, tc.expected.RootElmementsDiff, result.RootElmementsDiff)
+			compareNodeListRootElementDiff(t, tc.expected.RootElements, result.RootElements)
 		})
 	}
 }
@@ -290,13 +290,13 @@ func TestFullNodeListDiff(t *testing.T) {
 				RootElements: []string{"node1", "node2"},
 			},
 			expected: &NodeListDiff{
-				NodesDiff: NodeListDiffNodes{
+				Nodes: NodeSetDiff{
 					Added: []*Node{{Id: "node4", Name: "Node 4"}},
 				},
-				EdgesDiff: NodeListDiffEdges{
+				Edges: EdgeSetDiff{
 					Added: []*Edge{{From: "node3", Type: Edge_contains, To: []string{"node4"}}},
 				},
-				RootElmementsDiff: NodeListRootElementDiff{
+				RootElements: RootElementsDiff{
 					Added: []string{"node3"},
 				},
 			},
@@ -312,13 +312,13 @@ func TestFullNodeListDiff(t *testing.T) {
 				RootElements: []string{"node1"},
 			},
 			expected: &NodeListDiff{
-				NodesDiff: NodeListDiffNodes{
+				Nodes: NodeSetDiff{
 					Removed: []*Node{{Id: "node2", Name: "Node 2"}, {Id: "node3", Name: "Node 3"}},
 				},
-				EdgesDiff: NodeListDiffEdges{
+				Edges: EdgeSetDiff{
 					Removed: []*Edge{{From: "node2", Type: Edge_dependsOn, To: []string{"node3"}}},
 				},
-				RootElmementsDiff: NodeListRootElementDiff{
+				RootElements: RootElementsDiff{
 					Removed: []string{"node2"},
 				},
 			},
@@ -334,7 +334,7 @@ func TestFullNodeListDiff(t *testing.T) {
 				RootElements: []string{"node3"},
 			},
 			expected: &NodeListDiff{
-				NodesDiff: NodeListDiffNodes{
+				Nodes: NodeSetDiff{
 					NodeDiff: []*NodeDiff{
 						{
 							Removed:   &Node{},
@@ -343,10 +343,10 @@ func TestFullNodeListDiff(t *testing.T) {
 						},
 					},
 				},
-				EdgesDiff: NodeListDiffEdges{
+				Edges: EdgeSetDiff{
 					Added: []*Edge{{From: "node1", Type: Edge_dependsOn, To: []string{"node2"}}},
 				},
-				RootElmementsDiff: NodeListRootElementDiff{
+				RootElements: RootElementsDiff{
 					Added:   []string{"node3"},
 					Removed: []string{"node1", "node2"},
 				},
@@ -367,12 +367,12 @@ func TestFullNodeListDiff(t *testing.T) {
 }
 
 func compareDiff(t *testing.T, expected, actual *NodeListDiff) {
-	compareNodeListDiff(t, expected.NodesDiff, actual.NodesDiff)
-	compareEdgesDiff(t, expected.EdgesDiff, actual.EdgesDiff)
-	compareNodeListRootElementDiff(t, expected.RootElmementsDiff, actual.RootElmementsDiff)
+	compareNodeListDiff(t, expected.Nodes, actual.Nodes)
+	compareEdgesDiff(t, expected.Edges, actual.Edges)
+	compareNodeListRootElementDiff(t, expected.RootElements, actual.RootElements)
 }
 
-func compareEdgesDiff(t *testing.T, expected, actual NodeListDiffEdges) {
+func compareEdgesDiff(t *testing.T, expected, actual EdgeSetDiff) {
 	compareEdgesDiffSlice(t, expected.Added, actual.Added, "added")
 	compareEdgesDiffSlice(t, expected.Removed, actual.Removed, "removed")
 }
@@ -384,12 +384,12 @@ func compareEdgesDiffSlice(t *testing.T, expected, actual []*Edge, action string
 	}
 }
 
-func compareNodeListRootElementDiff(t *testing.T, expected, actual NodeListRootElementDiff) {
+func compareNodeListRootElementDiff(t *testing.T, expected, actual RootElementsDiff) {
 	require.ElementsMatch(t, expected.Added, actual.Added, "expected root elements added but not found")
 	require.ElementsMatch(t, expected.Removed, actual.Removed, "expected root elements removed but not found")
 }
 
-func compareNodeListDiff(t *testing.T, expected, actual NodeListDiffNodes) {
+func compareNodeListDiff(t *testing.T, expected, actual NodeSetDiff) {
 	for i, add := range expected.Added {
 		require.GreaterOrEqual(t, len(actual.Added), i+1, "expected node added but not found %s", add.flatString())
 		require.Equal(t, actual.Added[i].flatString(), add.flatString())

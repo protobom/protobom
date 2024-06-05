@@ -7,22 +7,22 @@ import (
 
 // NodeListDiff represents the difference between two lists NodeLists.
 type NodeListDiff struct {
-	Nodes         NodeListDiffNodes
-	Edges         NodeListDiffEdges
-	RootElmements NodeListRootElementDiff
+	Nodes        NodeSetDiff
+	Edges        EdgeSetDiff
+	RootElements RootElementsDiff
 }
 
 func (nlDiff *NodeListDiff) AddedNodeList() *NodeList {
 	var addedNodeList NodeList
-	for _, addedNode := range nlDiff.NodesDiff.Added {
+	for _, addedNode := range nlDiff.Nodes.Added {
 		addedNodeList.AddNode(addedNode)
 	}
-	for _, addedEdge := range nlDiff.EdgesDiff.Added {
+	for _, addedEdge := range nlDiff.Edges.Added {
 		addedNodeList.AddEdge(addedEdge)
 	}
-	addedNodeList.RootElements = append(addedNodeList.RootElements, nlDiff.RootElmementsDiff.Added...)
+	addedNodeList.RootElements = append(addedNodeList.RootElements, nlDiff.RootElements.Added...)
 
-	for _, diffNodeAdded := range nlDiff.NodesDiff.NodeDiff {
+	for _, diffNodeAdded := range nlDiff.Nodes.NodeDiff {
 		addedNodeList.AddNode(diffNodeAdded.Added)
 	}
 
@@ -31,22 +31,22 @@ func (nlDiff *NodeListDiff) AddedNodeList() *NodeList {
 
 func (nlDiff *NodeListDiff) RemovedNodeList() *NodeList {
 	var removedNodeList NodeList
-	for _, removedNode := range nlDiff.NodesDiff.Removed {
+	for _, removedNode := range nlDiff.Nodes.Removed {
 		removedNodeList.AddNode(removedNode)
 	}
-	for _, removedEdge := range nlDiff.EdgesDiff.Removed {
+	for _, removedEdge := range nlDiff.Edges.Removed {
 		removedNodeList.AddEdge(removedEdge)
 	}
-	removedNodeList.RootElements = append(removedNodeList.RootElements, nlDiff.RootElmementsDiff.Removed...)
+	removedNodeList.RootElements = append(removedNodeList.RootElements, nlDiff.RootElements.Removed...)
 
-	for _, diffNodeRemoved := range nlDiff.NodesDiff.NodeDiff {
+	for _, diffNodeRemoved := range nlDiff.Nodes.NodeDiff {
 		removedNodeList.AddNode(diffNodeRemoved.Removed)
 	}
 
 	return &removedNodeList
 }
 
-// NodeListDiffNodes represents the differences between two NodeList nodes.
+// NodeSetDiff represents the differences between two NodeList nodes.
 type NodeSetDiff struct {
 	Added    []*Node
 	Removed  []*Node
@@ -60,7 +60,7 @@ type EdgeSetDiff struct {
 }
 
 // NodeListRootElementDiff represents the differences between two NodeLists root elements.
-type RootElemenstDiff struct {
+type RootElementsDiff struct {
 	Added   []string
 	Removed []string
 }
@@ -69,16 +69,15 @@ type RootElemenstDiff struct {
 // that are different in nl2 from nl.
 func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 	return NodeListDiff{
-		NodesDiff:         nl.diffNodes(nl2),
-		EdgesDiff:         nl.diffEdges(nl2),
-		RootElmementsDiff: nl.diffRootElements(nl2),
+		Nodes:        nl.diffNodes(nl2),
+		Edges:        nl.diffEdges(nl2),
+		RootElements: nl.diffRootElements(nl2),
 	}
 }
 
-
 // diffRootElements computes the differences in root elements between two NodeLists.
-func (nl *NodeList) diffRootElements(nl2 *NodeList) NodeListRootElementDiff {
-	diff := NodeListRootElementDiff{}
+func (nl *NodeList) diffRootElements(nl2 *NodeList) RootElementsDiff {
+	diff := RootElementsDiff{}
 
 	nlRoots := make(map[string]struct{}) // map to store root elements of nl
 	for _, root := range nl.RootElements {
@@ -108,8 +107,8 @@ func (nl *NodeList) diffRootElements(nl2 *NodeList) NodeListRootElementDiff {
 	return diff
 }
 
-func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
-	diff := NodeListDiffNodes{}
+func (nl *NodeList) diffNodes(nl2 *NodeList) NodeSetDiff {
+	diff := NodeSetDiff{}
 
 	nlNodes := nl.Nodes
 	nl2Nodes := nl2.Nodes
@@ -167,8 +166,8 @@ func (nl *NodeList) diffNodes(nl2 *NodeList) NodeListDiffNodes {
 	return diff
 }
 
-func (nl *NodeList) diffEdges(nl2 *NodeList) NodeListDiffEdges {
-	diff := NodeListDiffEdges{}
+func (nl *NodeList) diffEdges(nl2 *NodeList) EdgeSetDiff {
+	diff := EdgeSetDiff{}
 
 	nlEdges := nl.Edges
 	nl2Edges := nl2.Edges

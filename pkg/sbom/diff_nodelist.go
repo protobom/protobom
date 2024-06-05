@@ -47,7 +47,7 @@ func (nlDiff *NodeListDiff) RemovedNodeList() *NodeList {
 }
 
 // NodeListDiffNodes represents the differences between two NodeList nodes.
-type NodeListDiffNodes struct {
+type NodeSetDiff struct {
 	Added    []*Node
 	Removed  []*Node
 	NodeDiff []*NodeDiff

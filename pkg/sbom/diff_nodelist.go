@@ -7,9 +7,9 @@ import (
 
 // NodeListDiff represents the difference between two lists NodeLists.
 type NodeListDiff struct {
-	NodesDiff         NodeListDiffNodes
-	EdgesDiff         NodeListDiffEdges
-	RootElmementsDiff NodeListRootElementDiff
+	Nodes         NodeListDiffNodes
+	Edges         NodeListDiffEdges
+	RootElmements NodeListRootElementDiff
 }
 
 func (nlDiff *NodeListDiff) AddedNodeList() *NodeList {

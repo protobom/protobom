@@ -180,6 +180,33 @@ func (nl *NodeList) diffEdges(nl2 *NodeList) EdgeSetDiff {
 		switch {
 		case index1 < len(nlEdges) && index2 < len(nl2Edges):
 			e, e2 := nlEdges[index1], nl2Edges[index2]
+
+			if e.From == e2.From && e.Type == e2.Type {
+				// Edge To split
+				index1++
+				index2++
+				removedTo := getSliceDiff(e.To, e2.To)
+				addedTo := getSliceDiff(e2.To, e.To)
+
+				if len(removedTo) > 0 {
+					diff.Removed = append(diff.Removed, &Edge{
+						From: e.From,
+						To:   removedTo,
+						Type: e.Type,
+					})
+				}
+
+				if len(addedTo) > 0 {
+					diff.Added = append(diff.Added, &Edge{
+						From: e2.From,
+						To:   addedTo,
+						Type: e2.Type,
+					})
+				}
+
+				continue
+			}
+
 			switch compareEdges(e, e2) {
 			case 0: // Edges are equal
 				index1++
@@ -214,4 +241,19 @@ func compareEdges(e1, e2 *Edge) int {
 	sort.Strings(e1.To)
 	sort.Strings(e2.To)
 	return strings.Compare(e1.String(), e2.String())
+}
+
+func getSliceDiff(l, l2 []string) []string {
+	sort.Strings(l)
+
+	sort.Strings(l2)
+
+	diff := []string{}
+	for _, el := range l {
+		if !contains(l2, el) {
+			diff = append(diff, el)
+		}
+	}
+
+	return diff
 }

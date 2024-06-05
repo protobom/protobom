@@ -116,7 +116,7 @@ func TestNodeListDiffEdge(t *testing.T) {
 			{Id: "test4"},
 		},
 		Edges: []*Edge{
-			{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+			{From: "test1", Type: Edge_contains, To: []string{"test2", "test3"}},
 			{From: "test3", Type: Edge_contains, To: []string{"test4"}},
 		},
 	}
@@ -168,7 +168,35 @@ func TestNodeListDiffEdge(t *testing.T) {
 						{
 							From: "test1",
 							Type: Edge_contains,
-							To:   []string{"test2"},
+							To:   []string{"test2", "test3"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "remove from to",
+			prepare: func(sutNodeList *NodeList, newNodeList *NodeList) {
+				tmpNodes := []*Edge{}
+				for i, edge := range newNodeList.Edges {
+					if i == 0 {
+						edge.To = []string{"test2"}
+						tmpNodes = append(tmpNodes, edge.Copy())
+					} else {
+						tmpNodes = append(tmpNodes, edge.Copy())
+					}
+				}
+				newNodeList.Edges = tmpNodes
+			},
+			sut:  &NodeList{},
+			node: &NodeList{},
+			expected: &NodeListDiff{
+				Edges: EdgeSetDiff{
+					Removed: []*Edge{
+						{
+							From: "test1",
+							Type: Edge_contains,
+							To:   []string{"test3"},
 						},
 					},
 				},

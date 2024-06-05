@@ -75,15 +75,6 @@ func (nl *NodeList) Diff(nl2 *NodeList) NodeListDiff {
 	}
 }
 
-// DiffWithStripQulifiers analyses a NodeList and returns a NodeList populated with all fields
-// that are different in nl2 from nl after stripping identifier Quilifiers.
-func (nl *NodeList) DiffWithStripQulifiers(nl2 *NodeList) NodeListDiff {
-	return NodeListDiff{
-		NodesDiff:         nl.diffNodes(nl),
-		EdgesDiff:         nl.diffEdges(nl2),
-		RootElmementsDiff: nl.diffRootElements(nl2),
-	}
-}
 
 // diffRootElements computes the differences in root elements between two NodeLists.
 func (nl *NodeList) diffRootElements(nl2 *NodeList) NodeListRootElementDiff {

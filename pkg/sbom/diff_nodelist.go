@@ -53,8 +53,8 @@ type NodeListDiffNodes struct {
 	NodeDiff []*NodeDiff
 }
 
-// NodeListDiffEdges represents the differences between two NodeList edges.
-type NodeListDiffEdges struct {
+// EdgeSetDiff represents the differences between two NodeList edges.
+type EdgeSetDiff struct {
 	Added   []*Edge
 	Removed []*Edge
 }

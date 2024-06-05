@@ -60,7 +60,7 @@ type NodeListDiffEdges struct {
 }
 
 // NodeListRootElementDiff represents the differences between two NodeLists root elements.
-type NodeListRootElementDiff struct {
+type RootElemenstDiff struct {
 	Added   []string
 	Removed []string
 }

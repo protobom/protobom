@@ -194,7 +194,6 @@ func TestPurposeToComponentType(t *testing.T) {
 }
 
 func TestCDX_Serialize(t *testing.T) {
-
 	type fields struct {
 		version  string
 		encoding string
@@ -402,7 +401,7 @@ func TestCDX_Serialize(t *testing.T) {
 						Type:               "",
 					},
 					Lifecycles: &[]cdx.Lifecycle{{Phase: cdx.LifecyclePhasePostBuild}},
-					Tools:      &cdx.ToolsChoice{Tools: &[]cdx.Tool{{Version: "2", Name: "ToolName"}}},
+					Tools:      &cdx.ToolsChoice{Tools: &[]cdx.Tool{{Version: "2", Name: "ToolName"}}}, //nolint:staticcheck // Tool is needed for older cdx versions
 					Authors:    &[]cdx.OrganizationalContact{{Name: "TestName", Email: "TestEmail", Phone: "TestPhone"}},
 				},
 				Components:   &[]cdx.Component{},

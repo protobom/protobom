@@ -232,7 +232,6 @@ func TestNodeDiff(t *testing.T) {
 			require.Truef(t, tc.expected.Removed.Equal(result.Removed), "comparing removed: %s %s", result.Removed.flatString(), tc.expected.Removed.flatString())
 			require.Equal(t, tc.expected.DiffCount, result.DiffCount)
 			require.Equal(t, tc.expected.NodeId, result.NodeId)
-
 		})
 	}
 }

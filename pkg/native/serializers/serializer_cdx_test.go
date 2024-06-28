@@ -1,10 +1,12 @@
 package serializers
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/CycloneDX/cyclonedx-go"
 	cdx "github.com/CycloneDX/cyclonedx-go"
+	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/stretchr/testify/require"
 )
@@ -188,5 +190,241 @@ func TestPurposeToComponentType(t *testing.T) {
 		res, err := cdxs.purposeToComponentType(protoPupose)
 		require.NoError(t, err)
 		require.Equal(t, cdxType, res)
+	}
+}
+
+func TestCDX_Serialize(t *testing.T) {
+	type fields struct {
+		version  string
+		encoding string
+	}
+	type args struct {
+		bom *sbom.Document
+		in1 *native.SerializeOptions
+		in2 interface{}
+	}
+
+	var nilSlice []cdx.Dependency
+
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "Empty BOM",
+			fields: fields{
+				version:  "1.4",
+				encoding: "json",
+			},
+			args: args{
+				bom: &sbom.Document{
+					Metadata: &sbom.Metadata{
+						Id:      "1234",
+						Version: "1",
+					},
+					NodeList: &sbom.NodeList{},
+				},
+				in1: nil,
+				in2: nil,
+			},
+			want: &cdx.BOM{
+				XMLNS:        "http://cyclonedx.org/schema/bom/1.5",
+				JSONSchema:   "http://cyclonedx.org/schema/bom-1.5.schema.json",
+				BOMFormat:    "CycloneDX",
+				SpecVersion:  cdx.SpecVersion(6),
+				SerialNumber: "1234",
+				Version:      1,
+				Metadata: &cdx.Metadata{
+					Lifecycles: &[]cdx.Lifecycle{},
+					Component: &cdx.Component{
+						Type: "",
+						Name: "",
+					},
+				},
+				Components:   &[]cdx.Component{},
+				Dependencies: &[]cdx.Dependency{},
+			},
+			wantErr: false,
+		},
+		{
+			name: "No Root Nodes",
+			fields: fields{
+				version:  "1.4",
+				encoding: "json",
+			},
+			args: args{
+				bom: &sbom.Document{
+					Metadata: &sbom.Metadata{
+						Id:      "1234",
+						Version: "1",
+					},
+					NodeList: &sbom.NodeList{
+						Nodes: []*sbom.Node{
+							{Id: "node1"},
+						},
+					},
+				},
+				in1: nil,
+				in2: nil,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "Multiple Root Nodes",
+			fields: fields{
+				version:  "1.4",
+				encoding: "json",
+			},
+			args: args{
+				bom: &sbom.Document{
+					Metadata: &sbom.Metadata{
+						Id:      "1234",
+						Version: "1",
+					},
+					NodeList: &sbom.NodeList{
+						RootElements: []string{"root1", "root2"},
+					},
+				},
+				in1: nil,
+				in2: nil,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+
+		{
+			name: "Valid BOM with Single Root Node",
+			fields: fields{
+				version:  "1.4",
+				encoding: "json",
+			},
+			args: args{
+				bom: &sbom.Document{
+					Metadata: &sbom.Metadata{
+						Id:      "1234",
+						Version: "1",
+					},
+					NodeList: &sbom.NodeList{
+						RootElements: []string{"root1"},
+						Nodes: []*sbom.Node{
+							{Id: "root1", Name: "Root Node"},
+						},
+					},
+				},
+				in1: nil,
+				in2: nil,
+			},
+			want: &cdx.BOM{
+				XMLNS:        "http://cyclonedx.org/schema/bom/1.5",
+				JSONSchema:   "http://cyclonedx.org/schema/bom-1.5.schema.json",
+				BOMFormat:    "CycloneDX",
+				SpecVersion:  cdx.SpecVersion(6),
+				SerialNumber: "1234",
+				Version:      1,
+				Metadata: &cdx.Metadata{
+					Component: &cdx.Component{
+						BOMRef:             "root1",
+						Name:               "Root Node",
+						Hashes:             &[]cdx.Hash{},
+						ExternalReferences: &[]cdx.ExternalReference{},
+						Type:               "",
+					},
+					Lifecycles: &[]cdx.Lifecycle{},
+				},
+				Components:   &[]cdx.Component{},
+				Dependencies: &nilSlice,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Valid filled out BOM",
+			fields: fields{
+				version:  "1.4",
+				encoding: "json",
+			},
+			args: args{
+				bom: &sbom.Document{
+					Metadata: &sbom.Metadata{
+						Id:      "1234",
+						Version: "1",
+						DocumentTypes: []*sbom.DocumentType{
+							{
+								Type: sbom.DocumentType_ANALYZED.Enum(),
+								Name: func() *string {
+									name := "Analyzed Document"
+									return &name
+								}(),
+							},
+						},
+						Authors: []*sbom.Person{
+							{
+								Name:  "TestName",
+								Email: "TestEmail",
+								Phone: "TestPhone",
+							},
+						},
+						Tools: []*sbom.Tool{
+							{
+								Name:    "ToolName",
+								Version: "2",
+							},
+						},
+						Name: "DocName",
+					},
+					NodeList: &sbom.NodeList{
+						RootElements: []string{"root1"},
+						Nodes: []*sbom.Node{
+							{Id: "root1", Name: "Root Node 1"},
+						},
+					},
+				},
+				in1: nil,
+				in2: nil,
+			},
+			want: &cdx.BOM{
+				XMLNS:        "http://cyclonedx.org/schema/bom/1.5",
+				JSONSchema:   "http://cyclonedx.org/schema/bom-1.5.schema.json",
+				BOMFormat:    "CycloneDX",
+				SpecVersion:  cdx.SpecVersion(6),
+				SerialNumber: "1234",
+				Version:      1,
+				Metadata: &cdx.Metadata{
+					Component: &cdx.Component{
+						BOMRef:             "root1",
+						Name:               "DocName",
+						Hashes:             &[]cdx.Hash{},
+						ExternalReferences: &[]cdx.ExternalReference{},
+						Type:               "",
+					},
+					Lifecycles: &[]cdx.Lifecycle{{Phase: cdx.LifecyclePhasePostBuild}},
+					Tools:      &cdx.ToolsChoice{Tools: &[]cdx.Tool{{Version: "2", Name: "ToolName"}}}, //nolint:staticcheck // Tool is needed for older cdx versions
+					Authors:    &[]cdx.OrganizationalContact{{Name: "TestName", Email: "TestEmail", Phone: "TestPhone"}},
+				},
+				Components:   &[]cdx.Component{},
+				Dependencies: &nilSlice,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &CDX{
+				version:  tt.fields.version,
+				encoding: tt.fields.encoding,
+			}
+			got, err := s.Serialize(tt.args.bom, tt.args.in1, tt.args.in2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Serialize() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Serialize() got = %v, want %v", got.(*cdx.BOM).Metadata, tt.want.(*cdx.BOM).Metadata)
+			}
+		})
 	}
 }

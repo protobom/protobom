@@ -522,7 +522,7 @@ func (x Edge_Type) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Edge_Type.Descriptor instead.
 func (Edge_Type) EnumDescriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{3, 0}
+	return file_api_sbom_proto_rawDescGZIP(), []int{4, 0}
 }
 
 // Type enumerator representing of the external reference.
@@ -746,7 +746,7 @@ func (x ExternalReference_ExternalReferenceType) Number() protoreflect.EnumNumbe
 
 // Deprecated: Use ExternalReference_ExternalReferenceType.Descriptor instead.
 func (ExternalReference_ExternalReferenceType) EnumDescriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{4, 0}
+	return file_api_sbom_proto_rawDescGZIP(), []int{5, 0}
 }
 
 // Enumeration of SBOM document types.
@@ -814,7 +814,7 @@ func (x DocumentType_SBOMType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DocumentType_SBOMType.Descriptor instead.
 func (DocumentType_SBOMType) EnumDescriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{7, 0}
+	return file_api_sbom_proto_rawDescGZIP(), []int{8, 0}
 }
 
 // Document is the top-level structure representing the entire Software Bill of Materials (SBOM).
@@ -1151,6 +1151,7 @@ type Metadata struct {
 	Authors       []*Person              `protobuf:"bytes,6,rep,name=authors,proto3" json:"authors,omitempty"`             // Individuals or organizations involved in the creation or maintenance of the document.
 	Comment       string                 `protobuf:"bytes,7,opt,name=comment,proto3" json:"comment,omitempty"`             // Comments on the document.
 	DocumentTypes []*DocumentType        `protobuf:"bytes,8,rep,name=documentTypes,proto3" json:"documentTypes,omitempty"` // Types categorizing the document based on its purpose or stage in the software development lifecycle.
+	Unsterilized  *Unsterilized          `protobuf:"bytes,9,opt,name=unsterilized,proto3" json:"unsterilized,omitempty"`   // Metadata associated with the SBOM document Unsterilized file.
 }
 
 func (x *Metadata) Reset() {
@@ -1241,6 +1242,76 @@ func (x *Metadata) GetDocumentTypes() []*DocumentType {
 	return nil
 }
 
+func (x *Metadata) GetUnsterilized() *Unsterilized {
+	if x != nil {
+		return x.Unsterilized
+	}
+	return nil
+}
+
+type Unsterilized struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Format string           `protobuf:"bytes,1,opt,name=format,proto3" json:"format,omitempty"`                                                                                          // The original format of the SBOM document.
+	Hashes map[int32]string `protobuf:"bytes,2,rep,name=hashes,proto3" json:"hashes,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // Hashes map associated with the of the original SBOM document to ensure integrity.
+	Uri    string           `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`                                                                                                // The original URI of the SBOM document.
+}
+
+func (x *Unsterilized) Reset() {
+	*x = Unsterilized{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_sbom_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Unsterilized) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Unsterilized) ProtoMessage() {}
+
+func (x *Unsterilized) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sbom_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Unsterilized.ProtoReflect.Descriptor instead.
+func (*Unsterilized) Descriptor() ([]byte, []int) {
+	return file_api_sbom_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Unsterilized) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+func (x *Unsterilized) GetHashes() map[int32]string {
+	if x != nil {
+		return x.Hashes
+	}
+	return nil
+}
+
+func (x *Unsterilized) GetUri() string {
+	if x != nil {
+		return x.Uri
+	}
+	return ""
+}
+
 // Edge represents relationships between nodes in the Software Bill of Materials (SBOM) graph.
 // Each Edge captures the type of relationship and the nodes involved, providing a structured
 // way to model dependencies and connections within the SBOM.
@@ -1257,7 +1328,7 @@ type Edge struct {
 func (x *Edge) Reset() {
 	*x = Edge{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_sbom_proto_msgTypes[3]
+		mi := &file_api_sbom_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1270,7 +1341,7 @@ func (x *Edge) String() string {
 func (*Edge) ProtoMessage() {}
 
 func (x *Edge) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sbom_proto_msgTypes[3]
+	mi := &file_api_sbom_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1283,7 +1354,7 @@ func (x *Edge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Edge.ProtoReflect.Descriptor instead.
 func (*Edge) Descriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{3}
+	return file_api_sbom_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Edge) GetType() Edge_Type {
@@ -1325,7 +1396,7 @@ type ExternalReference struct {
 func (x *ExternalReference) Reset() {
 	*x = ExternalReference{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_sbom_proto_msgTypes[4]
+		mi := &file_api_sbom_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1338,7 +1409,7 @@ func (x *ExternalReference) String() string {
 func (*ExternalReference) ProtoMessage() {}
 
 func (x *ExternalReference) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sbom_proto_msgTypes[4]
+	mi := &file_api_sbom_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1351,7 +1422,7 @@ func (x *ExternalReference) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExternalReference.ProtoReflect.Descriptor instead.
 func (*ExternalReference) Descriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{4}
+	return file_api_sbom_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ExternalReference) GetUrl() string {
@@ -1407,7 +1478,7 @@ type Person struct {
 func (x *Person) Reset() {
 	*x = Person{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_sbom_proto_msgTypes[5]
+		mi := &file_api_sbom_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1420,7 +1491,7 @@ func (x *Person) String() string {
 func (*Person) ProtoMessage() {}
 
 func (x *Person) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sbom_proto_msgTypes[5]
+	mi := &file_api_sbom_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1433,7 +1504,7 @@ func (x *Person) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Person.ProtoReflect.Descriptor instead.
 func (*Person) Descriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{5}
+	return file_api_sbom_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Person) GetName() string {
@@ -1492,7 +1563,7 @@ type Tool struct {
 func (x *Tool) Reset() {
 	*x = Tool{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_sbom_proto_msgTypes[6]
+		mi := &file_api_sbom_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1505,7 +1576,7 @@ func (x *Tool) String() string {
 func (*Tool) ProtoMessage() {}
 
 func (x *Tool) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sbom_proto_msgTypes[6]
+	mi := &file_api_sbom_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1518,7 +1589,7 @@ func (x *Tool) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Tool.ProtoReflect.Descriptor instead.
 func (*Tool) Descriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{6}
+	return file_api_sbom_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Tool) GetName() string {
@@ -1557,7 +1628,7 @@ type DocumentType struct {
 func (x *DocumentType) Reset() {
 	*x = DocumentType{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_sbom_proto_msgTypes[7]
+		mi := &file_api_sbom_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1570,7 +1641,7 @@ func (x *DocumentType) String() string {
 func (*DocumentType) ProtoMessage() {}
 
 func (x *DocumentType) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sbom_proto_msgTypes[7]
+	mi := &file_api_sbom_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1583,7 +1654,7 @@ func (x *DocumentType) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DocumentType.ProtoReflect.Descriptor instead.
 func (*DocumentType) Descriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{7}
+	return file_api_sbom_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DocumentType) GetType() DocumentType_SBOMType {
@@ -1622,7 +1693,7 @@ type NodeList struct {
 func (x *NodeList) Reset() {
 	*x = NodeList{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_sbom_proto_msgTypes[8]
+		mi := &file_api_sbom_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1635,7 +1706,7 @@ func (x *NodeList) String() string {
 func (*NodeList) ProtoMessage() {}
 
 func (x *NodeList) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sbom_proto_msgTypes[8]
+	mi := &file_api_sbom_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1648,7 +1719,7 @@ func (x *NodeList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeList.ProtoReflect.Descriptor instead.
 func (*NodeList) Descriptor() ([]byte, []int) {
-	return file_api_sbom_proto_rawDescGZIP(), []int{8}
+	return file_api_sbom_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *NodeList) GetNodes() []*Node {
@@ -1768,8 +1839,8 @@ var file_api_sbom_proto_rawDesc = []byte{
 	0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x21, 0x0a, 0x08, 0x4e,
 	0x6f, 0x64, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x0b, 0x0a, 0x07, 0x50, 0x41, 0x43, 0x4b, 0x41,
-	0x47, 0x45, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x46, 0x49, 0x4c, 0x45, 0x10, 0x01, 0x22, 0xbd,
-	0x02, 0x0a, 0x08, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x0e, 0x0a, 0x02, 0x69,
+	0x47, 0x45, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x46, 0x49, 0x4c, 0x45, 0x10, 0x01, 0x22, 0x82,
+	0x03, 0x0a, 0x08, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x0e, 0x0a, 0x02, 0x69,
 	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x76,
 	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65,
 	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20,
@@ -1788,7 +1859,23 @@ var file_api_sbom_proto_rawDesc = []byte{
 	0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x73, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1f,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x6f, 0x6d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
 	0x6f, 0x6d, 0x2e, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x52,
-	0x0d, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x73, 0x22, 0xe1,
+	0x0d, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x73, 0x12, 0x43,
+	0x0a, 0x0c, 0x75, 0x6e, 0x73, 0x74, 0x65, 0x72, 0x69, 0x6c, 0x69, 0x7a, 0x65, 0x64, 0x18, 0x09,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x6f, 0x6d, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x6f, 0x6d, 0x2e, 0x55, 0x6e, 0x73, 0x74, 0x65, 0x72, 0x69,
+	0x6c, 0x69, 0x7a, 0x65, 0x64, 0x52, 0x0c, 0x75, 0x6e, 0x73, 0x74, 0x65, 0x72, 0x69, 0x6c, 0x69,
+	0x7a, 0x65, 0x64, 0x22, 0xb8, 0x01, 0x0a, 0x0c, 0x55, 0x6e, 0x73, 0x74, 0x65, 0x72, 0x69, 0x6c,
+	0x69, 0x7a, 0x65, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x12, 0x43, 0x0a, 0x06,
+	0x68, 0x61, 0x73, 0x68, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2b, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x6f, 0x6d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x6f, 0x6d,
+	0x2e, 0x55, 0x6e, 0x73, 0x74, 0x65, 0x72, 0x69, 0x6c, 0x69, 0x7a, 0x65, 0x64, 0x2e, 0x48, 0x61,
+	0x73, 0x68, 0x65, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x06, 0x68, 0x61, 0x73, 0x68, 0x65,
+	0x73, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x72, 0x69, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
+	0x75, 0x72, 0x69, 0x1a, 0x39, 0x0a, 0x0b, 0x48, 0x61, 0x73, 0x68, 0x65, 0x73, 0x45, 0x6e, 0x74,
+	0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0xe1,
 	0x06, 0x0a, 0x04, 0x45, 0x64, 0x67, 0x65, 0x12, 0x30, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x6f, 0x6d,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x6f, 0x6d, 0x2e, 0x45, 0x64, 0x67, 0x65, 0x2e, 0x54,
@@ -2050,7 +2137,7 @@ func file_api_sbom_proto_rawDescGZIP() []byte {
 }
 
 var file_api_sbom_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
-var file_api_sbom_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_api_sbom_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_api_sbom_proto_goTypes = []interface{}{
 	(HashAlgorithm)(0),          // 0: protobom.protobom.HashAlgorithm
 	(SoftwareIdentifierType)(0), // 1: protobom.protobom.SoftwareIdentifierType
@@ -2062,46 +2149,50 @@ var file_api_sbom_proto_goTypes = []interface{}{
 	(*Document)(nil),                             // 7: protobom.protobom.Document
 	(*Node)(nil),                                 // 8: protobom.protobom.Node
 	(*Metadata)(nil),                             // 9: protobom.protobom.Metadata
-	(*Edge)(nil),                                 // 10: protobom.protobom.Edge
-	(*ExternalReference)(nil),                    // 11: protobom.protobom.ExternalReference
-	(*Person)(nil),                               // 12: protobom.protobom.Person
-	(*Tool)(nil),                                 // 13: protobom.protobom.Tool
-	(*DocumentType)(nil),                         // 14: protobom.protobom.DocumentType
-	(*NodeList)(nil),                             // 15: protobom.protobom.NodeList
-	nil,                                          // 16: protobom.protobom.Node.IdentifiersEntry
-	nil,                                          // 17: protobom.protobom.Node.HashesEntry
-	nil,                                          // 18: protobom.protobom.ExternalReference.HashesEntry
-	(*timestamppb.Timestamp)(nil),                // 19: google.protobuf.Timestamp
+	(*Unsterilized)(nil),                         // 10: protobom.protobom.Unsterilized
+	(*Edge)(nil),                                 // 11: protobom.protobom.Edge
+	(*ExternalReference)(nil),                    // 12: protobom.protobom.ExternalReference
+	(*Person)(nil),                               // 13: protobom.protobom.Person
+	(*Tool)(nil),                                 // 14: protobom.protobom.Tool
+	(*DocumentType)(nil),                         // 15: protobom.protobom.DocumentType
+	(*NodeList)(nil),                             // 16: protobom.protobom.NodeList
+	nil,                                          // 17: protobom.protobom.Node.IdentifiersEntry
+	nil,                                          // 18: protobom.protobom.Node.HashesEntry
+	nil,                                          // 19: protobom.protobom.Unsterilized.HashesEntry
+	nil,                                          // 20: protobom.protobom.ExternalReference.HashesEntry
+	(*timestamppb.Timestamp)(nil),                // 21: google.protobuf.Timestamp
 }
 var file_api_sbom_proto_depIdxs = []int32{
 	9,  // 0: protobom.protobom.Document.metadata:type_name -> protobom.protobom.Metadata
-	15, // 1: protobom.protobom.Document.node_list:type_name -> protobom.protobom.NodeList
+	16, // 1: protobom.protobom.Document.node_list:type_name -> protobom.protobom.NodeList
 	3,  // 2: protobom.protobom.Node.type:type_name -> protobom.protobom.Node.NodeType
-	12, // 3: protobom.protobom.Node.suppliers:type_name -> protobom.protobom.Person
-	12, // 4: protobom.protobom.Node.originators:type_name -> protobom.protobom.Person
-	19, // 5: protobom.protobom.Node.release_date:type_name -> google.protobuf.Timestamp
-	19, // 6: protobom.protobom.Node.build_date:type_name -> google.protobuf.Timestamp
-	19, // 7: protobom.protobom.Node.valid_until_date:type_name -> google.protobuf.Timestamp
-	11, // 8: protobom.protobom.Node.external_references:type_name -> protobom.protobom.ExternalReference
-	16, // 9: protobom.protobom.Node.identifiers:type_name -> protobom.protobom.Node.IdentifiersEntry
-	17, // 10: protobom.protobom.Node.hashes:type_name -> protobom.protobom.Node.HashesEntry
+	13, // 3: protobom.protobom.Node.suppliers:type_name -> protobom.protobom.Person
+	13, // 4: protobom.protobom.Node.originators:type_name -> protobom.protobom.Person
+	21, // 5: protobom.protobom.Node.release_date:type_name -> google.protobuf.Timestamp
+	21, // 6: protobom.protobom.Node.build_date:type_name -> google.protobuf.Timestamp
+	21, // 7: protobom.protobom.Node.valid_until_date:type_name -> google.protobuf.Timestamp
+	12, // 8: protobom.protobom.Node.external_references:type_name -> protobom.protobom.ExternalReference
+	17, // 9: protobom.protobom.Node.identifiers:type_name -> protobom.protobom.Node.IdentifiersEntry
+	18, // 10: protobom.protobom.Node.hashes:type_name -> protobom.protobom.Node.HashesEntry
 	2,  // 11: protobom.protobom.Node.primary_purpose:type_name -> protobom.protobom.Purpose
-	19, // 12: protobom.protobom.Metadata.date:type_name -> google.protobuf.Timestamp
-	13, // 13: protobom.protobom.Metadata.tools:type_name -> protobom.protobom.Tool
-	12, // 14: protobom.protobom.Metadata.authors:type_name -> protobom.protobom.Person
-	14, // 15: protobom.protobom.Metadata.documentTypes:type_name -> protobom.protobom.DocumentType
-	4,  // 16: protobom.protobom.Edge.type:type_name -> protobom.protobom.Edge.Type
-	18, // 17: protobom.protobom.ExternalReference.hashes:type_name -> protobom.protobom.ExternalReference.HashesEntry
-	5,  // 18: protobom.protobom.ExternalReference.type:type_name -> protobom.protobom.ExternalReference.ExternalReferenceType
-	12, // 19: protobom.protobom.Person.contacts:type_name -> protobom.protobom.Person
-	6,  // 20: protobom.protobom.DocumentType.type:type_name -> protobom.protobom.DocumentType.SBOMType
-	8,  // 21: protobom.protobom.NodeList.nodes:type_name -> protobom.protobom.Node
-	10, // 22: protobom.protobom.NodeList.edges:type_name -> protobom.protobom.Edge
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	21, // 12: protobom.protobom.Metadata.date:type_name -> google.protobuf.Timestamp
+	14, // 13: protobom.protobom.Metadata.tools:type_name -> protobom.protobom.Tool
+	13, // 14: protobom.protobom.Metadata.authors:type_name -> protobom.protobom.Person
+	15, // 15: protobom.protobom.Metadata.documentTypes:type_name -> protobom.protobom.DocumentType
+	10, // 16: protobom.protobom.Metadata.unsterilized:type_name -> protobom.protobom.Unsterilized
+	19, // 17: protobom.protobom.Unsterilized.hashes:type_name -> protobom.protobom.Unsterilized.HashesEntry
+	4,  // 18: protobom.protobom.Edge.type:type_name -> protobom.protobom.Edge.Type
+	20, // 19: protobom.protobom.ExternalReference.hashes:type_name -> protobom.protobom.ExternalReference.HashesEntry
+	5,  // 20: protobom.protobom.ExternalReference.type:type_name -> protobom.protobom.ExternalReference.ExternalReferenceType
+	13, // 21: protobom.protobom.Person.contacts:type_name -> protobom.protobom.Person
+	6,  // 22: protobom.protobom.DocumentType.type:type_name -> protobom.protobom.DocumentType.SBOMType
+	8,  // 23: protobom.protobom.NodeList.nodes:type_name -> protobom.protobom.Node
+	11, // 24: protobom.protobom.NodeList.edges:type_name -> protobom.protobom.Edge
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_api_sbom_proto_init() }
@@ -2147,7 +2238,7 @@ func file_api_sbom_proto_init() {
 			}
 		}
 		file_api_sbom_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Edge); i {
+			switch v := v.(*Unsterilized); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2159,7 +2250,7 @@ func file_api_sbom_proto_init() {
 			}
 		}
 		file_api_sbom_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ExternalReference); i {
+			switch v := v.(*Edge); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2171,7 +2262,7 @@ func file_api_sbom_proto_init() {
 			}
 		}
 		file_api_sbom_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Person); i {
+			switch v := v.(*ExternalReference); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2183,7 +2274,7 @@ func file_api_sbom_proto_init() {
 			}
 		}
 		file_api_sbom_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Tool); i {
+			switch v := v.(*Person); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2195,7 +2286,7 @@ func file_api_sbom_proto_init() {
 			}
 		}
 		file_api_sbom_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DocumentType); i {
+			switch v := v.(*Tool); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2207,6 +2298,18 @@ func file_api_sbom_proto_init() {
 			}
 		}
 		file_api_sbom_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DocumentType); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_sbom_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NodeList); i {
 			case 0:
 				return &v.state
@@ -2219,14 +2322,14 @@ func file_api_sbom_proto_init() {
 			}
 		}
 	}
-	file_api_sbom_proto_msgTypes[7].OneofWrappers = []interface{}{}
+	file_api_sbom_proto_msgTypes[8].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_sbom_proto_rawDesc,
 			NumEnums:      7,
-			NumMessages:   12,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

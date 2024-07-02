@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/formats/spdx"
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/sbom"
-	"github.com/bom-squad/protobom/pkg/writer"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/writer"
 )
 
 var _ native.Serializer = &SPDX3{}

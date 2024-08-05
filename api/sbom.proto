@@ -96,6 +96,13 @@ message Metadata {
     repeated Person authors = 6; // Individuals or organizations involved in the creation or maintenance of the document.
     string comment = 7; // Comments on the document.
     repeated DocumentType documentTypes = 8; // Types categorizing the document based on its purpose or stage in the software development lifecycle.
+    Unsterilized unsterilized = 9;  // Metadata associated with the SBOM document Unsterilized file.
+
+}
+
+message Unsterilized {
+    string format = 1; // The original format of the SBOM document.
+    map<int32,string> hashes = 2; // Hashes map associated with the of the original SBOM document to ensure integrity.
 }
 
 // Edge represents relationships between nodes in the Software Bill of Materials (SBOM) graph.

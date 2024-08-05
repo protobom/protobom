@@ -1,10 +1,14 @@
 package reader
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"fmt"
+	"io"
 
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 )
 
@@ -83,4 +87,19 @@ func WithRetrieveOptions(ro *storage.RetrieveOptions) ReaderOption {
 			r.Options.RetrieveOptions = ro
 		}
 	}
+}
+
+func hashStream(rs io.ReadSeeker) (map[int32]string, error) {
+	var buf bytes.Buffer
+	hash := make(map[int32]string)
+	_, err := io.Copy(&buf, rs)
+	if err != nil {
+		return hash, fmt.Errorf("copying reader: %w", err)
+	}
+
+	sha256 := sha256.New()
+	sha256.Write(buf.Bytes())
+	hash[int32(sbom.HashAlgorithm_SHA256)] = fmt.Sprintf("%x", sha256.Sum(nil))
+
+	return hash, nil
 }

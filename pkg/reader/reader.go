@@ -138,6 +138,18 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		return nil, fmt.Errorf("unserializing: %w", err)
 	}
 
+	hashStream, err := hashStream(f)
+	if err != nil {
+		return nil, fmt.Errorf("hashing stream: %w", err)
+	}
+
+	unsterilized := &sbom.Unsterilized{
+		Format: string(format),
+		Hashes: hashStream,
+	}
+
+	doc.Metadata.Unsterilized = unsterilized
+
 	return doc, err
 }
 

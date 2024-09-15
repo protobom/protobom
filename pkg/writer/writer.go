@@ -55,6 +55,7 @@ func ensureSerializersInitialized() {
 		serializers.Store(formats.CDX13JSON, drivers.NewCDX("1.3", formats.JSON))
 		serializers.Store(formats.CDX14JSON, drivers.NewCDX("1.4", formats.JSON))
 		serializers.Store(formats.CDX15JSON, drivers.NewCDX("1.5", formats.JSON))
+		serializers.Store(formats.CDX16JSON, drivers.NewCDX("1.6", formats.JSON))
 		serializers.Store(formats.SPDX23JSON, drivers.NewSPDX23())
 	})
 }

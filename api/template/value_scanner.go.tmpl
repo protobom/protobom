@@ -1,0 +1,41 @@
+// Automatically generated code. DO NOT EDIT.
+
+package {{ .Package }}
+
+import (
+	"database/sql/driver"
+	"fmt"
+
+	"google.golang.org/protobuf/proto"
+)
+
+{{- range $name := .Names }}
+
+func (x *{{ $name }}) Value() (driver.Value, error) {
+	return value(x)
+}
+
+func (x *{{ $name }}) Scan(src any) error {
+	return scan(src, x)
+}
+{{- end }}
+
+func value(msg proto.Message) (driver.Value, error) {
+	return proto.Marshal(msg)
+}
+
+func scan(src any, msg proto.Message) error {
+	if src == nil {
+		return nil
+	}
+
+	if srcBytes, ok := src.([]byte); ok {
+		if err := proto.Unmarshal(srcBytes, msg); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return fmt.Errorf("unexpected type %T", src)
+}

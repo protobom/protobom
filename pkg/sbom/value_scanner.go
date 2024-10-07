@@ -82,21 +82,16 @@ func (x *Tool) Scan(src any) error {
 }
 
 func value(msg proto.Message) (driver.Value, error) {
-	return proto.Marshal(msg)
+	return proto.MarshalOptions{Deterministic: true}.Marshal(msg)
 }
 
 func scan(src any, msg proto.Message) error {
-	if src == nil {
+	switch src := src.(type) {
+	case nil:
 		return nil
+	case []byte:
+		return proto.Unmarshal(src, msg)
+	default:
+		return fmt.Errorf("unexpected type %T", src)
 	}
-
-	if srcBytes, ok := src.([]byte); ok {
-		if err := proto.Unmarshal(srcBytes, msg); err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	return fmt.Errorf("unexpected type %T", src)
 }

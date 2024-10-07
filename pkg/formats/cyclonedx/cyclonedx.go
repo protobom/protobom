@@ -22,6 +22,8 @@ func ParseVersion(version string) (cyclonedx.SpecVersion, error) {
 		specVersion = cyclonedx.SpecVersion1_4
 	case "1.5":
 		specVersion = cyclonedx.SpecVersion1_5
+	case "1.6":
+		specVersion = cyclonedx.SpecVersion1_6
 	default:
 		return specVersion, fmt.Errorf("unsupported CDX version %s", version)
 	}

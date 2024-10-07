@@ -23,6 +23,7 @@ const (
 	CDX13JSON  = Format("application/vnd.cyclonedx+json;version=1.3")
 	CDX14JSON  = Format("application/vnd.cyclonedx+json;version=1.4")
 	CDX15JSON  = Format("application/vnd.cyclonedx+json;version=1.5")
+	CDX16JSON  = Format("application/vnd.cyclonedx+json;version=1.6")
 	CDXFORMAT  = "cyclonedx"
 	SPDXFORMAT = "spdx"
 )
@@ -31,7 +32,7 @@ type Document interface{}
 
 var (
 	ListFormats = []Format{CDXFORMAT, SPDXFORMAT}
-	List        = []Format{SPDX23TV, SPDX23JSON, SPDX22TV, SPDX22JSON, CDX14JSON, CDX15JSON}
+	List        = []Format{SPDX23TV, SPDX23JSON, SPDX22TV, SPDX22JSON, CDX14JSON, CDX15JSON, CDX16JSON}
 )
 
 // Version returns the version of the format

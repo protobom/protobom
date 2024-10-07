@@ -47,7 +47,7 @@ func TestReader_ParseFile(t *testing.T) {
 			name: "happy success",
 			path: "test-cdx",
 			prepare: func() {
-				format := formats.CDX15JSON
+				format := formats.CDX16JSON
 				fake.UnserializeReturns(doc, nil)
 				reader.RegisterUnserializer(format, fake)
 				fakeSniffer.SniffReaderReturns(format, nil)
@@ -93,9 +93,9 @@ func TestReader_ParseFile(t *testing.T) {
 			name: "unserializer parse error",
 			path: "test",
 			prepare: func() {
-				fakeSniffer.SniffReaderReturns(formats.CDX15JSON, nil)
+				fakeSniffer.SniffReaderReturns(formats.CDX16JSON, nil)
 				fake.UnserializeReturns(nil, errors.New("parse error"))
-				reader.RegisterUnserializer(formats.CDX15JSON, fake)
+				reader.RegisterUnserializer(formats.CDX16JSON, fake)
 			},
 			wantErr: true,
 		},
@@ -158,7 +158,7 @@ func TestReader_ParseFileWithOptions(t *testing.T) {
 			name: "success",
 			path: "test-cdx",
 			prepare: func() {
-				format := formats.CDX15JSON
+				format := formats.CDX16JSON
 				fake.UnserializeReturns(doc, nil)
 				reader.RegisterUnserializer(format, fake)
 				fakeSniffer.SniffReaderReturns(format, nil)
@@ -301,7 +301,7 @@ func TestReader_ParseStream(t *testing.T) {
 		{
 			name: "default success",
 			prepare: func() {
-				format := formats.CDX15JSON
+				format := formats.CDX16JSON
 				fake.UnserializeReturns(doc, nil)
 				reader.RegisterUnserializer(format, fake)
 				fakeSniffer.SniffReaderReturns(format, nil)
@@ -367,7 +367,7 @@ func TestUnserializerRegistry(t *testing.T) {
 	}{
 		{
 			name:   "known format success",
-			format: formats.CDX15JSON,
+			format: formats.CDX16JSON,
 		},
 		{
 			name:   "new format success",

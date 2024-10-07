@@ -1,7 +1,6 @@
 module github.com/protobom/protobom
 
-go 1.22.4
-toolchain go1.23.2
+go 1.22.8
 
 require (
 	github.com/CycloneDX/cyclonedx-go v0.9.1
@@ -12,7 +11,7 @@ require (
 	github.com/spdx/tools-golang v0.5.5
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/protobuf v1.34.2
-	sigs.k8s.io/release-utils v0.8.5
+	sigs.k8s.io/release-utils v0.8.4
 )
 
 require (

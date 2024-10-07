@@ -6,8 +6,8 @@ representation of SBOM data able to ingest documents in modern
 without loss. It has an accompanying Go library generated from the protocol
 buffers definition that also implements ingesters for those formats.
 
-Standard SBOMs are read by a reader using [parsers](docs/parsers.md) that
-understand the common formats. Parsers create a neutral protobom from data
+Standard SBOMs are read by a reader using [unserializers](docs/unserializers.md) that
+understand the common formats. Unserializers create a neutral protobom from data
 read from CycloneDX or SPDX documents.
 
 A protobom can be rendered into standard SBOM formats by the writer using
@@ -33,7 +33,7 @@ other [languages supported by protobuf](https://protobuf.dev/getting-started/)
 
 ## Usage
 
-The `protobom` library can be used to read in and write out SBOM documents in any of the above formats.  
+The `protobom` library can be used to read in and write out SBOM documents in any of the above formats.
 
 ### Example 1:  The sbom-convert project
 
@@ -151,7 +151,7 @@ func main() {
 	node2.AddHash(sbom.HashAlgorithm_SHA256, "ad291c9572af8fc2ec8fd78d295adf7132c60ad3d10488fb63d120fc967a4132")
 	node2.AddHash(sbom.HashAlgorithm_SHA512,  "5940d8647907831e77ec00d81b318ca06655dbb0fd36d112684b03947412f0f98ea85b32548bc0877f3d7ce8f4de9b2c964062df44742b98c8e9bd851faecce9")
 
-	// Relate the application package and the files. This adds the nodes to 
+	// Relate the application package and the files. This adds the nodes to
 	// the document graph:
 	document.RelateNodeAtID(node1, appNode.Id, sbom.Edge_contains)
 	document.RelateNodeAtID(node2, appNode.Id, sbom.Edge_contains)

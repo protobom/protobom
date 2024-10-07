@@ -61,7 +61,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	doc.Dependencies = &[]cdx.Dependency{}
 
 	// Check if the protobom has no root elements:
-	if bom.NodeList.RootElements == nil || len(bom.NodeList.RootElements) == 0 {
+	if len(bom.NodeList.RootElements) == 0 {
 		// Empty (nodeless) document
 		if len(bom.NodeList.Nodes) == 0 {
 			return doc, nil
@@ -307,7 +307,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		// cdx.Component only allows single Type so we are using the first
 	}
 
-	if n.Licenses != nil && len(n.Licenses) > 0 {
+	if len(n.Licenses) > 0 {
 		var licenseChoices []cdx.LicenseChoice
 		var licenses cdx.Licenses
 		for _, l := range n.Licenses {
@@ -322,7 +322,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		c.Licenses = &licenses
 	}
 
-	if n.Hashes != nil && len(n.Hashes) > 0 {
+	if len(n.Hashes) > 0 {
 		for algo, hash := range n.Hashes {
 			cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(algo))
 			if err != nil {

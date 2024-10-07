@@ -1,0 +1,41 @@
+// Automatically generated code. DO NOT EDIT.
+// --------------------------------------------------------------
+// SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
+// SPDX-FileType: SOURCE
+// SPDX-License-Identifier: Apache-2.0
+// --------------------------------------------------------------
+
+package {{ .Package }}
+
+import (
+	"database/sql/driver"
+	"fmt"
+
+	"google.golang.org/protobuf/proto"
+)
+
+{{- range $name := .Names }}
+
+func (x *{{ $name }}) Value() (driver.Value, error) {
+	return value(x)
+}
+
+func (x *{{ $name }}) Scan(src any) error {
+	return scan(src, x)
+}
+{{- end }}
+
+func value(msg proto.Message) (driver.Value, error) {
+	return proto.MarshalOptions{Deterministic: true}.Marshal(msg)
+}
+
+func scan(src any, msg proto.Message) error {
+	switch src := src.(type) {
+	case nil:
+		return nil
+	case []byte:
+		return proto.Unmarshal(src, msg)
+	default:
+		return fmt.Errorf("unexpected type %T", src)
+	}
+}

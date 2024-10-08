@@ -63,7 +63,7 @@ func TestExtRefTypeFromProtobomExtRef(t *testing.T) {
 	}
 }
 
-func TestSpdxNamespaceFromProtobomId(t *testing.T) {
+func TestSpdxNamespaceFromProtobomID(t *testing.T) {
 	for _, tc := range []struct {
 		name     string
 		sut      string

@@ -7,6 +7,7 @@ import (
 )
 
 type NodeDiff struct {
+	NodeId    string
 	Added     *Node
 	Removed   *Node
 	DiffCount int
@@ -16,6 +17,7 @@ type NodeDiff struct {
 // that are different in n2 from n. If no changes are found, Diff returns nil
 func (n *Node) Diff(n2 *Node) *NodeDiff {
 	nd := NodeDiff{
+		NodeId:  n.Id,
 		Added:   &Node{},
 		Removed: &Node{},
 	}

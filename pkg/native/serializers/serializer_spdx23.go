@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -21,8 +23,19 @@ var _ native.Serializer = &SPDX23{}
 
 type SPDX23 struct{}
 
-type SPDX3Options struct {
-	Indent int
+type SPDX23Options struct {
+	// FailOnInvalidDocIdFragment makes the serializer return an error if the
+	// document ID has a fragment but it is not set to "SPDXRef-Document".
+	FailOnInvalidDocIdFragment bool
+
+	// GenerateDocumentID causes the serializer to generate a non-deterministic
+	// document ID when a protobom doesn't have one defined.
+	GenerateDocumentID bool
+}
+
+var DefaultSPDX23Options = SPDX23Options{
+	FailOnInvalidDocIdFragment: false,
+	GenerateDocumentID:         true,
 }
 
 const spdxOther = "OTHER"
@@ -42,20 +55,70 @@ func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, 
 	return nil
 }
 
+// spdxNamespaceFromProtobomID parses the protobom identifier and returns the
+// appropriate SPDX namespace. In SPDX the namespace is what uniquely identifies
+// the document's elements on the Internet. The document SPDX identifier is always
+// set to "SPDXRef-DOCUMENT".
+//
+// For more info see
+// https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#63-spdx-identifier-field
+// https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#65-spdx-document-namespace-field
+func spdxNamespaceFromProtobomID(opts SPDX23Options, protoId string) (spdxId string, err error) {
+	// If the namespace is empty and the option is set, generate an SPDX
+	// identifier for the document when missing
+	if protoId == "" {
+		if opts.GenerateDocumentID {
+			return "https://spdx.org/spdxdocs/protobom/" + uuid.NewString(), nil
+		} else {
+			return "", fmt.Errorf("unable to generate namespace, document ID is blank")
+		}
+	}
+	u, err := url.Parse(protoId)
+	if err != nil {
+		return "", fmt.Errorf("unable to parse protobom id as URL")
+	}
+	if u.Fragment == "" {
+		return protoId, nil
+	}
+
+	// Clear the fragment
+	rawURI := strings.TrimSuffix(u.String(), "#"+u.Fragment)
+
+	if u.Fragment != "SPDXRef-DOCUMENT" && opts.FailOnInvalidDocIdFragment {
+		return rawURI, fmt.Errorf("unable to parse SPDX identifier (URI hash set to %q, SPDXRef-DOCUMENT expected)", u.Fragment)
+	}
+
+	return rawURI, nil
+}
+
 // Serialize takes a protobom and returns an SPDX 2.3 struct
-func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interface{}) (interface{}, error) {
+func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts any) (any, error) {
 	if bom == nil {
 		return nil, errors.New("document is nil, unable to serialize to SPDX 2.3")
 	}
 	if bom.Metadata == nil {
 		return nil, errors.New("document metadata is nil, unable to serialize to SPDX 2.3")
 	}
+
+	opts := DefaultSPDX23Options
+	if rawopts != nil {
+		var ok bool
+		if opts, ok = rawopts.(SPDX23Options); !ok {
+			return nil, fmt.Errorf("error casting SPDX 2.3 options")
+		}
+	}
+
+	ns, err := spdxNamespaceFromProtobomID(opts, bom.Metadata.Id)
+	if err != nil {
+		return nil, fmt.Errorf("serializing SPDX namespace: %w", err)
+	}
+
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,
 		SPDXIdentifier:    protospdx.DOCUMENT,
 		DocumentName:      bom.Metadata.Name,
-		DocumentNamespace: "https://spdx.org/spdxdocs/", // TODO(puerco): Think how to handle namespacing
+		DocumentNamespace: ns,
 		DocumentComment:   bom.Metadata.Comment,
 
 		CreationInfo: &spdx.CreationInfo{

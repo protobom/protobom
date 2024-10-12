@@ -154,6 +154,11 @@ func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 		n.LicenseConcluded = p.PackageLicenseConcluded
 	}
 
+	// TODO(degradation) NOASSERTION
+	if p.PackageLicenseDeclared != protospdx.NOASSERTION && p.PackageLicenseDeclared != "" {
+		n.Licenses = []string{p.PackageLicenseDeclared}
+	}
+
 	if len(p.PackageChecksums) > 0 {
 		n.Hashes = map[int32]string{}
 		for _, h := range p.PackageChecksums {

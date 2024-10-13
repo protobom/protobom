@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/storage"
 )
@@ -51,6 +52,18 @@ func WithStoreOptions(ro *storage.StoreOptions) WriterOption {
 		if ro != nil {
 			w.Options.StoreOptions = ro
 		}
+	}
+}
+
+func WithMod(m mod.Mod) WriterOption {
+	return func(w *Writer) {
+		w.Options.SerializeOptions.Mods[m] = struct{}{}
+	}
+}
+
+func WithoutMod(m mod.Mod) WriterOption {
+	return func(w *Writer) {
+		delete(w.Options.SerializeOptions.Mods, m)
 	}
 }
 

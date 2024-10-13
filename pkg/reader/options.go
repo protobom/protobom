@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/storage"
 )
@@ -82,5 +83,17 @@ func WithRetrieveOptions(ro *storage.RetrieveOptions) ReaderOption {
 		if ro != nil {
 			r.Options.RetrieveOptions = ro
 		}
+	}
+}
+
+func WithMod(m mod.Mod) ReaderOption {
+	return func(r *Reader) {
+		r.Options.UnserializeOptions.Mods[m] = struct{}{}
+	}
+}
+
+func WithoutMod(m mod.Mod) ReaderOption {
+	return func(r *Reader) {
+		delete(r.Options.UnserializeOptions.Mods, m)
 	}
 }

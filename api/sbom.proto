@@ -372,13 +372,13 @@ message Node {
   // Location to download the package.
   string url_download = 7;
 
-    // Multiple licenses applicable to the software component,
-    // Multiple licenses can be specified for CycloneDX 1.4 and files in SPDX.
-    repeated string licenses = 8;
+  // Multiple licenses applicable to the software component,
+  // Multiple licenses can be specified for CycloneDX 1.4 and files in SPDX.
+  repeated string licenses = 8;
 
-    // Concluded license applicable to the software component,
-    // This is only in SPDX and it is just one.
-    string license_concluded = 9;
+  // Concluded license applicable to the software component,
+  // This is only in SPDX and it is just one.
+  string license_concluded = 9;
 
   // Comments on the license.
   string license_comments = 10;
@@ -386,18 +386,18 @@ message Node {
   // Copyright information applicable to the software component.
   string copyright = 11;
 
-    // field 12 was the old hashes string map.
-    // Removed, see https://github.com/protobom/protobom/issues/89
-    // map<string,string> hashes = 12;
+  // field 12 was the old hashes string map.
+  // Removed, see https://github.com/protobom/protobom/issues/89
+  // map<string,string> hashes = 12;
   reserved 12;
 
-    // This field is intended to capture details related to the source or origin of the software component.
-    // It may include any relevant background information or additional comments.
-    string source_info = 13;
+  // This field is intended to capture details related to the source or origin of the software component.
+  // It may include any relevant background information or additional comments.
+  string source_info = 13;
 
-    // field 14 was the old string primary_purpose.
-    // Removed, see https://github.com/protobom/protobom/issues/124
-    // string primary_purpose = 14;   // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
+  // field 14 was the old string primary_purpose.
+  // Removed, see https://github.com/protobom/protobom/issues/124
+  // string primary_purpose = 14;   // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
   reserved 14;
 
   // Comments on the software component.
@@ -430,27 +430,27 @@ message Node {
   // External references associated with the software component.
   repeated ExternalReference external_references = 24;
 
-    // field 25 was the old identifier list.
-    // Removed, see https://github.com/protobom/protobom/issues/64
-    // repeated Identifier identifiers = 25;
+  // field 25 was the old identifier list.
+  // Removed, see https://github.com/protobom/protobom/issues/64
+  // repeated Identifier identifiers = 25;
   reserved 25;
 
   // File types associated with the component
   repeated string file_types = 27;
 
-    // Software identifer map used by the component.
-    // Maps between the software identifier types and the identifier values.
+  // Software identifer map used by the component.
+  // Maps between the software identifier types and the identifier values.
   map<int32, string> identifiers = 28;
 
-    // Hashes map associated with the software component.
-    // Maps between hash algorithms types and hash values.
+  // Hashes map associated with the software component.
+  // Maps between hash algorithms types and hash values.
   map<int32, string> hashes = 29;
 
   // Primary purpose or role assigned to the software component.
   repeated Purpose primary_purpose = 30;
 
-    // Type of the software component.
-    enum NodeType {
+  // Type of the software component.
+  enum NodeType {
     // Software component type is a package.
     PACKAGE = 0;
     // Software component type is a file.
@@ -492,7 +492,7 @@ message Person {
   // Contacts associated with the person or organization.
   repeated Person contacts = 6;
 
-    // repeated PersonIdentifier identifiers // Support?
+  // repeated PersonIdentifier identifiers // Support?
 }
 
 // Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.

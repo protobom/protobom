@@ -5,6 +5,7 @@ package native
 import (
 	"io"
 
+	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -18,4 +19,6 @@ type RenderOptions struct {
 	Indent int
 }
 
-type SerializeOptions struct{}
+type SerializeOptions struct {
+	Mods map[mod.Mod]struct{}
+}

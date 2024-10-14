@@ -5,6 +5,7 @@ package native
 import (
 	"io"
 
+	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -13,4 +14,6 @@ type Unserializer interface {
 	Unserialize(io.Reader, *UnserializeOptions, interface{}) (*sbom.Document, error)
 }
 
-type UnserializeOptions struct{}
+type UnserializeOptions struct {
+	Mods map[mod.Mod]struct{}
+}

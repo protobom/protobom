@@ -13,6 +13,7 @@ vars:
   BUF_RELEASE_URL: https://github.com/bufbuild/buf/releases/download/{{.BUF_VERSION}} # /buf-$(uname -s)-$(uname -m)
   GOLANGCI_LINT_VERSION: v1.61.0
   GOLANGCI_LINT_RELEASE_URL: https://github.com/golangci/golangci-lint/releases/download/{{.GOLANGCI_LINT_VERSION}}
+  PROTOC_GEN_GO_VERSION: v1.34.2
 
 tasks:
   make-tools-dir:
@@ -69,3 +70,11 @@ tasks:
         vars:
           ZIP_FILENAME: "{{.GOLANGCI_LINT_FILENAME}}"
           EXE_FILENAME: golangci-lint.exe
+
+  protoc-gen-go:
+    desc: Install protoc-gen-go
+    status:
+      - test -x "{{shellQuote .TOOLS_DIR}}/protoc-gen-go{{exeExt}}"
+    cmds:
+      - task: make-tools-dir
+      - cmd: GOBIN={{.TOOLS_DIR}} go install google.golang.org/protobuf/cmd/protoc-gen-go@{{.PROTOC_GEN_GO_VERSION}}

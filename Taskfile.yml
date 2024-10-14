@@ -11,9 +11,6 @@ version: "3"
 includes:
   fix:
     taskfile: .taskfiles/fix.yml
-    vars:
-      MARKDOWN_FILES: "{{.MARKDOWN_FILES}}"
-      SHELL_FILES: "{{.SHELL_FILES}}"
 
   install:
     taskfile: .taskfiles/install.yml
@@ -25,7 +22,6 @@ includes:
     taskfile: .taskfiles/lint.yml
     vars:
       TOOLS_DIR: "{{.TOOLS_DIR}}"
-      VERSION: "{{.VERSION}}"
 
 env:
   GO111MODULE: "on"
@@ -34,10 +30,12 @@ env:
   GOPROXY: https://proxy.golang.org,direct
 
 vars:
+  AGAINST: '{{default ".git" .AGAINST}}'
+  GIT_TAG:
+    sh: git describe --tags --abbrev=0
   RM: '{{if eq OS "windows"}}powershell -Command "Remove-Item -Recurse -Force -Path"{{else}}rm -rf{{end}}'
   TOOLS_DIR: '{{shellQuote (joinPath .ROOT_DIR ".bin")}}'
-  VERSION:
-    sh: '{{default "Undefined" "git describe --tags --abbrev=0"}}'
+  VERSION: "{{default .GIT_TAG .VERSION}}"
 
 tasks:
   default:

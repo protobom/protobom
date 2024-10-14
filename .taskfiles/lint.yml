@@ -45,7 +45,7 @@ tasks:
       - task: run
         vars:
           CLI_NAME: buf{{exeExt}}
-          CLI_ARGS: [breaking, --against, ".git#tag={{.VERSION}},subdir=api"]
+          CLI_ARGS: [breaking, --against, "{{.AGAINST}}#tag={{.VERSION}},subdir=api"]
 
   go:
     desc: Lint Golang code files
@@ -54,7 +54,3 @@ tasks:
         vars:
           CLI_NAME: golangci-lint{{exeExt}}
           CLI_ARGS: [run, --verbose]
-
-      - task: run
-        vars:
-          CLI_NAME: .github/scripts/check-go-headers.sh

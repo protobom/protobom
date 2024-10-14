@@ -10,13 +10,13 @@ import (
 
 func TestExtRefCategoryFromProtobomExtRef(t *testing.T) {
 	s23 := NewSPDX23()
-	for extRefType, name := range sbom.ExternalReference_Type_name {
+	for extRefType, name := range sbom.ExternalReference_ExternalReferenceType_name {
 		t.Run(name, func(t *testing.T) {
 			res := s23.extRefCategoryFromProtobomExtRef(&sbom.ExternalReference{
-				Type: sbom.ExternalReference_Type(extRefType),
+				Type: sbom.ExternalReference_ExternalReferenceType(extRefType),
 			})
 
-			switch sbom.ExternalReference_Type(extRefType) {
+			switch sbom.ExternalReference_ExternalReferenceType(extRefType) {
 			case sbom.ExternalReference_BOWER, sbom.ExternalReference_MAVEN_CENTRAL,
 				sbom.ExternalReference_NPM, sbom.ExternalReference_NUGET:
 				require.Equal(t, spdx.CategoryPackageManager, res)
@@ -32,14 +32,14 @@ func TestExtRefCategoryFromProtobomExtRef(t *testing.T) {
 
 func TestExtRefTypeFromProtobomExtRef(t *testing.T) {
 	s23 := NewSPDX23()
-	for extRefType, name := range sbom.ExternalReference_Type_name {
+	for extRefType, name := range sbom.ExternalReference_ExternalReferenceType_name {
 		t.Run(name, func(t *testing.T) {
 			extRefType := extRefType
 			res := s23.extRefTypeFromProtobomExtRef(&sbom.ExternalReference{
-				Type: sbom.ExternalReference_Type(extRefType),
+				Type: sbom.ExternalReference_ExternalReferenceType(extRefType),
 			})
 
-			switch sbom.ExternalReference_Type(extRefType) {
+			switch sbom.ExternalReference_ExternalReferenceType(extRefType) {
 			case sbom.ExternalReference_BOWER:
 				require.Equal(t, spdx.PackageManagerBower, res)
 			case sbom.ExternalReference_MAVEN_CENTRAL:

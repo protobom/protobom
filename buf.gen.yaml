@@ -13,4 +13,4 @@ plugins:
     opt: module=github.com/protobom/protobom/pkg/sbom
 
 inputs:
-  - directory: proto
+  - directory: api

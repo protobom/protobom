@@ -82,7 +82,7 @@ func TestComponentType(t *testing.T) {
 
 func TestProtobomExtRefTypeToCdxType(t *testing.T) {
 	cdxs := NewCDX("1.5", "json")
-	for cdxRefType, protoType := range map[sbom.ExternalReference_Type]cdx.ExternalReferenceType{
+	for cdxRefType, protoType := range map[sbom.ExternalReference_ExternalReferenceType]cdx.ExternalReferenceType{
 		sbom.ExternalReference_ATTESTATION:                             cdx.ERTypeAttestation,
 		sbom.ExternalReference_BOM:                                     cdx.ERTypeBOM,
 		sbom.ExternalReference_BUILD_META:                              cdx.ERTypeBuildMeta,

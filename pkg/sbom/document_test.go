@@ -94,7 +94,7 @@ func Example_nodes() {
 
 	// Create build dependency edge between the two software components.
 	edge := &sbom.Edge{
-		Type: sbom.Edge_BUILD_DEPENDENCY,
+		Type: sbom.Edge_buildDependency,
 		From: "pkg:generic/my-software@v1.0.0",
 		To: []string{
 			"pkg:generic/my-second-software@v2.0.0",

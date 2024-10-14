@@ -4,7 +4,7 @@ CYAN :=  \033[36m
 GREEN := \033[32m
 RESET := \033[0m
 
-VERSION := ${shell git describe --tags --abbrev=0}
+VERSION ?= ${shell git describe --tags --abbrev=0}
 
 .PHONY: help
 help:

@@ -289,7 +289,7 @@ func (*SPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
 // extRefToProtobomEnum converts the SPDX external reference to the corresponding
 // enumerated type. If the type is a software identifier, the function will return
 // -1 and the isIdentifier will be set to true.
-func (*SPDX23) extRefToProtobomEnum(extref *spdx.PackageExternalReference) (sbom.ExternalReference_ExternalReferenceType, bool, error) {
+func (*SPDX23) extRefToProtobomEnum(extref *spdx.PackageExternalReference) (sbom.ExternalReference_Type, bool, error) {
 	switch extref.Category {
 	case spdx.CategoryPackageManager:
 		switch extref.RefType {

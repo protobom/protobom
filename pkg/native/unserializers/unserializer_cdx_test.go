@@ -75,7 +75,7 @@ func TestCdxHashAlgoToProtobomAlgo(t *testing.T) {
 
 func TestCdxExtRefTypeToProtobomType(t *testing.T) {
 	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
-	for cdxRefType, protoType := range map[cdx.ExternalReferenceType]sbom.ExternalReference_ExternalReferenceType{
+	for cdxRefType, protoType := range map[cdx.ExternalReferenceType]sbom.ExternalReference_Type{
 		cdx.ERTypeAttestation:                      sbom.ExternalReference_ATTESTATION,
 		cdx.ERTypeBOM:                              sbom.ExternalReference_BOM,
 		cdx.ERTypeBuildMeta:                        sbom.ExternalReference_BUILD_META,

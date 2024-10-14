@@ -98,7 +98,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 			if len(doc.NodeList.RootElements) == 0 {
 				doc.NodeList.Add(nl)
 			} else {
-				if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
+				if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_CONTAINS); err != nil {
 					return nil, fmt.Errorf("relating components to root node: %w", err)
 				}
 			}
@@ -128,7 +128,7 @@ func (u *CDX) componentToNodeList(component *cdx.Component, cc *int) (*sbom.Node
 			if err != nil {
 				return nil, fmt.Errorf("converting subcomponent to nodelist: %w", err)
 			}
-			if err := nl.RelateNodeListAtID(subList, node.Id, sbom.Edge_contains); err != nil {
+			if err := nl.RelateNodeListAtID(subList, node.Id, sbom.Edge_CONTAINS); err != nil {
 				return nil, fmt.Errorf("relating subcomponents to new node: %w", err)
 			}
 		}
@@ -397,7 +397,7 @@ func (u *CDX) cdxHashAlgoToProtobomAlgo(cdxAlgo cdx.HashAlgorithm) sbom.HashAlgo
 //
 // Some values are missing in the CDX library that's why I'm creating them here.
 // (I opened https://github.com/CycloneDX/cyclonedx-go/pull/129 to fix it)
-func (u *CDX) cdxExtRefTypeToProtobomType(cdxExtRefType cdx.ExternalReferenceType) sbom.ExternalReference_ExternalReferenceType {
+func (u *CDX) cdxExtRefTypeToProtobomType(cdxExtRefType cdx.ExternalReferenceType) sbom.ExternalReference_Type {
 	switch cdxExtRefType {
 	case cdx.ERTypeAttestation:
 		return sbom.ExternalReference_ATTESTATION

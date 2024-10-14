@@ -233,7 +233,7 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 		// "contains" relationship. This is just an opinion for the demo
 		// and it is something we can parameterize
 		switch e.Type {
-		case sbom.Edge_contains:
+		case sbom.Edge_CONTAINS:
 			// Make sure we have the target component
 			for _, targetID := range e.To {
 				state.addedDict[targetID] = struct{}{}
@@ -247,7 +247,7 @@ func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Depen
 				*state.componentsDict[e.From].Components = append(*state.componentsDict[e.From].Components, *state.componentsDict[targetID])
 			}
 
-		case sbom.Edge_dependsOn:
+		case sbom.Edge_DEPENDS_ON:
 			// Add to the dependency tree
 			targetStrings := []string{}
 			depListCheck := map[string]struct{}{}
@@ -471,7 +471,7 @@ func getCDXState(ctx context.Context) (*serializerCDXState, error) {
 
 // protobomExtRefTypeToCdxType translates between the protobom external reference
 // identifiers and the CycloneDX equivalent types.
-func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference_ExternalReferenceType) cdx.ExternalReferenceType {
+func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference_Type) cdx.ExternalReferenceType {
 	switch protoExtRefType {
 	case sbom.ExternalReference_ATTESTATION:
 		return cdx.ERTypeAttestation

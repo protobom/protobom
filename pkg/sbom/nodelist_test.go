@@ -78,8 +78,8 @@ func TestCleanEdges(t *testing.T) {
 					{Id: "node1"}, {Id: "node2"}, {Id: "node3"},
 				},
 				Edges: []*Edge{
-					{Type: Edge_contains, From: "node1", To: []string{"node2"}},
-					{Type: Edge_contains, From: "node1", To: []string{"node3"}},
+					{Type: Edge_CONTAINS, From: "node1", To: []string{"node2"}},
+					{Type: Edge_CONTAINS, From: "node1", To: []string{"node3"}},
 				},
 				RootElements: []string{"node1"},
 			},
@@ -89,7 +89,7 @@ func TestCleanEdges(t *testing.T) {
 					{Id: "node1"}, {Id: "node2"}, {Id: "node3"},
 				},
 				Edges: []*Edge{
-					{Type: Edge_contains, From: "node1", To: []string{"node2", "node3"}},
+					{Type: Edge_CONTAINS, From: "node1", To: []string{"node2", "node3"}},
 				},
 				RootElements: []string{"node1"},
 			},
@@ -152,7 +152,7 @@ func TestAdd(t *testing.T) {
 					{Id: "test2"},
 				},
 				Edges: []*Edge{
-					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+					{From: "test1", Type: Edge_CONTAINS, To: []string{"test2"}},
 				},
 			},
 			prepare: func(n *NodeList) {
@@ -164,7 +164,7 @@ func TestAdd(t *testing.T) {
 					{Id: "test2"},
 				},
 				Edges: []*Edge{
-					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+					{From: "test1", Type: Edge_CONTAINS, To: []string{"test2"}},
 				},
 			},
 		},
@@ -176,7 +176,7 @@ func TestAdd(t *testing.T) {
 					{Id: "test2"},
 				},
 				Edges: []*Edge{
-					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+					{From: "test1", Type: Edge_CONTAINS, To: []string{"test2"}},
 				},
 			},
 			prepare: func(n *NodeList) {
@@ -194,7 +194,7 @@ func TestAdd(t *testing.T) {
 					{Id: "test3"},
 				},
 				Edges: []*Edge{
-					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+					{From: "test1", Type: Edge_CONTAINS, To: []string{"test2"}},
 				},
 			},
 		},
@@ -229,7 +229,7 @@ func TestNodeListIntersect(t *testing.T) {
 		},
 		Edges: []*Edge{
 			{
-				Type: Edge_contains,
+				Type: Edge_CONTAINS,
 				From: "node1",
 				To:   []string{"node2", "node3"},
 			},
@@ -285,7 +285,7 @@ func TestNodeListIntersect(t *testing.T) {
 					},
 				},
 				Edges: []*Edge{{
-					Type: Edge_contains,
+					Type: Edge_CONTAINS,
 					From: "node1",
 					To:   []string{"node2"},
 				}},
@@ -323,12 +323,12 @@ func TestNodeListUnion(t *testing.T) {
 		},
 		Edges: []*Edge{
 			{
-				Type: Edge_contains,
+				Type: Edge_CONTAINS,
 				From: "node1",
 				To:   []string{"node2", "node3"},
 			},
 			{
-				Type: Edge_dependsOn,
+				Type: Edge_DEPENDS_ON,
 				From: "node1",
 				To:   []string{"node3"},
 			},
@@ -391,12 +391,12 @@ func TestNodeListUnion(t *testing.T) {
 				},
 				Edges: []*Edge{
 					{
-						Type: Edge_contains,
+						Type: Edge_CONTAINS,
 						From: "node1",
 						To:   []string{"node2", "node3"},
 					},
 					{
-						Type: Edge_dependsOn,
+						Type: Edge_DEPENDS_ON,
 						From: "node1",
 						To:   []string{"node3"},
 					},
@@ -559,12 +559,12 @@ func TestEqual(t *testing.T) {
 			},
 			Edges: []*Edge{
 				{
-					Type: Edge_dependsOn,
+					Type: Edge_DEPENDS_ON,
 					From: "nginx-amd64",
 					To:   []string{"bash-4"},
 				},
 				{
-					Type: Edge_dependsOn,
+					Type: Edge_DEPENDS_ON,
 					From: "nginx-arm64",
 					To:   []string{"bash-4"},
 				},
@@ -598,7 +598,7 @@ func TestEqual(t *testing.T) {
 			shouldEq: false,
 			prepare: func(_ *NodeList, sut2 *NodeList) {
 				sut2.Edges = append(sut2.Edges, &Edge{
-					Type: Edge_documentation,
+					Type: Edge_DOCUMENTATION,
 					From: "nginx-docs",
 					To:   []string{"nginx-arm64", "nginx-amd64"},
 				})
@@ -1287,7 +1287,7 @@ func TestNodeListCopy(t *testing.T) {
 					{Id: "test2"},
 				},
 				Edges: []*Edge{
-					{From: "test1", Type: Edge_contains, To: []string{"test2"}},
+					{From: "test1", Type: Edge_CONTAINS, To: []string{"test2"}},
 				},
 			},
 		},
@@ -1347,7 +1347,7 @@ func TestRelateNodeListAtId(t *testing.T) {
 			expected: &NodeList{
 				RootElements: []string{sutId},
 				Nodes:        []*Node{{Id: sutId}, {Id: nodeId}},
-				Edges:        []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_ancestor}},
+				Edges:        []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_ANCESTOR}},
 			},
 		},
 		{
@@ -1362,14 +1362,14 @@ func TestRelateNodeListAtId(t *testing.T) {
 			nodeList: &NodeList{
 				RootElements: []string{nodeId},
 				Nodes:        []*Node{{Id: nodeId}, {Id: "nodeC"}},
-				Edges:        []*Edge{{From: nodeId, To: []string{"nodeC"}, Type: Edge_contains}},
+				Edges:        []*Edge{{From: nodeId, To: []string{"nodeC"}, Type: Edge_CONTAINS}},
 			},
 			expected: &NodeList{
 				RootElements: []string{sutId},
 				Nodes:        []*Node{{Id: sutId}, {Id: nodeId}, {Id: "nodeC"}},
 				Edges: []*Edge{
-					{From: sutId, To: []string{nodeId}, Type: Edge_ancestor},
-					{From: nodeId, To: []string{"nodeC"}, Type: Edge_contains},
+					{From: sutId, To: []string{nodeId}, Type: Edge_ANCESTOR},
+					{From: nodeId, To: []string{"nodeC"}, Type: Edge_CONTAINS},
 				},
 			},
 		},
@@ -1385,7 +1385,7 @@ func TestRelateNodeListAtId(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			err := tc.sut.RelateNodeListAtID(tc.nodeList, sutId, Edge_ancestor)
+			err := tc.sut.RelateNodeListAtID(tc.nodeList, sutId, Edge_ANCESTOR)
 			if tc.shouldError {
 				require.Error(t, err)
 				return

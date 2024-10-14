@@ -38,93 +38,93 @@ func (et Edge_Type) ToSPDX2() string {
 	switch et {
 	case Edge_UNKNOWN:
 		return ""
-	case Edge_amends:
+	case Edge_AMENDS:
 		return "AMENDS"
-	case Edge_ancestor:
+	case Edge_ANCESTOR:
 		return "ANCESTOR_OF"
-	case Edge_buildDependency:
+	case Edge_BUILD_DEPENDENCY:
 		return "BUILD_DEPENDENCY_OF"
-	case Edge_buildTool:
+	case Edge_BUILD_TOOL:
 		return "BUILD_TOOL_OF"
-	case Edge_contains:
+	case Edge_CONTAINS:
 		return "CONTAINS"
-	case Edge_contained_by:
+	case Edge_CONTAINED_BY:
 		return "CONTAINED_BY"
-	case Edge_copy:
+	case Edge_COPY:
 		return "COPY_OF"
-	case Edge_dataFile:
+	case Edge_DATA_FILE:
 		return "DATA_FILE_OF"
-	case Edge_dependencyManifest:
+	case Edge_DEPENDENCY_MANIFEST:
 		return "DEPENDENCY_MANIFEST_OF"
-	case Edge_dependsOn:
+	case Edge_DEPENDS_ON:
 		return "DEPENDS_ON"
-	case Edge_dependencyOf:
+	case Edge_DEPENDENCY_OF:
 		return "DEPENDENCY_OF"
-	case Edge_descendant:
+	case Edge_DESCENDANT:
 		return "DESCENDANT_OF"
-	case Edge_describes:
+	case Edge_DESCRIBES:
 		return "DESCRIBES"
-	case Edge_describedBy:
+	case Edge_DESCRIBED_BY:
 		return "DESCRIBED_BY"
-	case Edge_devDependency:
+	case Edge_DEV_DEPENDENCY:
 		return "DEV_DEPENDENCY_OF"
-	case Edge_devTool:
+	case Edge_DEV_TOOL:
 		return "DEV_TOOL_OF"
-	case Edge_distributionArtifact:
+	case Edge_DISTRIBUTION_ARTIFACT:
 		return "DISTRIBUTION_ARTIFACT"
-	case Edge_documentation:
+	case Edge_DOCUMENTATION:
 		return "DOCUMENTATION_OF"
-	case Edge_dynamicLink:
+	case Edge_DYNAMIC_LINK:
 		return "DYNAMIC_LINK"
-	case Edge_example:
+	case Edge_EXAMPLE:
 		return "EXAMPLE_OF"
-	case Edge_expandedFromArchive:
+	case Edge_EXPANDED_FROM_ARCHIVE:
 		return "EXPANDED_FROM_ARCHIVE"
-	case Edge_fileAdded:
+	case Edge_FILE_ADDED:
 		return "FILE_ADDED"
-	case Edge_fileDeleted:
+	case Edge_FILE_DELETED:
 		return "FILE_DELETED"
-	case Edge_fileModified:
+	case Edge_FILE_MODIFIED:
 		return "FILE_MODIFIED"
-	case Edge_generates:
+	case Edge_GENERATES:
 		return "GENERATES"
-	case Edge_generatedFrom:
+	case Edge_GENERATED_FROM:
 		return "GENERATED_FROM"
-	case Edge_metafile:
+	case Edge_METAFILE:
 		return "METAFILE_OF"
-	case Edge_optionalComponent:
+	case Edge_OPTIONAL_COMPONENT:
 		return "OPTIONAL_COMPONENT_OF"
-	case Edge_optionalDependency:
+	case Edge_OPTIONAL_DEPENDENCY:
 		return "OPTIONAL_DEPENDENCY_OF"
-	case Edge_other:
+	case Edge_OTHER:
 		return "OTHER"
-	case Edge_packages:
+	case Edge_PACKAGES:
 		return "PACKAGE_OF"
-	case Edge_patch:
+	case Edge_PATCH:
 		return "PATCH_APPLIED"
-	case Edge_prerequisite:
+	case Edge_PREREQUISITE:
 		return "HAS_PREREQUISITE"
-	case Edge_prerequisiteFor:
+	case Edge_PREREQUISITE_FOR:
 		return "PREREQUISITE_FOR"
-	case Edge_providedDependency:
+	case Edge_PROVIDED_DEPENDENCY:
 		return "PROVIDED_DEPENDENCY_OF"
-	case Edge_requirementFor:
+	case Edge_REQUIREMENT_FOR:
 		return "REQUIREMENT_DESCRIPTION_FOR"
-	case Edge_runtimeDependency:
+	case Edge_RUNTIME_DEPENDENCY:
 		return "RUNTIME_DEPENDENCY_OF"
-	case Edge_specificationFor:
+	case Edge_SPECIFICATION_FOR:
 		return "SPECIFICATION_FOR"
-	case Edge_staticLink:
+	case Edge_STATIC_LINK:
 		return "STATIC_LINK"
-	case Edge_test:
+	case Edge_TEST:
 		return "TEST_OF"
-	case Edge_testCase:
+	case Edge_TEST_CASE:
 		return "TEST_CASE_OF"
-	case Edge_testDependency:
+	case Edge_TEST_DEPENDENCY:
 		return "TEST_DEPENDENCY_OF"
-	case Edge_testTool:
+	case Edge_TEST_TOOL:
 		return "TEST_TOOL_OF"
-	case Edge_variant:
+	case Edge_VARIANT:
 		return "VARIANT_OF"
 	default:
 		return ""
@@ -138,95 +138,95 @@ func EdgeTypeFromSPDX2(spdx2Type string) Edge_Type {
 
 	switch spdx2Type {
 	case "AMENDS":
-		return Edge_amends
+		return Edge_AMENDS
 	case "ANCESTOR_OF":
-		return Edge_ancestor
+		return Edge_ANCESTOR
 	case "BUILD_DEPENDENCY_OF":
-		return Edge_buildDependency
+		return Edge_BUILD_DEPENDENCY
 	case "BUILD_TOOL_OF":
-		return Edge_buildTool
+		return Edge_BUILD_TOOL
 	case "CONTAINED_BY":
-		return Edge_contained_by
+		return Edge_CONTAINED_BY
 	case "CONTAINS":
-		return Edge_contains
+		return Edge_CONTAINS
 	case "COPY_OF":
-		return Edge_copy
+		return Edge_COPY
 	case "DATA_FILE_OF":
-		return Edge_dataFile
+		return Edge_DATA_FILE
 	case "DEPENDENCY_MANIFEST_OF":
-		return Edge_dependencyManifest
+		return Edge_DEPENDENCY_MANIFEST
 	case "DEPENDENCY_OF":
-		return Edge_dependencyOf
+		return Edge_DEPENDENCY_OF
 	case "DEPENDS_ON":
-		return Edge_dependsOn
+		return Edge_DEPENDS_ON
 	case "DESCENDANT_OF":
-		return Edge_descendant
+		return Edge_DESCENDANT
 	case "DESCRIBED_BY":
-		return Edge_describedBy
+		return Edge_DESCRIBED_BY
 	case "DESCRIBES":
-		return Edge_describes
+		return Edge_DESCRIBES
 	case "DEV_DEPENDENCY_OF":
-		return Edge_devDependency
+		return Edge_DEV_DEPENDENCY
 	case "DEV_TOOL_OF":
-		return Edge_devTool
+		return Edge_DEV_TOOL
 	case "DISTRIBUTION_ARTIFACT":
-		return Edge_distributionArtifact
+		return Edge_DISTRIBUTION_ARTIFACT
 	case "DOCUMENTATION_OF":
-		return Edge_documentation
+		return Edge_DOCUMENTATION
 	case "DYNAMIC_LINK":
-		return Edge_dynamicLink
+		return Edge_DYNAMIC_LINK
 	case "EXAMPLE_OF":
-		return Edge_example
+		return Edge_EXAMPLE
 	case "EXPANDED_FROM_ARCHIVE":
-		return Edge_expandedFromArchive
+		return Edge_EXPANDED_FROM_ARCHIVE
 	case "FILE_ADDED":
-		return Edge_fileAdded
+		return Edge_FILE_ADDED
 	case "FILE_DELETED":
-		return Edge_fileDeleted
+		return Edge_FILE_DELETED
 	case "FILE_MODIFIED":
-		return Edge_fileModified
+		return Edge_FILE_MODIFIED
 	case "GENERATED_FROM":
-		return Edge_generatedFrom
+		return Edge_GENERATED_FROM
 	case "GENERATES":
-		return Edge_generates
+		return Edge_GENERATES
 	case "METAFILE_OF":
-		return Edge_metafile
+		return Edge_METAFILE
 	case "OPTIONAL_COMPONENT_OF":
-		return Edge_optionalComponent
+		return Edge_OPTIONAL_COMPONENT
 	case "OPTIONAL_DEPENDENCY_OF":
-		return Edge_optionalDependency
+		return Edge_OPTIONAL_DEPENDENCY
 	case "OTHER":
-		return Edge_other
+		return Edge_OTHER
 	case "PACKAGE_OF":
-		return Edge_packages
+		return Edge_PACKAGES
 	case "PATCH_APPLIED":
-		return Edge_patch
+		return Edge_PATCH
 	case "PATCH_FOR":
-		return Edge_patch // TODO(degradation)
+		return Edge_PATCH // TODO(degradation)
 	case "PREREQUISITE_FOR":
-		return Edge_prerequisiteFor
+		return Edge_PREREQUISITE_FOR
 	case "HAS_PREREQUISITE":
-		return Edge_prerequisite
+		return Edge_PREREQUISITE
 	case "PROVIDED_DEPENDENCY_OF":
-		return Edge_providedDependency
+		return Edge_PROVIDED_DEPENDENCY
 	case "REQUIREMENT_DESCRIPTION_FOR":
-		return Edge_requirementFor
+		return Edge_REQUIREMENT_FOR
 	case "RUNTIME_DEPENDENCY_OF":
-		return Edge_runtimeDependency
+		return Edge_RUNTIME_DEPENDENCY
 	case "SPECIFICATION_FOR":
-		return Edge_specificationFor
+		return Edge_SPECIFICATION_FOR
 	case "STATIC_LINK":
-		return Edge_staticLink
+		return Edge_STATIC_LINK
 	case "TEST_OF":
-		return Edge_test
+		return Edge_TEST
 	case "TEST_CASE_OF":
-		return Edge_testCase
+		return Edge_TEST_CASE
 	case "TEST_DEPENDENCY_OF":
-		return Edge_testDependency
+		return Edge_TEST_DEPENDENCY
 	case "TEST_TOOL_OF":
-		return Edge_testTool
+		return Edge_TEST_TOOL
 	case "VARIANT_OF":
-		return Edge_variant
+		return Edge_VARIANT
 	default:
 		return Edge_UNKNOWN
 	}

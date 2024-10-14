@@ -16,7 +16,7 @@ func TestSPDXExtRefToProtobomEnum(t *testing.T) {
 	for _, tc := range []struct {
 		sut          spdx.PackageExternalReference
 		isIdentifier bool
-		expected     sbom.ExternalReference_ExternalReferenceType
+		expected     sbom.ExternalReference_Type
 		shouldErr    bool
 	}{
 		// Category: package manager

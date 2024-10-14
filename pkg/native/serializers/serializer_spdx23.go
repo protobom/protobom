@@ -31,11 +31,32 @@ type SPDX23Options struct {
 	// GenerateDocumentID causes the serializer to generate a non-deterministic
 	// document ID when a protobom doesn't have one defined.
 	GenerateDocumentID bool
+
+	// FailOnMultipleLicenses causes the SPDX serializer to fail when rendering
+	// a protobom with multiple licenses defined when set to true. When false,
+	// the SPDX License Declared field will be populated with a license expression
+	// formed by joining the licenses with the operator defined in LicenseExpressionOperator
+	// (defaults to OR).
+	FailOnMultipleLicenses bool
+
+	// LicenseExpressionOperator is the logical operator used to form an SPDX
+	// license expression whe a protobom node has more than one license
+	LicenseExpressionOperator string
+}
+
+// Validate returns an error if the SPDX options are invalid
+func (o *SPDX23Options) Validate() error {
+	if o.LicenseExpressionOperator != "OR" && o.LicenseExpressionOperator != "AND" {
+		return fmt.Errorf("invalid LicenseExpressionOperator, must be 'OR' or 'ANDW'")
+	}
+	return nil
 }
 
 var DefaultSPDX23Options = SPDX23Options{
 	FailOnInvalidDocIdFragment: false,
+	FailOnMultipleLicenses:     false,
 	GenerateDocumentID:         true,
+	LicenseExpressionOperator:  "OR",
 }
 
 const spdxOther = "OTHER"
@@ -108,6 +129,11 @@ func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawop
 		}
 	}
 
+	// Validate the options
+	if err := opts.Validate(); err != nil {
+		return nil, fmt.Errorf("validating spdx 2.3 options: %w", err)
+	}
+
 	ns, err := spdxNamespaceFromProtobomID(opts, bom.Metadata.Id)
 	if err != nil {
 		return nil, fmt.Errorf("serializing SPDX namespace: %w", err)
@@ -156,7 +182,7 @@ func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawop
 		})
 	}
 
-	packages, err := s.buildPackages(bom)
+	packages, err := s.buildPackages(opts, bom)
 	if err != nil {
 		return nil, fmt.Errorf("building SPDX packages: %s", err)
 	}
@@ -250,9 +276,18 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 	return files, nil
 }
 
-func (s *SPDX23) buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unparam
+func (s *SPDX23) buildPackages(opts SPDX23Options, bom *sbom.Document) ([]*spdx.Package, error) {
 	packages := []*spdx.Package{}
+
 	for _, node := range bom.NodeList.Nodes {
+		// Fail when multiple licenses are defined and the serializer is not configured to
+		// join them in an axpression
+		if len(node.Licenses) > 1 && opts.FailOnMultipleLicenses {
+			return nil, fmt.Errorf(
+				"node %q has multiple licenses (and FailOnMultipleLicenses is set to true)", node.Id,
+			)
+		}
+
 		if node.Type == sbom.Node_FILE {
 			continue
 		}
@@ -273,15 +308,15 @@ func (s *SPDX23) buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //
 			PackageHomePage:             node.UrlHome,
 			PackageSourceInfo:           node.SourceInfo,
 			PackageLicenseConcluded:     node.LicenseConcluded,
+			PackageLicenseDeclared:      strings.Join(node.Licenses, opts.LicenseExpressionOperator),
 			PackageLicenseInfoFromFiles: []string{},
-			// PackageLicenseDeclared:      node.Licenses[0],
-			PackageLicenseComments:    node.LicenseComments,
-			PackageCopyrightText:      strings.TrimSpace(node.Copyright),
-			PackageSummary:            node.Summary,
-			PackageDescription:        node.Description,
-			PackageComment:            node.Comment,
-			PackageExternalReferences: []*v2_3.PackageExternalReference{},
-			PackageAttributionTexts:   node.Attribution,
+			PackageLicenseComments:      node.LicenseComments,
+			PackageCopyrightText:        strings.TrimSpace(node.Copyright),
+			PackageSummary:              node.Summary,
+			PackageDescription:          node.Description,
+			PackageComment:              node.Comment,
+			PackageExternalReferences:   []*v2_3.PackageExternalReference{},
+			PackageAttributionTexts:     node.Attribution,
 			// PrimaryPackagePurpose:     node.PrimaryPurpose,
 			Annotations: []v2_3.Annotation{},
 

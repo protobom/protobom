@@ -1,0 +1,96 @@
+# --------------------------------------------------------------
+# SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
+# SPDX-FileType: SOURCE
+# SPDX-License-Identifier: Apache-2.0
+# --------------------------------------------------------------
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+includes:
+  fix:
+    taskfile: .taskfiles/fix.yml
+
+  install:
+    taskfile: .taskfiles/install.yml
+    vars:
+      RM: "{{.RM}}"
+      TOOLS_DIR: "{{.TOOLS_DIR}}"
+
+  lint:
+    taskfile: .taskfiles/lint.yml
+    vars:
+      TOOLS_DIR: "{{.TOOLS_DIR}}"
+
+env:
+  GO111MODULE: "on"
+  GOPATH:
+    sh: go env GOPATH
+  GOPROXY: https://proxy.golang.org,direct
+
+vars:
+  AGAINST: '{{default ".git" .AGAINST}}'
+  GIT_TAG:
+    sh: git describe --tags --abbrev=0
+  RM: '{{if eq OS "windows"}}powershell -Command "Remove-Item -Recurse -Force -Path"{{else}}rm -rf{{end}}'
+  TOOLS_DIR: '{{shellQuote (joinPath .ROOT_DIR ".bin")}}'
+  VERSION: "{{default .GIT_TAG .VERSION}}"
+
+tasks:
+  default:
+    silent: true
+    cmd: task --list
+
+  clean:
+    desc: Clean the working directory
+    cmd: "{{.RM}} dist"
+
+  conformance:
+    desc: Regenerate the conformance golden samples. Only to be run when changes are expected
+    cmd: go run ./test/conformance/generator/ test/conformance/testdata/
+
+  fix:
+    desc: Apply fixes to Golang code and protocol buffer definitions where possible
+    cmds:
+      - task: fix:buf
+      - task: fix:go
+
+  install:
+    desc: Install dev tools
+    cmds:
+      - task: install:buf
+      - task: install:golangci-lint
+
+  lint:
+    desc: Lint Golang code and protocol buffer definitions
+    cmds:
+      - task: lint:buf
+      - task: lint:go
+
+  proto:
+    desc: Compile .proto files with Buf
+    cmds:
+      - task: lint:run
+        vars:
+          CLI_NAME: buf{{exeExt}}
+          CLI_ARGS: [generate]
+
+      - task: lint:run
+        vars:
+          CLI_NAME: go
+          CLI_ARGS: [generate, api/generate.go]
+
+  test:
+    desc: Run all tests
+    cmds:
+      - task: test:conformance
+      - task: test:unit
+
+  test:conformance:
+    desc: Run the conformance test suite
+    cmd: go test ./test/conformance
+
+  test:unit:
+    desc: Run unit tests
+    cmd: go test -failfast -v -coverprofile=coverage.out -covermode=atomic ./...

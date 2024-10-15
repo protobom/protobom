@@ -46,6 +46,10 @@ tasks:
     desc: Clean the working directory
     cmd: "{{.RM}} dist"
 
+  conformance:
+    desc: Regenerate the conformance golden samples. Only to be run when changes are expected
+    cmd: go run ./test/conformance/generator/ test/conformance/testdata/
+
   fix:
     desc: Apply fixes to Golang code and protocol buffer definitions where possible
     cmds:
@@ -80,7 +84,12 @@ tasks:
   test:
     desc: Run all tests
     cmds:
+      - task: test:conformance
       - task: test:unit
+
+  test:conformance:
+    desc: Run the conformance test suite
+    cmd: go test ./test/conformance
 
   test:unit:
     desc: Run unit tests

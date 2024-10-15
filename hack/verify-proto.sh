@@ -28,7 +28,7 @@ tag_name="$(curl --fail --silent --show-error --location --url "$releases_api" |
 
 export PATH=${PWD}/.bin:${PATH}
 
-VERSION=$tag_name make buf-format buf-lint buf-generate
+VERSION=$tag_name make buf-format buf-lint proto
 
 git diff --exit-code -- **/{*.pb,value_scanner}.go **/*.proto ||
   exit_with_msg "The protobuf definitions are not up to date. Check the docs and run make proto"

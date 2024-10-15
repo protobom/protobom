@@ -449,6 +449,9 @@ message Node {
   // Primary purpose or role assigned to the software component.
   repeated Purpose primary_purpose = 30;
 
+  // Property collection of the node.
+  repeated Property properties = 31;
+
   // Type of the software component.
   enum NodeType {
     // Software component type is a package.
@@ -493,6 +496,15 @@ message Person {
   repeated Person contacts = 6;
 
   // repeated PersonIdentifier identifiers // Support?
+}
+
+// Property type, key-value store of data.
+message Property {
+  // Name of the property
+  string name = 1;
+
+  // Property value
+  string data = 2;
 }
 
 // Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.

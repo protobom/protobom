@@ -78,6 +78,14 @@ func (x *Person) Scan(src any) error {
 	return scan(src, x)
 }
 
+func (x *Property) Value() (driver.Value, error) {
+	return value(x)
+}
+
+func (x *Property) Scan(src any) error {
+	return scan(src, x)
+}
+
 func (x *Tool) Value() (driver.Value, error) {
 	return value(x)
 }

@@ -404,6 +404,15 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		c.Copyright = n.GetCopyright()
 	}
 
+	properties := []cdx.Property{}
+	for _, p := range n.Properties {
+		properties = append(properties, cdx.Property{
+			Name:  p.Name,
+			Value: p.Data,
+		})
+	}
+	c.Properties = &properties
+
 	return c
 }
 

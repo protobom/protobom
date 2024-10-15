@@ -1,25 +1,33 @@
 # Regenerate Protobuf Autogenerate Libraries
 
-The main protobom go types are generated from the
-[protocol buffers definitions](api/sbom.proto). If the protobuf definitions are
-changed, the go libraries need to be regenerated.
+The main protobom go types are generated from the [protocol buffers definitions](api/sbom.proto).
+If the protobuf definitions are changed, the go libraries need to be regenerated.
 
-To regenerate, install the protobuf compiler `protoc`. It is available from
-the [protobuf GitHub releases page](https://github.com/protocolbuffers/protobuf/releases/latest).
+To regenerate, [install the Buf CLI](https://buf.build/docs/installation).
 
-Once installed, simply run:
+If using `task` ([installation instructions](https://taskfile.dev/installation)), this can be done by running:
 
 ```bash
-protoc --go_out=pkg api/sbom.proto
+task install:buf install:protoc-gen-go
 ```
 
-The main repository Makefile has a target to rebuild the libraries, you can
-also rebuild them by running:
+To ensure the protocol buffer definitions are properly formatted, contain no lint errors or breaking changes,
+and rebuild the libraries, simply run one of the following:
 
 ```bash
-make proto
+# Run buf CLI directly
+buf format --write
+buf lint
+git_tag=$(git describe --tags --abbrev=0)
+buf breaking --against .git#tag=$git_tag,subdir=api
+buf generate
+
+# Run using `make`
+make buf-format buf-lint proto
+
+# Run using `task`
+task fix:buf lint:buf proto
 ```
 
-After invoking the compiler, the auto generated library
-[`pkg/sbom/sbom.pb.go`](../pkg/sbom/sbom.pb.go) should be overwritten with the new
-version, reflecting any changes.
+After invoking the compiler, the auto generated library [`pkg/sbom/sbom.pb.go`](../pkg/sbom/sbom.pb.go)
+should be overwritten with the new version, reflecting any changes.

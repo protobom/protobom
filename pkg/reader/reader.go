@@ -118,16 +118,15 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		return nil, fmt.Errorf("options cannot be nil")
 	}
 
-	format := o.Format
 	if o.Format == "" {
 		f, err := r.detectFormat(f)
 		if err != nil {
 			return nil, fmt.Errorf("detecting SBOM format: %w", err)
 		}
-		format = f
+		o.Format = f
 	}
 
-	unserializer, err := GetFormatUnserializer(format)
+	unserializer, err := GetFormatUnserializer(o.Format)
 	if err != nil {
 		return nil, fmt.Errorf("getting format parser: %w", err)
 	}

@@ -9,7 +9,7 @@ export PROTOC_GO_VER="v1.34.2"
 export BUF_VERSION="v1.45.0"
 
 # Install protoc-gen-go plugin
-go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOC_GO_VER}
+GOBIN="${PWD}/.bin" go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOC_GO_VER}
 
 # Install Buf CLI
 mkdir -p .bin

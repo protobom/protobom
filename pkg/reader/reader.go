@@ -6,6 +6,7 @@ package reader
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"io"
 	"os"
@@ -92,13 +93,7 @@ func New(opts ...ReaderOption) *Reader {
 
 // ParseFile reads a file and returns an sbom.Document
 func (r *Reader) ParseFile(path string) (*sbom.Document, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("opening SBOM file: %w", err)
-	}
-	defer f.Close()
-
-	return r.ParseStreamWithOptions(f, r.Options)
+	return r.ParseFileWithOptions(path, r.Options)
 }
 
 // ParseFile reads a file and returns an sbom.Document
@@ -109,7 +104,17 @@ func (r *Reader) ParseFileWithOptions(path string, o *Options) (*sbom.Document, 
 	}
 	defer f.Close()
 
-	return r.ParseStreamWithOptions(f, o)
+	doc, err := r.ParseStreamWithOptions(f, o)
+	if err != nil {
+		return nil, fmt.Errorf("parsing content: %w", err)
+	}
+
+	if doc.Metadata != nil && doc.Metadata.SourceData != nil {
+		docURI := fmt.Sprintf("file://%s", path)
+		doc.Metadata.SourceData.Uri = &docURI
+	}
+
+	return doc, nil
 }
 
 // ParseStreamWithOptions returns a document from a ioreader, accept options for unserializer
@@ -137,6 +142,13 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unserializing: %w", err)
+	}
+
+	if doc.Metadata != nil {
+		doc.Metadata.SourceData, err = setSourceData(f, format)
+		if err != nil {
+			return nil, fmt.Errorf("setting origin info: %w", err)
+		}
 	}
 
 	return doc, err
@@ -178,4 +190,26 @@ func (r *Reader) RetrieveWithOptions(id string, o *Options) (*sbom.Document, err
 	}
 
 	return doc, nil
+}
+
+func setSourceData(f io.ReadSeeker, format formats.Format) (*sbom.SourceData, error) {
+	_, err := f.Seek(0, io.SeekStart)
+	if err != nil {
+		return &sbom.SourceData{}, fmt.Errorf("seeking beginning of file: %w", err)
+	}
+
+	docBytes, err := io.ReadAll(f)
+	if err != nil {
+		return &sbom.SourceData{}, fmt.Errorf("reading file bytes: %w", err)
+	}
+
+	hash := sha256.Sum256(docBytes)
+	docLength := len(docBytes)
+	SourceData := &sbom.SourceData{
+		Format: string(format),
+		Hash:   string(hash[:]),
+		Size:   int64(docLength),
+	}
+
+	return SourceData, nil
 }

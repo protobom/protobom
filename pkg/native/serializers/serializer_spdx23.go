@@ -159,7 +159,6 @@ func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawop
 
 			// Interesting, should we keep the original date?
 			Created: time.Now().UTC().Format(time.RFC3339),
-			// CreatorComment: bom.Metadata.Authors(),
 			// CreatorComment: bom.Metadata.... /// TODO(puerco): Missing in the proto
 		},
 	}
@@ -179,6 +178,28 @@ func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawop
 		doc.CreationInfo.Creators = append(doc.CreationInfo.Creators, spdx.Creator{
 			Creator:     name,
 			CreatorType: protospdx.Tool,
+		})
+	}
+
+	for _, a := range bom.Metadata.Authors {
+		// TODO(degradation): SPDX is prescriptive on how this field is structured:
+		// it is an Author (person or org) identifier word and an optional email field in parentheses.
+		// We should transform the field value
+		// Ref: https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#68-creator-field
+		ctrType := protospdx.Person
+		name := a.Name
+
+		if a.IsOrg {
+			ctrType = protospdx.Organization
+		}
+
+		if a.Email != "" {
+			name = fmt.Sprintf("%s (%s)", a.Name, a.Email)
+		}
+
+		doc.CreationInfo.Creators = append(doc.CreationInfo.Creators, spdx.Creator{
+			Creator:     name,
+			CreatorType: ctrType,
 		})
 	}
 

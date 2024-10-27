@@ -57,6 +57,10 @@ func WithStoreOptions(ro *storage.StoreOptions) WriterOption {
 
 func WithMod(m mod.Mod) WriterOption {
 	return func(w *Writer) {
+		if w.Options.SerializeOptions.Mods == nil {
+			w.Options.SerializeOptions.Mods = map[mod.Mod]struct{}{m: {}}
+			return
+		}
 		w.Options.SerializeOptions.Mods[m] = struct{}{}
 	}
 }

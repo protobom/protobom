@@ -17,3 +17,9 @@ type Unserializer interface {
 type UnserializeOptions struct {
 	Mods map[mod.Mod]struct{}
 }
+
+// IsModEnabled returns true when the passed mod is enabled in the options set.
+func (uo *UnserializeOptions) IsModEnabled(m mod.Mod) bool {
+	_, ok := uo.Mods[m]
+	return ok
+}

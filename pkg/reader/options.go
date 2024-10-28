@@ -88,6 +88,11 @@ func WithRetrieveOptions(ro *storage.RetrieveOptions) ReaderOption {
 
 func WithMod(m mod.Mod) ReaderOption {
 	return func(r *Reader) {
+		if r.Options.UnserializeOptions.Mods == nil {
+			r.Options.UnserializeOptions.Mods = map[mod.Mod]struct{}{m: {}}
+			return
+		}
+
 		r.Options.UnserializeOptions.Mods[m] = struct{}{}
 	}
 }

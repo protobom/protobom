@@ -515,8 +515,8 @@ message SourceData {
   // The original format string of the SBOM document (e.g., text/spdx+json;version=2.3).
   string format = 1;
 
-  // The original hash of the SBOM document to ensure integrity.
-  string hash = 2;
+  // The hashes of the original SBOM document to ensure integrity.
+  map<int32, string> hashes = 2;
 
   // The original size of the SBOM document in bytes.
   int64 size = 3;

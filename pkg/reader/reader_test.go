@@ -462,3 +462,48 @@ func TestRetrieve(t *testing.T) {
 		})
 	}
 }
+
+func TestReader_SetSourceData(t *testing.T) {
+	tests := []struct {
+		name    string
+		fmt     formats.Format
+		want    *sbom.SourceData
+		wantErr bool
+	}{
+		{
+			name: "success",
+			fmt:  formats.SPDX23JSON,
+			want: &sbom.SourceData{
+				Format: string(formats.SPDX23JSON),
+				Hashes: map[int32]string{3: "\xe3\xb0\xc4B\x98\xfc\x1c\x14\x9a\xfb\xf4șo\xb9$'\xaeA\xe4d\x9b\x93L\xa4\x95\x99\x1bxR\xb8U"},
+				Size:   0,
+				Uri:    nil,
+			},
+			wantErr: false,
+		},
+		{
+			fmt: formats.CDX16JSON,
+			want: &sbom.SourceData{
+				Format: string(formats.CDX16JSON),
+				Hashes: map[int32]string{3: "\xe3\xb0\xc4B\x98\xfc\x1c\x14\x9a\xfb\xf4șo\xb9$'\xaeA\xe4d\x9b\x93L\xa4\x95\x99\x1bxR\xb8U"},
+				Size:   0,
+				Uri:    nil,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := require.New(t)
+
+			metaData, err := reader.SetSourceData(&fakeReadSeeker{}, tt.fmt)
+			if tt.wantErr {
+				r.Error(err)
+			} else {
+				r.NoError(err)
+				r.Equal(tt.want, metaData)
+			}
+		})
+	}
+}

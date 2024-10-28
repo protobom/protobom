@@ -205,13 +205,12 @@ func setSourceData(f io.ReadSeeker, format formats.Format) (*sbom.SourceData, er
 
 	hash := sha256.Sum256(docBytes)
 	docLength := len(docBytes)
-	SourceData := &sbom.SourceData{
+
+	return &sbom.SourceData{
 		Format: string(format),
 		Hashes: map[int32]string{
 			int32(sbom.HashAlgorithm_SHA256): string(hash[:]),
 		},
 		Size: int64(docLength),
-	}
-
-	return SourceData, nil
+	}, nil
 }

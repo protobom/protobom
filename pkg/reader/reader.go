@@ -137,8 +137,14 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		return nil, fmt.Errorf("getting format parser: %w", err)
 	}
 
+	// Build the listening chain of all the I/O sinks
+	var stream io.Reader = f
+	for i := range o.Listeners {
+		stream = io.TeeReader(stream, o.Listeners[i])
+	}
+
 	doc, err := unserializer.Unserialize(
-		f, o.UnserializeOptions, r.Options.GetFormatOptions(unserializer),
+		stream, o.UnserializeOptions, r.Options.GetFormatOptions(unserializer),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unserializing: %w", err)

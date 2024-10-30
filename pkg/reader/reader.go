@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	drivers "github.com/protobom/protobom/pkg/native/unserializers"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -22,7 +23,16 @@ import (
 var (
 	regMtx                    sync.RWMutex
 	unserializers             = make(map[formats.Format]native.Unserializer)
-	defaultUnserializeOptions = &native.UnserializeOptions{}
+	defaultUnserializeOptions = &native.UnserializeOptions{
+		Mods: map[mod.Mod]struct{}{
+			// By default protobom will recognize its own annotations
+			// in SPDX files encoding properties. This is only enabled
+			// when reading. To write properties to SPDX files, enable
+			// the SPDX_RENDER_PROPERTIES_IN_ANNOTATIONS mod in the
+			// serializer options.
+			mod.SPDX_READ_ANNOTATIONS_TO_PROPERTIES: {},
+		},
+	}
 )
 
 func init() {

@@ -3,6 +3,7 @@ package reader
 import (
 	"fmt"
 
+	"github.com/protobom/protobom/pkg/datasink"
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
@@ -11,6 +12,7 @@ import (
 
 type Options struct {
 	Format             formats.Format
+	Listeners          []datasink.Listener
 	UnserializeOptions *native.UnserializeOptions
 	RetrieveOptions    *storage.RetrieveOptions
 	formatOptions      map[string]interface{}
@@ -100,5 +102,11 @@ func WithMod(m mod.Mod) ReaderOption {
 func WithoutMod(m mod.Mod) ReaderOption {
 	return func(r *Reader) {
 		delete(r.Options.UnserializeOptions.Mods, m)
+	}
+}
+
+func WithListener(l datasink.Listener) ReaderOption {
+	return func(r *Reader) {
+		r.Options.Listeners = append(r.Options.Listeners, l)
 	}
 }

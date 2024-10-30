@@ -3,6 +3,7 @@ package writer
 import (
 	"fmt"
 
+	"github.com/protobom/protobom/pkg/datasink"
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
@@ -71,8 +72,15 @@ func WithoutMod(m mod.Mod) WriterOption {
 	}
 }
 
+func WithListener(l datasink.Listener) WriterOption {
+	return func(w *Writer) {
+		w.Options.Listeners = append(w.Options.Listeners, l)
+	}
+}
+
 type Options struct {
 	Format           formats.Format
+	Listeners        []datasink.Listener
 	RenderOptions    *native.RenderOptions
 	SerializeOptions *native.SerializeOptions
 	StoreOptions     *storage.StoreOptions

@@ -119,7 +119,14 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 		ro = defaultOptions.RenderOptions
 	}
 
-	if err := serializer.Render(nativeDoc, wr, ro, o.GetFormatOptions(serializer)); err != nil {
+	// Build the listening chain of all the I/O sinks
+	sinks := []io.Writer{wr}
+	for _, l := range o.Listeners {
+		sinks = append(sinks, l)
+	}
+	stream := io.MultiWriter(sinks...)
+
+	if err := serializer.Render(nativeDoc, stream, ro, o.GetFormatOptions(serializer)); err != nil {
 		return fmt.Errorf("writing rendered document to string: %w", err)
 	}
 

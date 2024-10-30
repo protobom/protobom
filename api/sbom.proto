@@ -345,6 +345,9 @@ message Metadata {
   // buf:lint:ignore FIELD_LOWER_SNAKE_CASE
   // Types categorizing the document based on its purpose or stage in the software development lifecycle.
   repeated DocumentType documentTypes = 8;
+
+  // Field for preserving original format information and additional metadata
+  SourceData source_data = 9;
 }
 
 // Node represents a central element within the Software Bill of Materials (SBOM) graph,
@@ -505,6 +508,21 @@ message Property {
 
   // Property value
   string data = 2;
+}
+
+// SourceData message encapsulates additional metadata related to the original SBOM document.
+message SourceData {
+  // The original format string of the SBOM document (e.g., text/spdx+json;version=2.3).
+  string format = 1;
+
+  // The hashes of the original SBOM document to ensure integrity.
+  map<int32, string> hashes = 2;
+
+  // The original size of the SBOM document in bytes.
+  int64 size = 3;
+
+  // The original URI of the SBOM document.
+  optional string uri = 4;
 }
 
 // Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.

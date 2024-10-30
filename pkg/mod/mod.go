@@ -18,3 +18,10 @@ type Mod string
 // property annotator will be fixed to protobom - v1.0.0 to make it identifiable
 // when reading them back.
 const SPDX_RENDER_PROPERTIES_IN_ANNOTATIONS = Mod("SPDX_RENDER_PROPERTIES")
+
+// SPDX_READ_ANNOTATIONS_TO_PROPERTIES is a mode that causes the spdx unserializer
+// to look for protobom properties encoded in SPDX the annotations of packages.
+// When enabled, the serializer will try to unmarshal the contents of any
+// annotations by "protobom - v1.0.0" into an sbom.Property and store it in the
+// node properties.
+const SPDX_READ_ANNOTATIONS_TO_PROPERTIES = Mod("SPDX_READ_ANNOTATIONS_TO_PROPERTIES")

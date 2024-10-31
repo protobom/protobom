@@ -5,8 +5,11 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/protobom/protobom/pkg/mod"
+	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/spdx/tools-golang/spdx"
+	"github.com/spdx/tools-golang/spdx/v2/common"
 	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"github.com/stretchr/testify/require"
 )
@@ -149,6 +152,125 @@ func TestBuildDocumentIdentifier(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			identifier := buildDocumentIdentifier(tc.sut)
 			require.True(t, tc.match(identifier), identifier)
+		})
+	}
+}
+
+func TestAnnotationsMod(t *testing.T) {
+	opts := &native.UnserializeOptions{
+		Mods: map[mod.Mod]struct{}{},
+	}
+	opts.Mods[mod.SPDX_READ_ANNOTATIONS_TO_PROPERTIES] = struct{}{}
+
+	for _, tc := range []struct {
+		name        string
+		opts        *native.UnserializeOptions
+		spdxPackage *spdx23.Package
+		expected    []*sbom.Property
+	}{
+		{
+			name:        "no-annotations",
+			opts:        opts,
+			spdxPackage: &spdx23.Package{},
+			expected:    []*sbom.Property{},
+		},
+		{
+			name: "one-annotation",
+			opts: opts,
+			spdxPackage: &spdx23.Package{
+				Annotations: []spdx23.Annotation{
+					{
+						Annotator: common.Annotator{
+							Annotator:     "protobom - v1.0.0",
+							AnnotatorType: "Tool",
+						},
+						AnnotationDate:    "1970-01-01T00:00:00Z",
+						AnnotationType:    "OTHER",
+						AnnotationComment: `{"name": "test", "data": "test data"}`,
+					},
+				},
+			},
+			expected: []*sbom.Property{
+				{
+					Name: "test",
+					Data: "test data",
+				},
+			},
+		},
+		{
+			name: "two-annotation",
+			opts: opts,
+			spdxPackage: &spdx23.Package{
+				Annotations: []spdx23.Annotation{
+					{
+						Annotator: common.Annotator{
+							Annotator:     "protobom - v1.0.0",
+							AnnotatorType: "Tool",
+						},
+						AnnotationDate:    "1970-01-01T00:00:00Z",
+						AnnotationType:    "OTHER",
+						AnnotationComment: `{"name": "test", "data": "test data"}`,
+					},
+					{
+						Annotator: common.Annotator{
+							Annotator:     "protobom - v1.0.0",
+							AnnotatorType: "Tool",
+						},
+						AnnotationDate:    "1970-01-01T00:00:00Z",
+						AnnotationType:    "OTHER",
+						AnnotationComment: `{"name": "second", "data": "test data 2"}`,
+					},
+				},
+			},
+			expected: []*sbom.Property{
+				{Name: "test", Data: "test data"},
+				{Name: "second", Data: "test data 2"},
+			},
+		},
+		{
+			name: "invalid-annotation",
+			opts: opts,
+			spdxPackage: &spdx23.Package{
+				Annotations: []spdx23.Annotation{
+					{
+						Annotator: common.Annotator{
+							Annotator:     "protobom - v1.0.0",
+							AnnotatorType: "Tool",
+						},
+						AnnotationDate:    "1970-01-01T00:00:00Z",
+						AnnotationType:    "OTHER",
+						AnnotationComment: `something else {`,
+					},
+				},
+			},
+			expected: []*sbom.Property{},
+		},
+		{
+			name: "other-annotation",
+			opts: opts,
+			spdxPackage: &spdx23.Package{
+				Annotations: []spdx23.Annotation{
+					{
+						Annotator: common.Annotator{
+							Annotator:     "John Doe Sr",
+							AnnotatorType: "Person",
+						},
+						AnnotationDate:    "1970-01-01T00:00:00Z",
+						AnnotationType:    "OTHER",
+						AnnotationComment: `{"name": "second", "data": "test data 2"}`,
+					},
+				},
+			},
+			expected: []*sbom.Property{},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			node := NewSPDX23().packageToNode(tc.opts, tc.spdxPackage)
+			require.Len(t, node.Properties, len(tc.expected))
+			for i := range node.Properties {
+				require.Equal(t, tc.expected[i].Name, node.Properties[i].Name)
+				require.Equal(t, tc.expected[i].Data, node.Properties[i].Data)
+			}
 		})
 	}
 }

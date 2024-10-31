@@ -7,6 +7,7 @@ package reader
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -225,7 +226,7 @@ func setSourceData(f io.ReadSeeker, format formats.Format) (*sbom.SourceData, er
 	return &sbom.SourceData{
 		Format: string(format),
 		Hashes: map[int32]string{
-			int32(sbom.HashAlgorithm_SHA256): string(hash[:]),
+			int32(sbom.HashAlgorithm_SHA256): hex.EncodeToString(hash[:]),
 		},
 		Size: int64(docLength),
 	}, nil

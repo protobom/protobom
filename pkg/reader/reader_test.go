@@ -475,7 +475,7 @@ func TestReader_SetSourceData(t *testing.T) {
 			fmt:  formats.SPDX23JSON,
 			want: &sbom.SourceData{
 				Format: string(formats.SPDX23JSON),
-				Hashes: map[int32]string{3: "\xe3\xb0\xc4B\x98\xfc\x1c\x14\x9a\xfb\xf4șo\xb9$'\xaeA\xe4d\x9b\x93L\xa4\x95\x99\x1bxR\xb8U"},
+				Hashes: map[int32]string{3: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
 				Size:   0,
 				Uri:    nil,
 			},
@@ -485,7 +485,7 @@ func TestReader_SetSourceData(t *testing.T) {
 			fmt: formats.CDX16JSON,
 			want: &sbom.SourceData{
 				Format: string(formats.CDX16JSON),
-				Hashes: map[int32]string{3: "\xe3\xb0\xc4B\x98\xfc\x1c\x14\x9a\xfb\xf4șo\xb9$'\xaeA\xe4d\x9b\x93L\xa4\x95\x99\x1bxR\xb8U"},
+				Hashes: map[int32]string{3: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
 				Size:   0,
 				Uri:    nil,
 			},

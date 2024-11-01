@@ -35,6 +35,7 @@ var (
 			// serializer options.
 			mod.SPDX_READ_ANNOTATIONS_TO_PROPERTIES: {},
 		},
+		TrackSource: true,
 	}
 )
 
@@ -122,7 +123,7 @@ func (r *Reader) ParseFileWithOptions(path string, o *Options) (*sbom.Document, 
 		return nil, fmt.Errorf("parsing content: %w", err)
 	}
 
-	if doc.Metadata != nil && doc.Metadata.SourceData != nil {
+	if doc.Metadata != nil && doc.Metadata.SourceData != nil && r.Options.UnserializeOptions.TrackSource {
 		docURI := fmt.Sprintf("file://%s", path)
 		doc.Metadata.SourceData.Uri = &docURI
 	}
@@ -161,29 +162,37 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		return nil, fmt.Errorf("getting format parser for %s: %w", format, err)
 	}
 
+	// Build the listening chain of all the I/O sinks
+	sinks := []io.Writer{}
+	for i := range o.Listeners {
+		sinks = append(sinks, o.Listeners[i])
+	}
+
 	// Create a byte counter to measure the size of the document
 	counter := byteCounter{
 		Count: new(int64),
 	}
 
-	// Build the listening chain of all the I/O sinks
-	sinks := []io.Writer{counter}
-	for i := range o.Listeners {
-		sinks = append(sinks, o.Listeners[i])
-	}
-
+	// Create the hashers to tack the checksum of the original SBOM
 	hashers := map[sbom.HashAlgorithm]hash.Hash{
 		sbom.HashAlgorithm_SHA1:   sha1.New(), //nolint:gosec // SHA1 is required in SPDX2
 		sbom.HashAlgorithm_SHA256: sha256.New(),
 		sbom.HashAlgorithm_SHA512: sha512.New(),
 	}
-	for i := range hashers {
-		sinks = append(sinks, hashers[i])
+
+	if o.UnserializeOptions.TrackSource {
+		sinks = append(sinks, counter)
+		for i := range hashers {
+			sinks = append(sinks, hashers[i])
+		}
 	}
 
+	// We aggregate all the data sinks into a single multireader
+	// that gets a copy of all the bytes read from the stream.
 	multiwriter := io.MultiWriter(sinks...)
 	tee := io.TeeReader(f, multiwriter)
 
+	// Call the format unserializer
 	doc, err := unserializer.Unserialize(
 		tee, o.UnserializeOptions, r.Options.GetFormatOptions(unserializer),
 	)
@@ -191,18 +200,20 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		return nil, fmt.Errorf("unserializing %s: %w", format, err)
 	}
 
-	// Protect if the unserializer returns a nil document
+	// Protect in case the unserializer returns a nil document
 	if doc.Metadata == nil {
 		doc.Metadata = &sbom.Metadata{}
 	}
 
-	doc.Metadata.SourceData = &sbom.SourceData{
-		Format: string(format),
-		Size:   *counter.Count,
-		Hashes: map[int32]string{},
-	}
-	for algo, hasher := range hashers {
-		doc.Metadata.SourceData.Hashes[int32(algo)] = fmt.Sprintf("%x", hasher.Sum(nil))
+	if o.UnserializeOptions.TrackSource {
+		doc.Metadata.SourceData = &sbom.SourceData{
+			Format: string(format),
+			Size:   *counter.Count,
+			Hashes: map[int32]string{},
+		}
+		for algo, hasher := range hashers {
+			doc.Metadata.SourceData.Hashes[int32(algo)] = fmt.Sprintf("%x", hasher.Sum(nil))
+		}
 	}
 
 	return doc, err

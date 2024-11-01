@@ -489,6 +489,9 @@ func TestReaderSourceData(t *testing.T) {
 	reader.RegisterUnserializer(formats.SPDX23JSON, unserializers.NewSPDX23())
 	doc, err := r.ParseStreamWithOptions(br, &reader.Options{
 		Format: formats.SPDX23JSON,
+		UnserializeOptions: &native.UnserializeOptions{
+			TrackSource: true,
+		},
 	})
 	require.NoError(t, err)
 	require.Equal(t, "text/spdx+json;version=2.3", doc.Metadata.SourceData.Format)

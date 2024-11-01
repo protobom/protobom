@@ -15,7 +15,10 @@ type Unserializer interface {
 }
 
 type UnserializeOptions struct {
-	Mods map[mod.Mod]struct{}
+	// TrackSource will cause the reader to capture information about the
+	// original SBOM document such as its hashes, size and original location.
+	TrackSource bool
+	Mods        map[mod.Mod]struct{}
 }
 
 // IsModEnabled returns true when the passed mod is enabled in the options set.

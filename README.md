@@ -2,6 +2,10 @@
 
 # protobom
 
+
+<img src="docs/images/OpenSSF_StagesBadges_sandbox.svg" alt="OpenSSF Sandbox Badge" style="float:right; margin: 2em;" width="75" height="75">
+
+
 `protobom` is a [protocol buffers](https://protobuf.dev/getting-started/)
 representation of SBOM data able to ingest documents in modern
 [SPDX](https://spdx.dev/) and [CycloneDX](https://cyclonedx.org/) versions
@@ -174,10 +178,13 @@ func main() {
 }
 ```
 
+------
+
+
+
 ## Join our Community
 
-- [#protobom on OpenSSF Slack](https://openssf.slack.com/archives/C06ED97EQ4B)
-- [OpenSSF Security Tooling Working Group Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/94897563315?password=7f03d8e7-7bc9-454e-95bd-6e1e09cb3b0b) - Every other Friday at 8am Pacific
-- [SBOM Tooling Working Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/92103679564?password=c351279a-5cec-44a4-ab5b-e4342da0e43f) - Every Monday, 2pm Pacific
-
-<img src="docs/images/OpenSSF_StagesBadges_sandbox.svg" alt="OpenSSF Sandbox Badge" width="75" height="75">
+- Come and say hi on [`#protobom` on OpenSSF Slack](https://openssf.slack.com/archives/C06ED97EQ4B).
+- [Protobom Community Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/93849959680?password=414218a0-8865-4cea-ba62-99443815ceff) - Every other Wednesday at 10am Pacific. 
+- [OpenSSF Security Tooling Working Group Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/94897563315?password=7f03d8e7-7bc9-454e-95bd-6e1e09cb3b0b) - Every other Friday at 8am Pacific.
+- [SBOM Tooling Working Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/92103679564?password=c351279a-5cec-44a4-ab5b-e4342da0e43f) - Every Monday, 2pm Pacific.

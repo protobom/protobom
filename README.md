@@ -1,7 +1,7 @@
 # protobom
 
-![protobom logo](./docs/images/protobom_horizontal_color.svg)
-![OpenSSF Sandbox Badge](./docs/images/OpenSSF_StagesBadges_sandbox.svg)
+<center><img src="docs/images/protobom_horizontal_color.png" alt="Protobom Logo"></center>
+<center><img src="docs/images/OpenSSF_StagesBadges_sandbox.svg" alt="OpenSSF Sandbox Badge" width="100" height="100"></center>
 
 `protobom` is a [protocol buffers](https://protobuf.dev/getting-started/)
 representation of SBOM data able to ingest documents in modern

@@ -182,7 +182,7 @@ func main() {
 
 
 
-## Join our Community
+## Join the Protobom Community!
 
 - Come and say hi on [`#protobom` on OpenSSF Slack](https://openssf.slack.com/archives/C06ED97EQ4B).
 - [Protobom Community Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/93849959680?password=414218a0-8865-4cea-ba62-99443815ceff) - Every other Wednesday at 10am Pacific. 

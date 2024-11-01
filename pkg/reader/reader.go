@@ -6,6 +6,7 @@ package reader
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 import (
+	"bytes"
 	"crypto/sha1" //nolint:gosec // SHA1 is required in SPDX2
 	"crypto/sha256"
 	"crypto/sha512"
@@ -131,17 +132,6 @@ func (r *Reader) ParseFileWithOptions(path string, o *Options) (*sbom.Document, 
 	return doc, nil
 }
 
-type byteCounter struct {
-	Count *int64
-}
-
-// Write implements the io.Writer interface, summing the bytes it gets.
-func (bc byteCounter) Write(p []byte) (int, error) {
-	n := len(p)
-	*bc.Count += int64(n)
-	return n, nil
-}
-
 // ParseStreamWithOptions returns a document from a ioreader, accept options for unserializer
 func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Document, error) {
 	if o == nil {
@@ -169,9 +159,7 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 	}
 
 	// Create a byte counter to measure the size of the document
-	counter := byteCounter{
-		Count: new(int64),
-	}
+	var counter bytes.Buffer
 
 	// Create the hashers to tack the checksum of the original SBOM
 	hashers := map[sbom.HashAlgorithm]hash.Hash{
@@ -181,7 +169,7 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 	}
 
 	if o.UnserializeOptions.TrackSource {
-		sinks = append(sinks, counter)
+		sinks = append(sinks, &counter)
 		for i := range hashers {
 			sinks = append(sinks, hashers[i])
 		}
@@ -208,7 +196,7 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 	if o.UnserializeOptions.TrackSource {
 		doc.Metadata.SourceData = &sbom.SourceData{
 			Format: string(format),
-			Size:   *counter.Count,
+			Size:   int64(counter.Len()),
 			Hashes: map[int32]string{},
 		}
 		for algo, hasher := range hashers {

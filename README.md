@@ -1,5 +1,8 @@
 # protobom
 
+![protobom logo](./docs/images/protobom_horizontal_color.svg)
+![OpenSSF Sandbox Badge](./docs/images/OpenSSF_StagesBadges_sandbox.svg)
+
 `protobom` is a [protocol buffers](https://protobuf.dev/getting-started/)
 representation of SBOM data able to ingest documents in modern
 [SPDX](https://spdx.dev/) and [CycloneDX](https://cyclonedx.org/) versions

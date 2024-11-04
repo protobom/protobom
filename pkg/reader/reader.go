@@ -6,9 +6,12 @@ package reader
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 import (
+	"bytes"
+	"crypto/sha1" //nolint:gosec // SHA1 is required in SPDX2
 	"crypto/sha256"
-	"encoding/hex"
+	"crypto/sha512"
 	"fmt"
+	"hash"
 	"io"
 	"os"
 	"sync"
@@ -33,6 +36,7 @@ var (
 			// serializer options.
 			mod.SPDX_READ_ANNOTATIONS_TO_PROPERTIES: {},
 		},
+		TrackSource: true,
 	}
 )
 
@@ -120,7 +124,7 @@ func (r *Reader) ParseFileWithOptions(path string, o *Options) (*sbom.Document, 
 		return nil, fmt.Errorf("parsing content: %w", err)
 	}
 
-	if doc.Metadata != nil && doc.Metadata.SourceData != nil {
+	if doc.Metadata != nil && doc.Metadata.SourceData != nil && r.Options.UnserializeOptions.TrackSource {
 		docURI := fmt.Sprintf("file://%s", path)
 		doc.Metadata.SourceData.Uri = &docURI
 	}
@@ -145,26 +149,58 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 
 	unserializer, err := GetFormatUnserializer(format)
 	if err != nil {
-		return nil, fmt.Errorf("getting format parser: %w", err)
+		return nil, fmt.Errorf("getting format parser for %s: %w", format, err)
 	}
 
 	// Build the listening chain of all the I/O sinks
-	var stream io.Reader = f
+	sinks := []io.Writer{}
 	for i := range o.Listeners {
-		stream = io.TeeReader(stream, o.Listeners[i])
+		sinks = append(sinks, o.Listeners[i])
 	}
 
+	// Create a byte counter to measure the size of the document
+	var counter bytes.Buffer
+
+	// Create the hashers to tack the checksum of the original SBOM
+	hashers := map[sbom.HashAlgorithm]hash.Hash{
+		sbom.HashAlgorithm_SHA1:   sha1.New(), //nolint:gosec // SHA1 is required in SPDX2
+		sbom.HashAlgorithm_SHA256: sha256.New(),
+		sbom.HashAlgorithm_SHA512: sha512.New(),
+	}
+
+	if o.UnserializeOptions.TrackSource {
+		sinks = append(sinks, &counter)
+		for i := range hashers {
+			sinks = append(sinks, hashers[i])
+		}
+	}
+
+	// We aggregate all the data sinks into a single multireader
+	// that gets a copy of all the bytes read from the stream.
+	multiwriter := io.MultiWriter(sinks...)
+	tee := io.TeeReader(f, multiwriter)
+
+	// Call the format unserializer
 	doc, err := unserializer.Unserialize(
-		stream, o.UnserializeOptions, r.Options.GetFormatOptions(unserializer),
+		tee, o.UnserializeOptions, r.Options.GetFormatOptions(unserializer),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("unserializing: %w", err)
+		return nil, fmt.Errorf("unserializing %s: %w", format, err)
 	}
 
-	if doc.Metadata != nil {
-		doc.Metadata.SourceData, err = setSourceData(f, format)
-		if err != nil {
-			return nil, fmt.Errorf("setting origin info: %w", err)
+	// Protect in case the unserializer returns a nil document
+	if doc.Metadata == nil {
+		doc.Metadata = &sbom.Metadata{}
+	}
+
+	if o.UnserializeOptions.TrackSource {
+		doc.Metadata.SourceData = &sbom.SourceData{
+			Format: string(format),
+			Size:   int64(counter.Len()),
+			Hashes: map[int32]string{},
+		}
+		for algo, hasher := range hashers {
+			doc.Metadata.SourceData.Hashes[int32(algo)] = fmt.Sprintf("%x", hasher.Sum(nil))
 		}
 	}
 
@@ -207,27 +243,4 @@ func (r *Reader) RetrieveWithOptions(id string, o *Options) (*sbom.Document, err
 	}
 
 	return doc, nil
-}
-
-func setSourceData(f io.ReadSeeker, format formats.Format) (*sbom.SourceData, error) {
-	_, err := f.Seek(0, io.SeekStart)
-	if err != nil {
-		return &sbom.SourceData{}, fmt.Errorf("seeking beginning of file: %w", err)
-	}
-
-	docBytes, err := io.ReadAll(f)
-	if err != nil {
-		return &sbom.SourceData{}, fmt.Errorf("reading file bytes: %w", err)
-	}
-
-	hash := sha256.Sum256(docBytes)
-	docLength := len(docBytes)
-
-	return &sbom.SourceData{
-		Format: string(format),
-		Hashes: map[int32]string{
-			int32(sbom.HashAlgorithm_SHA256): hex.EncodeToString(hash[:]),
-		},
-		Size: int64(docLength),
-	}, nil
 }

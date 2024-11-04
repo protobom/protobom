@@ -2,6 +2,7 @@ package reader_test
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -11,12 +12,24 @@ import (
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/native/nativefakes"
+	"github.com/protobom/protobom/pkg/native/unserializers"
 	"github.com/protobom/protobom/pkg/reader"
 	"github.com/protobom/protobom/pkg/reader/readerfakes"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 	"github.com/stretchr/testify/require"
 )
+
+// A note about Unserializers and reader behavior:
+// Some of the tests in this file alter the loaded unserializers to use the fakes.
+// If you want to write a test that requires a specific one, we recommend you to
+// load it explicitly in the test, for example:
+//
+//   r := reader.New()
+//   reader.RegisterUnserializer(formats.SPDX23JSON, unserializers.NewSPDX23())
+//
+// Failure to do so may result in varying behavior when the test is run
+// by itself or in batch with the other tests.
 
 type fakeReadSeeker struct {
 	io.Reader
@@ -33,7 +46,7 @@ func (f *fakeReadSeeker) Read(p []byte) (int, error) {
 func TestReader_ParseFile(t *testing.T) {
 	fake := &nativefakes.FakeUnserializer{}
 	fakeSniffer := &readerfakes.FakeSniffer{}
-	doc := &sbom.Document{}
+	doc := sbom.NewDocument()
 	tests := []struct {
 		name    string
 		path    string
@@ -142,7 +155,7 @@ func TestReader_ParseFile(t *testing.T) {
 func TestReader_ParseFileWithOptions(t *testing.T) {
 	fake := &nativefakes.FakeUnserializer{}
 	fakeSniffer := &readerfakes.FakeSniffer{}
-	doc := &sbom.Document{}
+	doc := sbom.NewDocument()
 	options := &reader.Options{
 		UnserializeOptions: &native.UnserializeOptions{},
 	}
@@ -209,7 +222,7 @@ func TestReader_ParseFileWithOptions(t *testing.T) {
 func TestReader_ParseStreamWithOptions(t *testing.T) {
 	fake := &nativefakes.FakeUnserializer{}
 	fakeSniffer := &readerfakes.FakeSniffer{}
-	doc := &sbom.Document{}
+	doc := sbom.NewDocument()
 	options := &reader.Options{
 		UnserializeOptions: &native.UnserializeOptions{},
 	}
@@ -289,7 +302,7 @@ func TestReader_ParseStream(t *testing.T) {
 	fake := &nativefakes.FakeUnserializer{}
 	fakeSniffer := &readerfakes.FakeSniffer{}
 	fakeKey := fmt.Sprintf("%T", fake)
-	doc := &sbom.Document{}
+	doc := sbom.NewDocument()
 	tests := []struct {
 		name    string
 		format  string
@@ -463,47 +476,28 @@ func TestRetrieve(t *testing.T) {
 	}
 }
 
-func TestReader_SetSourceData(t *testing.T) {
-	tests := []struct {
-		name    string
-		fmt     formats.Format
-		want    *sbom.SourceData
-		wantErr bool
-	}{
-		{
-			name: "success",
-			fmt:  formats.SPDX23JSON,
-			want: &sbom.SourceData{
-				Format: string(formats.SPDX23JSON),
-				Hashes: map[int32]string{3: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
-				Size:   0,
-				Uri:    nil,
-			},
-			wantErr: false,
+func TestReaderSourceData(t *testing.T) {
+	t.Parallel()
+	data, err := base64.StdEncoding.DecodeString(
+		"ewogICAgInNwZHhWZXJzaW9uIjogIlNQRFgtMi4zIiwKICAgICJkYXRhTGljZW5zZSI6ICJDQzAtMS4wIiwKICAgICJTUERYSUQiOiAiU1BEWFJlZi1ET0NVTUVOVCIsCiAgICAibmFtZSI6ICJ0ZXN0IiwKICAgICJkb2N1bWVudE5hbWVzcGFjZSI6ICJodHRwczovL3NwZHgub3JnL3NwZHhkb2NzL3Byb3RvYm9tL2U0MjBhYmQwLTUyZTgtNDY4OS1iMTYxLTBjMmMzNWVkYTRlYyIsCiAgICAiY3JlYXRpb25JbmZvIjogewogICAgICAgICJsaWNlbnNlTGlzdFZlcnNpb24iOiAiMy4yMCIsCiAgICAgICAgImNyZWF0b3JzIjogWwogICAgICAgICAgICAiVG9vbDogcHJvdG9ib20tZGV2ZWwiCiAgICAgICAgXSwKICAgICAgICAiY3JlYXRlZCI6ICIyMDI0LTEwLTI3VDE4OjMyOjAwWiIKICAgIH0sCiAgICAicGFja2FnZXMiOiBbCiAgICAgICAgewogICAgICAgICAgICAibmFtZSI6ICIiLAogICAgICAgICAgICAiU1BEWElEIjogIlNQRFhSZWYtMjRjYzkwNWYtZGE0YS00MDFkLThmMGUtNGIxYjI5MjQ2MjU5IiwKICAgICAgICAgICAgImRvd25sb2FkTG9jYXRpb24iOiAiTk9BU1NFUlRJT04iLAogICAgICAgICAgICAiZmlsZXNBbmFseXplZCI6IGZhbHNlLAogICAgICAgICAgICAiYW5ub3RhdGlvbnMiOiBbCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgImFubm90YXRvciI6ICJUb29sOiBwcm90b2JvbSAtIHYxLjAuMCIsCiAgICAgICAgICAgICAgICAgICAgImFubm90YXRpb25EYXRlIjogIjE5NzAtMDEtMDFUMDA6MDA6MDBaIiwKICAgICAgICAgICAgICAgICAgICAiYW5ub3RhdGlvblR5cGUiOiAiT1RIRVIiLAogICAgICAgICAgICAgICAgICAgICJjb21tZW50IjogIntcIm5hbWVcIjpcInRlc3QgQVwiLFwiZGF0YVwiOlwidGhpcyBpcyBkYXRhIEFcIn0iCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJhbm5vdGF0b3IiOiAiVG9vbDogcHJvdG9ib20gLSB2MS4wLjAiLAogICAgICAgICAgICAgICAgICAgICJhbm5vdGF0aW9uRGF0ZSI6ICIxOTcwLTAxLTAxVDAwOjAwOjAwWiIsCiAgICAgICAgICAgICAgICAgICAgImFubm90YXRpb25UeXBlIjogIk9USEVSIiwKICAgICAgICAgICAgICAgICAgICAiY29tbWVudCI6ICJ7XCJuYW1lXCI6XCJ0ZXN0IEJcIixcImRhdGFcIjpcInRoaXMgaXMgdGhlIHNlY29uZCB2YWx1ZVwifSIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgXQogICAgICAgIH0KICAgIF0sCiAgICAicmVsYXRpb25zaGlwcyI6IFsKICAgICAgICB7CiAgICAgICAgICAgICJzcGR4RWxlbWVudElkIjogIlNQRFhSZWYtRE9DVU1FTlQiLAogICAgICAgICAgICAicmVsYXRlZFNwZHhFbGVtZW50IjogIlNQRFhSZWYtMjRjYzkwNWYtZGE0YS00MDFkLThmMGUtNGIxYjI5MjQ2MjU5IiwKICAgICAgICAgICAgInJlbGF0aW9uc2hpcFR5cGUiOiAiREVTQ1JJQkVTIgogICAgICAgIH0KICAgIF0KfQo=",
+	)
+	require.NoError(t, err)
+	br := bytes.NewReader(data)
+	r := reader.New()
+	// Explicitly register the real unserializer for spdx 2.3 as
+	// some of the fakes may have been loaded by other tests.
+	reader.RegisterUnserializer(formats.SPDX23JSON, unserializers.NewSPDX23())
+	doc, err := r.ParseStreamWithOptions(br, &reader.Options{
+		Format: formats.SPDX23JSON,
+		UnserializeOptions: &native.UnserializeOptions{
+			TrackSource: true,
 		},
-		{
-			fmt: formats.CDX16JSON,
-			want: &sbom.SourceData{
-				Format: string(formats.CDX16JSON),
-				Hashes: map[int32]string{3: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
-				Size:   0,
-				Uri:    nil,
-			},
-			wantErr: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := require.New(t)
-
-			metaData, err := reader.SetSourceData(&fakeReadSeeker{}, tt.fmt)
-			if tt.wantErr {
-				r.Error(err)
-			} else {
-				r.NoError(err)
-				r.Equal(tt.want, metaData)
-			}
-		})
-	}
+	})
+	require.NoError(t, err)
+	require.Equal(t, "text/spdx+json;version=2.3", doc.Metadata.SourceData.Format)
+	require.Len(t, doc.Metadata.SourceData.Hashes, 3)
+	require.Equal(t, int64(1472), doc.Metadata.SourceData.Size)
+	require.Equal(t, "2f48db1a89d5e7f8b2d4d1a412be14d932f5613f", doc.Metadata.SourceData.Hashes[int32(sbom.HashAlgorithm_SHA1)])
+	require.Equal(t, "f042095476ef416fae33e9a76a4e406ff337cfc15a6f694894e6ff0070adb089", doc.Metadata.SourceData.Hashes[int32(sbom.HashAlgorithm_SHA256)])
+	require.Equal(t, "71b04d63bc55dc78b91dfb376484a20a4e410fd58db893ed6e20637ccb495f7bf83b1aa76ab377bd9a6ef96d0d19f8cfa834d152dbf4880c2400be9a89dea429", doc.Metadata.SourceData.Hashes[int32(sbom.HashAlgorithm_SHA512)])
 }

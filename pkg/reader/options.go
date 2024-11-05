@@ -110,3 +110,9 @@ func WithListener(l datasink.Listener) ReaderOption {
 		r.Options.Listeners = append(r.Options.Listeners, l)
 	}
 }
+
+func WithTrackSource(t bool) ReaderOption {
+	return func(r *Reader) {
+		r.Options.UnserializeOptions.TrackSource = t
+	}
+}

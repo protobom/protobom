@@ -224,6 +224,8 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Properties = append(newNode.Properties, &Property{Name: "secondTest", Data: "321"})
 			},
 			expected: &NodeDiff{
+				NodeId: "test-node",
+
 				Added: &Node{
 					Properties: []*Property{
 						{Name: "secondTest", Data: "321"},
@@ -239,7 +241,8 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Properties = []*Property{newNode.Properties[0]}
 			},
 			expected: &NodeDiff{
-				Added: &Node{},
+				NodeId: "test-node",
+				Added:  &Node{},
 				Removed: &Node{
 					Properties: []*Property{
 						{Name: "otherProperty", Data: "somethin else"},

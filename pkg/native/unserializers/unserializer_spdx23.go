@@ -1,6 +1,7 @@
 package unserializers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
@@ -44,7 +46,7 @@ func buildDocumentIdentifier(doc *spdx23.Document) string {
 }
 
 // ParseStream reads an io.Reader to parse an SPDX 2.3 document from it
-func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface{}) (*sbom.Document, error) {
+func (u *SPDX23) Unserialize(r io.Reader, opts *native.UnserializeOptions, _ interface{}) (*sbom.Document, error) {
 	spdxDoc, err := spdxjson.Read(r)
 	if err != nil {
 		return nil, fmt.Errorf("parsing SPDX json: %w", err)
@@ -79,7 +81,7 @@ func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interf
 	// TODO(degradation): SPDX LicenseVersion
 
 	for _, p := range spdxDoc.Packages {
-		bom.NodeList.AddNode(u.packageToNode(p))
+		bom.NodeList.AddNode(u.packageToNode(opts, p))
 	}
 
 	for _, f := range spdxDoc.Files {
@@ -99,7 +101,7 @@ func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interf
 }
 
 // packageToNode assigns the data from an SPDX package into a new Node
-func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
+func (u *SPDX23) packageToNode(opts *native.UnserializeOptions, p *spdx23.Package) *sbom.Node {
 	n := &sbom.Node{
 		Id:              string(p.PackageSPDXIdentifier),
 		Type:            sbom.Node_PACKAGE,
@@ -152,6 +154,11 @@ func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 	// TODO(degradation) NOASSERTION
 	if p.PackageLicenseConcluded != protospdx.NOASSERTION && p.PackageLicenseConcluded != "" {
 		n.LicenseConcluded = p.PackageLicenseConcluded
+	}
+
+	// TODO(degradation) NOASSERTION
+	if p.PackageLicenseDeclared != protospdx.NOASSERTION && p.PackageLicenseDeclared != "" {
+		n.Licenses = []string{p.PackageLicenseDeclared}
 	}
 
 	if len(p.PackageChecksums) > 0 {
@@ -218,6 +225,23 @@ func (u *SPDX23) packageToNode(p *spdx23.Package) *sbom.Node {
 		n.Originators = []*sbom.Person{{Name: p.PackageOriginator.Originator}}
 		if p.PackageOriginator.OriginatorType == protospdx.Organization {
 			n.Originators[0].IsOrg = true
+		}
+	}
+
+	// If the hack to read properties is enabled, unmarshall any properties
+	// created by protobom:
+	if opts.IsModEnabled(mod.SPDX_READ_ANNOTATIONS_TO_PROPERTIES) {
+		for i := range p.Annotations {
+			if p.Annotations[i].Annotator.AnnotatorType != "Tool" ||
+				p.Annotations[i].Annotator.Annotator != "protobom - v1.0.0" {
+				continue
+			}
+
+			property := &sbom.Property{}
+			if err := json.Unmarshal([]byte(p.Annotations[i].AnnotationComment), property); err != nil {
+				continue
+			}
+			n.Properties = append(n.Properties, property)
 		}
 	}
 

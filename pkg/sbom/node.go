@@ -106,9 +106,12 @@ func (n *Node) Update(n2 *Node) {
 	if len(n2.FileTypes) > 0 {
 		n.FileTypes = n2.FileTypes
 	}
+	if len(n2.Properties) > 0 {
+		n.Properties = n2.Properties
+	}
 }
 
-// Augment takes updates fields in n with data from n2 which is not already defined
+// Augment updates fields in n with data from n2 which is not already defined
 // (not empty string, not 0 length string, not nill pointer).
 func (n *Node) Augment(n2 *Node) {
 	if n.Name == "" && n2.Name != "" {
@@ -183,6 +186,9 @@ func (n *Node) Augment(n2 *Node) {
 	if len(n.FileTypes) == 0 && len(n2.FileTypes) > 0 {
 		n.FileTypes = n2.FileTypes
 	}
+	if len(n.Properties) == 0 && len(n2.Properties) > 0 {
+		n.Properties = n2.Properties
+	}
 }
 
 // Copy returns a duplicate of the Node.
@@ -235,6 +241,9 @@ func (n *Node) Copy() *Node {
 	for _, e := range n.ExternalReferences {
 		no.ExternalReferences = append(no.ExternalReferences, e.Copy())
 	}
+	for _, p := range n.Properties {
+		no.Properties = append(no.Properties, p.Copy())
+	}
 
 	return no
 }
@@ -273,7 +282,7 @@ func (n *Node) flatString() string {
 			}
 			sort.Ints(idKeys)
 			for _, t := range idKeys {
-				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)]))
+				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)])) //nolint:gosec
 			}
 		case "protobom.protobom.Node.release_date":
 			if n.ReleaseDate != nil {
@@ -294,7 +303,10 @@ func (n *Node) flatString() string {
 			"protobom.protobom.Node.file_types",
 			"protobom.protobom.Node.primary_purpose":
 			pairs = append(pairs, flatStringStrSlice(fd.FullName(), v.List()))
-
+		case "protobom.protobom.Node.properties":
+			for i, p := range n.Properties {
+				pairs = append(pairs, fmt.Sprintf("properties[%d]:%s", i, p.flatString()))
+			}
 		default:
 			pairs = append(pairs, string(fd.FullName())+":"+v.String())
 		}

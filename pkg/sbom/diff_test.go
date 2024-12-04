@@ -53,6 +53,10 @@ func TestNodeDiff(t *testing.T) {
 		Hashes: map[int32]string{
 			int32(HashAlgorithm_SHA1): "781721ca4eccbf8fe65c44dcdf141ca1b4e44adf",
 		},
+		Properties: []*Property{
+			{Name: "test", Data: "testing123"},
+			{Name: "otherProperty", Data: "somethin else"},
+		},
 	}
 
 	for _, tc := range []struct {
@@ -209,6 +213,36 @@ func TestNodeDiff(t *testing.T) {
 							Type:    ExternalReference_VCS,
 							Comment: "Organization Repo",
 						},
+					},
+				},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "add-property",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Properties = append(newNode.Properties, &Property{Name: "secondTest", Data: "321"})
+			},
+			expected: &NodeDiff{
+				Added: &Node{
+					Properties: []*Property{
+						{Name: "secondTest", Data: "321"},
+					},
+				},
+				Removed:   &Node{},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "remove-property",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Properties = []*Property{newNode.Properties[0]}
+			},
+			expected: &NodeDiff{
+				Added: &Node{},
+				Removed: &Node{
+					Properties: []*Property{
+						{Name: "otherProperty", Data: "somethin else"},
 					},
 				},
 				DiffCount: 1,

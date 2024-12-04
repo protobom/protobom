@@ -1,13 +1,19 @@
+<img src="docs/images/protobom-horizontal_color.svg" alt="Protobom Logo" width="400" height="114">
+
 # protobom
+
+
+<img src="docs/images/OpenSSF_StagesBadges_sandbox.svg" alt="OpenSSF Sandbox Badge" style="float:right; margin: 2em;" width="75" height="75">
+
 
 `protobom` is a [protocol buffers](https://protobuf.dev/getting-started/)
 representation of SBOM data able to ingest documents in modern
 [SPDX](https://spdx.dev/) and [CycloneDX](https://cyclonedx.org/) versions
 without loss. It has an accompanying Go library generated from the protocol
-buffers definiton that also implements ingesters for those formats.
+buffers definition that also implements ingesters for those formats.
 
-Standard SBOMs are read by a reader using [parsers](docs/parsers.md) that
-understand the common formats. Parsers create a neutral protobom from data
+Standard SBOMs are read by a reader using [unserializers](docs/unserializers.md) that
+understand the common formats. Unserializers create a neutral protobom from data
 read from CycloneDX or SPDX documents.
 
 A protobom can be rendered into standard SBOM formats by the writer using
@@ -27,13 +33,14 @@ the golang library.
 | SPDX | 3.0 | JSON | planned | planned |
 | CycloneDX | 1.4 | JSON | supported | supported |
 | CycloneDX | 1.5 | JSON | supported | supported |
+| CycloneDX | 1.6 | JSON | supported | supported |
 
 Other read and write implementations can potentially be written in
 other [languages supported by protobuf](https://protobuf.dev/getting-started/)
 
 ## Usage
 
-The `protobom` library can be used to read in and write out SBOM documents in any of the above formats.  
+The `protobom` library can be used to read in and write out SBOM documents in any of the above formats.
 
 ### Example 1:  The sbom-convert project
 
@@ -74,7 +81,7 @@ func main() {
 
 Developers can use the `protobom` library to generate SBOM documents based on the content of a separate SBOM document, as shown by the sbom-convert project (https://github.com/protobom/sbom-convert).
 
-However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The protobom v0.2.0 release includes five registered serializer formats for Writer.New(): SPDX23JSON, CDX12JSON, CDX13JSON, CDX14JSON, and CDX15JSON.
+However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The protobom v0.2.0 release includes six registered serializer formats for Writer.New(): SPDX23JSON, CDX12JSON, CDX13JSON, CDX14JSON, CDX15JSON, and CDX16JSON.
 
 ```golang
 package main
@@ -151,7 +158,7 @@ func main() {
 	node2.AddHash(sbom.HashAlgorithm_SHA256, "ad291c9572af8fc2ec8fd78d295adf7132c60ad3d10488fb63d120fc967a4132")
 	node2.AddHash(sbom.HashAlgorithm_SHA512,  "5940d8647907831e77ec00d81b318ca06655dbb0fd36d112684b03947412f0f98ea85b32548bc0877f3d7ce8f4de9b2c964062df44742b98c8e9bd851faecce9")
 
-	// Relate the application package and the files. This adds the nodes to 
+	// Relate the application package and the files. This adds the nodes to
 	// the document graph:
 	document.RelateNodeAtID(node1, appNode.Id, sbom.Edge_contains)
 	document.RelateNodeAtID(node2, appNode.Id, sbom.Edge_contains)
@@ -170,3 +177,14 @@ func main() {
 	)
 }
 ```
+
+------
+
+
+
+## Join the Protobom Community!
+
+- Come and say hi on [`#protobom` on OpenSSF Slack](https://openssf.slack.com/archives/C06ED97EQ4B).
+- [Protobom Community Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/93849959680?password=414218a0-8865-4cea-ba62-99443815ceff) - Every other Wednesday at 10am Pacific. 
+- [OpenSSF Security Tooling Working Group Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/94897563315?password=7f03d8e7-7bc9-454e-95bd-6e1e09cb3b0b) - Every other Friday at 8am Pacific.
+- [SBOM Tooling Working Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/92103679564?password=c351279a-5cec-44a4-ab5b-e4342da0e43f) - Every Monday, 2pm Pacific.

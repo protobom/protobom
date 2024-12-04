@@ -1,0 +1,56 @@
+# --------------------------------------------------------------
+# SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
+# SPDX-FileType: SOURCE
+# SPDX-License-Identifier: Apache-2.0
+# --------------------------------------------------------------
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+env:
+  BOLD: \033[1m
+  CYAN: \033[36m
+  YELLOW: \033[33m
+  RESET: \033[0m
+
+tasks:
+  run:
+    silent: true
+    dir: "{{.ROOT_DIR}}"
+    vars:
+      CLI_ARGS: '{{.CLI_ARGS | join " "}}'
+    cmd: >
+      export PATH="{{shellQuote .TOOLS_DIR}}{{eq OS "windows" | ternary ";" ":"}}{{env "PATH"}}";
+      if command -v {{.CLI_NAME}} > /dev/null; then
+        printf "Running ${CYAN}{{.CLI_NAME}} {{.CLI_ARGS}}${RESET}\n";
+        {{.CLI_NAME}} {{.CLI_ARGS}};
+      else
+        printf "${YELLOW}{{.CLI_NAME}} not found, please install and run the command again.${RESET}\n";
+      fi
+
+  buf:
+    desc: Lint .proto files with Buf
+    cmds:
+      - task: run
+        vars:
+          CLI_NAME: buf{{exeExt}}
+          CLI_ARGS: [format, --diff, --exit-code]
+
+      - task: run
+        vars:
+          CLI_NAME: buf{{exeExt}}
+          CLI_ARGS: [lint]
+
+      - task: run
+        vars:
+          CLI_NAME: buf{{exeExt}}
+          CLI_ARGS: [breaking, --against, "{{.AGAINST}}#tag={{.VERSION}},subdir=api"]
+
+  go:
+    desc: Lint Golang code files
+    cmds:
+      - task: run
+        vars:
+          CLI_NAME: golangci-lint{{exeExt}}
+          CLI_ARGS: [run, --verbose]

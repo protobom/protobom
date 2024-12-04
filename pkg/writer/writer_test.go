@@ -38,7 +38,7 @@ func TestNew(t *testing.T) {
 	}{
 		{
 			name:   "CDX format with 2 indent",
-			format: formats.CDX15JSON,
+			format: formats.CDX16JSON,
 			ro: &native.RenderOptions{
 				Indent: 2,
 			},
@@ -99,20 +99,20 @@ func TestWriteStreamWithOptions(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "cdx 1.5 success",
+			name: "cdx 1.6 success",
 			bom:  &sbom.Document{},
 			prepare: func(_ formats.Format) {
-				writer.RegisterSerializer(formats.CDX15JSON, &nativefakes.FakeSerializer{})
+				writer.RegisterSerializer(formats.CDX16JSON, &nativefakes.FakeSerializer{})
 			},
 			options: &writer.Options{
-				Format: formats.CDX15JSON,
+				Format: formats.CDX16JSON,
 			},
 		},
 		{
 			name:    "no bom fail",
 			prepare: func(f formats.Format) { writer.RegisterSerializer(f, &nativefakes.FakeSerializer{}) },
 			options: &writer.Options{
-				Format: formats.CDX15JSON,
+				Format: formats.CDX16JSON,
 			},
 			wantErr: true,
 		},
@@ -129,7 +129,7 @@ func TestWriteStreamWithOptions(t *testing.T) {
 			name: "render error",
 			bom:  &sbom.Document{},
 			options: &writer.Options{
-				Format: formats.CDX15JSON,
+				Format: formats.CDX16JSON,
 			},
 			prepare: func(f formats.Format) {
 				s := &nativefakes.FakeSerializer{}
@@ -142,7 +142,7 @@ func TestWriteStreamWithOptions(t *testing.T) {
 			name: "serializer error",
 			bom:  &sbom.Document{},
 			options: &writer.Options{
-				Format: formats.CDX15JSON,
+				Format: formats.CDX16JSON,
 			},
 			prepare: func(f formats.Format) {
 				s := &nativefakes.FakeSerializer{}
@@ -190,7 +190,7 @@ func TestWriteStream(t *testing.T) {
 		{
 			name:    "default options success",
 			prepare: func(f formats.Format) { writer.RegisterSerializer(f, fakeSerializer) },
-			format:  formats.CDX15JSON,
+			format:  formats.CDX16JSON,
 		},
 		{
 			name:    "no format failure",
@@ -260,11 +260,11 @@ func TestWriteFile(t *testing.T) {
 			prepare: func(f formats.Format) {
 				format := f
 				if f == "" {
-					format = formats.CDX15JSON
+					format = formats.CDX16JSON
 				}
 				writer.RegisterSerializer(format, fakeSerializer)
 			},
-			format: formats.CDX15JSON,
+			format: formats.CDX16JSON,
 			path:   "test.json",
 		},
 		{
@@ -272,7 +272,7 @@ func TestWriteFile(t *testing.T) {
 			prepare: func(f formats.Format) {
 				format := f
 				if f == "" {
-					format = formats.CDX15JSON
+					format = formats.CDX16JSON
 				}
 				writer.RegisterSerializer(format, fakeSerializer)
 			},
@@ -341,7 +341,7 @@ func TestWriteFileWithOptions(t *testing.T) {
 			path:    "test.json",
 			prepare: func(f formats.Format) { writer.RegisterSerializer(f, &nativefakes.FakeSerializer{}) },
 			options: &writer.Options{
-				Format: formats.CDX15JSON,
+				Format: formats.CDX16JSON,
 			},
 		},
 		{
@@ -357,7 +357,7 @@ func TestWriteFileWithOptions(t *testing.T) {
 			path:    "",
 			prepare: func(f formats.Format) { writer.RegisterSerializer(f, &nativefakes.FakeSerializer{}) },
 			options: &writer.Options{
-				Format: formats.CDX15JSON,
+				Format: formats.CDX16JSON,
 			},
 			wantErr: true,
 		},
@@ -396,7 +396,7 @@ func TestSerializerRegistry(t *testing.T) {
 	}{
 		{
 			name:   "known format success",
-			format: formats.CDX15JSON,
+			format: formats.CDX16JSON,
 		},
 		{
 			name:   "new format success",

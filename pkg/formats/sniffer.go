@@ -72,8 +72,10 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 				return CDX14JSON, nil
 			case "1.5":
 				return CDX15JSON, nil
+			case "1.6":
+				return CDX16JSON, nil
 			default:
-				// JSON + BomFormat CycloneDX but specVersion not 1.3, 1.4, or 1.5
+				// JSON + BomFormat CycloneDX but specVersion not 1.3, 1.4, 1.5, or 1.6
 				return "", fmt.Errorf("unknown SBOM format")
 			}
 		} else {

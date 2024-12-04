@@ -1,0 +1,80 @@
+# --------------------------------------------------------------
+# SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
+# SPDX-FileType: SOURCE
+# SPDX-License-Identifier: Apache-2.0
+# --------------------------------------------------------------
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+vars:
+  BUF_VERSION: v1.45.0
+  BUF_RELEASE_URL: https://github.com/bufbuild/buf/releases/download/{{.BUF_VERSION}} # /buf-$(uname -s)-$(uname -m)
+  GOLANGCI_LINT_VERSION: v1.61.0
+  GOLANGCI_LINT_RELEASE_URL: https://github.com/golangci/golangci-lint/releases/download/{{.GOLANGCI_LINT_VERSION}}
+  PROTOC_GEN_GO_VERSION: v1.34.2
+
+tasks:
+  make-tools-dir:
+    silent: true
+    status:
+      - test -d {{.TOOLS_DIR}}
+    cmds:
+      - cmd: mkdir {{.TOOLS_DIR}}
+        platforms: [darwin, linux]
+
+      - cmd: powershell -Command '$null = New-Item -ItemType directory -Path {{shellQuote .TOOLS_DIR}}'
+        platforms: [windows]
+
+  unzip-windows:
+    internal: true
+    platforms: [windows]
+    cmd:
+      powershell -Command 'Add-Type -Assembly System.IO.Compression.FileSystem;
+      $zip = [IO.Compression.ZipFile]::OpenRead("{{.ZIP_FILENAME}}");
+      $entry = $zip.Entries | Where-Object -Property Name -EQ "{{.EXE_FILENAME}}";
+      $target = {{shellQuote (joinPath .TOOLS_DIR .EXE_FILENAME)}};
+      [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $target)'
+
+  buf:
+    desc: Install Buf CLI
+    vars:
+      BUF_FILE_NAME: buf-{{title OS}}-{{ARCH}}{{exeExt}}
+      BUF_DOWNLOAD_URL: "{{.BUF_RELEASE_URL}}/{{.BUF_FILE_NAME}}"
+    status:
+      - test -x "{{shellQuote .TOOLS_DIR}}/buf{{exeExt}}"
+    cmds:
+      - task: make-tools-dir
+      - cmd: curl --fail --silent --show-error --location --url {{.BUF_DOWNLOAD_URL}} --output {{.TOOLS_DIR}}/buf{{exeExt}}
+      - cmd: chmod +x {{.TOOLS_DIR}}/buf
+        platforms: [darwin, linux]
+
+  golangci-lint:
+    desc: Install golangci-lint
+    vars:
+      GOLANGCI_LINT_PREFIX: golangci-lint-{{trimPrefix "v" .GOLANGCI_LINT_VERSION}}-{{OS}}-{{ARCH}}
+      GOLANGCI_LINT_FILENAME: '{{.GOLANGCI_LINT_PREFIX}}{{if eq OS "windows"}}.zip{{else}}.tar.gz{{end}}'
+      GOLANGCI_LINT_DOWNLOAD_URL: "{{.GOLANGCI_LINT_RELEASE_URL}}/{{.GOLANGCI_LINT_FILENAME}}"
+    status:
+      - test -x "{{shellQuote .TOOLS_DIR}}/golangci-lint{{exeExt}}"
+    cmds:
+      - task: make-tools-dir
+      - cmd: curl --fail --silent --show-error --location --url {{.GOLANGCI_LINT_DOWNLOAD_URL}} --remote-name
+      - defer: "{{.RM}} {{.GOLANGCI_LINT_FILENAME}}"
+      - cmd:
+          tar --extract --gzip --file {{.GOLANGCI_LINT_FILENAME}} --directory {{.TOOLS_DIR}}
+          --strip-components=1 {{.GOLANGCI_LINT_PREFIX}}/golangci-lint
+        platforms: [darwin, linux]
+      - task: unzip-windows
+        vars:
+          ZIP_FILENAME: "{{.GOLANGCI_LINT_FILENAME}}"
+          EXE_FILENAME: golangci-lint.exe
+
+  protoc-gen-go:
+    desc: Install protoc-gen-go
+    status:
+      - test -x "{{shellQuote .TOOLS_DIR}}/protoc-gen-go{{exeExt}}"
+    cmds:
+      - task: make-tools-dir
+      - cmd: GOBIN={{.TOOLS_DIR}} go install google.golang.org/protobuf/cmd/protoc-gen-go@{{.PROTOC_GEN_GO_VERSION}}

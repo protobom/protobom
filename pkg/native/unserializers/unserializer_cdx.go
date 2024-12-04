@@ -198,6 +198,17 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 		}
 	}
 
+	if c.Properties != nil && len(*c.Properties) > 0 {
+		ps := []*sbom.Property{}
+		for _, p := range *c.Properties {
+			protoprop := sbom.NewProperty()
+			protoprop.Name = p.Name
+			protoprop.Data = p.Value
+			ps = append(ps, protoprop)
+		}
+		node.Properties = ps
+	}
+
 	// Generate a new ID if none is set
 	if node.Id == "" {
 		node.Id = sbom.NewNodeIdentifier("auto", fmt.Sprintf("%09d", *cc))

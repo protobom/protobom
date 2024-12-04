@@ -5,10 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/spdx/tools-golang/spdx"
@@ -21,8 +24,40 @@ var _ native.Serializer = &SPDX23{}
 
 type SPDX23 struct{}
 
-type SPDX3Options struct {
-	Indent int
+type SPDX23Options struct {
+	// FailOnInvalidDocIdFragment makes the serializer return an error if the
+	// document ID has a fragment but it is not set to "SPDXRef-Document".
+	FailOnInvalidDocIdFragment bool
+
+	// GenerateDocumentID causes the serializer to generate a non-deterministic
+	// document ID when a protobom doesn't have one defined.
+	GenerateDocumentID bool
+
+	// FailOnMultipleLicenses causes the SPDX serializer to fail when rendering
+	// a protobom with multiple licenses defined when set to true. When false,
+	// the SPDX License Declared field will be populated with a license expression
+	// formed by joining the licenses with the operator defined in LicenseExpressionOperator
+	// (defaults to OR).
+	FailOnMultipleLicenses bool
+
+	// LicenseExpressionOperator is the logical operator used to form an SPDX
+	// license expression whe a protobom node has more than one license
+	LicenseExpressionOperator string
+}
+
+// Validate returns an error if the SPDX options are invalid
+func (o *SPDX23Options) Validate() error {
+	if o.LicenseExpressionOperator != "OR" && o.LicenseExpressionOperator != "AND" {
+		return fmt.Errorf("invalid LicenseExpressionOperator, must be 'OR' or 'ANDW'")
+	}
+	return nil
+}
+
+var DefaultSPDX23Options = SPDX23Options{
+	FailOnInvalidDocIdFragment: false,
+	FailOnMultipleLicenses:     false,
+	GenerateDocumentID:         true,
+	LicenseExpressionOperator:  "OR",
 }
 
 const spdxOther = "OTHER"
@@ -42,20 +77,75 @@ func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, 
 	return nil
 }
 
+// spdxNamespaceFromProtobomID parses the protobom identifier and returns the
+// appropriate SPDX namespace. In SPDX the namespace is what uniquely identifies
+// the document's elements on the Internet. The document SPDX identifier is always
+// set to "SPDXRef-DOCUMENT".
+//
+// For more info see
+// https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#63-spdx-identifier-field
+// https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#65-spdx-document-namespace-field
+func spdxNamespaceFromProtobomID(opts SPDX23Options, protoId string) (spdxId string, err error) {
+	// If the namespace is empty and the option is set, generate an SPDX
+	// identifier for the document when missing
+	if protoId == "" {
+		if opts.GenerateDocumentID {
+			return "https://spdx.org/spdxdocs/protobom/" + uuid.NewString(), nil
+		} else {
+			return "", fmt.Errorf("unable to generate namespace, document ID is blank")
+		}
+	}
+	u, err := url.Parse(protoId)
+	if err != nil {
+		return "", fmt.Errorf("unable to parse protobom id as URL")
+	}
+	if u.Fragment == "" {
+		return protoId, nil
+	}
+
+	// Clear the fragment
+	rawURI := strings.TrimSuffix(u.String(), "#"+u.Fragment)
+
+	if u.Fragment != "SPDXRef-DOCUMENT" && opts.FailOnInvalidDocIdFragment {
+		return rawURI, fmt.Errorf("unable to parse SPDX identifier (URI hash set to %q, SPDXRef-DOCUMENT expected)", u.Fragment)
+	}
+
+	return rawURI, nil
+}
+
 // Serialize takes a protobom and returns an SPDX 2.3 struct
-func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interface{}) (interface{}, error) {
+func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptions, rawopts any) (any, error) {
 	if bom == nil {
 		return nil, errors.New("document is nil, unable to serialize to SPDX 2.3")
 	}
 	if bom.Metadata == nil {
 		return nil, errors.New("document metadata is nil, unable to serialize to SPDX 2.3")
 	}
+
+	opts := DefaultSPDX23Options
+	if rawopts != nil {
+		var ok bool
+		if opts, ok = rawopts.(SPDX23Options); !ok {
+			return nil, fmt.Errorf("error casting SPDX 2.3 options")
+		}
+	}
+
+	// Validate the options
+	if err := opts.Validate(); err != nil {
+		return nil, fmt.Errorf("validating spdx 2.3 options: %w", err)
+	}
+
+	ns, err := spdxNamespaceFromProtobomID(opts, bom.Metadata.Id)
+	if err != nil {
+		return nil, fmt.Errorf("serializing SPDX namespace: %w", err)
+	}
+
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,
 		SPDXIdentifier:    protospdx.DOCUMENT,
 		DocumentName:      bom.Metadata.Name,
-		DocumentNamespace: "https://spdx.org/spdxdocs/", // TODO(puerco): Think how to handle namespacing
+		DocumentNamespace: ns,
 		DocumentComment:   bom.Metadata.Comment,
 
 		CreationInfo: &spdx.CreationInfo{
@@ -70,7 +160,6 @@ func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ int
 
 			// Interesting, should we keep the original date?
 			Created: time.Now().UTC().Format(time.RFC3339),
-			// CreatorComment: bom.Metadata.Authors(),
 			// CreatorComment: bom.Metadata.... /// TODO(puerco): Missing in the proto
 		},
 	}
@@ -93,7 +182,29 @@ func (s *SPDX23) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ int
 		})
 	}
 
-	packages, err := s.buildPackages(bom)
+	for _, a := range bom.Metadata.Authors {
+		// TODO(degradation): SPDX is prescriptive on how this field is structured:
+		// it is an Author (person or org) identifier word and an optional email field in parentheses.
+		// We should transform the field value
+		// Ref: https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#68-creator-field
+		ctrType := protospdx.Person
+		name := a.Name
+
+		if a.IsOrg {
+			ctrType = protospdx.Organization
+		}
+
+		if a.Email != "" {
+			name = fmt.Sprintf("%s (%s)", a.Name, a.Email)
+		}
+
+		doc.CreationInfo.Creators = append(doc.CreationInfo.Creators, spdx.Creator{
+			Creator:     name,
+			CreatorType: ctrType,
+		})
+	}
+
+	packages, err := s.buildPackages(serializeopts, opts, bom)
 	if err != nil {
 		return nil, fmt.Errorf("building SPDX packages: %s", err)
 	}
@@ -187,9 +298,20 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 	return files, nil
 }
 
-func (s *SPDX23) buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //nolint:unparam
+func (s *SPDX23) buildPackages(
+	serializeopts *native.SerializeOptions, spdxopts SPDX23Options, bom *sbom.Document,
+) ([]*spdx.Package, error) {
 	packages := []*spdx.Package{}
+
 	for _, node := range bom.NodeList.Nodes {
+		// Fail when multiple licenses are defined and the serializer is not configured to
+		// join them in an axpression
+		if len(node.Licenses) > 1 && spdxopts.FailOnMultipleLicenses {
+			return nil, fmt.Errorf(
+				"node %q has multiple licenses (and FailOnMultipleLicenses is set to true)", node.Id,
+			)
+		}
+
 		if node.Type == sbom.Node_FILE {
 			continue
 		}
@@ -210,15 +332,15 @@ func (s *SPDX23) buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //
 			PackageHomePage:             node.UrlHome,
 			PackageSourceInfo:           node.SourceInfo,
 			PackageLicenseConcluded:     node.LicenseConcluded,
+			PackageLicenseDeclared:      strings.Join(node.Licenses, spdxopts.LicenseExpressionOperator),
 			PackageLicenseInfoFromFiles: []string{},
-			// PackageLicenseDeclared:      node.Licenses[0],
-			PackageLicenseComments:    node.LicenseComments,
-			PackageCopyrightText:      strings.TrimSpace(node.Copyright),
-			PackageSummary:            node.Summary,
-			PackageDescription:        node.Description,
-			PackageComment:            node.Comment,
-			PackageExternalReferences: []*v2_3.PackageExternalReference{},
-			PackageAttributionTexts:   node.Attribution,
+			PackageLicenseComments:      node.LicenseComments,
+			PackageCopyrightText:        strings.TrimSpace(node.Copyright),
+			PackageSummary:              node.Summary,
+			PackageDescription:          node.Description,
+			PackageComment:              node.Comment,
+			PackageExternalReferences:   []*v2_3.PackageExternalReference{},
+			PackageAttributionTexts:     node.Attribution,
 			// PrimaryPackagePurpose:     node.PrimaryPurpose,
 			Annotations: []v2_3.Annotation{},
 
@@ -349,6 +471,33 @@ func (s *SPDX23) buildPackages(bom *sbom.Document) ([]*spdx.Package, error) { //
 			p.PackageSupplier = &spdx.Supplier{
 				Supplier:     node.Originators[0].ToSPDX2ClientString(),
 				SupplierType: node.Originators[0].ToSPDX2ClientOrg(),
+			}
+		}
+
+		// Support the properties->annotations mod
+		if len(node.Properties) > 0 &&
+			serializeopts.IsModEnabled(mod.SPDX_RENDER_PROPERTIES_IN_ANNOTATIONS) {
+			for i, property := range node.Properties {
+				jsonProperty, err := json.Marshal(property)
+				if err != nil {
+					return nil, fmt.Errorf(
+						"unable to serialize property #%d (%s): %w", i, property.Name, err,
+					)
+				}
+				p.Annotations = append(p.Annotations, spdx.Annotation{
+					Annotator: common.Annotator{
+						// We fix the annotator version to v1 as we want to identify
+						// protobom, yet make the string deterministic:
+						Annotator:     "protobom - v1.0.0",
+						AnnotatorType: "Tool",
+					},
+					AnnotationDate: "1970-01-01T00:00:00Z",
+					AnnotationType: "OTHER",
+					AnnotationSPDXIdentifier: common.DocElementID{
+						ElementRefID: common.ElementID(node.Id),
+					},
+					AnnotationComment: string(jsonProperty),
+				})
 			}
 		}
 

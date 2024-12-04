@@ -1,0 +1,16 @@
+---
+version: v2
+
+managed:
+  enabled: true
+  override:
+    - file_option: go_package
+      value: github.com/protobom/protobom/pkg/sbom
+
+plugins:
+  - protoc_builtin: go
+    out: pkg/sbom
+    opt: module=github.com/protobom/protobom/pkg/sbom
+
+inputs:
+  - directory: api

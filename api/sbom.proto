@@ -1,348 +1,657 @@
+// --------------------------------------------------------------
+// SPDX-FileCopyrightText: Copyright © 2024 The Protobom Authors
+// SPDX-FileType: SOURCE
+// SPDX-License-Identifier: Apache-2.0
+// --------------------------------------------------------------
+
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
-option go_package = "sbom/";
 package protobom.protobom;
+
+import "google/protobuf/timestamp.proto";
 
 // Document is the top-level structure representing the entire Software Bill of Materials (SBOM).
 // It serves as the core neutral ground for the SBOM translation process, encapsulating metadata,
 // components (nodes), and the graph structure (edges).
 message Document {
-    Metadata metadata = 1;  // Metadata associated with the SBOM document
-    NodeList node_list = 2; // List of nodes and edges forming the SBOM graph
+  // Metadata associated with the SBOM document
+  Metadata metadata = 1;
+
+  // List of nodes and edges forming the SBOM graph
+  NodeList node_list = 2;
 }
 
-// Node represents a central element within the Software Bill of Materials (SBOM) graph,
-// serving as a vertex that captures vital information about a software component.
-// Each Node in the SBOM graph signifies a distinct software component, forming the vertices of the graph.
-message Node {
-    string id = 1;           // Unique identifier for the node.
-    NodeType type = 2;       // Type of the software component.
-    string name = 3;         // Name of the software component.
-    string version = 4;      // Version string of the software component.
-    string file_name = 5;    // Package filename when there is one.
+// DocumentType represents the type of document in the Software Bill of Materials (SBOM) ecosystem.
+// It categorizes the SBOM document based on its purpose or stage in the software development lifecycle.
+message DocumentType {
+  // SBOM document type.
+  optional SBOMType type = 1;
 
-    string url_home = 6;     // Website of the package.
-    string url_download = 7; // Location to download the package.
+  // Name associated with the document type.
+  optional string name = 2;
 
-    // Multiple licenses applicable to the software component,
-    // Multiple licenses can be specified for CycloneDX 1.4 and files in SPDX.
-    repeated string licenses = 8;
-    // Concluded license applicable to the software component,
-    // This is only in SPDX and it is just one.
-    string license_concluded = 9;
-    string license_comments = 10;     // Comments on the license.
-    string copyright = 11;            // Copyright information applicable to the software component.
+  // Description of the document type.
+  optional string description = 3;
 
-    // field 12 was the old hashes string map.
-    // Removed, see https://github.com/protobom/protobom/issues/89
-    // map<string,string> hashes = 12;
-
-    // This field is intended to capture details related to the source or origin of the software component.
-    // It may include any relevant background information or additional comments.
-    string source_info = 13;
-
-    // field 14 was the old string primary_purpose.
-    // Removed, see https://github.com/protobom/protobom/issues/124
-    // string primary_purpose = 14;   // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
-
-    string comment = 15;              // Comments on the software component.
-    string summary = 16;              // Concise description of the software component (short description).
-    string description = 17;          // Detailed description of the software component (full description).
-
-    repeated string attribution = 18; // One or more contributions or acknowledgments associated with the software component.
-    repeated Person suppliers = 19;   // One or more entities providing the software component.
-    repeated Person originators = 20; // One or more entities involved in the creation or maintenance of the software component.
-
-    google.protobuf.Timestamp release_date = 21;         // Release date of the software component.
-    google.protobuf.Timestamp build_date = 22;           // Build date of the software component.
-    google.protobuf.Timestamp valid_until_date = 23;     // Valid until date of the software component.
-
-    repeated ExternalReference external_references = 24; // External references associated with the software component.
-
-    // field 25 was the old identifier list.
-    // Removed, see https://github.com/protobom/protobom/issues/64
-    // repeated Identifier identifiers = 25;
-
-    repeated string file_types = 27;     // File types associated with the component
-
-    // Software identifer map used by the component.
-    // Maps between the software identifier types and the identifier values.
-    map<int32,string> identifiers = 28;
-
-    // Hashes map associated with the software component.
-    // Maps between hash algorithms types and hash values.
-    map<int32,string> hashes = 29;
-
-    repeated Purpose primary_purpose = 30; // Primary purpose or role assigned to the software component.
-
-    // Type of the software component.
-    enum NodeType {
-        PACKAGE = 0; // Software component type is a package.
-        FILE = 1;    // Software component type is a file.
-    }
-}
-
-// Metadata encapsulates document-related details about the Software Bill of Materials (SBOM) document.
-// It includes information such as the document's identifier, version, authorship, creation date,
-// associated tools, and document types.
-message Metadata {
-    string id = 1; // // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
-    string version = 2; // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
-    string name = 3; // Name associated with the document.
-    google.protobuf.Timestamp date = 4; // Created date of the Document. In SPDX formats mapped to the created date field.
-    repeated Tool tools = 5; // Tools used in the creation or processing of the document.
-    repeated Person authors = 6; // Individuals or organizations involved in the creation or maintenance of the document.
-    string comment = 7; // Comments on the document.
-    repeated DocumentType documentTypes = 8; // Types categorizing the document based on its purpose or stage in the software development lifecycle.
+  // Enumeration of SBOM document types.
+  enum SBOMType {
+    // Other document type.
+    OTHER = 0;
+    // Design document type. (CDX: design)
+    DESIGN = 1;
+    // Source document type. (CDX: pre-build)
+    SOURCE = 2;
+    // Build document type. (CDX: build)
+    BUILD = 3;
+    // Analyzed document type. (CDX: post-build)
+    ANALYZED = 4;
+    // Deployed document type. (CDX: operations)
+    DEPLOYED = 5;
+    // Runtime document type. (CDX: none)
+    RUNTIME = 6;
+    // Discovery document type. (CDX Specific)
+    DISCOVERY = 7;
+    // Decommission document type. (CDX Specific)
+    DECOMISSION = 8;
+  }
 }
 
 // Edge represents relationships between nodes in the Software Bill of Materials (SBOM) graph.
 // Each Edge captures the type of relationship and the nodes involved, providing a structured
 // way to model dependencies and connections within the SBOM.
 message Edge {
-    Type type = 1; // Type enumerator representing the node relationship.
-    string from = 2; // Source node of the edge.
-    repeated string to = 3; // Target nodes of the edge.
+  // Type enumerator representing the node relationship.
+  Type type = 1;
 
-    // Type enumerator representing the node relationship.
-    enum Type {
-        UNKNOWN = 0; // Unknown type.
-        amends = 1; // Amends relationship type.
-        ancestor = 2; // Ancestor relationship type.
-        buildDependency = 3; // Build dependency relationship type.
-        buildTool = 4; // Build tool relationship type.
-        contains = 5; // Contains relationship type.
-        contained_by = 6; // Contained by relationship type. In SPDX 3.x, this field is not supported.
-        copy = 7; // Copy relationship type.
-        dataFile = 8; // Data file relationship type.
-        dependencyManifest = 9; // Dependency manifest relationship type.
-        dependsOn = 10; // Depends on relationship type.
-        dependencyOf = 11; // Dependency of relationship type. In SPDX 3.x, this field is not supported.
-        descendant = 12; // Descendant relationship type.
-        describes = 13; // Describes relationship type.
-        describedBy = 14; // Described by relationship type. In SPDX 3.x, this field is not supported.
-        devDependency = 15; // Development dependency relationship type.
-        devTool = 16; // Development tool relationship type.
-        distributionArtifact = 17; // Distribution artifact relationship type.
-        documentation = 18; // Documentation relationship type.
-        dynamicLink = 19; // Dynamic link relationship type.
-        example = 20; // Example relationship type.
-        expandedFromArchive = 21; // Expanded from archive relationship type.
-        fileAdded = 22; // File added relationship type.
-        fileDeleted = 23; // File deleted relationship type.
-        fileModified = 24; // File modified relationship type.
-        generates = 25; // Generates relationship type.
-        generatedFrom = 26; // Generated from relationship type. In SPDX 3.x, this field is not supported.
-        metafile = 27; // Metafile relationship type.
-        optionalComponent = 28; // Optional component relationship type.
-        optionalDependency = 29; // Optional dependency relationship type.
-        other = 30; // Other relationship type.
-        packages = 31; // Packages relationship type.
-        patch = 32; // Patch relationship type.
-        prerequisite = 33; // Prerequisite relationship type.
-        prerequisiteFor = 34; // Prerequisite for relationship type. In SPDX 3.x, this field is not supported.
-        providedDependency = 35; // Provided dependency relationship type.
-        requirementFor = 36; // Requirement for relationship type.
-        runtimeDependency = 37; // Runtime dependency relationship type.
-        specificationFor = 38; // Specification for relationship type.
-        staticLink = 39; // Static link relationship type.
-        test = 40; // Test relationship type.
-        testCase = 41; // Test case relationship type.
-        testDependency = 42; // Test dependency relationship type.
-        testTool = 43; // Test tool relationship type.
-        variant = 44; // Variant relationship type.
-    }
+  // Source node of the edge.
+  string from = 2;
+
+  // Target nodes of the edge.
+  repeated string to = 3;
+
+  // buf:lint:ignore ENUM_VALUE_UPPER_SNAKE_CASE
+  // Type representing the node relationship.
+  enum Type {
+    // Unknown type.
+    UNKNOWN = 0;
+    // Amends relationship type.
+    amends = 1;
+    // Ancestor relationship type.
+    ancestor = 2;
+    // Build dependency relationship type.
+    buildDependency = 3;
+    // Build tool relationship type.
+    buildTool = 4;
+    // Contains relationship type.
+    contains = 5;
+    // Contained by relationship type. In SPDX 3.x, this field is not supported.
+    contained_by = 6;
+    // Copy relationship type.
+    copy = 7;
+    // Data file relationship type.
+    dataFile = 8;
+    // Dependency manifest relationship type.
+    dependencyManifest = 9;
+    // Depends on relationship type.
+    dependsOn = 10;
+    // Dependency of relationship type. In SPDX 3.x, this field is not supported.
+    dependencyOf = 11;
+    // Descendant relationship type.
+    descendant = 12;
+    // Describes relationship type.
+    describes = 13;
+    // Described by relationship type. In SPDX 3.x, this field is not supported.
+    describedBy = 14;
+    // Development dependency relationship type.
+    devDependency = 15;
+    // Development tool relationship type.
+    devTool = 16;
+    // Distribution artifact relationship type.
+    distributionArtifact = 17;
+    // Documentation relationship type.
+    documentation = 18;
+    // Dynamic link relationship type.
+    dynamicLink = 19;
+    // Example relationship type.
+    example = 20;
+    // Expanded from archive relationship type.
+    expandedFromArchive = 21;
+    // File added relationship type.
+    fileAdded = 22;
+    // File deleted relationship type.
+    fileDeleted = 23;
+    // File modified relationship type.
+    fileModified = 24;
+    // Generates relationship type.
+    generates = 25;
+    // Generated from relationship type. In SPDX 3.x, this field is not supported.
+    generatedFrom = 26;
+    // Metafile relationship type.
+    metafile = 27;
+    // Optional component relationship type.
+    optionalComponent = 28;
+    // Optional dependency relationship type.
+    optionalDependency = 29;
+    // Other relationship type.
+    other = 30;
+    // Packages relationship type.
+    packages = 31;
+    // Patch relationship type.
+    patch = 32;
+    // Prerequisite relationship type.
+    prerequisite = 33;
+    // Prerequisite for relationship type. In SPDX 3.x, this field is not supported.
+    prerequisiteFor = 34;
+    // Provided dependency relationship type.
+    providedDependency = 35;
+    // Requirement for relationship type.
+    requirementFor = 36;
+    // Runtime dependency relationship type.
+    runtimeDependency = 37;
+    // Specification for relationship type.
+    specificationFor = 38;
+    // Static link relationship type.
+    staticLink = 39;
+    // Test relationship type.
+    test = 40;
+    // Test case relationship type.
+    testCase = 41;
+    // Test dependency relationship type.
+    testDependency = 42;
+    // Test tool relationship type.
+    testTool = 43;
+    // Variant relationship type.
+    variant = 44;
+  }
 }
 
 // ExternalReference is an entry linking an element to a resource defined outside the SBOM standard.
 message ExternalReference {
-    string url = 1; // URL providing reference to an external resource.
-    // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/protobom/protobom/issues/148..
-    string comment = 3; // Comments associated with the external reference.
-    string authority = 4; // Authority responsible for the external reference.
-    // string type = 5; // Deprecated (string map) use hashes field instead, see https://github.com/protobom/protobom/issues/89.
-    map<int32,string> hashes = 6;  // Hashes associated with the external reference, Replaced field 5.
-    ExternalReferenceType type = 7;  // Type of the external reference, Replaced field 2.
+  // URL providing reference to an external resource.
+  string url = 1;
 
-    // Type enumerator representing of the external reference.
-    enum ExternalReferenceType {
-        UNKNOWN = 0; // Unknown type.
-        ATTESTATION = 1; // Attestation type.
-        BINARY = 2; // Binary type.
-        BOM = 3; // BOM type.
-        BOWER = 4; // Bower type.
-        BUILD_META = 5; // Build meta type.
-        BUILD_SYSTEM = 6; // Build system type.
-        CERTIFICATION_REPORT = 7; // Certification report type.
-        CHAT = 8; // Chat type.
-        CODIFIED_INFRASTRUCTURE = 9; // Codified infrastructure type.
-        COMPONENT_ANALYSIS_REPORT = 10; // Component analysis report type.
-        CONFIGURATION = 11; // Configuration type.
-        DISTRIBUTION_INTAKE = 12; // Distribution intake type.
-        DOCUMENTATION = 13; // Documentation type.
-        DOWNLOAD = 14; // Download type.
-        DYNAMIC_ANALYSIS_REPORT = 15; // Dynamic analysis report type.
-        EOL_NOTICE = 16; // End-of-life notice type.
-        EVIDENCE = 17; // Evidence type.
-        EXPORT_CONTROL_ASSESSMENT = 18; // Export control assessment type.
-        FORMULATION = 19; // Formulation type.
-        FUNDING = 20; // Funding type.
-        ISSUE_TRACKER = 21; // Issue tracker type.
-        LICENSE = 22; // License type.
-        LOG = 23; // Log type.
-        MAILING_LIST = 24; // Mailing list type.
-        MATURITY_REPORT = 25; // Maturity report type.
-        MAVEN_CENTRAL = 26; // Maven Central type.
-        METRICS = 27; // Metrics type.
-        MODEL_CARD = 28; // Model card type.
-        NPM = 29; // NPM type.
-        NUGET = 30; // NuGet type.
-        OTHER = 31; // Other type.
-        POAM = 32; // POAM type.
-        PRIVACY_ASSESSMENT = 33; // Privacy assessment type.
-        PRODUCT_METADATA = 34; // Product metadata type.
-        PURCHASE_ORDER = 35; // Purchase order type.
-        QUALITY_ASSESSMENT_REPORT = 36; // Quality assessment report type.
-        QUALITY_METRICS = 37; // Quality metrics type.
-        RELEASE_HISTORY = 38; // Release history type.
-        RELEASE_NOTES = 39; // Release notes type.
-        RISK_ASSESSMENT = 40; // Risk assessment type.
-        RUNTIME_ANALYSIS_REPORT = 41; // Runtime analysis report type.
-        SECURE_SOFTWARE_ATTESTATION = 42; // Secure software attestation type.
-        SECURITY_ADVERSARY_MODEL = 43; // Security adversary model type.
-        SECURITY_ADVISORY = 44; // Security advisory type.
-        SECURITY_CONTACT = 45; // Security contact type.
-        SECURITY_FIX = 46; // Security fix type.
-        SECURITY_OTHER = 47; // Security other type.
-        SECURITY_PENTEST_REPORT = 48; // Security pentest report type.
-        SECURITY_POLICY = 49; // Security policy type.
-        SECURITY_SWID = 50; // Security SWID type.
-        SECURITY_THREAT_MODEL = 51; // Security threat model type.
-        SOCIAL = 52; // Social type.
-        SOURCE_ARTIFACT = 53; // Source artifact type.
-        STATIC_ANALYSIS_REPORT = 54; // Static analysis report type.
-        SUPPORT = 55; // Support type.
-        VCS = 56; // VCS type.
-        VULNERABILITY_ASSERTION = 57; // Vulnerability assertion type.
-        VULNERABILITY_DISCLOSURE_REPORT = 58; // Vulnerability disclosure report type.
-        VULNERABILITY_EXPLOITABILITY_ASSESSMENT = 59; // Vulnerability exploitability assessment type.
-        WEBSITE = 60; // Website type.
-    }
+  // Deprecated (string) use ExternalReferenceType instead, see https://github.com/protobom/protobom/issues/148..
+  // string type = 2;
+  reserved 2;
+
+  // Comments associated with the external reference.
+  string comment = 3;
+
+  // Authority responsible for the external reference.
+  string authority = 4;
+
+  // Deprecated (string map) use hashes field instead, see https://github.com/protobom/protobom/issues/89.
+  // string type = 5;
+  reserved 5;
+
+  // Hashes associated with the external reference.
+  map<int32, string> hashes = 6;
+
+  // Type of the external reference, Replaced field 2.
+  ExternalReferenceType type = 7;
+
+  // Type enumerator representing of the external reference.
+  enum ExternalReferenceType {
+    // Unknown type.
+    UNKNOWN = 0;
+    // Attestation type.
+    ATTESTATION = 1;
+    // Binary type.
+    BINARY = 2;
+    // BOM type.
+    BOM = 3;
+    // Bower type.
+    BOWER = 4;
+    // Build meta type.
+    BUILD_META = 5;
+    // Build system type.
+    BUILD_SYSTEM = 6;
+    // Certification report type.
+    CERTIFICATION_REPORT = 7;
+    // Chat type.
+    CHAT = 8;
+    // Codified infrastructure type.
+    CODIFIED_INFRASTRUCTURE = 9;
+    // Component analysis report type.
+    COMPONENT_ANALYSIS_REPORT = 10;
+    // Configuration type.
+    CONFIGURATION = 11;
+    // Distribution intake type.
+    DISTRIBUTION_INTAKE = 12;
+    // Documentation type.
+    DOCUMENTATION = 13;
+    // Download type.
+    DOWNLOAD = 14;
+    // Dynamic analysis report type.
+    DYNAMIC_ANALYSIS_REPORT = 15;
+    // End-of-life notice type.
+    EOL_NOTICE = 16;
+    // Evidence type.
+    EVIDENCE = 17;
+    // Export control assessment type.
+    EXPORT_CONTROL_ASSESSMENT = 18;
+    // Formulation type.
+    FORMULATION = 19;
+    // Funding type.
+    FUNDING = 20;
+    // Issue tracker type.
+    ISSUE_TRACKER = 21;
+    // License type.
+    LICENSE = 22;
+    // Log type.
+    LOG = 23;
+    // Mailing list type.
+    MAILING_LIST = 24;
+    // Maturity report type.
+    MATURITY_REPORT = 25;
+    // Maven Central type.
+    MAVEN_CENTRAL = 26;
+    // Metrics type.
+    METRICS = 27;
+    // Model card type.
+    MODEL_CARD = 28;
+    // NPM type.
+    NPM = 29;
+    // NuGet type.
+    NUGET = 30;
+    // Other type.
+    OTHER = 31;
+    // POAM type.
+    POAM = 32;
+    // Privacy assessment type.
+    PRIVACY_ASSESSMENT = 33;
+    // Product metadata type.
+    PRODUCT_METADATA = 34;
+    // Purchase order type.
+    PURCHASE_ORDER = 35;
+    // Quality assessment report type.
+    QUALITY_ASSESSMENT_REPORT = 36;
+    // Quality metrics type.
+    QUALITY_METRICS = 37;
+    // Release history type.
+    RELEASE_HISTORY = 38;
+    // Release notes type.
+    RELEASE_NOTES = 39;
+    // Risk assessment type.
+    RISK_ASSESSMENT = 40;
+    // Runtime analysis report type.
+    RUNTIME_ANALYSIS_REPORT = 41;
+    // Secure software attestation type.
+    SECURE_SOFTWARE_ATTESTATION = 42;
+    // Security adversary model type.
+    SECURITY_ADVERSARY_MODEL = 43;
+    // Security advisory type.
+    SECURITY_ADVISORY = 44;
+    // Security contact type.
+    SECURITY_CONTACT = 45;
+    // Security fix type.
+    SECURITY_FIX = 46;
+    // Security other type.
+    SECURITY_OTHER = 47;
+    // Security pentest report type.
+    SECURITY_PENTEST_REPORT = 48;
+    // Security policy type.
+    SECURITY_POLICY = 49;
+    // Security SWID type.
+    SECURITY_SWID = 50;
+    // Security threat model type.
+    SECURITY_THREAT_MODEL = 51;
+    // Social type.
+    SOCIAL = 52;
+    // Source artifact type.
+    SOURCE_ARTIFACT = 53;
+    // Static analysis report type.
+    STATIC_ANALYSIS_REPORT = 54;
+    // Support type.
+    SUPPORT = 55;
+    // VCS type.
+    VCS = 56;
+    // Vulnerability assertion type.
+    VULNERABILITY_ASSERTION = 57;
+    // Vulnerability disclosure report type.
+    VULNERABILITY_DISCLOSURE_REPORT = 58;
+    // Vulnerability exploitability assessment type.
+    VULNERABILITY_EXPLOITABILITY_ASSESSMENT = 59;
+    // Website type.
+    WEBSITE = 60;
+  }
 }
 
-// Person represents an individual or organization involved in the creation or maintenance
-// of the document or node.
-message Person {
-    string name = 1; // Name of the person or organization.
-    bool is_org = 2; // Indicates whether the entity is an organization (true) or an individual (false).
-    string email  = 3; // Email address of the person or organization.
-    string url = 4; // URL associated with the person or organization.
-    string phone = 5;  // Phone number associated with the person or organization.
-    repeated Person contacts = 6; // Contacts associated with the person or organization.
-    // repeated PersonIdentifier identifiers // Support?
+// Metadata encapsulates document-related details about the Software Bill of Materials (SBOM) document.
+// It includes information such as the document's identifier, version, authorship, creation date,
+// associated tools, and document types.
+message Metadata {
+  // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
+  string id = 1;
+
+  // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
+  string version = 2;
+
+  // Name associated with the document.
+  string name = 3;
+
+  // Created date of the Document. In SPDX formats mapped to the created date field.
+  google.protobuf.Timestamp date = 4;
+
+  // Tools used in the creation or processing of the document.
+  repeated Tool tools = 5;
+
+  // Individuals or organizations involved in the creation or maintenance of the document.
+  repeated Person authors = 6;
+
+  // Comments on the document.
+  string comment = 7;
+
+  // buf:lint:ignore FIELD_LOWER_SNAKE_CASE
+  // Types categorizing the document based on its purpose or stage in the software development lifecycle.
+  repeated DocumentType documentTypes = 8;
+
+  // Field for preserving original format information and additional metadata
+  SourceData source_data = 9;
 }
 
-// Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.
-message Tool {
-    string name = 1; // Name of the software tool.
-    string version = 2; // Version of the software tool.
-    string vendor = 3; // Vendor or creator of the software tool.
-}
+// Node represents a central element within the Software Bill of Materials (SBOM) graph,
+// serving as a vertex that captures vital information about a software component.
+// Each Node in the SBOM graph signifies a distinct software component, forming the vertices of the graph.
+message Node {
+  // Unique identifier for the node.
+  string id = 1;
 
-// DocumentType represents the type of document in the Software Bill of Materials (SBOM) ecosystem.
-// It categorizes the SBOM document based on its purpose or stage in the software development lifecycle.
-message DocumentType {
-    optional SBOMType type = 1; // SBOM document type.
-    optional string name = 2; // Name associated with the document type.
-    optional string description = 3; // Description of the document type.
+  // Type of the software component.
+  NodeType type = 2;
 
-    // Enumeration of SBOM document types.
-    enum SBOMType {
-        OTHER = 0; // Other document type.
-        DESIGN = 1; // Design document type. (CDX: design)
-        SOURCE = 2; // Source document type. (CDX: pre-build)
-        BUILD = 3; // Build document type. (CDX: build)
-        ANALYZED = 4; // Analyzed document type. (CDX: post-build)
-        DEPLOYED = 5; // Deployed document type. (CDX: operations)
-        RUNTIME = 6; // Runtime document type. (CDX: none)
-        DISCOVERY = 7;  // Discovery document type. (CDX Specific)
-        DECOMISSION = 8; // Decommission document type. (CDX Specific)
-    }
+  // Name of the software component.
+  string name = 3;
+
+  // Version string of the software component.
+  string version = 4;
+
+  // Package filename when there is one.
+  string file_name = 5;
+
+  // Website of the package.
+  string url_home = 6;
+
+  // Location to download the package.
+  string url_download = 7;
+
+  // Multiple licenses applicable to the software component,
+  // Multiple licenses can be specified for CycloneDX 1.4 and files in SPDX.
+  repeated string licenses = 8;
+
+  // Concluded license applicable to the software component,
+  // This is only in SPDX and it is just one.
+  string license_concluded = 9;
+
+  // Comments on the license.
+  string license_comments = 10;
+
+  // Copyright information applicable to the software component.
+  string copyright = 11;
+
+  // field 12 was the old hashes string map.
+  // Removed, see https://github.com/protobom/protobom/issues/89
+  // map<string,string> hashes = 12;
+  reserved 12;
+
+  // This field is intended to capture details related to the source or origin of the software component.
+  // It may include any relevant background information or additional comments.
+  string source_info = 13;
+
+  // field 14 was the old string primary_purpose.
+  // Removed, see https://github.com/protobom/protobom/issues/124
+  // string primary_purpose = 14;   // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
+  reserved 14;
+
+  // Comments on the software component.
+  string comment = 15;
+
+  // Concise description of the software component (short description).
+  string summary = 16;
+
+  // Detailed description of the software component (full description).
+  string description = 17;
+
+  // One or more contributions or acknowledgments associated with the software component.
+  repeated string attribution = 18;
+
+  // One or more entities providing the software component.
+  repeated Person suppliers = 19;
+
+  // One or more entities involved in the creation or maintenance of the software component.
+  repeated Person originators = 20;
+
+  // Release date of the software component.
+  google.protobuf.Timestamp release_date = 21;
+
+  // Build date of the software component.
+  google.protobuf.Timestamp build_date = 22;
+
+  // Valid until date of the software component.
+  google.protobuf.Timestamp valid_until_date = 23;
+
+  // External references associated with the software component.
+  repeated ExternalReference external_references = 24;
+
+  // field 25 was the old identifier list.
+  // Removed, see https://github.com/protobom/protobom/issues/64
+  // repeated Identifier identifiers = 25;
+  reserved 25;
+
+  // File types associated with the component
+  repeated string file_types = 27;
+
+  // Software identifer map used by the component.
+  // Maps between the software identifier types and the identifier values.
+  map<int32, string> identifiers = 28;
+
+  // Hashes map associated with the software component.
+  // Maps between hash algorithms types and hash values.
+  map<int32, string> hashes = 29;
+
+  // Primary purpose or role assigned to the software component.
+  repeated Purpose primary_purpose = 30;
+
+  // Property collection of the node.
+  repeated Property properties = 31;
+
+  // Type of the software component.
+  enum NodeType {
+    // Software component type is a package.
+    PACKAGE = 0;
+    // Software component type is a file.
+    FILE = 1;
+  }
 }
 
 // NodeList represents a collection of nodes and edges forming the Software Bill of Materials (SBOM) graph.
 // It encapsulates the fundamental components of the SBOM, including software entities (nodes) and their relationships (edges).
 message NodeList {
-    repeated Node nodes = 1; // List of software components (nodes) in the SBOM graph.
-    repeated Edge edges = 2; // List of relationships (edges) between nodes in the SBOM graph.
-    repeated string root_elements = 3; // List of root elements in the SBOM graph.
+  // List of software components (nodes) in the SBOM graph.
+  repeated Node nodes = 1;
+
+  // List of relationships (edges) between nodes in the SBOM graph.
+  repeated Edge edges = 2;
+
+  // List of root elements in the SBOM graph.
+  repeated string root_elements = 3;
+}
+
+// Person represents an individual or organization involved in the creation or maintenance
+// of the document or node.
+message Person {
+  // Name of the person or organization.
+  string name = 1;
+
+  // Indicates whether the entity is an organization (true) or an individual (false).
+  bool is_org = 2;
+
+  // Email address of the person or organization.
+  string email = 3;
+
+  // URL associated with the person or organization.
+  string url = 4;
+
+  // Phone number associated with the person or organization.
+  string phone = 5;
+
+  // Contacts associated with the person or organization.
+  repeated Person contacts = 6;
+
+  // repeated PersonIdentifier identifiers // Support?
+}
+
+// Property type, key-value store of data.
+message Property {
+  // Name of the property
+  string name = 1;
+
+  // Property value
+  string data = 2;
+}
+
+// SourceData message encapsulates additional metadata related to the original SBOM document.
+message SourceData {
+  // The original format string of the SBOM document (e.g., text/spdx+json;version=2.3).
+  string format = 1;
+
+  // The hashes of the original SBOM document to ensure integrity.
+  map<int32, string> hashes = 2;
+
+  // The original size of the SBOM document in bytes.
+  int64 size = 3;
+
+  // The original URI of the SBOM document.
+  optional string uri = 4;
+}
+
+// Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.
+message Tool {
+  // Name of the software tool.
+  string name = 1;
+
+  // Version of the software tool.
+  string version = 2;
+
+  // Vendor or creator of the software tool.
+  string vendor = 3;
 }
 
 // HashAlgorithm represents the hashing algorithms used within the Software Bill of Materials (SBOM) document.
 // It enumerates various hash algorithms that can be employed to generate checksums or unique identifiers for files or data.
 enum HashAlgorithm {
-    UNKNOWN = 0; // Unknown hash algorithm.
-    MD5 = 1; // MD5 hash algorithm.
-    SHA1 = 2; // SHA-1 hash algorithm.
-    SHA256 = 3; // SHA-256 hash algorithm.
-    SHA384 = 4; // SHA-384 hash algorithm.
-    SHA512 = 5; // SHA-512 hash algorithm.
-    SHA3_256 = 6; // SHA3-256 hash algorithm.
-    SHA3_384 = 7; // SHA3-384 hash algorithm.
-    SHA3_512 = 8; // SHA3-512 hash algorithm.
-    BLAKE2B_256 = 9; // BLAKE2B-256 hash algorithm.
-    BLAKE2B_384 = 10; // BLAKE2B-384 hash algorithm.
-    BLAKE2B_512 = 11; // BLAKE2B-512 hash algorithm.
-    BLAKE3 = 12; // BLAKE3 hash algorithm.
-
-    MD2 = 13; // MD2 hash algorithm, not supported by SPDX formats.
-    ADLER32 = 14; // Adler-32 hash algorithm, not supported by SPDX formats..
-    MD4 = 15; // MD4 hash algorithm, not supported by SPDX formats..
-    MD6 = 16; // MD6 hash algorithm, not supported by SPDX formats..
-    SHA224 = 17; // SHA-224 hash algorithm, not supported by SPDX formats..
-}
-
-// SoftwareIdentifierType represents different types of identifiers used for software entities within the Software Bill of Materials (SBOM).
-enum SoftwareIdentifierType {
-    UNKNOWN_IDENTIFIER_TYPE = 0; // Unknown software identifier type.
-    PURL = 1; // Package URL (PURL) identifier type.
-    CPE22 = 2; // Common Platform Enumeration (CPE) version 2.2 identifier type.
-    CPE23 = 3; // Common Platform Enumeration (CPE) version 2.3 identifier type.
-    GITOID = 4; // Git Object Identifier (OID) identifier type.
+  // Unknown hash algorithm.
+  UNKNOWN = 0;
+  // MD5 hash algorithm.
+  MD5 = 1;
+  // SHA-1 hash algorithm.
+  SHA1 = 2;
+  // SHA-256 hash algorithm.
+  SHA256 = 3;
+  // SHA-384 hash algorithm.
+  SHA384 = 4;
+  // SHA-512 hash algorithm.
+  SHA512 = 5;
+  // SHA3-256 hash algorithm.
+  SHA3_256 = 6;
+  // SHA3-384 hash algorithm.
+  SHA3_384 = 7;
+  // SHA3-512 hash algorithm.
+  SHA3_512 = 8;
+  // BLAKE2B-256 hash algorithm.
+  BLAKE2B_256 = 9;
+  // BLAKE2B-384 hash algorithm.
+  BLAKE2B_384 = 10;
+  // BLAKE2B-512 hash algorithm.
+  BLAKE2B_512 = 11;
+  // BLAKE3 hash algorithm.
+  BLAKE3 = 12;
+  // MD2 hash algorithm, not supported by SPDX formats.
+  MD2 = 13;
+  // Adler-32 hash algorithm, not supported by SPDX formats..
+  ADLER32 = 14;
+  // MD4 hash algorithm, not supported by SPDX formats..
+  MD4 = 15;
+  // MD6 hash algorithm, not supported by SPDX formats..
+  MD6 = 16;
+  // SHA-224 hash algorithm, not supported by SPDX formats..
+  SHA224 = 17;
 }
 
 // Purpose represents different purposes or roles assigned to software entities within the Software Bill of Materials (SBOM).
 // It categorizes the roles that software components can fulfill.
 enum Purpose {
-    UNKNOWN_PURPOSE = 0; // Unknown purpose.
-    APPLICATION = 1; // Application purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    ARCHIVE = 2; // Archive purpose. (SPDX2.3, SPDX3.0)
-    BOM = 3; // BOM purpose. (SPDX3.0)
-    CONFIGURATION = 4; // Configuration purpose. (SPDX3.0)
-    CONTAINER = 5; // Container purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    DATA = 6; // Data purpose. (CDX1.5, SPDX3.0)
-    DEVICE = 7; // Device purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    DEVICE_DRIVER = 8; // Device Driver purpose. (CDX1.5, SPDX3.0)
-    DOCUMENTATION = 9; // Documentation purpose. (SPDX3.0)
-    EVIDENCE = 10; // Evidence purpose. (SPDX3.0)
-    EXECUTABLE = 11; // Executable purpose. (SPDX3.0)
-    FILE = 12; // File purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    FIRMWARE = 13; // Firmware purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    FRAMEWORK = 14; // Framework purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    INSTALL = 15; // Install purpose. (SPDX2.3, SPDX3.0)
-    LIBRARY = 16; // Library purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    MACHINE_LEARNING_MODEL = 17; // Machine Learning Model purpose. (CDX1.5)
-    MANIFEST = 18; // Manifest purpose. (SPDX3.0)
-    MODEL = 19; // Model purpose. (SPDX3.0)
-    MODULE = 20; // Module purpose. (SPDX3.0)
-    OPERATING_SYSTEM = 21; // Operating System purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    OTHER = 22; // Other purpose. (SPDX2.3, SPDX3.0)
-    PATCH = 23; // Patch purpose. (SPDX3.0)
-    PLATFORM = 24; // Platform purpose. (SPDX2.3, CDX1.5, SPDX3.0)
-    REQUIREMENT = 25; // Requirement purpose. (SPDX3.0)
-    SOURCE = 26; // Source purpose. (SPDX2.3, SPDX3.0)
-    SPECIFICATION = 27; // Specification purpose. (SPDX3.0)
-    TEST = 28; // Test purpose. (SPDX3.0)
+  // Unknown purpose.
+  UNKNOWN_PURPOSE = 0;
+  // Application purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  APPLICATION = 1;
+  // Archive purpose. (SPDX2.3, SPDX3.0)
+  ARCHIVE = 2;
+  // BOM purpose. (SPDX3.0)
+  BOM = 3;
+  // Configuration purpose. (SPDX3.0)
+  CONFIGURATION = 4;
+  // Container purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  CONTAINER = 5;
+  // Data purpose. (CDX1.5, SPDX3.0)
+  DATA = 6;
+  // Device purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  DEVICE = 7;
+  // Device Driver purpose. (CDX1.5, SPDX3.0)
+  DEVICE_DRIVER = 8;
+  // Documentation purpose. (SPDX3.0)
+  DOCUMENTATION = 9;
+  // Evidence purpose. (SPDX3.0)
+  EVIDENCE = 10;
+  // Executable purpose. (SPDX3.0)
+  EXECUTABLE = 11;
+  // File purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  FILE = 12;
+  // Firmware purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  FIRMWARE = 13;
+  // Framework purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  FRAMEWORK = 14;
+  // Install purpose. (SPDX2.3, SPDX3.0)
+  INSTALL = 15;
+  // Library purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  LIBRARY = 16;
+  // Machine Learning Model purpose. (CDX1.5)
+  MACHINE_LEARNING_MODEL = 17;
+  // Manifest purpose. (SPDX3.0)
+  MANIFEST = 18;
+  // Model purpose. (SPDX3.0)
+  MODEL = 19;
+  // Module purpose. (SPDX3.0)
+  MODULE = 20;
+  // Operating System purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  OPERATING_SYSTEM = 21;
+  // Other purpose. (SPDX2.3, SPDX3.0)
+  OTHER = 22;
+  // Patch purpose. (SPDX3.0)
+  PATCH = 23;
+  // Platform purpose. (SPDX2.3, CDX1.5, SPDX3.0)
+  PLATFORM = 24;
+  // Requirement purpose. (SPDX3.0)
+  REQUIREMENT = 25;
+  // Source purpose. (SPDX2.3, SPDX3.0)
+  SOURCE = 26;
+  // Specification purpose. (SPDX3.0)
+  SPECIFICATION = 27;
+  // Test purpose. (SPDX3.0)
+  TEST = 28;
+}
+
+// SoftwareIdentifierType represents different types of identifiers used
+// for software entities within the Software Bill of Materials (SBOM).
+enum SoftwareIdentifierType {
+  // Unknown software identifier type.
+  UNKNOWN_IDENTIFIER_TYPE = 0;
+  // Package URL (PURL) identifier type.
+  PURL = 1;
+  // Common Platform Enumeration (CPE) version 2.2 identifier type.
+  CPE22 = 2;
+  // Common Platform Enumeration (CPE) version 2.3 identifier type.
+  CPE23 = 3;
+  // Git Object Identifier (OID) identifier type.
+  GITOID = 4;
 }

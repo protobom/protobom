@@ -47,6 +47,12 @@ The purpose of conformance testing is to ensure that the system or software meet
 
 If you encounter any issues or have suggestions for improvements, please open an issue on the [issue tracker](https://github.com/protobom/protobom/issues).
 
+## Join our Community
+
+- [#protobom on OpenSSF Slack](https://openssf.slack.com/archives/C06ED97EQ4B)
+- [OpenSSF Security Tooling Working Group Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/94897563315?password=7f03d8e7-7bc9-454e-95bd-6e1e09cb3b0b) - Every other Friday at 8am Pacific
+- [SBOM Tooling Working Meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/92103679564?password=c351279a-5cec-44a4-ab5b-e4342da0e43f) - Every Monday, 2pm Pacific
+
 ## License
 
 When contributing to the protobom project, it is important to understand and agree to the licensing terms. All contributions to the project will be licensed under the Apache 2.0 License. By submitting a pull request, you are agreeing to these terms.

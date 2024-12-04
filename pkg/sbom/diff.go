@@ -152,6 +152,11 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 	nd.Removed.Hashes = removedM
 	nd.DiffCount += count
 
+	addedPr, removedPr, count := diffList(n.Properties, n2.Properties)
+	nd.Added.Properties = addedPr
+	nd.Removed.Properties = removedPr
+	nd.DiffCount += count
+
 	if nd.DiffCount > 0 {
 		return &nd
 	}

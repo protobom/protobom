@@ -55,6 +55,7 @@ func ensureSerializersInitialized() {
 		serializers.Store(formats.CDX13JSON, drivers.NewCDX("1.3", formats.JSON))
 		serializers.Store(formats.CDX14JSON, drivers.NewCDX("1.4", formats.JSON))
 		serializers.Store(formats.CDX15JSON, drivers.NewCDX("1.5", formats.JSON))
+		serializers.Store(formats.CDX16JSON, drivers.NewCDX("1.6", formats.JSON))
 		serializers.Store(formats.SPDX23JSON, drivers.NewSPDX23())
 	})
 }
@@ -118,7 +119,14 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 		ro = defaultOptions.RenderOptions
 	}
 
-	if err := serializer.Render(nativeDoc, wr, ro, o.GetFormatOptions(serializer)); err != nil {
+	// Build the listening chain of all the I/O sinks
+	sinks := []io.Writer{wr}
+	for _, l := range o.Listeners {
+		sinks = append(sinks, l)
+	}
+	stream := io.MultiWriter(sinks...)
+
+	if err := serializer.Render(nativeDoc, stream, ro, o.GetFormatOptions(serializer)); err != nil {
 		return fmt.Errorf("writing rendered document to string: %w", err)
 	}
 

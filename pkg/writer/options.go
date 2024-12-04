@@ -3,8 +3,9 @@ package writer
 import (
 	"fmt"
 
-	"github.com/bom-squad/protobom/pkg/formats"
-	"github.com/bom-squad/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/storage"
 )
 
 type WriterOption func(*Writer)
@@ -37,10 +38,27 @@ func WithFormat(f formats.Format) WriterOption {
 	}
 }
 
+func WithStoreRetriever(sb storage.StoreRetriever) WriterOption {
+	return func(w *Writer) {
+		if sb != nil {
+			w.Storage = sb
+		}
+	}
+}
+
+func WithStoreOptions(ro *storage.StoreOptions) WriterOption {
+	return func(w *Writer) {
+		if ro != nil {
+			w.Options.StoreOptions = ro
+		}
+	}
+}
+
 type Options struct {
 	Format           formats.Format
 	RenderOptions    *native.RenderOptions
 	SerializeOptions *native.SerializeOptions
+	StoreOptions     *storage.StoreOptions
 	formatOptions    map[string]interface{}
 }
 

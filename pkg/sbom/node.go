@@ -253,19 +253,19 @@ func (n *Node) flatString() string {
 	pairs := []string{}
 	n.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
 		switch fd.FullName() {
-		case "bomsquad.protobom.Node.external_references":
+		case "protobom.protobom.Node.external_references":
 			for _, ex := range n.ExternalReferences {
 				pairs = append(pairs, fmt.Sprintf("extref:%s", ex.flatString()))
 			}
-		case "bomsquad.protobom.Node.suppliers":
+		case "protobom.protobom.Node.suppliers":
 			for _, i := range n.Suppliers {
 				pairs = append(pairs, fmt.Sprintf("supplier:%s", i.flatString()))
 			}
-		case "bomsquad.protobom.Node.originators":
+		case "protobom.protobom.Node.originators":
 			for _, i := range n.Originators {
 				pairs = append(pairs, fmt.Sprintf("originator:%s", i.flatString()))
 			}
-		case "bomsquad.protobom.Node.identifiers":
+		case "protobom.protobom.Node.identifiers":
 			// Index the keys and sort them to make the string deterministic
 			idKeys := []int{}
 			for t := range n.Identifiers {
@@ -275,24 +275,24 @@ func (n *Node) flatString() string {
 			for _, t := range idKeys {
 				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)]))
 			}
-		case "bomsquad.protobom.Node.release_date":
+		case "protobom.protobom.Node.release_date":
 			if n.ReleaseDate != nil {
 				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ReleaseDate.AsTime().Unix()))
 			}
-		case "bomsquad.protobom.Node.valid_until_date":
+		case "protobom.protobom.Node.valid_until_date":
 			if n.ValidUntilDate != nil {
 				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.ValidUntilDate.AsTime().Unix()))
 			}
-		case "bomsquad.protobom.Node.build_date":
+		case "protobom.protobom.Node.build_date":
 			if n.BuildDate != nil {
 				pairs = append(pairs, fmt.Sprintf("%s:%d", fd.FullName(), n.BuildDate.AsTime().Unix()))
 			}
-		case "bomsquad.protobom.Node.hashes":
+		case "protobom.protobom.Node.hashes":
 			pairs = append(pairs, string(fd.FullName())+":"+flatStringMap(v.Map()))
-		case "bomsquad.protobom.Node.licenses",
-			"bomsquad.protobom.Node.attribution",
-			"bomsquad.protobom.Node.file_types",
-			"bomsquad.protobom.Node.primary_purpose":
+		case "protobom.protobom.Node.licenses",
+			"protobom.protobom.Node.attribution",
+			"protobom.protobom.Node.file_types",
+			"protobom.protobom.Node.primary_purpose":
 			pairs = append(pairs, flatStringStrSlice(fd.FullName(), v.List()))
 
 		default:

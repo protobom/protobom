@@ -5,8 +5,8 @@ import (
 	"io"
 	"sync"
 
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 type FakeUnserializer struct {

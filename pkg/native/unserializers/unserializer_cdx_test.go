@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
-	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/stretchr/testify/require"
 )
 

@@ -1,38 +1,30 @@
 syntax = "proto3";
 
-import "gorm.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "sbom/";
-package bomsquad.protobom;
+package protobom.protobom;
 
 // Document is the top-level structure representing the entire Software Bill of Materials (SBOM).
 // It serves as the core neutral ground for the SBOM translation process, encapsulating metadata,
 // components (nodes), and the graph structure (edges).
 message Document {
-    option (gorm.opts) = {
-        ormable: true,
-        include: [{type: "uint32", name: "id", tag: {primary_key: true, auto_increment: true}}]
-    };
-
-    Metadata metadata = 1 [(gorm.field).has_one = {}];  // Metadata associated with the SBOM document
-    NodeList node_list = 2 [(gorm.field).has_one = {}]; // List of nodes and edges forming the SBOM graph
+    Metadata metadata = 1;  // Metadata associated with the SBOM document
+    NodeList node_list = 2; // List of nodes and edges forming the SBOM graph
 }
 
 // Node represents a central element within the Software Bill of Materials (SBOM) graph,
 // serving as a vertex that captures vital information about a software component.
 // Each Node in the SBOM graph signifies a distinct software component, forming the vertices of the graph.
 message Node {
-    option (gorm.opts).ormable = true;
+    string id = 1;           // Unique identifier for the node.
+    NodeType type = 2;       // Type of the software component.
+    string name = 3;         // Name of the software component.
+    string version = 4;      // Version string of the software component.
+    string file_name = 5;    // Package filename when there is one.
 
-    string id = 1 [(gorm.field).tag = {primary_key: true}]; // Unique identifier for the node.
-    NodeType type = 2;                                      // Type of the software component.
-    string name = 3;                                        // Name of the software component.
-    string version = 4;                                     // Version string of the software component.
-    string file_name = 5;                                   // Package filename when there is one.
-
-    string url_home = 6;                                    // Website of the package.
-    string url_download = 7;                                // Location to download the package.
+    string url_home = 6;     // Website of the package.
+    string url_download = 7; // Location to download the package.
 
     // Multiple licenses applicable to the software component,
     // Multiple licenses can be specified for CycloneDX 1.4 and files in SPDX.
@@ -44,7 +36,7 @@ message Node {
     string copyright = 11;            // Copyright information applicable to the software component.
 
     // field 12 was the old hashes string map.
-    // Removed, see https://github.com/bom-squad/protobom/issues/89
+    // Removed, see https://github.com/protobom/protobom/issues/89
     // map<string,string> hashes = 12;
 
     // This field is intended to capture details related to the source or origin of the software component.
@@ -52,7 +44,7 @@ message Node {
     string source_info = 13;
 
     // field 14 was the old string primary_purpose.
-    // Removed, see https://github.com/bom-squad/protobom/issues/124
+    // Removed, see https://github.com/protobom/protobom/issues/124
     // string primary_purpose = 14;   // APPLICATION | FRAMEWORK | LIBRARY | CONTAINER | OPERATING-SYSTEM | DEVICE | FIRMWARE | SOURCE | ARCHIVE | FILE | INSTALL | OTHER |
 
     string comment = 15;              // Comments on the software component.
@@ -70,7 +62,7 @@ message Node {
     repeated ExternalReference external_references = 24; // External references associated with the software component.
 
     // field 25 was the old identifier list.
-    // Removed, see https://github.com/bom-squad/protobom/issues/64
+    // Removed, see https://github.com/protobom/protobom/issues/64
     // repeated Identifier identifiers = 25;
 
     repeated string file_types = 27;     // File types associated with the component
@@ -96,9 +88,7 @@ message Node {
 // It includes information such as the document's identifier, version, authorship, creation date,
 // associated tools, and document types.
 message Metadata {
-    option (gorm.opts).ormable = true;
-
-    string id = 1 [(gorm.field).tag = {primary_key: true}]; // // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
+    string id = 1; // // Unique identifier for the document. Serial number in CycloneDX foramts, SPDXID in spdx formats.
     string version = 2; // Version of the document. In Cyclone formats the version is translated from `Int` field in to a more general `String` field.
     string name = 3; // Name associated with the document.
     google.protobuf.Timestamp date = 4; // Created date of the Document. In SPDX formats mapped to the created date field.
@@ -112,11 +102,9 @@ message Metadata {
 // Each Edge captures the type of relationship and the nodes involved, providing a structured
 // way to model dependencies and connections within the SBOM.
 message Edge {
-    option (gorm.opts).ormable = true;
-
-    Type type = 1 [(gorm.field).tag = {unique_index: "idx_edge"}]; // Type enumerator representing the node relationship.
-    string from = 2 [(gorm.field).tag = {unique_index: "idx_edge"}]; // Source node of the edge.
-    repeated string to = 3 [(gorm.field).tag = {unique_index: "idx_edge"}]; // Target nodes of the edge.
+    Type type = 1; // Type enumerator representing the node relationship.
+    string from = 2; // Source node of the edge.
+    repeated string to = 3; // Target nodes of the edge.
 
     // Type enumerator representing the node relationship.
     enum Type {
@@ -170,13 +158,11 @@ message Edge {
 
 // ExternalReference is an entry linking an element to a resource defined outside the SBOM standard.
 message ExternalReference {
-    option (gorm.opts).ormable = true;
-
-    string url = 1 [(gorm.field).tag = {unique_index: "idx_external_reference"}]; // URL providing reference to an external resource.
-    // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/bom-squad/protobom/issues/148..
-    string comment = 3 [(gorm.field).tag = {unique_index: "idx_external_reference"}]; // Comments associated with the external reference.
-    string authority = 4 [(gorm.field).tag = {unique_index: "idx_external_reference"}]; // Authority responsible for the external reference.
-    // string type = 5; // Deprecated (string map) use hashes field instead, see https://github.com/bom-squad/protobom/issues/89.
+    string url = 1; // URL providing reference to an external resource.
+    // string type = 2; // Deprecated (string) use ExternalReferenceType instead, see https://github.com/protobom/protobom/issues/148..
+    string comment = 3; // Comments associated with the external reference.
+    string authority = 4; // Authority responsible for the external reference.
+    // string type = 5; // Deprecated (string map) use hashes field instead, see https://github.com/protobom/protobom/issues/89.
     map<int32,string> hashes = 6;  // Hashes associated with the external reference, Replaced field 5.
     ExternalReferenceType type = 7;  // Type of the external reference, Replaced field 2.
 
@@ -249,40 +235,28 @@ message ExternalReference {
 // Person represents an individual or organization involved in the creation or maintenance
 // of the document or node.
 message Person {
-    option (gorm.opts) = {
-        ormable: true,
-        include: [{type: "uint32", name: "id", tag: {primary_key: true, auto_increment: true}}]
-    };
-
-    string name = 1 [(gorm.field).tag = {unique_index: "idx_person"}]; // Name of the person or organization.
-    bool is_org = 2 [(gorm.field).tag = {unique_index: "idx_person"}]; // Indicates whether the entity is an organization (true) or an individual (false).
-    string email  = 3 [(gorm.field).tag = {unique_index: "idx_person"}]; // Email address of the person or organization.
-    string url = 4 [(gorm.field).tag = {unique_index: "idx_person"}]; // URL associated with the person or organization.
-    string phone = 5 [(gorm.field).tag = {unique_index: "idx_person"}];  // Phone number associated with the person or organization.
-    repeated Person contacts = 6 [(gorm.field).many_to_many = {}]; // Contacts associated with the person or organization.
+    string name = 1; // Name of the person or organization.
+    bool is_org = 2; // Indicates whether the entity is an organization (true) or an individual (false).
+    string email  = 3; // Email address of the person or organization.
+    string url = 4; // URL associated with the person or organization.
+    string phone = 5;  // Phone number associated with the person or organization.
+    repeated Person contacts = 6; // Contacts associated with the person or organization.
     // repeated PersonIdentifier identifiers // Support?
 }
 
 // Tool represents a software tool used in the creation or processing of the Software Bill of Materials (SBOM) document.
 message Tool {
-    option (gorm.opts) = {
-        ormable: true,
-        include: [{type: "uint32", name: "id", tag: {primary_key: true, auto_increment: true}}]
-    };
-
-    string name = 1 [(gorm.field).tag = {unique_index: "idx_tool"}]; // Name of the software tool.
-    string version = 2 [(gorm.field).tag = {unique_index: "idx_tool"}]; // Version of the software tool.
-    string vendor = 3 [(gorm.field).tag = {unique_index: "idx_tool"}]; // Vendor or creator of the software tool.
+    string name = 1; // Name of the software tool.
+    string version = 2; // Version of the software tool.
+    string vendor = 3; // Vendor or creator of the software tool.
 }
 
 // DocumentType represents the type of document in the Software Bill of Materials (SBOM) ecosystem.
 // It categorizes the SBOM document based on its purpose or stage in the software development lifecycle.
 message DocumentType {
-    option (gorm.opts) = {ormable: true, include: [{type: "int32", name: "type", tag: {unique_index: "idx_document_type"}}]};
-
-    optional SBOMType type = 1 [(gorm.field).drop = true]; // SBOM document type.
-    optional string name = 2 [(gorm.field).tag = {unique_index: "idx_document_type"}]; // Name associated with the document type.
-    optional string description = 3 [(gorm.field).tag = {unique_index: "idx_document_type"}]; // Description of the document type.
+    optional SBOMType type = 1; // SBOM document type.
+    optional string name = 2; // Name associated with the document type.
+    optional string description = 3; // Description of the document type.
 
     // Enumeration of SBOM document types.
     enum SBOMType {
@@ -301,11 +275,6 @@ message DocumentType {
 // NodeList represents a collection of nodes and edges forming the Software Bill of Materials (SBOM) graph.
 // It encapsulates the fundamental components of the SBOM, including software entities (nodes) and their relationships (edges).
 message NodeList {
-    option (gorm.opts) = {
-        ormable: true,
-        include: [{type: "uint32", name: "id", tag: {primary_key: true, auto_increment: true}}]
-    };
-
     repeated Node nodes = 1; // List of software components (nodes) in the SBOM graph.
     repeated Edge edges = 2; // List of relationships (edges) between nodes in the SBOM graph.
     repeated string root_elements = 3; // List of root elements in the SBOM graph.

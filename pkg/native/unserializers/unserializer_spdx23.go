@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
-	protospdx "github.com/bom-squad/protobom/pkg/formats/spdx"
-	"github.com/bom-squad/protobom/pkg/native"
-	"github.com/bom-squad/protobom/pkg/sbom"
+	"github.com/google/uuid"
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -26,6 +27,22 @@ func NewSPDX23() *SPDX23 {
 	return &SPDX23{}
 }
 
+// buildDocumentIdentifier builds the protobom identifier from
+// the SPDX information.
+func buildDocumentIdentifier(doc *spdx23.Document) string {
+	// The namespace isentifies the spdx document uniquely
+	if doc.DocumentNamespace != "" {
+		return fmt.Sprintf("%s#%s", doc.DocumentNamespace, doc.SPDXIdentifier)
+	}
+
+	// If we don't have a namespace it is an invalid SPDX doc, but
+	// protobom needs one so let's generate an URI
+	return fmt.Sprintf(
+		"%s/protobom-%s#%s", "https://spdx.org/spdxdocs",
+		uuid.NewString(), doc.SPDXIdentifier,
+	)
+}
+
 // ParseStream reads an io.Reader to parse an SPDX 2.3 document from it
 func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface{}) (*sbom.Document, error) {
 	spdxDoc, err := spdxjson.Read(r)
@@ -34,7 +51,7 @@ func (u *SPDX23) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interf
 	}
 
 	bom := sbom.NewDocument()
-	bom.Metadata.Id = string(spdxDoc.SPDXIdentifier)
+	bom.Metadata.Id = buildDocumentIdentifier(spdxDoc)
 	bom.Metadata.Name = spdxDoc.DocumentName
 
 	// TODO(degradation): External document references

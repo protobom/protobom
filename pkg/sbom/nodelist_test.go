@@ -1312,6 +1312,86 @@ func TestNodeListCopy(t *testing.T) {
 		},
 	} {
 		copied := tc.original.Copy()
-		require.True(t, tc.original.Equal(copied), "equal copied nodelist", tc.original, copied)
+		require.True(t, tc.original.Equal(copied), "equal copied nodelist %s %s", tc.original, copied)
+	}
+}
+
+func TestRelateNodeListAtId(t *testing.T) {
+	sutId := "nodeA"
+	nodeId := "nodeB"
+	testNodeList := &NodeList{
+		RootElements: []string{sutId},
+		Nodes:        []*Node{{Id: sutId}},
+		Edges:        []*Edge{},
+	}
+
+	for _, tc := range []struct {
+		name        string
+		sut         *NodeList
+		nodeList    *NodeList
+		expected    *NodeList
+		shouldError bool
+	}{
+		{
+			// This merges these nodelists:
+			//   root        root
+			//     \           \
+			//    NodeA       NodeB
+			name: "relate to node",
+			sut:  testNodeList,
+			nodeList: &NodeList{
+				RootElements: []string{nodeId},
+				Nodes:        []*Node{{Id: nodeId}},
+				Edges:        []*Edge{},
+			},
+			expected: &NodeList{
+				RootElements: []string{sutId},
+				Nodes:        []*Node{{Id: sutId}, {Id: nodeId}},
+				Edges:        []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_ancestor}},
+			},
+		},
+		{
+			// This merges two nodelists:
+			// root         root
+			//   \            \
+			//  NodeA        NodeB
+			//                 \ (contains)
+			//                NodeC
+			name: "relate with descendants",
+			sut:  testNodeList,
+			nodeList: &NodeList{
+				RootElements: []string{nodeId},
+				Nodes:        []*Node{{Id: nodeId}, {Id: "nodeC"}},
+				Edges:        []*Edge{{From: nodeId, To: []string{"nodeC"}, Type: Edge_contains}},
+			},
+			expected: &NodeList{
+				RootElements: []string{sutId},
+				Nodes:        []*Node{{Id: sutId}, {Id: nodeId}, {Id: "nodeC"}},
+				Edges: []*Edge{
+					{From: sutId, To: []string{nodeId}, Type: Edge_ancestor},
+					{From: nodeId, To: []string{"nodeC"}, Type: Edge_contains},
+				},
+			},
+		},
+		{
+			// Error when the specified ID is not there
+			name: "merge point not available",
+			sut: &NodeList{
+				RootElements: []string{"nodeC"},
+				Nodes:        []*Node{{Id: "nodeC"}},
+			},
+			nodeList:    testNodeList,
+			shouldError: true,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.sut.RelateNodeListAtID(tc.nodeList, sutId, Edge_ancestor)
+			if tc.shouldError {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Truef(t, tc.sut.Equal(tc.expected), "Result: %+v", tc.sut)
+		})
 	}
 }

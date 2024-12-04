@@ -2,7 +2,7 @@
 
 PYTHON_UTILS=("yamllint" "pre-commit")
 GITHUB_UTILS=("")
-GOLANG_UTILS=("github.com/google/yamlfmt/cmd/yamlfmt@latest" "google.golang.org/protobuf/cmd/protoc-gen-go@latest" "github.com/infobloxopen/protoc-gen-gorm@main")
+GOLANG_UTILS=("github.com/google/yamlfmt/cmd/yamlfmt@latest" "google.golang.org/protobuf/cmd/protoc-gen-go@latest")
 APT_UTILS=("shellcheck" "vim")
 
 set -e

@@ -468,9 +468,9 @@ func (s *SPDX23) buildPackages(
 		if len(node.Originators) > 0 {
 			// TODO(degradation): URL, Phone are lost if set
 			// TODO(degradation): If is more than one originator, it will be lost
-			p.PackageSupplier = &spdx.Supplier{
-				Supplier:     node.Originators[0].ToSPDX2ClientString(),
-				SupplierType: node.Originators[0].ToSPDX2ClientOrg(),
+			p.PackageOriginator = &spdx.Originator{
+				Originator:     node.Originators[0].ToSPDX2ClientString(),
+				OriginatorType: node.Originators[0].ToSPDX2ClientOrg(),
 			}
 		}
 

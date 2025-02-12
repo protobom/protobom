@@ -1,7 +1,8 @@
 
-¦
+¹
 Xhttps://github.com/kubernetes/kubernetes/dependency_graph/sbom-e5f37ce77fd4fd38#DOCUMENT0 com.github.kubernetes/kubernetes"Åí«*
-GitHub.com-Dependency-GraphŠ§
+GitHub.com-Dependency-GraphJ
+text/spdx+json;version=2.3…€5fd2e6c38c18432fd9b73aa9e16358a30d39e6afddf890f9cec01493351ed45d86a7a05fb132a1ce8ae7ab77cf9803ec101a395c9a2f4c7e1ef08a37f14fdc4f,(99255ec4dba019adda3bd6311d1a0ceba8d6d876D@9d9f06ff989d30478b60505a3fe64affa597955da9faba26ac6e6a1ca4967d2d‚ã"rfile://test/conformance/testdata/spdx/2.3/json/kubernetes_kubernetes_d61cbac69aae97db1839bd2e0e86d68f26b353a7.jsonŠ§
 ¥
  com.github.kubernetes-kubernetes com.github.kubernetes/kubernetes:,git+https://github.com/kubernetes/kubernetesB
 Apache-2.0â$ pkg:github/kubernetes/kubernetes

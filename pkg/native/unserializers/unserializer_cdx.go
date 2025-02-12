@@ -95,8 +95,16 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				return nil, fmt.Errorf("converting component to node: %w", err)
 			}
 
-			if len(doc.NodeList.RootElements) == 0 {
+			// TODO(mod): Write a hack to force one componento to the top
+			// if there is no component in the metadata.
+
+			// If the CDX doc does not have a a top level component,
+			// then the nodes come in as top level nodes:
+			if bom.Metadata.Component != nil {
 				doc.NodeList.Add(nl)
+
+				// ... unless we have a top level component. Then we descend
+				// all body nodes from it:
 			} else {
 				if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
 					return nil, fmt.Errorf("relating components to root node: %w", err)
@@ -104,6 +112,12 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 			}
 		}
 	}
+
+	// Parse the dependency graph
+	deps := u.parseDependencyGraph(bom)
+
+	// Now append the dependency data to the document nodelist
+	doc.NodeList.MergeEdges(deps)
 
 	return doc, nil
 }
@@ -215,6 +229,39 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 	}
 
 	return node, nil
+}
+
+// parseDependencyGraph parses the bom dependency graph and returns the
+// protobom Edge set with the data.
+func (u *CDX) parseDependencyGraph(bom *cdx.BOM) []*sbom.Edge {
+	ret := []*sbom.Edge{}
+	mapa := map[string]*sbom.Edge{}
+
+	// Avoid panicking if no deps are set:
+	if bom.Dependencies == nil {
+		return ret
+	}
+
+	for _, d := range *bom.Dependencies {
+		if _, ok := mapa[d.Ref]; !ok {
+			mapa[d.Ref] = sbom.NewEdge()
+			mapa[d.Ref].From = d.Ref
+			mapa[d.Ref].Type = sbom.Edge_contains
+		}
+
+		// d.Dependencies is a pointer, so we can panic if nil,
+		if d.Dependencies == nil {
+			continue
+		}
+
+		mapa[d.Ref].To = append(mapa[d.Ref].To, *d.Dependencies...)
+	}
+
+	for _, e := range mapa {
+		ret = append(ret, e)
+	}
+
+	return ret
 }
 
 // unserializeExternalReferences reads a slice of cyclonedx references and returns

@@ -88,20 +88,6 @@ linters:
     # - wrapcheck
     # - wsl
 linters-settings:
-  depguard:
-    list-type: blacklist
-    include-go-root: true
-    include-go-std-lib: true
-  gci:
-    no-inline-comments: false
-    no-prefix-comments: true
-    sections:
-      - standard
-      - default
-      - prefix(github.com/protobom/protobom)
-
-    section-separators:
-      - newLine
   godox:
     keywords:
       - BUG

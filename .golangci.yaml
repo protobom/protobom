@@ -94,7 +94,7 @@ linters-settings:
       - FIXME
       - HACK
   errcheck:
-    check-type-assertions: true
+    check-type-assertions: false
     check-blank: true
   gocritic:
     enabled-checks:

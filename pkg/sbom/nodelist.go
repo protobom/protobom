@@ -163,6 +163,31 @@ func (nl *NodeList) AddEdge(e *Edge) {
 	nl.Edges = append(nl.Edges, e)
 }
 
+// MergeEdges merges a set of edges into the current nodelist edges.
+// In contrast to AddEdge, this method merges the edges into existing
+// equivalents (from + type) if found.
+func (nl *NodeList) MergeEdges(es []*Edge) {
+	index := nl.indexEdges()
+
+	for _, e := range es {
+		if _, ok := index[e.From]; !ok {
+			index[e.From] = map[Edge_Type][]*Edge{}
+		}
+
+		if _, ok := index[e.GetFrom()][e.GetType()]; !ok {
+			index[e.GetFrom()][e.GetType()] = make([]*Edge, 0)
+		}
+
+		// We don't have a match of this origin+type. Add new
+		if len(index[e.GetFrom()][e.GetType()]) == 0 {
+			index[e.GetFrom()][e.GetType()] = append(index[e.GetFrom()][e.GetType()], e)
+			nl.AddEdge(e)
+		} else {
+			index[e.GetFrom()][e.GetType()][0].AddDestinationById(e.To...)
+		}
+	}
+}
+
 // AddRootNode adds a node to the NodeList and registers it as a Root Elements.
 // More than one root element can be added to the NodeList.
 func (nl *NodeList) AddRootNode(n *Node) {
@@ -200,21 +225,8 @@ func (nl *NodeList) Add(nl2 *NodeList) {
 		}
 	}
 
-	existingEdges := nl.indexEdges()
-	for i := range nl2.Edges {
-		if _, ok := existingEdges[nl2.Edges[i].From]; !ok {
-			nl.Edges = append(nl.Edges, nl2.Edges[i])
-			continue
-		}
-
-		if _, ok := existingEdges[nl2.Edges[i].From][nl2.Edges[i].Type]; !ok {
-			nl.Edges = append(nl.Edges, nl2.Edges[i])
-			continue
-		}
-
-		// Add it here to the existing edge
-		existingEdges[nl2.Edges[i].From][nl2.Edges[i].Type][0].To = append(existingEdges[nl2.Edges[i].From][nl2.Edges[i].Type][0].To, nl2.Edges[i].To...)
-	}
+	// Merge the edges into the existing edge set
+	nl.MergeEdges(nl2.Edges)
 
 	rootElements := nl.indexRootElements()
 	for _, id := range nl2.RootElements {

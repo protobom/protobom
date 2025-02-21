@@ -463,3 +463,207 @@ func TestNodeAddHash(t *testing.T) {
 		})
 	}
 }
+
+func TestMergeEdges(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		name   string
+		sut    *NodeList
+		input  []*Edge
+		expect *NodeList
+	}{
+		{
+			"no-nodes",
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+				},
+			},
+			[]*Edge{},
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+				},
+			},
+		},
+		{
+			"one-edge-other-origin-other-to-other-type",
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+				},
+			},
+			[]*Edge{
+				{
+					Type: Edge_dependsOn,
+					From: "testA",
+					To:   []string{"testB"},
+				},
+			},
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+					{
+						Type: Edge_dependsOn,
+						From: "testA",
+						To:   []string{"testB"},
+					},
+				},
+			},
+		},
+		{
+			"one-edge-other-origin-other-to-same-type",
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+				},
+			},
+			[]*Edge{
+				{
+					Type: Edge_contains,
+					From: "testA",
+					To:   []string{"testB"},
+				},
+			},
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+					{
+						Type: Edge_contains,
+						From: "testA",
+						To:   []string{"testB"},
+					},
+				},
+			},
+		},
+		{
+			"one-edge-other-origin-same-to-same-type",
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+				},
+			},
+			[]*Edge{
+				{
+					Type: Edge_contains,
+					From: "testA",
+					To:   []string{"test2"},
+				},
+			},
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+					{
+						Type: Edge_contains,
+						From: "testA",
+						To:   []string{"test2"},
+					},
+				},
+			},
+		},
+		{
+			"one-edge-same-origin-same-to-same-type",
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+				},
+			},
+			[]*Edge{
+				{
+					Type: Edge_contains,
+					From: "test",
+					To:   []string{"test2"},
+				},
+			},
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+				},
+			},
+		},
+		{
+			"two-edges-same-origin-other-to-same-type",
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2"},
+					},
+				},
+			},
+			[]*Edge{
+				{
+					Type: Edge_contains,
+					From: "test",
+					To:   []string{"test3"},
+				},
+				{
+					Type: Edge_dependsOn,
+					From: "test",
+					To:   []string{"test4"},
+				},
+			},
+			&NodeList{
+				Edges: []*Edge{
+					{
+						Type: Edge_contains,
+						From: "test",
+						To:   []string{"test2", "test3"},
+					},
+					{
+						Type: Edge_dependsOn,
+						From: "test",
+						To:   []string{"test4"},
+					},
+				},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			tc.sut.MergeEdges(tc.input)
+			require.True(t, tc.sut.Equal(tc.expect))
+		})
+	}
+}

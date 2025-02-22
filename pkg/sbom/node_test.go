@@ -312,6 +312,7 @@ func TestNodeCopy(t *testing.T) {
 }
 
 func TestNodeDescendants(t *testing.T) {
+	t.Parallel()
 	sutId := "mynode"
 	for _, tc := range []struct {
 		name                string
@@ -319,6 +320,17 @@ func TestNodeDescendants(t *testing.T) {
 		expectedNodesLength int
 		depth               int
 	}{
+		{
+			// Zero depth should return no nodes but the root
+			name: "depth-zero",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: sutId}},
+				Edges:        []*Edge{},
+				RootElements: []string{sutId},
+			},
+			expectedNodesLength: 1,
+			depth:               0,
+		},
 		{
 			// SA graph with a single node. We should get a one node result but
 			// we use a max distance of 10 to catch any possible errors traversing
@@ -356,7 +368,7 @@ func TestNodeDescendants(t *testing.T) {
 			//  child1  child2
 			//     |      |
 			// child1-1 child2-1
-			name: "four descendants two levels",
+			name: "four-descendants-two-levels",
 			sut: &NodeList{
 				Nodes: []*Node{{Id: sutId}, {Id: "child1"}, {Id: "child2"}, {Id: "child1-1"}, {Id: "child2-1"}},
 				Edges: []*Edge{
@@ -375,7 +387,7 @@ func TestNodeDescendants(t *testing.T) {
 			//  child1  child2    <-- Depth 2
 			//     |      |
 			// child1-1 child2-1  <-- Depth 3
-			name: "four descendants two levels, depth 2",
+			name: "four-descendants-two-levels--depth-1",
 			sut: &NodeList{
 				Nodes: []*Node{{Id: sutId}, {Id: "child1"}, {Id: "child2"}, {Id: "child1-1"}, {Id: "child2-1"}},
 				Edges: []*Edge{
@@ -386,6 +398,25 @@ func TestNodeDescendants(t *testing.T) {
 				RootElements: []string{sutId},
 			},
 			expectedNodesLength: 3,
+			depth:               1,
+		},
+		{
+			//      mynode        <-- Depth 1
+			//      /   \
+			//  child1  child2    <-- Depth 2
+			//     |      |
+			// child1-1 child2-1  <-- Depth 3
+			name: "four-descendants-two-levels--depth-2",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: "child1"}, {Id: "child2"}, {Id: "child1-1"}, {Id: "child2-1"}},
+				Edges: []*Edge{
+					{From: sutId, To: []string{"child1", "child2"}},
+					{From: "child1", To: []string{"child1-1"}},
+					{From: "child2", To: []string{"child2-1"}},
+				},
+				RootElements: []string{sutId},
+			},
+			expectedNodesLength: 5,
 			depth:               2,
 		},
 		{
@@ -409,9 +440,20 @@ func TestNodeDescendants(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			res := tc.sut.NodeDescendants(sutId, tc.depth)
 			require.NotNil(t, res)
+			// Root elements must always be one
 			require.Len(t, res.RootElements, 1)
+			// When there are no descendants (or root!) then there
+			// should not be any Edges defined
+			if len(res.Nodes) <= 1 {
+				require.Len(t, res.Edges, 0)
+			} else {
+				// ... but when there are descendants, then the function
+				// must return only 1 edge, grouping all descendants.
+				require.Len(t, res.Edges, 1)
+			}
 			require.Len(t, res.Nodes, tc.expectedNodesLength)
 		})
 	}

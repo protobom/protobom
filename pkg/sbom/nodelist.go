@@ -891,17 +891,17 @@ func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
 	}
 
 	nl2 := NodeList{
-		Nodes:        []*Node{},
-		Edges:        nl.Edges,
+		Nodes:        []*Node{startNode},
+		Edges:        []*Edge{},
 		RootElements: []string{startNode.Id},
 	}
 
-	siblings := nodeIndex{}
+	descendants := nodeIndex{}
 
 	var loopNodes []*Node
 	newLoopNodes := []*Node{}
 
-	for i := 0; i < maxDepth; i++ {
+	for i := 0; i <= maxDepth; i++ {
 		if i == 0 {
 			loopNodes = []*Node{startNode}
 		} else {
@@ -910,11 +910,11 @@ func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
 		newLoopNodes = []*Node{}
 		for _, n := range loopNodes {
 			// If we've seen it, we're done
-			if _, ok := siblings[n.Id]; ok {
+			if _, ok := descendants[n.Id]; ok {
 				continue
 			}
 
-			siblings[n.Id] = n
+			descendants[n.Id] = n
 
 			// If node has no relationships, we're done
 			if _, ok := edgeIdx[n.Id]; !ok {
@@ -929,7 +929,7 @@ func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
 			for et := range edgeIdx[n.Id] {
 				for j := range edgeIdx[n.Id][et] {
 					for _, siblingID := range edgeIdx[n.Id][et][j].To {
-						if _, ok := siblings[siblingID]; ok {
+						if _, ok := descendants[siblingID]; ok {
 							continue
 						}
 
@@ -943,11 +943,14 @@ func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
 		}
 	}
 
-	// Assign found nodes to nodelist
-	for _, n := range siblings {
-		nl2.AddNode(n)
+	// Assign found nodes to nodelist and connect them
+	for _, n := range descendants {
+		if n.Id == id {
+			continue
+		}
+		// RelateNodeAtID can return an error but it will never happen as the
+		// nodelist was synthesized here
+		_ = nl2.RelateNodeAtID(n, id, Edge_ancestor) //nolint: errcheck
 	}
-
-	nl2.cleanEdges()
 	return &nl2
 }

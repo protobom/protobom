@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
 	"strconv"
 	"strings"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
+	"github.com/google/uuid"
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -45,6 +47,10 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
+	if doc.SerialNumber == "" || !isValidCycloneDXSerialNumber(doc.SerialNumber) {
+		doc.SerialNumber = "urn:uuid:" + uuid.New().String()
+	}
+
 	ver, err := strconv.Atoi(bom.Metadata.Version)
 	// TODO(deprecation): If version does not parse to int, there's data loss here.
 	if err == nil {
@@ -147,6 +153,13 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	doc.Components = &components
 
 	return doc, nil
+}
+
+// isValidCycloneDXSerialNumber validates serial id against regex pattern
+func isValidCycloneDXSerialNumber(serial string) bool {
+	pattern := `^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`
+	matched, _ := regexp.MatchString(pattern, serial)
+	return matched
 }
 
 // sbomTypeToPhase converts a SBOM document type to a CDX lifecycle phase

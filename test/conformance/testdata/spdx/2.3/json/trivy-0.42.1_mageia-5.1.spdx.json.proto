@@ -1,10 +1,10 @@
 
 ˜
-lhttp://aquasecurity.github.io/trivy/container_image/mageia:5.1-1195e55f-6de0-4b47-baca-9be7e7a51a0d#DOCUMENT0
+lhttp://aquasecurity.github.io/trivy/container_image/mageia:5.1-1195e55f-6de0-4b47-baca-9be7e7a51a0d#DOCUMENT1
 mageia:5.1"¡¸£ª*
 trivy-0.42.12
 aquasecurityJî
-text/spdx+json;version=2.3,(c1ab5fcf08d6b3014a4f10382ef2c2bf86db60ceD@fbc13d79cdb93181db8a0ed34d771ee954b84652ce36c9ba2a5ee16b3924a063…€ba865816a95fc08b349a1fd24465586d889018f1736acf689d5435dcad49442ddc7082bdc468b3897f1c8d1742e68be84abdc4ab3435fd666b3709ae5b0ff1b8éñ"Pfile://test/conformance/testdata/spdx/2.3/json/trivy-0.42.1_mageia-5.1.spdx.jsonõú
+text/spdx+json;version=2.3…€ba865816a95fc08b349a1fd24465586d889018f1736acf689d5435dcad49442ddc7082bdc468b3897f1c8d1742e68be84abdc4ab3435fd666b3709ae5b0ff1b8,(c1ab5fcf08d6b3014a4f10382ef2c2bf86db60ceD@fbc13d79cdb93181db8a0ed34d771ee954b84652ce36c9ba2a5ee16b3924a063éñ"Pfile://test/conformance/testdata/spdx/2.3/json/trivy-0.42.1_mageia-5.1.spdx.jsonõú
 ‰
 Package-2caaa458314d9a49basesystem-minimal"1:2-21.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj*built package from: basesystem 1:2-21.mga5’*PkgID: basesystem-minimal@2-21.mga5.x86_64’TLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2š
 

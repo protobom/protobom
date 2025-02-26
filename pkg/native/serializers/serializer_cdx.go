@@ -29,6 +29,27 @@ type (
 	}
 )
 
+// CDXOptions groups the configuration options for the CycloneDX serializer.
+type CDXOptions struct {
+	// GenerateSerialNumber instructs the serializer to generate a random URN
+	// when the protobom document has an empty ID or a deterministic UUID when
+	// it contains an incompatible string.
+	//
+	// When false, the serializer will return an error when the document ID is
+	// empty or not a serialNumber-compatible string.
+	GenerateSerialNumber bool
+}
+
+// Validate checks if the serializer options are
+func (o *CDXOptions) Validate() error {
+	// This is a noop for now
+	return nil
+}
+
+var DefaultCDXOptions = CDXOptions{
+	GenerateSerialNumber: true,
+}
+
 func NewCDX(version, encoding string) *CDX {
 	return &CDX{
 		version:  version,
@@ -36,12 +57,23 @@ func NewCDX(version, encoding string) *CDX {
 	}
 }
 
-func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interface{}) (interface{}, error) {
+func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts interface{}) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
 	state := newSerializerCDXState()
 	ctx := context.WithValue(context.Background(), stateKey, state)
+
+	opts := DefaultCDXOptions
+	if rawopts != nil {
+		var ok bool
+		if opts, ok = rawopts.(CDXOptions); !ok {
+			return nil, fmt.Errorf("error casting SPDX 2.3 options")
+		}
+	}
+	if err := opts.Validate(); err != nil {
+		return nil, fmt.Errorf("validating CDX options: %w", err)
+	}
 
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id

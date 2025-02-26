@@ -23,7 +23,7 @@ func NewDocument() *Document {
 	return &Document{
 		Metadata: &Metadata{
 			Id:      "",
-			Version: "0",
+			Version: "1",
 			Name:    "",
 			// Date:    &timestamppb.New(spdxDoc.CreationInfo.Created), // bug in onesbom
 			Tools:   []*Tool{},

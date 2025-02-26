@@ -29,17 +29,17 @@ const (
 type (
 	state string
 	CDX   struct {
-		version  string
-		encoding string
+		version              string
+		encoding             string
 		GenerateSerialNumber bool
 	}
 )
 
 func NewCDX(version, encoding string) *CDX {
 	return &CDX{
-		version:  version,
-		encoding: encoding,
-		GenerateSerialNumber: false
+		version:              version,
+		encoding:             encoding,
+		GenerateSerialNumber: false,
 	}
 }
 
@@ -53,18 +53,18 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 	doc := cdx.NewBOM()
 	doc.SerialNumber = bom.Metadata.Id
 
-    if doc.SerialNumber == "" || !isValidCycloneDXSerialNumberFormat(doc.SerialNumber) {
-        if s.GenerateSerialNumber {
-            if bom.Metadata.Id != "" {
-                namespace := uuid.MustParse("5dbcd03c-dd56-4fff-97af-77f89c66eeba")
-                doc.SerialNumber = "urn:uuid:" + uuid.NewSHA1(namespace, []byte(bom.Metadata.Id)).String()
-            } else {
-                doc.SerialNumber = "urn:uuid:" + uuid.New().String()
-            }
-        } else {
-            return nil, fmt.Errorf("unable to generate serialNumber, document ID is blank or invalid")
-        }
-    }
+	if doc.SerialNumber == "" || !isValidCycloneDXSerialNumberFormat(doc.SerialNumber) {
+		if s.GenerateSerialNumber {
+			if bom.Metadata.Id != "" {
+				namespace := uuid.MustParse("5dbcd03c-dd56-4fff-97af-77f89c66eeba")
+				doc.SerialNumber = "urn:uuid:" + uuid.NewSHA1(namespace, []byte(bom.Metadata.Id)).String()
+			} else {
+				doc.SerialNumber = "urn:uuid:" + uuid.New().String()
+			}
+		} else {
+			return nil, fmt.Errorf("unable to generate serialNumber, document ID is blank or invalid")
+		}
+	}
 
 	ver, err := strconv.Atoi(bom.Metadata.Version)
 	// TODO(deprecation): If version does not parse to int, there's data loss here.
@@ -172,7 +172,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, _ interf
 
 // isValidCycloneDXSerialNumber validates serial id against regex pattern
 func isValidCycloneDXSerialNumberFormat(serial string) bool {
-    return serialNumberPattern.MatchString(serial)
+	return serialNumberPattern.MatchString(serial)
 }
 
 // sbomTypeToPhase converts a SBOM document type to a CDX lifecycle phase

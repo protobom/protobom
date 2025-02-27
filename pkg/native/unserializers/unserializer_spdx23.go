@@ -264,18 +264,33 @@ func (*SPDX23) spdxDateToTime(date string) *time.Time {
 // fileToNode converts a file from SPDX into a protobom node
 func (u *SPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 	n := &sbom.Node{
-		Id:               string(f.FileSPDXIdentifier),
-		Type:             sbom.Node_FILE,
-		Name:             f.FileName,
-		Licenses:         f.LicenseInfoInFiles,
-		LicenseConcluded: f.LicenseConcluded,
-		LicenseComments:  f.LicenseComments,
-		Copyright:        f.FileCopyrightText,
-		Comment:          f.FileComment,
-		Attribution:      []string{},
-		Suppliers:        []*sbom.Person{},
-		Originators:      []*sbom.Person{},
-		FileTypes:        f.FileTypes,
+		Id:              string(f.FileSPDXIdentifier),
+		Type:            sbom.Node_FILE,
+		Name:            f.FileName,
+		LicenseComments: f.LicenseComments,
+		Copyright:       f.FileCopyrightText,
+		Comment:         f.FileComment,
+		Attribution:     []string{},
+		Suppliers:       []*sbom.Person{},
+		Originators:     []*sbom.Person{},
+		FileTypes:       f.FileTypes,
+	}
+
+	// Filter LicenseInfoInFiles, skip "NOASSERTION"
+	if len(f.LicenseInfoInFiles) > 0 {
+		filtered := make([]string, 0, len(f.LicenseInfoInFiles))
+		for _, lic := range f.LicenseInfoInFiles {
+			if lic != "NOASSERTION" {
+				filtered = append(filtered, lic)
+			}
+		}
+		if len(filtered) > 0 {
+			n.Licenses = filtered
+		}
+	}
+
+	if f.LicenseConcluded != protospdx.NOASSERTION && f.LicenseConcluded != "" {
+		n.LicenseConcluded = f.LicenseConcluded
 	}
 
 	if len(f.Checksums) > 0 {

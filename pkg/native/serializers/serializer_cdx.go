@@ -77,10 +77,9 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 	if doc.SerialNumber == "" || !isValidCycloneDXSerialNumberFormat(doc.SerialNumber) {
 		if opts.GenerateSerialNumber {
 			if bom.Metadata.Id != "" {
-				namespace := uuid.MustParse("5dbcd03c-dd56-4fff-97af-77f89c66eeba")
-				doc.SerialNumber = "urn:uuid:" + uuid.NewSHA1(namespace, []byte(bom.Metadata.Id)).String()
+				doc.SerialNumber = "urn:uuid:" + uuid.NewSHA1(uuid.MustParse(sbom.NamespaceUUID), []byte(bom.Metadata.Id)).String()
 			} else {
-				doc.SerialNumber = "urn:uuid:" + uuid.New().String()
+				doc.SerialNumber = "urn:uuid:" + uuid.NewString()
 			}
 		} else {
 			return nil, fmt.Errorf("unable to generate serialNumber, document ID is blank or invalid")

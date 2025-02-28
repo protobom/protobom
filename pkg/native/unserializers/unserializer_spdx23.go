@@ -280,7 +280,7 @@ func (u *SPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 	if len(f.LicenseInfoInFiles) > 0 {
 		filtered := make([]string, 0, len(f.LicenseInfoInFiles))
 		for _, lic := range f.LicenseInfoInFiles {
-			if lic != "NOASSERTION" {
+			if lic != protospdx.NOASSERTION {
 				filtered = append(filtered, lic)
 			}
 		}

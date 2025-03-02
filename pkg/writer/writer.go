@@ -12,7 +12,6 @@ import (
 	drivers "github.com/protobom/protobom/pkg/native/serializers"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
-	fstore "github.com/protobom/protobom/pkg/storage"
 )
 
 type Writer struct {
@@ -36,7 +35,7 @@ var (
 func New(opts ...WriterOption) *Writer {
 	ensureSerializersInitialized()
 	w := &Writer{
-		Storage: fstore.NewFileSystem(),
+		Storage: storage.NewFileSystem(),
 		Options: defaultOptions,
 	}
 
@@ -89,7 +88,7 @@ func GetFormatSerializer(format formats.Format) (native.Serializer, error) {
 }
 
 // WriteStreamWithOptions writes an SBOM in a native format to the stream w using the options set o.
-func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o *Options) error {
+func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.Writer, o *Options) error {
 	if bom == nil {
 		return fmt.Errorf("unable to write sbom to stream, SBOM is nil")
 	}
@@ -133,7 +132,7 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.WriteCloser, o
 	return nil
 }
 
-func (w *Writer) WriteStream(bom *sbom.Document, wr io.WriteCloser) error {
+func (w *Writer) WriteStream(bom *sbom.Document, wr io.Writer) error {
 	return w.WriteStreamWithOptions(bom, wr, w.Options)
 }
 

@@ -100,7 +100,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 
 			// If the CDX doc does not have a a top level component,
 			// then the nodes come in as top level nodes:
-			if bom.Metadata.Component != nil {
+			if bom.Metadata.Component == nil {
 				doc.NodeList.Add(nl)
 
 				// ... unless we have a top level component. Then we descend

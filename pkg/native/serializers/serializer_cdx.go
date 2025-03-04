@@ -1,7 +1,6 @@
 package serializers
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -14,7 +13,6 @@ import (
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
-	"github.com/sirupsen/logrus"
 )
 
 var _ native.Serializer = &CDX{}
@@ -22,13 +20,8 @@ var _ native.Serializer = &CDX{}
 // Precompiled regex for serialNumber validation
 var serialNumberPattern = regexp.MustCompile(`^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)
 
-const (
-	stateKey state = "cyclonedx_serializer_state"
-)
-
 type (
-	state string
-	CDX   struct {
+	CDX struct {
 		version  string
 		encoding string
 	}
@@ -66,8 +59,6 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
-	state := newSerializerCDXState()
-	ctx := context.WithValue(context.Background(), stateKey, state)
 
 	opts := DefaultCDXOptions
 	if rawopts != nil {
@@ -102,14 +93,12 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 		doc.Version = ver
 	}
 
-	metadata := cdx.Metadata{
-		Component:  &cdx.Component{},
-		Lifecycles: &[]cdx.Lifecycle{},
+	// Add the document metadata
+	md, err := buildMetadata(bom)
+	if err != nil {
+		return nil, fmt.Errorf("building metadata: %w", err)
 	}
-
-	doc.Metadata = &metadata
-	doc.Components = &[]cdx.Component{}
-	doc.Dependencies = &[]cdx.Dependency{}
+	doc.Metadata = md
 
 	// Check if the protobom has no root elements:
 	if len(bom.NodeList.RootElements) == 0 {
@@ -130,37 +119,137 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 		return nil, fmt.Errorf("unable to serialize multiroot cyclonedx, document has %d root nodes", l)
 	}
 
+	// Convert all nodes to cdx cmponents
+	components := map[string]*cdx.Component{}
+	for _, node := range bom.NodeList.Nodes {
+		components[node.Id] = s.nodeToComponent(node)
+	}
+
+	// CLear the protobom generated bomrefs
+	clearAutoRefs(components)
+
 	rootNode := bom.NodeList.GetNodeByID(bom.NodeList.RootElements[0])
 	if rootNode == nil {
 		return nil, fmt.Errorf("integrity error: root node %q not found", bom.NodeList.RootElements[0])
 	}
 
 	doc.Metadata.Component = s.nodeToComponent(rootNode)
-	state.addedDict[rootNode.Id] = struct{}{}
 
-	if err := s.componentsMaps(ctx, bom); err != nil {
-		return nil, err
+	// Extract the component tree
+	componentTree, err := recurseComponentComponents(
+		rootNode.Id, bom.NodeList, components, &map[string]struct{}{rootNode.Id: {}},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("building component tree: %w", err)
+	}
+	doc.Components = componentTree
+
+	// Build the dependency graph:
+	deps, err := buildDependencies(bom.NodeList, components)
+	if err != nil {
+		return nil, fmt.Errorf("building dependency tree: %w", err)
+	}
+	doc.Dependencies = &deps
+
+	if bom.Metadata != nil && bom.GetMetadata().GetName() != "" {
+		doc.Metadata.Component.Name = bom.GetMetadata().GetName()
 	}
 
-	for _, dt := range bom.Metadata.DocumentTypes {
-		var lfc cdx.Lifecycle
+	return doc, nil
+}
 
-		if dt.Type == nil {
-			lfc.Name = *dt.Name
-			lfc.Description = *dt.Description
-		} else {
-			lfc.Phase, err = sbomTypeToPhase(dt)
-			if err != nil {
-				return nil, err
-			}
+func buildDependencies(nl *sbom.NodeList, components map[string]*cdx.Component) ([]cdx.Dependency, error) {
+	ret := []cdx.Dependency{}
+	for _, e := range nl.Edges {
+		if _, ok := components[e.From]; !ok {
+			return nil, fmt.Errorf("node %q not found in components list", e.From)
 		}
 
-		*doc.Metadata.Lifecycles = append(*doc.Metadata.Lifecycles, lfc)
+		// If the src does not have a bomref, skip
+		if components[e.From].BOMRef == "" {
+			continue
+		}
+		deps := []string{}
+		dep := cdx.Dependency{
+			Ref: components[e.From].BOMRef,
+		}
+
+		for _, id := range e.To {
+			if _, ok := components[id]; !ok {
+				return nil, fmt.Errorf("node %q not found in components list", id)
+			}
+			if components[id].BOMRef == "" {
+				continue
+			}
+			deps = append(deps, components[id].BOMRef)
+		}
+		dep.Dependencies = &deps
+		// Only add the tree if it has destinations
+		if len(deps) > 0 {
+			ret = append(ret, dep)
+		}
+	}
+	return ret, nil
+}
+
+// isValidCycloneDXSerialNumber validates serial id against regex pattern
+func isValidCycloneDXSerialNumberFormat(serial string) bool {
+	return serialNumberPattern.MatchString(serial)
+}
+
+func recurseComponentComponents(
+	start string, nl *sbom.NodeList, components map[string]*cdx.Component, seen *map[string]struct{}, //nolint:gocritic
+) (*[]cdx.Component, error) {
+	// FIrst, well add the first level ones and then recurse
+	ret := []cdx.Component{}
+	descendants := nl.NodeDescendants(start, 1)
+	if len(descendants.Edges) == 0 {
+		return &ret, nil
 	}
 
-	if bom.Metadata != nil && len(bom.GetMetadata().GetAuthors()) > 0 {
+	protoIDToComp := map[string]*cdx.Component{}
+
+	// First add the nodes to the top
+	for _, id := range descendants.Edges[0].To {
+		if _, ok := (*seen)[id]; ok {
+			continue
+		}
+		if _, ok := components[id]; !ok {
+			return nil, fmt.Errorf("unable to find component for node %q", id)
+		}
+		protoIDToComp[id] = components[id]
+		(*seen)[id] = struct{}{}
+	}
+
+	// Now cycle them again and recurse
+	for id := range protoIDToComp {
+		comps, err := recurseComponentComponents(id, nl, components, seen)
+		if err != nil {
+			return nil, err
+		}
+		protoIDToComp[id].Components = comps
+	}
+
+	// Assemble the return slice
+	for _, comp := range protoIDToComp {
+		ret = append(ret, *comp)
+	}
+	return &ret, nil
+}
+
+// buildMetadata builds the sbom metadata
+func buildMetadata(doc *sbom.Document) (*cdx.Metadata, error) {
+	metadata := cdx.Metadata{
+		Component: &cdx.Component{},
+	}
+
+	if doc.Metadata == nil {
+		return nil, fmt.Errorf("protobom metadata is nil")
+	}
+
+	if len(doc.GetMetadata().GetAuthors()) > 0 {
 		var authors []cdx.OrganizationalContact
-		for _, bomauthor := range bom.GetMetadata().GetAuthors() {
+		for _, bomauthor := range doc.GetMetadata().GetAuthors() {
 			authors = append(authors, cdx.OrganizationalContact{
 				Name:  bomauthor.Name,
 				Email: bomauthor.Email,
@@ -170,9 +259,30 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 		metadata.Authors = &authors
 	}
 
-	if bom.Metadata != nil && len(bom.GetMetadata().GetTools()) > 0 {
+	if len(doc.Metadata.DocumentTypes) > 0 {
+		lifecycles := []cdx.Lifecycle{}
+
+		for _, dt := range doc.Metadata.DocumentTypes {
+			var lfc cdx.Lifecycle
+			var err error
+			if dt.Type == nil {
+				lfc.Name = *dt.Name
+				lfc.Description = *dt.Description
+			} else {
+				lfc.Phase, err = sbomTypeToPhase(dt)
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			lifecycles = append(lifecycles, lfc)
+		}
+		metadata.Lifecycles = &lifecycles
+	}
+
+	if len(doc.GetMetadata().GetTools()) > 0 {
 		var tools []cdx.Tool //nolint:staticcheck
-		for _, bomtool := range bom.GetMetadata().GetTools() {
+		for _, bomtool := range doc.GetMetadata().GetTools() {
 			tools = append(tools, cdx.Tool{ //nolint:staticcheck // Tool is needed for older cdx versions
 				Name:    bomtool.Name,
 				Version: bomtool.Version,
@@ -183,26 +293,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 		}
 	}
 
-	if bom.Metadata != nil && bom.GetMetadata().GetName() != "" {
-		doc.Metadata.Component.Name = bom.GetMetadata().GetName()
-	}
-
-	deps, err := s.dependencies(ctx, bom)
-	if err != nil {
-		return nil, err
-	}
-	doc.Dependencies = &deps
-
-	components := state.components()
-	clearAutoRefs(&components)
-	doc.Components = &components
-
-	return doc, nil
-}
-
-// isValidCycloneDXSerialNumber validates serial id against regex pattern
-func isValidCycloneDXSerialNumberFormat(serial string) bool {
-	return serialNumberPattern.MatchString(serial)
+	return &metadata, nil
 }
 
 // sbomTypeToPhase converts a SBOM document type to a CDX lifecycle phase
@@ -234,107 +325,16 @@ func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
 // refs added by the protobom reader. These are added on CycloneDX ingestion
 // to all nodes that don't have them. To maintain the closest fidelity, we
 // clear their refs again before output to CDX
-func clearAutoRefs(comps *[]cdx.Component) {
-	for i := range *comps {
-		if strings.HasPrefix((*comps)[i].BOMRef, "protobom-") {
-			flags := strings.Split((*comps)[i].BOMRef, "--")
+func clearAutoRefs(comps map[string]*cdx.Component) {
+	for i := range comps {
+		if strings.HasPrefix((comps)[i].BOMRef, "protobom-") {
+			// Read the flags from the autogen reference
+			flags := strings.Split((comps)[i].BOMRef, "--")
 			if strings.Contains(flags[0], "-auto") {
-				(*comps)[i].BOMRef = ""
+				comps[i].BOMRef = ""
 			}
 		}
-		if (*comps)[i].Components != nil && len(*(*comps)[i].Components) != 0 {
-			clearAutoRefs((*comps)[i].Components)
-		}
 	}
-}
-
-func (s *CDX) componentsMaps(ctx context.Context, bom *sbom.Document) error {
-	state, err := getCDXState(ctx)
-	if err != nil {
-		return fmt.Errorf("reading state: %w", err)
-	}
-
-	for _, n := range bom.NodeList.Nodes {
-		comp := s.nodeToComponent(n)
-		if comp == nil {
-			// Error? Warn?
-			continue
-		}
-
-		state.componentsDict[comp.BOMRef] = comp
-	}
-	return nil
-}
-
-// NOTE dependencies function modifies the components dictionary
-func (s *CDX) dependencies(ctx context.Context, bom *sbom.Document) ([]cdx.Dependency, error) {
-	var dependencies []cdx.Dependency
-	state, err := getCDXState(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("reading state: %w", err)
-	}
-
-	for _, e := range bom.NodeList.Edges {
-		e := e
-		if _, ok := state.addedDict[e.From]; ok {
-			continue
-		}
-
-		if _, ok := state.componentsDict[e.From]; !ok {
-			logrus.Info("serialize")
-			return nil, fmt.Errorf("unable to find component %s", e.From)
-		}
-
-		// In this example, we tree-ify all components related with a
-		// "contains" relationship. This is just an opinion for the demo
-		// and it is something we can parameterize
-		switch e.Type {
-		case sbom.Edge_contains:
-			// Make sure we have the target component
-			for _, targetID := range e.To {
-				state.addedDict[targetID] = struct{}{}
-				if _, ok := state.componentsDict[targetID]; !ok {
-					return nil, fmt.Errorf("unable to locate node %s", targetID)
-				}
-
-				if state.componentsDict[e.From].Components == nil {
-					state.componentsDict[e.From].Components = &[]cdx.Component{}
-				}
-				*state.componentsDict[e.From].Components = append(*state.componentsDict[e.From].Components, *state.componentsDict[targetID])
-			}
-
-		case sbom.Edge_dependsOn:
-			// Add to the dependency tree
-			targetStrings := []string{}
-			depListCheck := map[string]struct{}{}
-			for _, targetID := range e.To {
-				// Add entries to dependency only once.
-				if _, ok := depListCheck[targetID]; ok {
-					continue
-				}
-
-				if _, ok := state.componentsDict[targetID]; !ok {
-					return nil, fmt.Errorf("unable to locate node %s", targetID)
-				}
-
-				state.addedDict[targetID] = struct{}{}
-				depListCheck[targetID] = struct{}{}
-				targetStrings = append(targetStrings, targetID)
-			}
-			dependencies = append(dependencies, cdx.Dependency{
-				Ref:          e.From,
-				Dependencies: &targetStrings,
-			})
-		default:
-			// TODO(degradation) here, we would document how relationships are lost
-			logrus.Warnf(
-				"node %s is related with %s to %d other nodes, data will be lost",
-				e.From, e.Type, len(e.To),
-			)
-		}
-	}
-
-	return dependencies, nil
 }
 
 // nodeToComponent converts a node in protobuf to a CycloneDX component
@@ -456,9 +456,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		c.Supplier = &oe
 	}
 
-	if n.GetCopyright() != "" {
-		c.Copyright = n.GetCopyright()
-	}
+	c.Copyright = n.GetCopyright()
 
 	properties := []cdx.Property{}
 	for _, p := range n.Properties {
@@ -500,38 +498,6 @@ func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, _ i
 	}
 
 	return nil
-}
-
-type serializerCDXState struct {
-	addedDict      map[string]struct{}
-	componentsDict map[string]*cdx.Component
-}
-
-func newSerializerCDXState() *serializerCDXState {
-	return &serializerCDXState{
-		addedDict:      map[string]struct{}{},
-		componentsDict: map[string]*cdx.Component{},
-	}
-}
-
-func (s *serializerCDXState) components() []cdx.Component {
-	components := []cdx.Component{}
-	for _, c := range s.componentsDict {
-		if _, ok := s.addedDict[c.BOMRef]; ok {
-			continue
-		}
-		components = append(components, *c)
-	}
-
-	return components
-}
-
-func getCDXState(ctx context.Context) (*serializerCDXState, error) {
-	dm, ok := ctx.Value(stateKey).(*serializerCDXState)
-	if !ok {
-		return nil, errors.New("unable to cast serializer state from context")
-	}
-	return dm, nil
 }
 
 // protobomExtRefTypeToCdxType translates between the protobom external reference

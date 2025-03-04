@@ -3,7 +3,6 @@ package serializers
 import (
 	"testing"
 
-	"github.com/CycloneDX/cyclonedx-go"
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/stretchr/testify/require"
@@ -15,16 +14,16 @@ func TestComponentType(t *testing.T) {
 
 	for s, tc := range map[string]struct {
 		prepare  func(*sbom.Node)
-		compType cyclonedx.ComponentType
+		compType cdx.ComponentType
 	}{
 		"node file": {func(n *sbom.Node) {
 			n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FILE}
 			n.Type = sbom.Node_FILE
-		}, cyclonedx.ComponentTypeFile},
+		}, cdx.ComponentTypeFile},
 		"node file, ne purpose": {func(n *sbom.Node) {
 			n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY}
 			n.Type = sbom.Node_FILE
-		}, cyclonedx.ComponentTypeFile},
+		}, cdx.ComponentTypeFile},
 		"application": {func(n *sbom.Node) {
 			n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_APPLICATION}
 			n.Type = sbom.Node_PACKAGE
@@ -40,7 +39,7 @@ func TestComponentType(t *testing.T) {
 		"library": {func(n *sbom.Node) {
 			n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY}
 			n.Type = sbom.Node_PACKAGE
-		}, cyclonedx.ComponentTypeLibrary},
+		}, cdx.ComponentTypeLibrary},
 		"node package, pp file": {func(n *sbom.Node) {
 			n.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_FILE}
 			n.Type = sbom.Node_PACKAGE

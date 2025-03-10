@@ -18,7 +18,9 @@ import (
 var _ native.Serializer = &CDX{}
 
 // Precompiled regex for serialNumber validation
-var serialNumberPattern = regexp.MustCompile(`^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)
+const serialNumberPattern = `^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`
+
+var serialNumberRegex *regexp.Regexp
 
 type (
 	CDX struct {
@@ -193,7 +195,10 @@ func buildDependencies(nl *sbom.NodeList, components map[string]*cdx.Component) 
 
 // isValidCycloneDXSerialNumber validates serial id against regex pattern
 func isValidCycloneDXSerialNumberFormat(serial string) bool {
-	return serialNumberPattern.MatchString(serial)
+	if serialNumberRegex == nil {
+		serialNumberRegex = regexp.MustCompile(serialNumberPattern)
+	}
+	return serialNumberRegex.MatchString(serial)
 }
 
 func recurseComponentComponents(

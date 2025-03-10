@@ -77,6 +77,7 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Id = "modified"
 			},
 			expected: &NodeDiff{
+				NodeId: "test-node",
 				Added: &Node{
 					Id: "modified",
 				},
@@ -90,6 +91,7 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Name = "newname"
 			},
 			expected: &NodeDiff{
+				NodeId: "test-node",
 				Added: &Node{
 					Name: "newname",
 				},
@@ -104,6 +106,7 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Name = "newname"
 			},
 			expected: &NodeDiff{
+				NodeId: "test-node",
 				Added: &Node{
 					Id:   "modified",
 					Name: "newname",
@@ -118,7 +121,8 @@ func TestNodeDiff(t *testing.T) {
 				newNode.UrlDownload = ""
 			},
 			expected: &NodeDiff{
-				Added: &Node{},
+				NodeId: "test-node",
+				Added:  &Node{},
 				Removed: &Node{
 					UrlDownload: "http://example.com/test-node.zip",
 				},
@@ -131,6 +135,7 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Licenses = append(newNode.Licenses, "GPL3")
 			},
 			expected: &NodeDiff{
+				NodeId: "test-node",
 				Added: &Node{
 					Licenses: []string{"GPL3"},
 				},
@@ -145,7 +150,8 @@ func TestNodeDiff(t *testing.T) {
 				sutNode.Licenses = append(sutNode.Licenses, "GPL3")
 			},
 			expected: &NodeDiff{
-				Added: &Node{},
+				NodeId: "test-node",
+				Added:  &Node{},
 				Removed: &Node{
 					Licenses: []string{"GPL3"},
 				},
@@ -158,6 +164,7 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Hashes[int32(HashAlgorithm_SHA256)] = "2f2ed83cb80d77c14b7a23284fa73fbe3150a571fdb9388dcce9a7209bb11055"
 			},
 			expected: &NodeDiff{
+				NodeId: "test-node",
 				Added: &Node{
 					Hashes: map[int32]string{
 						int32(HashAlgorithm_SHA256): "2f2ed83cb80d77c14b7a23284fa73fbe3150a571fdb9388dcce9a7209bb11055",
@@ -173,7 +180,8 @@ func TestNodeDiff(t *testing.T) {
 				sutNode.Hashes[int32(HashAlgorithm_SHA256)] = "2f2ed83cb80d77c14b7a23284fa73fbe3150a571fdb9388dcce9a7209bb11055"
 			},
 			expected: &NodeDiff{
-				Added: &Node{},
+				NodeId: "test-node",
+				Added:  &Node{},
 				Removed: &Node{
 					Hashes: map[int32]string{
 						int32(HashAlgorithm_SHA256): "2f2ed83cb80d77c14b7a23284fa73fbe3150a571fdb9388dcce9a7209bb11055",
@@ -188,6 +196,7 @@ func TestNodeDiff(t *testing.T) {
 				newNode.ExternalReferences[0].Type = ExternalReference_WEBSITE
 			},
 			expected: &NodeDiff{
+				NodeId: "test-node",
 				Added: &Node{
 					ExternalReferences: []*ExternalReference{
 						{
@@ -215,6 +224,8 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Properties = append(newNode.Properties, &Property{Name: "secondTest", Data: "321"})
 			},
 			expected: &NodeDiff{
+				NodeId: "test-node",
+
 				Added: &Node{
 					Properties: []*Property{
 						{Name: "secondTest", Data: "321"},
@@ -230,7 +241,8 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Properties = []*Property{newNode.Properties[0]}
 			},
 			expected: &NodeDiff{
-				Added: &Node{},
+				NodeId: "test-node",
+				Added:  &Node{},
 				Removed: &Node{
 					Properties: []*Property{
 						{Name: "otherProperty", Data: "somethin else"},
@@ -256,6 +268,7 @@ func TestNodeDiff(t *testing.T) {
 			require.Truef(t, tc.expected.Added.Equal(result.Added), "comparing added: %s %s", result.Added.flatString(), tc.expected.Added.flatString())
 			require.Truef(t, tc.expected.Removed.Equal(result.Removed), "comparing removed: %s %s", result.Removed.flatString(), tc.expected.Removed.flatString())
 			require.Equal(t, tc.expected.DiffCount, result.DiffCount)
+			require.Equal(t, tc.expected.NodeId, result.NodeId)
 		})
 	}
 }

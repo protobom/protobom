@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
@@ -84,6 +85,14 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				logrus.Warnf("root nodelist has %d components, this should not happen", len(nl.RootElements))
 			}
 			doc.NodeList.Add(nl)
+		}
+		if bom.Metadata.Timestamp != "" {
+			t, err := time.Parse(time.RFC3339, bom.Metadata.Timestamp)
+			if err != nil {
+				logrus.Warnf("unable to parse time %q: %v", bom.Metadata.Timestamp, err)
+			} else {
+				md.Date = timestamppb.New(t)
+			}
 		}
 	}
 

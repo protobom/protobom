@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/google/uuid"
@@ -291,6 +292,11 @@ func buildMetadata(doc *sbom.Document) (*cdx.Metadata, error) {
 		metadata.Tools = &cdx.ToolsChoice{
 			Tools: &tools,
 		}
+	}
+
+	if doc.GetMetadata().GetDate() != nil {
+		t := doc.GetMetadata().GetDate().AsTime()
+		metadata.Timestamp = t.Format(time.RFC3339)
 	}
 
 	return &metadata, nil

@@ -61,7 +61,6 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	if bom.Metadata != nil {
 		if bom.Metadata.Lifecycles != nil {
 			for _, lc := range *bom.Metadata.Lifecycles {
-
 				name := lc.Name
 				desc := lc.Description
 				t := u.phaseToSBOMType(&lc.Phase)

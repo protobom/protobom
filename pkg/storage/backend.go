@@ -17,11 +17,13 @@ type (
 		Retrieve(string, *RetrieveOptions) (*sbom.Document, error)
 	}
 
+	//nolint:iface
 	StoreRetriever interface {
 		Storer
 		Retriever
 	}
 
+	//nolint:iface
 	Backend interface {
 		StoreRetriever
 	}

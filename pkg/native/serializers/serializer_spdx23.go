@@ -68,11 +68,15 @@ func NewSPDX23() *SPDX23 {
 	return &SPDX23{}
 }
 
-func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, _ interface{}) error {
+func (s *SPDX23) Render(doc any, wr io.Writer, o *native.RenderOptions, _ any) error {
 	// TODO: add support for XML
 	encoder := json.NewEncoder(wr)
 	encoder.SetIndent("", strings.Repeat(" ", o.Indent))
-	if err := encoder.Encode(doc.(*spdx.Document)); err != nil {
+	spdxDoc, ok := doc.(*spdx.Document)
+	if !ok {
+		return errors.New("unable to cast doc as spdx.Document")
+	}
+	if err := encoder.Encode(spdxDoc); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
 
@@ -105,11 +109,12 @@ func spdxNamespaceFromProtobomID(opts SPDX23Options, protoId string) (spdxId str
 	if err != nil || u.Scheme == "" || (u.Fragment != "" && u.Fragment != "SPDXRef-DOCUMENT") {
 		// If the document identifier is not full URI, generate a
 		// deterministic URN
+		//nolint:nilerr
 		return fmt.Sprintf(
 			`urn:uuid:%s`, uuid.NewSHA1(
 				uuid.MustParse(sbom.NamespaceUUID), []byte(protoId),
 			).String(),
-		), nil //nolint:nilerr
+		), nil
 	}
 
 	// At this point we've verified the protobom document ID is a URI and its
@@ -392,11 +397,12 @@ func (s *SPDX23) buildPackages(
 				p.PrimaryPackagePurpose = "FILE"
 			case sbom.Purpose_INSTALL:
 				p.PrimaryPackagePurpose = "INSTALL"
-			case sbom.Purpose_OTHER, sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST:
-				p.PrimaryPackagePurpose = "OTHER"
-			case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
-				p.PrimaryPackagePurpose = "OTHER"
-			case sbom.Purpose_PLATFORM:
+			case sbom.Purpose_OTHER, sbom.Purpose_DATA, sbom.Purpose_BOM,
+				sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION,
+				sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT,
+				sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST,
+				sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL,
+				sbom.Purpose_PLATFORM:
 				p.PrimaryPackagePurpose = "OTHER"
 			default:
 				// TODO(degradation): Non-matching primary purpose to component type mapping

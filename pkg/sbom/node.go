@@ -321,7 +321,7 @@ func (n *Node) flatString() string {
 // It returns a string composed of slice of strings shorted by values.
 func flatStringStrSlice(name protoreflect.FullName, protoSlice protoreflect.List) string {
 	vals := []string{}
-	for i := 0; i < protoSlice.Len(); i++ {
+	for i := range protoSlice.Len() {
 		vals = append(vals, protoSlice.Get(i).String())
 	}
 	slices.Sort(vals)

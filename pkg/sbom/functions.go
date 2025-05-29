@@ -64,6 +64,8 @@ func NewNodeIdentifier(prefixes ...string) string {
 }
 
 // EdgeTypeFromSPDX converts an SPDX2 edge type string to its corresponding edge type.
+//
+//nolint:goconst
 func EdgeTypeFromSPDX(spdxName string) Edge_Type {
 	switch spdxName {
 	case "AMENDS":

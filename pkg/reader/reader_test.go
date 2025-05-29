@@ -433,6 +433,7 @@ func TestRetrieve(t *testing.T) {
 			mustErr: false,
 			prepare: func(r *reader.Reader) {
 				t.Helper()
+				//nolint:errcheck,forcetypeassert // This is a controlled test
 				r.Storage.(*storage.Fake).RetrieveReturns = struct {
 					Document *sbom.Document
 					Error    error
@@ -454,6 +455,7 @@ func TestRetrieve(t *testing.T) {
 			mustErr: true,
 			prepare: func(r *reader.Reader) {
 				t.Helper()
+				//nolint:errcheck,forcetypeassert // This is a controlled test
 				r.Storage.(*storage.Fake).RetrieveReturns = struct {
 					Document *sbom.Document
 					Error    error

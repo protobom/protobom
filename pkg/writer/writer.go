@@ -82,7 +82,11 @@ func GetFormatSerializer(format formats.Format) (native.Serializer, error) {
 		if serializer == nil {
 			return nil, nil
 		}
-		return serializer.(native.Serializer), nil
+		s, ok := serializer.(native.Serializer)
+		if !ok {
+			return nil, fmt.Errorf("unable to cast serializer as native")
+		}
+		return s, nil
 	}
 	return nil, fmt.Errorf("unable to find serializer for format %s", format)
 }
@@ -143,7 +147,7 @@ func (w *Writer) WriteFileWithOptions(bom *sbom.Document, path string, o *Option
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 	return w.WriteStreamWithOptions(bom, f, o)
 }
 

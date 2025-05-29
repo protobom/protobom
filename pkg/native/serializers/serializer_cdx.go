@@ -500,11 +500,12 @@ func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, _ i
 	encoder := cdx.NewBOMEncoder(wr, encoding)
 	encoder.SetPretty(true)
 
-	if _, ok := doc.(*cdx.BOM); !ok {
+	cdxdoc, ok := doc.(*cdx.BOM)
+	if !ok {
 		return errors.New("document is not a cyclonedx bom")
 	}
 
-	if err := encoder.EncodeVersion(doc.(*cdx.BOM), version); err != nil {
+	if err := encoder.EncodeVersion(cdxdoc, version); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
 

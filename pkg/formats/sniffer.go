@@ -40,7 +40,7 @@ func (fs *Sniffer) SniffFile(path string) (Format, error) {
 	if err != nil {
 		return "", fmt.Errorf("opening path: %w", err)
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 	return fs.SniffReader(f)
 }
 

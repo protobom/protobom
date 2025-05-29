@@ -1,149 +1,183 @@
+# SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
+# SPDX-License-Identifier: Apache-2.0
 ---
+version: "2"
 run:
   concurrency: 6
   timeout: 5m
 issues:
-  exclude-rules:
-    # counterfeiter fakes are usually named 'fake_<something>.go'
-    - path: fake_.*\.go
-      linters:
-        - gocritic
-        - golint
-        - dupl
-
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
 
   # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
   max-same-issues: 0
-linters:
-  disable-all: true
+formatters:
+  # Enable specific formatter.
+  # Default: [] (uses standard Go formatting)
   enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+    # - golines
+  settings: 
+    gci:
+      no-inline-comments: false
+      no-prefix-comments: true
+      sections:
+        - standard
+        - default
+        - prefix(github.com/protobom/protobom)
+linters:
+  enable:
+    - asasalint
     - asciicheck
+    - bidichk
     - bodyclose
-    # - depguard
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - decorder
     - dogsled
     - dupl
     - durationcheck
     - errcheck
-    # - goconst Disabled temporarily as we need to const away all the relationships
+    - errchkjson
+    - errname
+    - errorlint
+    # - exhaustive
+    - exptostd
+    - fatcontext
+    - forcetypeassert
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecksumtype
+    - goconst
     - gocritic
-    # - gocyclo Disables until some functions are optimized
+    - gocyclo
+    # - godot
     - godox
-    - gofmt
-    - gofumpt
     - goheader
-    - goimports
     - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
+    - gosmopolitan
     - govet
+    - grouper
+    - iface
     - importas
     - ineffassign
+    - intrange
+    - loggercheck
     - makezero
+    - mirror
     - misspell
+    - musttag
     - nakedret
+    - nilerr
+    - nilnesserr
+    # - nlreturn
+    - noctx
     - nolintlint
+    - nosprintfhostport
+    # - perfsprint
     - prealloc
     - predeclared
     - promlinter
-    # - revive Disabled for now as we have lots of uppercase consts
+    # - protogetter
+    - reassign
+    - recvcheck
+    # - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
     - staticcheck
-    #- stylecheck
-    - typecheck
+    - tagalign
+    # - testableexamples
+    - testifylint
+    - tparallel
     - unconvert
     - unparam
     - unused
+    - usestdlibvars
+    - usetesting
+    - wastedassign
     - whitespace
-    # - cyclop
-    # - errorlint
-    # - exhaustive
-    # - exhaustivestruct
-    # - exportloopref
-    # - forbidigo
-    # - forcetypeassert
-    # - funlen
-    # - gci
-    # - gochecknoglobals
-    # - gochecknoinits
-    # - gocognit
-    # - godot
-    # - goerr113
-    # - gomnd
-    # - ifshort
-    # - lll
-    # - nestif
-    # - nilerr
-    # - nlreturn
-    # - noctx
-    # - paralleltest
-    # - scopelint
-    # - tagliatelle
-    # - testpackage
-    # - thelper
-    # - tparallel
-    # - wastedassign
-    # - wrapcheck
     # - wsl
-linters-settings:
-  godox:
-    keywords:
-      - BUG
-      - FIXME
-      - HACK
-  errcheck:
-    check-type-assertions: false
-    check-blank: true
-  gocritic:
-    enabled-checks:
-      # Diagnostic
-      - commentedOutCode
-      - nilValReturn
-      - sloppyReassign
-      - weakCond
-      - octalLiteral
+    - zerologlint
 
-      # Performance
-      - appendCombine
-      - equalFold
-      - hugeParam
-      - indexAlloc
-      - rangeExprCopy
-      - rangeValCopy
+  settings:
+    gocyclo:
+      min-complexity: 51
+    godox:
+      keywords:
+        - BUG
+        - FIXME
+        - HACK
+    gosmopolitan:
+      # Allow and ignore `time.Local` usages.
+      #
+      # Default: false
+      allow-time-local: true
+    perfsprint:
+      integer-format: false
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    gocritic:
+      enabled-checks:
+        # Diagnostic
+        - commentedOutCode
+        - nilValReturn
+        - sloppyReassign
+        - weakCond
+        - octalLiteral
 
-      # Style
-      - boolExprSimplify
-      - commentedOutImport
-      - docStub
-      - emptyFallthrough
-      - emptyStringTest
-      - hexLiteral
-      - methodExprCall
-      - stringXbytes
-      - typeAssertChain
-      - unlabelStmt
-      - yodaStyleExpr
-      # - ifElseChain
+        # Performance
+        - appendCombine
+        - equalFold
+        - hugeParam
+        - indexAlloc
+        - rangeExprCopy
+        - rangeValCopy
 
-      # Opinionated
-      - builtinShadow
-      - importShadow
-      - initClause
-      - nestingReduce
-      - paramTypeCombine
-      - ptrToRefParam
-      - typeUnparen
-      - unnamedResult
-      - unnecessaryBlock
-  nolintlint:
-    # Enable to ensure that nolint directives are all used. Default is true.
-    allow-unused: false
-    # Exclude following linters from requiring an explanation.  Default is [].
-    allow-no-explanation: []
-    # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
-    # TODO(lint): Enforce explanations for `nolint` directives
-    require-explanation: false
-    # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: true
+        # Style
+        - boolExprSimplify
+        - commentedOutImport
+        - docStub
+        - emptyFallthrough
+        - emptyStringTest
+        - hexLiteral
+        - methodExprCall
+        - stringXbytes
+        - typeAssertChain
+        - unlabelStmt
+        - yodaStyleExpr
+        # - ifElseChain
+
+        # Opinionated
+        - builtinShadow
+        - importShadow
+        - initClause
+        - nestingReduce
+        - paramTypeCombine
+        - ptrToRefParam
+        - typeUnparen
+        - unnamedResult
+        - unnecessaryBlock
+    gosec:
+      excludes:
+        - G304
+    nolintlint:
+      # Enable to ensure that nolint directives are all used. Default is true.
+      allow-unused: false
+      # Exclude following linters from requiring an explanation.  Default is [].
+      allow-no-explanation: []
+      # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
+      # TODO(lint): Enforce explanations for `nolint` directives
+      require-explanation: false
+      # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
+      require-specific: true

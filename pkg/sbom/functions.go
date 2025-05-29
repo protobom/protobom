@@ -6,7 +6,6 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/CycloneDX/cyclonedx-go"
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/google/uuid"
 )
@@ -43,7 +42,7 @@ func NewNodeIdentifier(prefixes ...string) string {
 		}
 		// Replace invalid chars with unicode numbers to avoid collisions
 		s = invalidIDCharsRe.ReplaceAllStringFunc(s, func(s string) (r string) {
-			for i := 0; i < len(s); i++ {
+			for i := range len(s) {
 				uc, _ := utf8.DecodeRuneInString(string(s[i]))
 				r = fmt.Sprintf("%sC%d", r, uc)
 			}
@@ -65,6 +64,8 @@ func NewNodeIdentifier(prefixes ...string) string {
 }
 
 // EdgeTypeFromSPDX converts an SPDX2 edge type string to its corresponding edge type.
+//
+//nolint:goconst
 func EdgeTypeFromSPDX(spdxName string) Edge_Type {
 	switch spdxName {
 	case "AMENDS":
@@ -157,7 +158,7 @@ func EdgeTypeFromSPDX(spdxName string) Edge_Type {
 }
 
 // HashAlgorithmFromCDX converts a CycloneDX hash algorithm to its corresponding Hash Algorithm.
-func HashAlgorithmFromCDX(cdxAlgorithm cyclonedx.HashAlgorithm) HashAlgorithm {
+func HashAlgorithmFromCDX(cdxAlgorithm cdx.HashAlgorithm) HashAlgorithm {
 	switch cdxAlgorithm {
 	case cdx.HashAlgoMD5:
 		return HashAlgorithm_MD5

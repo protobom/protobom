@@ -73,12 +73,12 @@ func (f *Format) URI() string {
 }
 
 // Encoding returns the encoding used by the SBOM format
-func (f Format) Encoding() string {
+func (f *Format) Encoding() string {
 	// Trim the version first
 	switch {
-	case strings.Contains(string(f), JSON):
+	case strings.Contains(string(*f), JSON):
 		return JSON
-	case strings.Contains(string(f), TEXT):
+	case strings.Contains(string(*f), TEXT):
 		return TEXT
 	default:
 		return ""

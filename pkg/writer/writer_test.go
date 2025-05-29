@@ -6,13 +6,14 @@ import (
 	"path"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/native/nativefakes"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 	"github.com/protobom/protobom/pkg/writer"
-	"github.com/stretchr/testify/require"
 )
 
 type fakeWriteCloser struct {
@@ -34,7 +35,7 @@ func TestNew(t *testing.T) {
 		format formats.Format
 		ro     *native.RenderOptions
 		so     *native.SerializeOptions
-		fo     map[string]interface{}
+		fo     map[string]any
 	}{
 		{
 			name:   "CDX format with 2 indent",
@@ -51,7 +52,7 @@ func TestNew(t *testing.T) {
 				Indent: 4,
 			},
 			so: &native.SerializeOptions{},
-			fo: map[string]interface{}{
+			fo: map[string]any{
 				string(formats.SPDX23JSON): &dummyOptions{
 					TestProperty: "test",
 				},
@@ -209,7 +210,6 @@ func TestWriteStream(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
@@ -448,6 +448,7 @@ func TestStore(t *testing.T) {
 			mustErr: false,
 			prepare: func(r *writer.Writer) {
 				t.Helper()
+				//nolint:errcheck,forcetypeassert // This is a controlled test
 				w.Storage.(*storage.Fake).StoreReturns = nil
 			},
 		},
@@ -466,11 +467,11 @@ func TestStore(t *testing.T) {
 			mustErr: true,
 			prepare: func(w *writer.Writer) {
 				t.Helper()
-				w.Storage.(*storage.Fake).StoreReturns = fmt.Errorf("fallo todo")
+				//nolint:errcheck,forcetypeassert // This is a controlled test
+				w.Storage.(*storage.Fake).StoreReturns = fmt.Errorf("everything failed")
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			w := *w

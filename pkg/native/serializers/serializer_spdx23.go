@@ -10,14 +10,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
-	"github.com/protobom/protobom/pkg/mod"
-	"github.com/protobom/protobom/pkg/native"
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	"github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"sigs.k8s.io/release-utils/version"
+
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/mod"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 var _ native.Serializer = &SPDX23{}
@@ -67,11 +68,15 @@ func NewSPDX23() *SPDX23 {
 	return &SPDX23{}
 }
 
-func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, _ interface{}) error {
+func (s *SPDX23) Render(doc any, wr io.Writer, o *native.RenderOptions, _ any) error {
 	// TODO: add support for XML
 	encoder := json.NewEncoder(wr)
 	encoder.SetIndent("", strings.Repeat(" ", o.Indent))
-	if err := encoder.Encode(doc.(*spdx.Document)); err != nil {
+	spdxDoc, ok := doc.(*spdx.Document)
+	if !ok {
+		return errors.New("unable to cast doc as spdx.Document")
+	}
+	if err := encoder.Encode(spdxDoc); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
 	}
 
@@ -104,6 +109,7 @@ func spdxNamespaceFromProtobomID(opts SPDX23Options, protoId string) (spdxId str
 	if err != nil || u.Scheme == "" || (u.Fragment != "" && u.Fragment != "SPDXRef-DOCUMENT") {
 		// If the document identifier is not full URI, generate a
 		// deterministic URN
+		//nolint:nilerr
 		return fmt.Sprintf(
 			`urn:uuid:%s`, uuid.NewSHA1(
 				uuid.MustParse(sbom.NamespaceUUID), []byte(protoId),
@@ -209,12 +215,12 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 
 	packages, err := s.buildPackages(serializeopts, opts, bom)
 	if err != nil {
-		return nil, fmt.Errorf("building SPDX packages: %s", err)
+		return nil, fmt.Errorf("building SPDX packages: %w", err)
 	}
 
 	files, err := buildFiles(bom)
 	if err != nil {
-		return nil, fmt.Errorf("building SPDX file list: %s", err)
+		return nil, fmt.Errorf("building SPDX file list: %w", err)
 	}
 
 	rels, err := buildRelationships(bom)
@@ -391,11 +397,12 @@ func (s *SPDX23) buildPackages(
 				p.PrimaryPackagePurpose = "FILE"
 			case sbom.Purpose_INSTALL:
 				p.PrimaryPackagePurpose = "INSTALL"
-			case sbom.Purpose_OTHER, sbom.Purpose_DATA, sbom.Purpose_BOM, sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION, sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT, sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST:
-				p.PrimaryPackagePurpose = "OTHER"
-			case sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL:
-				p.PrimaryPackagePurpose = "OTHER"
-			case sbom.Purpose_PLATFORM:
+			case sbom.Purpose_OTHER, sbom.Purpose_DATA, sbom.Purpose_BOM,
+				sbom.Purpose_CONFIGURATION, sbom.Purpose_DOCUMENTATION,
+				sbom.Purpose_EVIDENCE, sbom.Purpose_MANIFEST, sbom.Purpose_REQUIREMENT,
+				sbom.Purpose_SPECIFICATION, sbom.Purpose_TEST,
+				sbom.Purpose_MACHINE_LEARNING_MODEL, sbom.Purpose_MODEL,
+				sbom.Purpose_PLATFORM:
 				p.PrimaryPackagePurpose = "OTHER"
 			default:
 				// TODO(degradation): Non-matching primary purpose to component type mapping

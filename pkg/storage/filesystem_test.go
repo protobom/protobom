@@ -4,8 +4,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 func TestFileSystem(t *testing.T) {
@@ -25,7 +26,6 @@ func TestFileSystem(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 

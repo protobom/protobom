@@ -117,7 +117,7 @@ func (r *Reader) ParseFileWithOptions(path string, o *Options) (*sbom.Document, 
 	if err != nil {
 		return nil, fmt.Errorf("opening SBOM file: %w", err)
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 
 	doc, err := r.ParseStreamWithOptions(f, o)
 	if err != nil {

@@ -7,10 +7,10 @@ import (
 	"time"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
-	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -61,7 +61,6 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	if bom.Metadata != nil {
 		if bom.Metadata.Lifecycles != nil {
 			for _, lc := range *bom.Metadata.Lifecycles {
-				lc := lc
 				name := lc.Name
 				desc := lc.Description
 				t := u.phaseToSBOMType(&lc.Phase)
@@ -349,7 +348,7 @@ func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 			s += fmt.Sprintf("(%s) OR ", s)
 		}
 
-		newLicense := ""
+		var newLicense string
 		if lc.Expression != "" {
 			newLicense = lc.Expression
 		} else {

@@ -27,6 +27,7 @@ type hashIndex map[string][]*Node
 // purlIndex captures the SBOM nodelist ordered by package url
 type purlIndex map[PackageURL][]*Node
 
+//nolint:errname // cannot change this without compatibility break
 var ErrorMoreThanOneMatch = fmt.Errorf("more than one node matches")
 
 // NewNodeList returns a new NodeList with empty nodes, edges, and root elements.

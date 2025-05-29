@@ -82,7 +82,7 @@ func TestAugment(t *testing.T) {
 		},
 	} {
 		tc.sut.Augment(tc.n2)
-		require.Equal(t, tc.sut, tc.expected)
+		require.Equal(t, tc.expected, tc.sut)
 	}
 }
 
@@ -134,7 +134,7 @@ func TestUpdate(t *testing.T) {
 		},
 	} {
 		tc.sut.Update(tc.n2)
-		require.Equal(t, tc.sut, tc.expected)
+		require.Equal(t, tc.expected, tc.sut)
 	}
 }
 
@@ -263,7 +263,6 @@ func TestNodeFlatString(t *testing.T) {
 			"protobom.protobom.Node.attribution[0]:Copyright 2003 The Protobom Authors:protobom.protobom.Node.comment:This a test file to check serialization:protobom.protobom.Node.copyright:Copyright (c) 2023 The Protobom Authors:protobom.protobom.Node.description:Descr:protobom.protobom.Node.file_name:textfile.txt:protobom.protobom.Node.hashes:2:7df059597099bb7dcf25d2a9aedfaf4465f72d8d3:b51261db1ecadecf85274e811e537c5811a0ad1ab2a0121aeac4e3d031e1bf835:dc6b68d13b8cf959644b935f1192b02c71aa7a5cf653bd43b4480fa89eec8d4d3f16a2278ec8c3b40ab1fdb233b3173a78fd83590d6f739e0c9e8ff56c282557:protobom.protobom.Node.id:node-2:protobom.protobom.Node.license_comments:Test license, ignore:protobom.protobom.Node.license_concluded:Apache-2.0:protobom.protobom.Node.name:textfile.txt:protobom.protobom.Node.primary_purpose[0]:12:protobom.protobom.Node.summary:Test:protobom.protobom.Node.type:1:protobom.protobom.Node.url_download:http://example.com/file.tar.gz:protobom.protobom.Node.url_home:http://example.com/",
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			s := tc.sut.flatString()
 			require.Equal(t, tc.expectedString, s)
@@ -448,7 +447,7 @@ func TestNodeDescendants(t *testing.T) {
 			// When there are no descendants (or root!) then there
 			// should not be any Edges defined
 			if len(res.Nodes) <= 1 {
-				require.Len(t, res.Edges, 0)
+				require.Empty(t, res.Edges)
 			} else {
 				// ... but when there are descendants, then the function
 				// must return only 1 edge, grouping all descendants.

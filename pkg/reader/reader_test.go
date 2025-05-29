@@ -9,6 +9,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/native/nativefakes"
@@ -17,7 +19,6 @@ import (
 	"github.com/protobom/protobom/pkg/reader/readerfakes"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
-	"github.com/stretchr/testify/require"
 )
 
 // A note about Unserializers and reader behavior:
@@ -432,6 +433,7 @@ func TestRetrieve(t *testing.T) {
 			mustErr: false,
 			prepare: func(r *reader.Reader) {
 				t.Helper()
+				//nolint:errcheck,forcetypeassert // This is a controlled test
 				r.Storage.(*storage.Fake).RetrieveReturns = struct {
 					Document *sbom.Document
 					Error    error
@@ -453,6 +455,7 @@ func TestRetrieve(t *testing.T) {
 			mustErr: true,
 			prepare: func(r *reader.Reader) {
 				t.Helper()
+				//nolint:errcheck,forcetypeassert // This is a controlled test
 				r.Storage.(*storage.Fake).RetrieveReturns = struct {
 					Document *sbom.Document
 					Error    error
@@ -460,7 +463,6 @@ func TestRetrieve(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			r := *r

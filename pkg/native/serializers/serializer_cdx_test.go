@@ -4,8 +4,9 @@ import (
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 func TestComponentType(t *testing.T) {

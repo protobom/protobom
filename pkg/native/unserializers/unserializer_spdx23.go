@@ -9,16 +9,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
+	spdxjson "github.com/spdx/tools-golang/json"
+	"github.com/spdx/tools-golang/spdx"
+	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
-	"github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/types/known/timestamppb"
-
-	spdxjson "github.com/spdx/tools-golang/json"
-	"github.com/spdx/tools-golang/spdx"
-	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 )
 
 var _ native.Unserializer = &SPDX23{}

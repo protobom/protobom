@@ -8,12 +8,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/protobom/protobom/pkg/formats"
-	"github.com/protobom/protobom/pkg/reader"
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/reader"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 func TestUnserializeFormats(t *testing.T) {
@@ -58,7 +59,7 @@ func findFiles(t *testing.T, f formats.Format) []string {
 }
 
 func testNodes(t *testing.T, golden, sut *sbom.Document) {
-	require.Equal(t, len(golden.NodeList.Nodes), len(sut.NodeList.Nodes), "number of nodes")
+	require.Len(t, sut.NodeList.Nodes, len(golden.NodeList.Nodes), "number of nodes")
 }
 
 func testEqualNodeList(t *testing.T, golden, sut *sbom.Document) {
@@ -70,13 +71,13 @@ func readProtobom(t *testing.T, path string) *sbom.Document {
 	require.NoError(t, err)
 	bom := &sbom.Document{}
 	if err := proto.Unmarshal(data, bom); err != nil {
-		logrus.Fatal(fmt.Errorf("unmarshaling protobuf: %v", err))
+		logrus.Fatal(fmt.Errorf("unmarshaling protobuf: %w", err))
 	}
 	return bom
 }
 
 func testEdges(t *testing.T, golden, sut *sbom.Document) {
-	require.Equal(t, len(golden.NodeList.Edges), len(sut.NodeList.Edges), "number of nodes")
+	require.Len(t, golden.NodeList.Edges, len(sut.NodeList.Edges), "number of nodes")
 }
 
 // TODO(puerco): Implement comparison methods in the document metadata

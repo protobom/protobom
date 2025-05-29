@@ -3,8 +3,9 @@ package sbom
 import (
 	"testing"
 
-	"github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/protobom/pkg/formats/spdx"
 )
 
 func TestIToSPDX2Category(t *testing.T) {

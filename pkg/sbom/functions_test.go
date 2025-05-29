@@ -1,7 +1,6 @@
 package sbom
 
 import (
-	"fmt"
 	"regexp"
 	"testing"
 
@@ -27,7 +26,7 @@ func TestNewNodeIdentifier(t *testing.T) {
 	} {
 		id := NewNodeIdentifier(tc.parts...)
 		logrus.Info(id)
-		require.True(t, validIDCharsRe.MatchString(id), fmt.Sprintf("%s: %s", m, id))
+		require.True(t, validIDCharsRe.MatchString(id), "%s: %s", m, id)
 		if tc.expect != "" {
 			require.Equal(t, id, tc.expect)
 		}

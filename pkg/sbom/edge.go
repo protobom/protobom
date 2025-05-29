@@ -34,6 +34,8 @@ func (e *Edge) PointsTo(id string) bool {
 
 // ToSPDX2 converts the edge type to the corresponding SPDX2 label.
 // It maps the neutral edge type to its SPDX2 representation.
+//
+//nolint:goconst // TODO(puerco): The SPDX labels will fail the goconst linter, perhaps these exist in the SPDX libs.
 func (et Edge_Type) ToSPDX2() string {
 	switch et {
 	case Edge_UNKNOWN:

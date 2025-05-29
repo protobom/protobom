@@ -5,10 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/protobom/protobom/pkg/formats"
-	"github.com/protobom/protobom/pkg/reader"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/reader"
 )
 
 // This is a simple utility to generate the golden samples of the conformance

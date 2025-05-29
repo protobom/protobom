@@ -10,14 +10,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
-	"github.com/protobom/protobom/pkg/mod"
-	"github.com/protobom/protobom/pkg/native"
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	"github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"sigs.k8s.io/release-utils/version"
+
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/mod"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 var _ native.Serializer = &SPDX23{}
@@ -108,7 +109,7 @@ func spdxNamespaceFromProtobomID(opts SPDX23Options, protoId string) (spdxId str
 			`urn:uuid:%s`, uuid.NewSHA1(
 				uuid.MustParse(sbom.NamespaceUUID), []byte(protoId),
 			).String(),
-		), nil
+		), nil //nolint:nilerr
 	}
 
 	// At this point we've verified the protobom document ID is a URI and its
@@ -209,12 +210,12 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 
 	packages, err := s.buildPackages(serializeopts, opts, bom)
 	if err != nil {
-		return nil, fmt.Errorf("building SPDX packages: %s", err)
+		return nil, fmt.Errorf("building SPDX packages: %w", err)
 	}
 
 	files, err := buildFiles(bom)
 	if err != nil {
-		return nil, fmt.Errorf("building SPDX file list: %s", err)
+		return nil, fmt.Errorf("building SPDX file list: %w", err)
 	}
 
 	rels, err := buildRelationships(bom)

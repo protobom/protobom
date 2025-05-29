@@ -5,13 +5,14 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/protobom/protobom/pkg/mod"
-	"github.com/protobom/protobom/pkg/native"
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/protobom/pkg/mod"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 func TestSPDXExtRefToProtobomEnum(t *testing.T) {
@@ -91,7 +92,6 @@ func TestSPDXExtRefToProtobomEnum(t *testing.T) {
 		},
 		// TODO(complete this)
 	} {
-		tc := tc
 		t.Run(fmt.Sprintf("%s/%s", tc.sut.Category, tc.sut.RefType), func(t *testing.T) {
 			res, isIdentifier, err := s23.extRefToProtobomEnum(&tc.sut)
 			if tc.shouldErr {
@@ -148,8 +148,8 @@ func TestBuildDocumentIdentifier(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			identifier := buildDocumentIdentifier(tc.sut)
 			require.True(t, tc.match(identifier), identifier)
 		})

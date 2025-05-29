@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/CycloneDX/cyclonedx-go"
+
 	"github.com/protobom/protobom/pkg/formats"
 )
 

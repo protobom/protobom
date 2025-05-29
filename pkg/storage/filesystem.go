@@ -7,10 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/release-utils/util"
+
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 var _ StoreRetriever = (*FileSystem)(nil)
@@ -106,11 +107,11 @@ func (fs *FileSystem) Retrieve(id string, _ *RetrieveOptions) (*sbom.Document, e
 
 	data, err := os.ReadFile(filepath.Join(fs.Options.Path, filename))
 	if err != nil {
-		logrus.Fatal(fmt.Errorf("reading protobom data from disk: %v", err))
+		logrus.Fatal(fmt.Errorf("reading protobom data from disk: %w", err))
 	}
 	bom := &sbom.Document{}
 	if err := proto.Unmarshal(data, bom); err != nil {
-		logrus.Fatal(fmt.Errorf("unmarshaling protobom data: %v", err))
+		logrus.Fatal(fmt.Errorf("unmarshaling protobom data: %w", err))
 	}
 
 	return bom, nil

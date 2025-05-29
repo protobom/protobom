@@ -11,6 +11,7 @@ import (
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/google/uuid"
+
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"

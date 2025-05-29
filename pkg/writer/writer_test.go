@@ -6,13 +6,14 @@ import (
 	"path"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/native/nativefakes"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 	"github.com/protobom/protobom/pkg/writer"
-	"github.com/stretchr/testify/require"
 )
 
 type fakeWriteCloser struct {
@@ -209,7 +210,6 @@ func TestWriteStream(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
@@ -470,7 +470,6 @@ func TestStore(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			w := *w

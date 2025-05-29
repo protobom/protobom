@@ -1,7 +1,6 @@
 package sbom
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -134,7 +133,7 @@ func TestRemoveNodes(t *testing.T) {
 		},
 	} {
 		tc.prep(tc.sut)
-		require.Equal(t, tc.sut, tc.expected)
+		require.Equal(t, tc.expected, tc.sut)
 	}
 }
 
@@ -294,7 +293,7 @@ func TestNodeListIntersect(t *testing.T) {
 		},
 	} {
 		newNodeList := tc.sut.Intersect(tc.isec)
-		require.True(t, tc.expect.Equal(newNodeList), fmt.Sprintf("%s: %v %v", title, tc.expect, newNodeList))
+		require.True(t, tc.expect.Equal(newNodeList), "%s: %v %v", title, tc.expect, newNodeList)
 	}
 }
 
@@ -707,8 +706,8 @@ func TestIndexByHash(t *testing.T) {
 		},
 	} {
 		res := tc.sut.indexNodesByHash()
-		require.Equal(t, tc.expectedLength, len(res), label)
-		// TODO(puerco): CHheck deeper into result
+		require.Len(t, res, tc.expectedLength, label)
+		// TODO(puerco): Check deeper into result
 	}
 }
 
@@ -777,8 +776,8 @@ func TestIndexByPurl(t *testing.T) {
 		},
 	} {
 		res := tc.sut.indexNodesByPurl()
-		require.Equal(t, tc.expectedLength, len(res), label)
-		// TODO(puerco): CHheck deeper into result
+		require.Len(t, res, tc.expectedLength, label)
+		// TODO(puerco): Check deeper into result
 	}
 }
 

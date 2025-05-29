@@ -5,12 +5,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/protobom/protobom/pkg/mod"
-	"github.com/protobom/protobom/pkg/native"
-	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/protobom/pkg/mod"
+	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 func TestExtRefCategoryFromProtobomExtRef(t *testing.T) {
@@ -217,7 +218,7 @@ func TestPropertiesMod(t *testing.T) {
 			}
 			require.Len(t, packages, 1)
 			if !tc.annotationsExpected {
-				require.Len(t, packages[0].Annotations, 0)
+				require.Empty(t, packages[0].Annotations)
 				return
 			}
 			require.Len(t, packages[0].Annotations, 2)

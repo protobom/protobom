@@ -18,6 +18,8 @@
 // serialzers.
 package sbom
 
+const NamespaceUUID = `cea529d3-3fa2-4066-b5ac-e8717b8d374d`
+
 // NewDocument Creates a new empty document.
 func NewDocument() *Document {
 	return &Document{

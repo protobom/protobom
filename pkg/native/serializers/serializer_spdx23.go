@@ -25,8 +25,9 @@ var _ native.Serializer = &SPDX23{}
 type SPDX23 struct{}
 
 type SPDX23Options struct {
-	// FailOnInvalidDocIdFragment makes the serializer return an error if the
-	// document ID has a fragment but it is not set to "SPDXRef-Document".
+	// Deprecated: FailOnInvalidDocIdFragment makes the serializer return an
+	// error if the document ID has a fragment but it is not set to
+	// "SPDXRef-Document".
 	FailOnInvalidDocIdFragment bool
 
 	// GenerateDocumentID causes the serializer to generate a non-deterministic
@@ -77,10 +78,10 @@ func (s *SPDX23) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, 
 	return nil
 }
 
-// spdxNamespaceFromProtobomID parses the protobom identifier and returns the
-// appropriate SPDX namespace. In SPDX the namespace is what uniquely identifies
-// the document's elements on the Internet. The document SPDX identifier is always
-// set to "SPDXRef-DOCUMENT".
+// spdxNamespaceFromProtobomID parses the protobom identifier and returns a string
+// suitable to use as an SPDX namespace. In SPDX, the namespace is what uniquely
+// identifies the document's elements on the Internet. The document SPDX identifier
+// is always set to "SPDXRef-DOCUMENT".
 //
 // For more info see
 // https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#63-spdx-identifier-field
@@ -95,22 +96,24 @@ func spdxNamespaceFromProtobomID(opts SPDX23Options, protoId string) (spdxId str
 			return "", fmt.Errorf("unable to generate namespace, document ID is blank")
 		}
 	}
+
+	// Parse the identifier to understand if we can use it as the SPDX
+	// namespace. Only full URIs can be used as namespaces triming any
+	// fragment at the end.
 	u, err := url.Parse(protoId)
-	if err != nil {
-		return "", fmt.Errorf("unable to parse protobom id as URL")
-	}
-	if u.Fragment == "" {
-		return protoId, nil
-	}
-
-	// Clear the fragment
-	rawURI := strings.TrimSuffix(u.String(), "#"+u.Fragment)
-
-	if u.Fragment != "SPDXRef-DOCUMENT" && opts.FailOnInvalidDocIdFragment {
-		return rawURI, fmt.Errorf("unable to parse SPDX identifier (URI hash set to %q, SPDXRef-DOCUMENT expected)", u.Fragment)
+	if err != nil || u.Scheme == "" || (u.Fragment != "" && u.Fragment != "SPDXRef-DOCUMENT") {
+		// If the document identifier is not full URI, generate a
+		// deterministic URN
+		return fmt.Sprintf(
+			`urn:uuid:%s`, uuid.NewSHA1(
+				uuid.MustParse(sbom.NamespaceUUID), []byte(protoId),
+			).String(),
+		), nil
 	}
 
-	return rawURI, nil
+	// At this point we've verified the protobom document ID is a URI and its
+	// fragment is blank or SPDXRef-DOCUMENT, we can use it as the SPDX namespace
+	return strings.Replace(protoId, "#SPDXRef-DOCUMENT", "", 1), nil
 }
 
 // Serialize takes a protobom and returns an SPDX 2.3 struct

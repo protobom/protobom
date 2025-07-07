@@ -50,7 +50,7 @@ type SPDX23Options struct {
 // Validate returns an error if the SPDX options are invalid
 func (o *SPDX23Options) Validate() error {
 	if o.LicenseExpressionOperator != "OR" && o.LicenseExpressionOperator != "AND" {
-		return fmt.Errorf("invalid LicenseExpressionOperator, must be 'OR' or 'ANDW'")
+		return fmt.Errorf("invalid LicenseExpressionOperator, must be 'OR' or 'AND'")
 	}
 	return nil
 }
@@ -341,7 +341,7 @@ func (s *SPDX23) buildPackages(
 			PackageHomePage:             node.UrlHome,
 			PackageSourceInfo:           node.SourceInfo,
 			PackageLicenseConcluded:     node.LicenseConcluded,
-			PackageLicenseDeclared:      strings.Join(node.Licenses, spdxopts.LicenseExpressionOperator),
+			PackageLicenseDeclared:      strings.Join(node.Licenses, fmt.Sprintf(" %s ", spdxopts.LicenseExpressionOperator)),
 			PackageLicenseInfoFromFiles: []string{},
 			PackageLicenseComments:      node.LicenseComments,
 			PackageCopyrightText:        strings.TrimSpace(node.Copyright),

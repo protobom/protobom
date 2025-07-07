@@ -7,8 +7,10 @@ import (
 
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
+	"github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"github.com/stretchr/testify/require"
 
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -234,6 +236,250 @@ func TestPropertiesMod(t *testing.T) {
 				require.Equal(t, "protobom - v1.0.0", packages[0].Annotations[i].Annotator.Annotator)
 				require.Equal(t, "OTHER", packages[0].Annotations[i].AnnotationType)
 			}
+		})
+	}
+}
+
+func TestBuildPackages(t *testing.T) {
+	s23 := NewSPDX23()
+
+	for _, tc := range []struct {
+		name     string
+		doc      *sbom.Document
+		spdxopts SPDX23Options
+		validate func(t *testing.T, packages []*spdx.Package, err error)
+	}{
+		{
+			name: "multiple-licenses-fail",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+				n := sbom.NewNode()
+				n.Id = "test-node-id-1"
+				n.Licenses = []string{"MIT", "Apache-2.0"}
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+				return doc
+			}(),
+			spdxopts: SPDX23Options{
+				FailOnMultipleLicenses: true,
+			},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), "has multiple licenses")
+			},
+		},
+		{
+			name: "license-expression-with-OR",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+				n := sbom.NewNode()
+				n.Id = "test-node-id-2"
+				n.Licenses = []string{"MIT", "Apache-2.0"}
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+				return doc
+			}(),
+			spdxopts: SPDX23Options{
+				FailOnMultipleLicenses:    false,
+				LicenseExpressionOperator: "OR",
+			},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				require.Len(t, packages, 1)
+				require.Equal(t, "MIT OR Apache-2.0", packages[0].PackageLicenseDeclared)
+			},
+		},
+		{
+			name: "license-expression-with-AND",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+				n := sbom.NewNode()
+				n.Id = "test-node-id-3"
+				n.Licenses = []string{"MIT", "Apache-2.0"}
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+				return doc
+			}(),
+			spdxopts: SPDX23Options{
+				FailOnMultipleLicenses:    false,
+				LicenseExpressionOperator: "AND",
+			},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				require.Len(t, packages, 1)
+				require.Equal(t, "MIT AND Apache-2.0", packages[0].PackageLicenseDeclared)
+			},
+		},
+		{
+			name: "supplier-and-originator",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+
+				n := sbom.NewNode()
+				n.Id = "node-with-supplier-and-originator"
+
+				supplier := &sbom.Person{
+					Name:  "ACME Corp",
+					IsOrg: true,
+				}
+				n.Suppliers = append(n.Suppliers, supplier)
+
+				originator := &sbom.Person{
+					Name:  "John Doe",
+					Email: "john@example.com",
+					IsOrg: false,
+				}
+				n.Originators = append(n.Originators, originator)
+
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+				return doc
+			}(),
+			spdxopts: SPDX23Options{},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				require.Len(t, packages, 1)
+
+				require.NotNil(t, packages[0].PackageSupplier)
+				require.Equal(t, "Organization", packages[0].PackageSupplier.SupplierType)
+
+				require.NotNil(t, packages[0].PackageOriginator)
+				require.Equal(t, "Person", packages[0].PackageOriginator.OriginatorType)
+				require.Contains(t, packages[0].PackageOriginator.Originator, "John Doe")
+				require.Contains(t, packages[0].PackageOriginator.Originator, "john@example.com")
+			},
+		},
+		{
+			name: "primary-purpose-mapping",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+
+				appNode := sbom.NewNode()
+				appNode.Id = "app-node"
+				appNode.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_APPLICATION}
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, appNode)
+
+				libNode := sbom.NewNode()
+				libNode.Id = "lib-node"
+				libNode.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY}
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, libNode)
+
+				return doc
+			}(),
+			spdxopts: SPDX23Options{},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				require.Len(t, packages, 2)
+
+				for _, pkg := range packages {
+					switch string(pkg.PackageSPDXIdentifier) {
+					case "app-node":
+						require.Equal(t, "APPLICATION", pkg.PrimaryPackagePurpose)
+					case "lib-node":
+						require.Equal(t, "LIBRARY", pkg.PrimaryPackagePurpose)
+					}
+				}
+			},
+		},
+		{
+			name: "checksums-mapping",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+
+				n := sbom.NewNode()
+				n.Id = "node-with-checksums"
+				n.Hashes = map[int32]string{
+					int32(sbom.HashAlgorithm_SHA1):   "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
+					int32(sbom.HashAlgorithm_SHA256): "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+				}
+
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+				return doc
+			}(),
+			spdxopts: SPDX23Options{},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				require.Len(t, packages, 1)
+
+				checksums := packages[0].PackageChecksums
+				require.Len(t, checksums, 2)
+
+				checksumMap := make(map[string]string)
+				for _, cs := range checksums {
+					checksumMap[string(cs.Algorithm)] = cs.Value
+				}
+
+				require.Equal(t, "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3", checksumMap["SHA1"])
+				require.Equal(t, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", checksumMap["SHA256"])
+			},
+		},
+		{
+			name: "external-references",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+
+				n := sbom.NewNode()
+				n.Id = "node-with-external-refs"
+
+				n.ExternalReferences = append(n.ExternalReferences, &sbom.ExternalReference{
+					Type:    sbom.ExternalReference_NPM,
+					Url:     "https://www.npmjs.com/package/example",
+					Comment: "NPM reference",
+				}, &sbom.ExternalReference{
+					Type:    sbom.ExternalReference_SECURITY_ADVISORY,
+					Url:     "https://nvd.nist.gov/vuln/detail/CVE-2021-1234",
+					Comment: "Security advisory",
+				})
+
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+				return doc
+			}(),
+			spdxopts: SPDX23Options{},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				require.Len(t, packages, 1)
+
+				refs := packages[0].PackageExternalReferences
+				require.Len(t, refs, 2)
+
+				var npmRef, securityRef *v2_3.PackageExternalReference
+				for _, ref := range refs {
+					switch ref.RefType {
+					case spdx.PackageManagerNpm:
+						npmRef = ref
+					case spdx.SecurityAdvisory:
+						securityRef = ref
+					}
+				}
+
+				require.NotNil(t, npmRef)
+				require.Equal(t, spdx.CategoryPackageManager, npmRef.Category)
+				require.Equal(t, "https://www.npmjs.com/package/example", npmRef.Locator)
+
+				require.NotNil(t, securityRef)
+				require.Equal(t, spdx.CategorySecurity, securityRef.Category)
+				require.Equal(t, "https://nvd.nist.gov/vuln/detail/CVE-2021-1234", securityRef.Locator)
+			},
+		},
+		{
+			name: "empty-download-location",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+
+				n := sbom.NewNode()
+				n.Id = "node-empty-download"
+				n.UrlDownload = ""
+
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+				return doc
+			}(),
+			spdxopts: SPDX23Options{},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				require.Len(t, packages, 1)
+				require.Equal(t, protospdx.NOASSERTION, packages[0].PackageDownloadLocation)
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			packages, err := s23.buildPackages(&native.SerializeOptions{}, tc.spdxopts, tc.doc)
+			tc.validate(t, packages, err)
 		})
 	}
 }

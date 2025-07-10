@@ -7,10 +7,12 @@ on:
   schedule:
   - cron: '21 12 * * *'
 
+permissions: {}
+
 jobs:
   stale:
-
     runs-on: ubuntu-latest
+
     permissions:
       issues: write
       pull-requests: write

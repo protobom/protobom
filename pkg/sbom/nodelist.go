@@ -3,11 +3,11 @@ package sbom
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/sirupsen/logrus"
 )
 
 // This file adds a few methods to the NodeList type which
@@ -194,15 +194,11 @@ func (nl *NodeList) MergeEdges(es []*Edge) {
 // More than one root element can be added to the NodeList.
 func (nl *NodeList) AddRootNode(n *Node) {
 	if n.Id == "" {
-		logrus.Warnf("Node with empty ID, creating a new Id: %s@%s\n", n.Name, n.Version)
-		n.Id = NewNodeIdentifier(fmt.Sprintf("%s@%s", n.Name, n.Version))
+		n.Id = NewNodeIdentifier("auto", fmt.Sprintf("%s@%s", n.Name, n.Version))
 	}
 
-	for _, id := range nl.RootElements {
-		if id == n.Id {
-			logrus.Warnf("Node with ID %s already exists in the NodeList, skipping: %s\n", n.Id, n.Name)
-			return
-		}
+	if slices.Contains(nl.RootElements, n.Id) {
+		return
 	}
 
 	nl.AddNode(n)

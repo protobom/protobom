@@ -3,6 +3,7 @@ package sbom
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 
@@ -193,15 +194,11 @@ func (nl *NodeList) MergeEdges(es []*Edge) {
 // More than one root element can be added to the NodeList.
 func (nl *NodeList) AddRootNode(n *Node) {
 	if n.Id == "" {
-		// TODO warn here
-		return
+		n.Id = NewNodeIdentifier("auto", fmt.Sprintf("%s@%s", n.Name, n.Version))
 	}
 
-	for _, id := range nl.RootElements {
-		if id == n.Id {
-			// TODO warn here
-			return
-		}
+	if slices.Contains(nl.RootElements, n.Id) {
+		return
 	}
 
 	nl.AddNode(n)

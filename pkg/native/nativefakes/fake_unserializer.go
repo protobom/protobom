@@ -98,8 +98,6 @@ func (fake *FakeUnserializer) UnserializeReturnsOnCall(i int, result1 *sbom.Docu
 func (fake *FakeUnserializer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.unserializeMutex.RLock()
-	defer fake.unserializeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

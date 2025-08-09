@@ -171,10 +171,6 @@ func (fake *FakeSniffer) SniffReaderReturnsOnCall(i int, result1 formats.Format,
 func (fake *FakeSniffer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.sniffFileMutex.RLock()
-	defer fake.sniffFileMutex.RUnlock()
-	fake.sniffReaderMutex.RLock()
-	defer fake.sniffReaderMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

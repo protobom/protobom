@@ -9,7 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
-	"sigs.k8s.io/release-utils/util"
+	"sigs.k8s.io/release-utils/helpers"
 
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -79,7 +79,7 @@ func (fs *FileSystem) Store(bom *sbom.Document, opts *StoreOptions) error {
 		return err
 	}
 
-	if opts.NoClobber && util.Exists(filepath.Join(fs.Options.Path, filename)) {
+	if opts.NoClobber && helpers.Exists(filepath.Join(fs.Options.Path, filename)) {
 		return fmt.Errorf("there is already an entry for the specified document (and NoClobber = true)")
 	}
 

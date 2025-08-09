@@ -176,10 +176,6 @@ func (fake *FakeSerializer) SerializeReturnsOnCall(i int, result1 interface{}, r
 func (fake *FakeSerializer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.renderMutex.RLock()
-	defer fake.renderMutex.RUnlock()
-	fake.serializeMutex.RLock()
-	defer fake.serializeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

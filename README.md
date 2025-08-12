@@ -160,8 +160,8 @@ func main() {
 
 	// Relate the application package and the files. This adds the nodes to
 	// the document graph:
-	document.RelateNodeAtID(node1, appNode.Id, sbom.Edge_contains)
-	document.RelateNodeAtID(node2, appNode.Id, sbom.Edge_contains)
+	document.NodeList.RelateNodeAtID(node1, appNode.Id, sbom.Edge_contains)
+	document.NodeList.RelateNodeAtID(node2, appNode.Id, sbom.Edge_contains)
 
 	// Now render the document to STDOUT:
 	w := writer.New()

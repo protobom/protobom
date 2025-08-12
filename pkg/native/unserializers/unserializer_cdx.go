@@ -254,7 +254,7 @@ func (u *CDX) parseDependencyGraph(bom *cdx.BOM) []*sbom.Edge {
 		if _, ok := mapa[d.Ref]; !ok {
 			mapa[d.Ref] = sbom.NewEdge()
 			mapa[d.Ref].From = d.Ref
-			mapa[d.Ref].Type = sbom.Edge_contains
+			mapa[d.Ref].Type = sbom.Edge_dependsOn
 		}
 
 		// d.Dependencies is a pointer, so we can panic if nil,

@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 	spdxjson "github.com/spdx/tools-golang/json"
 	"github.com/spdx/tools-golang/spdx"
+	"github.com/spdx/tools-golang/spdx/v2/common"
 	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -313,7 +314,7 @@ func (*SPDX23) relationshipToEdge(r *spdx23.Relationship) *sbom.Edge {
 	// TODO(degradation) How to handle external documents?
 	// TODO(degradation) How to handle NOASSERTION and NONE targets
 	e := &sbom.Edge{
-		Type: sbom.EdgeTypeFromSPDX2(r.Relationship),
+		Type: spdxRelToEdgeType(r.Relationship),
 		From: string(r.RefA.ElementRefID),
 		To:   []string{string(r.RefB.ElementRefID)},
 	}
@@ -385,5 +386,103 @@ func (*SPDX23) extRefTypeToIdentifierType(spdxType string) sbom.SoftwareIdentifi
 		return sbom.SoftwareIdentifierType_GITOID
 	default:
 		return sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE
+	}
+}
+
+// spdxRelToEdgeType returns the protobom edge type for the SPDX relationship type
+func spdxRelToEdgeType(spdxRel string) sbom.Edge_Type {
+	switch spdxRel {
+	case "":
+		return sbom.Edge_UNKNOWN
+	case common.TypeRelationshipAmends:
+		return sbom.Edge_amends
+	case common.TypeRelationshipAncestorOf:
+		return sbom.Edge_ancestor
+	case common.TypeRelationshipBuildDependencyOf:
+		return sbom.Edge_buildDependency
+	case common.TypeRelationshipBuildToolOf:
+		return sbom.Edge_buildTool
+	case common.TypeRelationshipContains:
+		return sbom.Edge_contains
+	case common.TypeRelationshipContainedBy:
+		return sbom.Edge_contained_by
+	case common.TypeRelationshipCopyOf:
+		return sbom.Edge_copy
+	case common.TypeRelationshipDataFileOf:
+		return sbom.Edge_dataFile
+	case "DEPENDENCY_MANIFEST_OF":
+		return sbom.Edge_dependencyManifest
+	case common.TypeRelationshipDependsOn:
+		return sbom.Edge_dependsOn
+	case common.TypeRelationshipDependencyOf:
+		return sbom.Edge_dependencyOf
+	case common.TypeRelationshipDescendantOf:
+		return sbom.Edge_descendant
+	case common.TypeRelationshipDescribe:
+		return sbom.Edge_describes
+	case common.TypeRelationshipDescribeBy:
+		return sbom.Edge_describedBy
+	case common.TypeRelationshipDevDependencyOf:
+		return sbom.Edge_devDependency
+	case common.TypeRelationshipDevToolOf:
+		return sbom.Edge_devTool
+	case common.TypeRelationshipDistributionArtifact:
+		return sbom.Edge_distributionArtifact
+	case common.TypeRelationshipDocumentationOf:
+		return sbom.Edge_documentation
+	case common.TypeRelationshipDynamicLink:
+		return sbom.Edge_dynamicLink
+	case common.TypeRelationshipExampleOf:
+		return sbom.Edge_example
+	case common.TypeRelationshipExpandedFromArchive:
+		return sbom.Edge_expandedFromArchive
+	case common.TypeRelationshipFileAdded:
+		return sbom.Edge_fileAdded
+	case common.TypeRelationshipFileDeleted:
+		return sbom.Edge_fileDeleted
+	case common.TypeRelationshipFileModified:
+		return sbom.Edge_fileModified
+	case common.TypeRelationshipGenerates:
+		return sbom.Edge_generates
+	case common.TypeRelationshipGeneratedFrom:
+		return sbom.Edge_generatedFrom
+	case common.TypeRelationshipMetafileOf:
+		return sbom.Edge_metafile
+	case common.TypeRelationshipOptionalComponentOf:
+		return sbom.Edge_optionalComponent
+	case common.TypeRelationshipOptionalDependencyOf:
+		return sbom.Edge_optionalDependency
+	case common.TypeRelationshipOther:
+		return sbom.Edge_other
+	case common.TypeRelationshipPackageOf:
+		return sbom.Edge_packages
+	case common.TypeRelationshipPatchApplied:
+		return sbom.Edge_patch
+	case common.TypeRelationshipHasPrerequisite:
+		return sbom.Edge_prerequisite
+	case common.TypeRelationshipPrerequisiteFor:
+		return sbom.Edge_prerequisiteFor
+	case common.TypeRelationshipProvidedDependencyOf:
+		return sbom.Edge_providedDependency
+	case common.TypeRelationshipRequirementDescriptionFor:
+		return sbom.Edge_requirementFor
+	case common.TypeRelationshipRuntimeDependencyOf:
+		return sbom.Edge_runtimeDependency
+	case common.TypeRelationshipSpecificationFor:
+		return sbom.Edge_specificationFor
+	case common.TypeRelationshipStaticLink:
+		return sbom.Edge_staticLink
+	case common.TypeRelationshipTestOf:
+		return sbom.Edge_test
+	case common.TypeRelationshipTestCaseOf:
+		return sbom.Edge_testCase
+	case common.TypeRelationshipTestDependencyOf:
+		return sbom.Edge_testDependency
+	case common.TypeRelationshipTestToolOf:
+		return sbom.Edge_testTool
+	case common.TypeRelationshipVariantOf:
+		return sbom.Edge_variant
+	default:
+		return sbom.Edge_UNKNOWN
 	}
 }

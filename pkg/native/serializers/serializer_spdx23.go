@@ -254,7 +254,7 @@ func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) { //no
 			rel := spdx.Relationship{
 				RefA:         common.MakeDocElementID("", e.From),
 				RefB:         common.MakeDocElementID("", dest),
-				Relationship: e.Type.ToSPDX2(),
+				Relationship: edgeTypeToSPDXRel(e.Type),
 				// RelationshipComment: "",
 			}
 			relationships = append(relationships, &rel)
@@ -564,5 +564,103 @@ func (s *SPDX23) extRefTypeFromProtobomExtRef(extref *sbom.ExternalReference) st
 		return spdx.SecurityUrl
 	default:
 		return spdxOther
+	}
+}
+
+// edgeTypeToSPDXRel returns the SPDX analogous type for the protobom edge type
+func edgeTypeToSPDXRel(edgeType sbom.Edge_Type) string {
+	switch edgeType {
+	case sbom.Edge_UNKNOWN:
+		return ""
+	case sbom.Edge_amends:
+		return common.TypeRelationshipAmends
+	case sbom.Edge_ancestor:
+		return common.TypeRelationshipAncestorOf
+	case sbom.Edge_buildDependency:
+		return common.TypeRelationshipBuildDependencyOf
+	case sbom.Edge_buildTool:
+		return common.TypeRelationshipBuildToolOf
+	case sbom.Edge_contains:
+		return common.TypeRelationshipContains
+	case sbom.Edge_contained_by:
+		return common.TypeRelationshipContainedBy
+	case sbom.Edge_copy:
+		return common.TypeRelationshipCopyOf
+	case sbom.Edge_dataFile:
+		return common.TypeRelationshipDataFileOf
+	case sbom.Edge_dependencyManifest:
+		return "DEPENDENCY_MANIFEST_OF" // Missing in spdx
+	case sbom.Edge_dependsOn:
+		return common.TypeRelationshipDependsOn
+	case sbom.Edge_dependencyOf:
+		return common.TypeRelationshipDependencyOf
+	case sbom.Edge_descendant:
+		return common.TypeRelationshipDescendantOf
+	case sbom.Edge_describes:
+		return common.TypeRelationshipDescribe
+	case sbom.Edge_describedBy:
+		return common.TypeRelationshipDescribeBy
+	case sbom.Edge_devDependency:
+		return common.TypeRelationshipDevDependencyOf
+	case sbom.Edge_devTool:
+		return common.TypeRelationshipDevToolOf
+	case sbom.Edge_distributionArtifact:
+		return common.TypeRelationshipDistributionArtifact
+	case sbom.Edge_documentation:
+		return common.TypeRelationshipDocumentationOf
+	case sbom.Edge_dynamicLink:
+		return common.TypeRelationshipDynamicLink
+	case sbom.Edge_example:
+		return common.TypeRelationshipExampleOf
+	case sbom.Edge_expandedFromArchive:
+		return common.TypeRelationshipExpandedFromArchive
+	case sbom.Edge_fileAdded:
+		return common.TypeRelationshipFileAdded
+	case sbom.Edge_fileDeleted:
+		return common.TypeRelationshipFileDeleted
+	case sbom.Edge_fileModified:
+		return common.TypeRelationshipFileModified
+	case sbom.Edge_generates:
+		return common.TypeRelationshipGenerates
+	case sbom.Edge_generatedFrom:
+		return common.TypeRelationshipGeneratedFrom
+	case sbom.Edge_metafile:
+		return common.TypeRelationshipMetafileOf
+	case sbom.Edge_optionalComponent:
+		return common.TypeRelationshipOptionalComponentOf
+	case sbom.Edge_optionalDependency:
+		return common.TypeRelationshipOptionalDependencyOf
+	case sbom.Edge_other:
+		return common.TypeRelationshipOther
+	case sbom.Edge_packages:
+		return common.TypeRelationshipPackageOf
+	case sbom.Edge_patch:
+		return common.TypeRelationshipPatchApplied
+	case sbom.Edge_prerequisite:
+		return common.TypeRelationshipHasPrerequisite
+	case sbom.Edge_prerequisiteFor:
+		return common.TypeRelationshipPrerequisiteFor
+	case sbom.Edge_providedDependency:
+		return common.TypeRelationshipProvidedDependencyOf
+	case sbom.Edge_requirementFor:
+		return common.TypeRelationshipRequirementDescriptionFor
+	case sbom.Edge_runtimeDependency:
+		return common.TypeRelationshipRuntimeDependencyOf
+	case sbom.Edge_specificationFor:
+		return common.TypeRelationshipSpecificationFor
+	case sbom.Edge_staticLink:
+		return common.TypeRelationshipStaticLink
+	case sbom.Edge_test:
+		return common.TypeRelationshipTestOf
+	case sbom.Edge_testCase:
+		return common.TypeRelationshipTestCaseOf
+	case sbom.Edge_testDependency:
+		return common.TypeRelationshipTestDependencyOf
+	case sbom.Edge_testTool:
+		return common.TypeRelationshipTestToolOf
+	case sbom.Edge_variant:
+		return common.TypeRelationshipVariantOf
+	default:
+		return ""
 	}
 }

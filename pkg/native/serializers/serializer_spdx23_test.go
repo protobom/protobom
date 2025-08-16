@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	"github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/mod"
@@ -474,6 +476,53 @@ func TestBuildPackages(t *testing.T) {
 				require.NoError(t, err)
 				require.Len(t, packages, 1)
 				require.Equal(t, protospdx.NOASSERTION, packages[0].PackageDownloadLocation)
+			},
+		},
+		{
+			name: "SPDX 2.3 format dates",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+
+				loc, err := time.LoadLocation("Asia/Kolkata")
+				require.NoError(t, err)
+				testTime := time.Date(2002, time.September, 28, 19, 12, 0, 0, loc)
+				ts := timestamppb.New(testTime)
+
+				n := sbom.NewNode()
+				n.Id = "node-with-timestamp"
+				n.BuildDate = ts
+				n.ValidUntilDate = ts
+				n.ReleaseDate = ts
+
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+				return doc
+			}(),
+			spdxopts: SPDX23Options{},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				require.Len(t, packages, 1)
+
+				buildDateStr := packages[0].BuiltDate
+				validUntilDateStr := packages[0].ValidUntilDate
+				releaseDateStr := packages[0].ReleaseDate
+
+				testTimeStamp := func(dateStr string) {
+					spdxTimestampFormat := "2006-01-02T15:04:05Z"
+					parsedTime, err := time.Parse(spdxTimestampFormat, dateStr)
+					require.NoError(t, err, "Timestamp should be in valid SPDX 2.3 format")
+
+					loc, err := time.LoadLocation("Asia/Kolkata")
+					require.NoError(t, err)
+					expectedUTC := time.Date(2002, time.September, 28, 19, 12, 0, 0, loc).UTC()
+					require.Equal(t, expectedUTC.Unix(), parsedTime.Unix(), "Timestamp should match expected UTC time")
+
+					spdxTimestampFormatRegex := `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$`
+					require.Regexp(t, spdxTimestampFormatRegex, dateStr, "Timestamp should match spdx 2.3 format pattern")
+				}
+
+				testTimeStamp(buildDateStr)
+				testTimeStamp(validUntilDateStr)
+				testTimeStamp(releaseDateStr)
 			},
 		},
 	} {

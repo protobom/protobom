@@ -412,16 +412,17 @@ func (s *SPDX23) buildPackages(
 			}
 		}
 
+		// conversion to UTC is needed as SPDX requires UTC dates
 		if node.ReleaseDate != nil {
-			p.ReleaseDate = node.ReleaseDate.String()
+			p.ReleaseDate = node.ReleaseDate.AsTime().UTC().Format(time.RFC3339)
 		}
 
 		if node.BuildDate != nil {
-			p.BuiltDate = node.BuildDate.String()
+			p.BuiltDate = node.BuildDate.AsTime().UTC().Format(time.RFC3339)
 		}
 
 		if node.ValidUntilDate != nil {
-			p.ValidUntilDate = node.ValidUntilDate.String()
+			p.ValidUntilDate = node.ValidUntilDate.AsTime().UTC().Format(time.RFC3339)
 		}
 
 		if p.PackageDownloadLocation == "" {

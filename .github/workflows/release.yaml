@@ -35,7 +35,7 @@ jobs:
           check-latest: true
 
       - name: Install bom
-        uses: kubernetes-sigs/release-actions/setup-bom@a30d93cf2aa029e1e4c8a6c79f766aebf429fddb # v0.3.1
+        uses: kubernetes-sigs/release-actions/setup-bom@8af7b2a5596dff526de9db59b2c4b8457e9f52a1 # v0.4.0
 
       - name: Generate SBOM
         shell: bash
@@ -43,7 +43,7 @@ jobs:
           bom generate --format=json -o /tmp/protobom-$TAG.spdx.json .
 
       - name: Publish Release
-        uses: kubernetes-sigs/release-actions/publish-release@a30d93cf2aa029e1e4c8a6c79f766aebf429fddb # v0.3.1
+        uses: kubernetes-sigs/release-actions/publish-release@8af7b2a5596dff526de9db59b2c4b8457e9f52a1 # v0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

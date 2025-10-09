@@ -228,6 +228,11 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 		return nil, fmt.Errorf("building relationships: %w", err)
 	}
 
+	extDocRefs, err := buildExternalDocumentRefs(bom)
+	if err != nil {
+		return nil, fmt.Errorf("building ExternalDocumentRefs: %w", err)
+	}
+
 	for _, id := range bom.NodeList.RootElements {
 		rels = append(rels, &spdx.Relationship{
 			RefA:                common.MakeDocElementID("", protospdx.DOCUMENT),
@@ -243,8 +248,26 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 	doc.Packages = packages
 	doc.Files = files
 	doc.Relationships = rels
+	doc.ExternalDocumentReferences = extDocRefs
 
 	return doc, nil
+}
+
+func buildExternalDocumentRefs(bom *sbom.Document) ([]spdx.ExternalDocumentRef, error) {
+	extDocRefs := []spdx.ExternalDocumentRef{}
+	for _, node := range bom.NodeList.Nodes {
+		if node.Type == sbom.Node_PACKAGE || node.Type == sbom.Node_FILE {
+			continue
+		}
+
+		d := spdx.ExternalDocumentRef{
+			DocumentRefID:	node.Id,
+			URI:			node.UrlDownload,
+			Checksum:		common.Checksum{},
+		}
+		extDocRefs = append(extDocRefs, d)
+	}
+	return extDocRefs, nil
 }
 
 func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) { //nolint:unparam
@@ -266,7 +289,7 @@ func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) { //no
 func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 	files := []*spdx.File{}
 	for _, node := range bom.NodeList.Nodes {
-		if node.Type == sbom.Node_PACKAGE {
+		if node.Type == sbom.Node_PACKAGE || node.Type == sbom.Node_EXTDOCUMENT {
 			continue
 		}
 
@@ -321,7 +344,7 @@ func (s *SPDX23) buildPackages(
 			)
 		}
 
-		if node.Type == sbom.Node_FILE {
+		if node.Type == sbom.Node_FILE || node.Type == sbom.Node_EXTDOCUMENT {
 			continue
 		}
 

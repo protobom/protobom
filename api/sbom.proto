@@ -461,6 +461,8 @@ message Node {
     PACKAGE = 0;
     // Software component type is a file.
     FILE = 1;
+    // Software component type is from a External Document.
+    EXTDOCUMENT = 2;
   }
 }
 

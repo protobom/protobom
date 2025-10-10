@@ -49,11 +49,7 @@ func (e *Edge) flatString() string {
 // new destination identifiers are guaranteed to be added only once and will
 // not be duplicated if there is already a destination with the same ID.
 func (e *Edge) AddDestinationById(ids ...string) {
-	dests := map[string]struct{}{}
-	for _, id := range e.To {
-		dests[id] = struct{}{}
-	}
-
+	dests := e.indexDestinations()
 	for _, id := range ids {
 		if _, ok := dests[id]; ok {
 			continue
@@ -61,4 +57,13 @@ func (e *Edge) AddDestinationById(ids ...string) {
 		dests[id] = struct{}{}
 		e.To = append(e.To, id)
 	}
+}
+
+// indexDestinations returns a set with the IDs of the destinations
+func (e *Edge) indexDestinations() map[string]struct{} {
+	dests := map[string]struct{}{}
+	for _, id := range e.To {
+		dests[id] = struct{}{}
+	}
+	return dests
 }

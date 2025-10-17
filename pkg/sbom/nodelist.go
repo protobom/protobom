@@ -626,6 +626,11 @@ func (nl *NodeList) RelateNodeAtID(n *Node, nodeID string, edgeType Edge_Type) e
 		}
 	}
 
+	// Check if self destination, then early return
+	if nodeID == n.Id {
+		return nil
+	}
+
 	if edge == nil {
 		edge = &Edge{
 			Type: edgeType,
@@ -634,8 +639,10 @@ func (nl *NodeList) RelateNodeAtID(n *Node, nodeID string, edgeType Edge_Type) e
 		}
 		nl.Edges = append(nl.Edges, edge)
 	} else {
-		// Perhaps we should filter these
-		edge.To = append(edge.To, n.Id)
+		dests := edge.indexDestinations()
+		if _, exist := dests[n.Id]; !exist {
+			edge.To = append(edge.To, n.Id)
+		}
 	}
 
 	// It the node does not exist in the nodelist, return

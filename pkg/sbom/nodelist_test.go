@@ -1263,6 +1263,40 @@ func TestRelateNodeAtId(t *testing.T) {
 				Edges: []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_UNKNOWN}},
 			},
 		},
+		{
+			name: "relate dup destination",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+				Edges: []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_UNKNOWN}},
+			},
+			node: testNode,
+			expected: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+				Edges: []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_UNKNOWN}},
+			},
+		},
+		{
+			name: "relate self destination",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+			},
+			node: &Node{Id: sutId},
+			expected: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+			},
+		},
+		{
+			name: "relate self destination2",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+				Edges: []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_UNKNOWN}},
+			},
+			node: &Node{Id: sutId},
+			expected: &NodeList{
+				Nodes: []*Node{{Id: sutId}, {Id: nodeId}},
+				Edges: []*Edge{{From: sutId, To: []string{nodeId}, Type: Edge_UNKNOWN}},
+			},
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.sut.RelateNodeAtID(tc.node, sutId, Edge_UNKNOWN)

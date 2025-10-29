@@ -303,7 +303,7 @@ func buildExternalDocumentRefs(bom *sbom.Document) ([]spdx.ExternalDocumentRef, 
 		}
 
 		d := spdx.ExternalDocumentRef{
-			DocumentRefID:	node.Id,
+			DocumentRefID:	common.DocumentID(node.Id),
 			URI:			node.UrlDownload,
 			Checksum:		common.Checksum{},
 		}

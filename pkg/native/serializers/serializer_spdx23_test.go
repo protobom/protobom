@@ -245,61 +245,61 @@ func TestPropertiesMod(t *testing.T) {
 func TestBuildDocElementID(t *testing.T) {
 	for _, tc := range []struct {
 		name    string
-        input   string
+		input   string
 		want    common.DocElementID
-        wantErr bool
+		wantErr bool
 	}{
-        {
-            name:    "NONE special value",
-            input:   "NONE",
-            want:    common.MakeDocElementSpecial("NONE"),
-            wantErr: false,
-        },
-        {
-            name:    "NOASSERTION special value",
-            input:   "NOASSERTION",
-            want:    common.MakeDocElementSpecial("NOASSERTION"),
-            wantErr: false,
-        },
-        {
-            name:    "DocumentRef with SPDXRef prefix",
-            input:   "DocumentRef-doc1:SPDXRef-pkg1",
-            want:    common.MakeDocElementID("doc1", "pkg1"),
-            wantErr: false,
-        },
-        {
-            name:    "SPDXRef prefix only",
-            input:   "SPDXRef-pkg1",
-            want:    common.MakeDocElementID("", "pkg1"),
-            wantErr: false,
-        },
-        {
-            name:    "No prefix - use as-is",
-            input:   "pkg1",
-            want:    common.MakeDocElementID("", "pkg1"),
-            wantErr: false,
-        },
 		{
-            name:    "DocumentRef without colon",
-            input:   "DocumentRef-doc1",
-            wantErr: true,
-        },
-        {
-            name:    "DocumentRef with empty element after colon",
-            input:   "DocumentRef-doc1:",
-            wantErr: true,
-        },
+			name:    "NONE special value",
+			input:   "NONE",
+			want:    common.MakeDocElementSpecial("NONE"),
+			wantErr: false,
+		},
 		{
-            name:    "DocumentRef with multiple colons",
-            input:   "DocumentRef-doc1:extra:Package1",
-            wantErr: true,
-        },
-        {
-            name:    "DocumentRef with empty document ID",
-            input:   "DocumentRef-:SPDXRef-pkg1",
-            wantErr: true,
-        },
-	}{
+			name:    "NOASSERTION special value",
+			input:   "NOASSERTION",
+			want:    common.MakeDocElementSpecial("NOASSERTION"),
+			wantErr: false,
+		},
+		{
+			name:    "DocumentRef with SPDXRef prefix",
+			input:   "DocumentRef-doc1:SPDXRef-pkg1",
+			want:    common.MakeDocElementID("doc1", "pkg1"),
+			wantErr: false,
+		},
+		{
+			name:    "SPDXRef prefix only",
+			input:   "SPDXRef-pkg1",
+			want:    common.MakeDocElementID("", "pkg1"),
+			wantErr: false,
+		},
+		{
+			name:    "No prefix - use as-is",
+			input:   "pkg1",
+			want:    common.MakeDocElementID("", "pkg1"),
+			wantErr: false,
+		},
+		{
+			name:    "DocumentRef without colon",
+			input:   "DocumentRef-doc1",
+			wantErr: true,
+		},
+		{
+			name:    "DocumentRef with empty element after colon",
+			input:   "DocumentRef-doc1:",
+			wantErr: true,
+		},
+		{
+			name:    "DocumentRef with multiple colons",
+			input:   "DocumentRef-doc1:extra:Package1",
+			wantErr: true,
+		},
+		{
+			name:    "DocumentRef with empty document ID",
+			input:   "DocumentRef-:SPDXRef-pkg1",
+			wantErr: true,
+		},
+	} {
 		t.Run(tc.name, func(t *testing.T) {
 			got, err := buildDocElementID(tc.input)
 

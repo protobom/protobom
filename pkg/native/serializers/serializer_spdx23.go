@@ -275,8 +275,8 @@ func buildDocElementID(value string) (common.DocElementID, error) {
 			return common.DocElementID{}, fmt.Errorf("document identifier has nothing after prefix")
 		}
 		if strs[1] == "" {
-            return common.DocElementID{}, fmt.Errorf("element identifier after colon cannot be empty")
-        }
+			return common.DocElementID{}, fmt.Errorf("element identifier after colon cannot be empty")
+		}
 		idStr = strs[1]
 	}
 
@@ -295,7 +295,7 @@ func buildDocElementID(value string) (common.DocElementID, error) {
 	return common.MakeDocElementID(docRefID, eltRefID), nil
 }
 
-func buildExternalDocumentRefs(bom *sbom.Document) ([]spdx.ExternalDocumentRef, error) {
+func buildExternalDocumentRefs(bom *sbom.Document) ([]spdx.ExternalDocumentRef, error) { //nolint:unparam
 	extDocRefs := []spdx.ExternalDocumentRef{}
 	for _, node := range bom.NodeList.Nodes {
 		if node.Type == sbom.Node_PACKAGE || node.Type == sbom.Node_FILE {
@@ -312,7 +312,7 @@ func buildExternalDocumentRefs(bom *sbom.Document) ([]spdx.ExternalDocumentRef, 
 	return extDocRefs, nil
 }
 
-func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) { //nolint:unparam
+func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) {
 	relationships := []*spdx.Relationship{}
 	for _, e := range bom.NodeList.Edges {
 		for _, dest := range e.To {

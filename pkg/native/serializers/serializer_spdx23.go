@@ -253,6 +253,48 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 	return doc, nil
 }
 
+func buildDocElementID(value string) (common.DocElementID, error) {
+	docRefID := ""
+	eltRefID := ""
+	idStr := value
+
+	// special values
+	if idStr == "NONE" || idStr == "NOASSERTION" {
+		return common.MakeDocElementSpecial(idStr), nil
+	}
+
+	// Parse DocumentRef- prefix if present
+	if strings.HasPrefix(idStr, "DocumentRef-") {
+		strs := strings.Split(idStr, ":")
+		if len(strs) != 2 {
+			return common.DocElementID{}, fmt.Errorf("DocumentRef- format requires exactly one colon")
+		}
+
+		docRefID = strings.TrimPrefix(strs[0], "DocumentRef-")
+		if docRefID == "" {
+			return common.DocElementID{}, fmt.Errorf("document identifier has nothing after prefix")
+		}
+		if strs[1] == "" {
+            return common.DocElementID{}, fmt.Errorf("element identifier after colon cannot be empty")
+        }
+		idStr = strs[1]
+	}
+
+	// Remove SPDXRef- prefix if present
+	if strings.HasPrefix(idStr, "SPDXRef-") {
+		eltRefID = strings.TrimPrefix(idStr, "SPDXRef-")
+	}
+
+	// Use raw value as element ID if no prefix was found
+	if docRefID == "" && eltRefID == "" {
+		eltRefID = value
+	} else if docRefID != "" && eltRefID == "" {
+		return common.DocElementID{}, fmt.Errorf("element identifier cannot be empty when DocumentRef is specified")
+	}
+
+	return common.MakeDocElementID(docRefID, eltRefID), nil
+}
+
 func buildExternalDocumentRefs(bom *sbom.Document) ([]spdx.ExternalDocumentRef, error) {
 	extDocRefs := []spdx.ExternalDocumentRef{}
 	for _, node := range bom.NodeList.Nodes {
@@ -274,9 +316,17 @@ func buildRelationships(bom *sbom.Document) ([]*spdx.Relationship, error) { //no
 	relationships := []*spdx.Relationship{}
 	for _, e := range bom.NodeList.Edges {
 		for _, dest := range e.To {
+			refA, err := buildDocElementID(e.From)
+			if err != nil {
+				return relationships, err
+			}
+			refB, err := buildDocElementID(dest)
+			if err != nil {
+				return relationships, err
+			}
 			rel := spdx.Relationship{
-				RefA:         common.MakeDocElementID("", e.From),
-				RefB:         common.MakeDocElementID("", dest),
+				RefA:         refA,
+				RefB:         refB,
 				Relationship: edgeTypeToSPDXRel(e.Type),
 				// RelationshipComment: "",
 			}

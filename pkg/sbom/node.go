@@ -282,7 +282,7 @@ func (n *Node) flatString() string {
 			}
 			sort.Ints(idKeys)
 			for _, t := range idKeys {
-				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)])) //nolint:gosec
+				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)]))
 			}
 		case "protobom.protobom.Node.release_date":
 			if n.ReleaseDate != nil {

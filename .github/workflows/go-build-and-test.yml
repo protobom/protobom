@@ -21,6 +21,7 @@ jobs:
       with:
         go-version-file: './.go-version'
         check-latest: true
+        cache: false
 
     - name: Verify proto generated code
       run: |

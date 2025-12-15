@@ -282,7 +282,7 @@ func (n *Node) flatString() string {
 			}
 			sort.Ints(idKeys)
 			for _, t := range idKeys {
-				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)]))
+				pairs = append(pairs, fmt.Sprintf("identifiers[%d]:%s", t, n.Identifiers[int32(t)])) //nolint:gosec // This will not hit the int limit as we only have like 3
 			}
 		case "protobom.protobom.Node.release_date":
 			if n.ReleaseDate != nil {

@@ -1,6 +1,7 @@
 <p align="center">
 <img src="docs/images/protobom-horizontal_color.svg" alt="Protobom Logo" width="400" height="114">
 </p>
+
 # protobom
 
 <img align="right" width="75" height="75" src="docs/images/OpenSSF_StagesBadges_sandbox.svg" alt="OpenSSF Sandbox Badge">

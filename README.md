@@ -1,14 +1,16 @@
+<p align="center">
 <img src="docs/images/protobom-horizontal_color.svg" alt="Protobom Logo" width="400" height="114">
-
+</p>
 # protobom
 
+<img align="right" width="75" height="75" src="docs/images/OpenSSF_StagesBadges_sandbox.svg" alt="OpenSSF Sandbox Badge">
 `protobom` is a [protocol buffers](https://protobuf.dev/getting-started/)
 representation of SBOM data able to ingest documents in modern
 [SPDX](https://spdx.dev/) and [CycloneDX](https://cyclonedx.org/) versions
 without loss. It has an accompanying Go library generated from the protocol
 buffers definition that also implements ingesters for those formats.
 
-<img src="docs/images/OpenSSF_StagesBadges_sandbox.svg" alt="OpenSSF Sandbox Badge" style="float:right; margin: 2em;" width="75" height="75">Standard SBOMs are read by a reader using [unserializers](docs/unserializers.md) that
+Standard SBOMs are read by a reader using [unserializers](docs/unserializers.md) that
 understand the common formats. Unserializers create a neutral protobom from data
 read from CycloneDX or SPDX documents.
 

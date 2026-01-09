@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spdx/tools-golang v0.5.5
+	github.com/spdx/tools-golang v0.5.6
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/protobuf v1.36.11
 	sigs.k8s.io/release-utils v0.12.2
@@ -21,7 +21,7 @@ require (
 )
 
 require (
-	github.com/anchore/go-struct-converter v0.0.0-20230627203149-c72ef8859ca9 // indirect
+	github.com/anchore/go-struct-converter v0.1.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

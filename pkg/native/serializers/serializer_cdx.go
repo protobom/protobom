@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
@@ -22,7 +23,10 @@ var _ native.Serializer = &CDX{}
 // Precompiled regex for serialNumber validation
 const serialNumberPattern = `^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`
 
-var serialNumberRegex *regexp.Regexp
+var (
+	serialNumberRegex     *regexp.Regexp
+	serialNumberRegexInit sync.Once
+)
 
 type (
 	CDX struct {
@@ -198,7 +202,9 @@ func buildDependencies(nl *sbom.NodeList, components map[string]*cdx.Component) 
 // isValidCycloneDXSerialNumber validates serial id against regex pattern
 func isValidCycloneDXSerialNumberFormat(serial string) bool {
 	if serialNumberRegex == nil {
-		serialNumberRegex = regexp.MustCompile(serialNumberPattern)
+		serialNumberRegexInit.Do(func() {
+			serialNumberRegex = regexp.MustCompile(serialNumberPattern)
+		})
 	}
 	return serialNumberRegex.MatchString(serial)
 }

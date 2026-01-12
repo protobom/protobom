@@ -201,11 +201,9 @@ func buildDependencies(nl *sbom.NodeList, components map[string]*cdx.Component) 
 
 // isValidCycloneDXSerialNumber validates serial id against regex pattern
 func isValidCycloneDXSerialNumberFormat(serial string) bool {
-	if serialNumberRegex == nil {
-		serialNumberRegexInit.Do(func() {
-			serialNumberRegex = regexp.MustCompile(serialNumberPattern)
-		})
-	}
+	serialNumberRegexInit.Do(func() {
+		serialNumberRegex = regexp.MustCompile(serialNumberPattern)
+	})
 	return serialNumberRegex.MatchString(serial)
 }
 

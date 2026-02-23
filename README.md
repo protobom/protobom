@@ -5,6 +5,7 @@
 # protobom
 
 <img align="right" width="75" height="75" src="docs/images/OpenSSF_StagesBadges_sandbox.svg" alt="OpenSSF Sandbox Badge">
+
 `protobom` is a [protocol buffers](https://protobuf.dev/getting-started/)
 representation of SBOM data able to ingest documents in modern
 [SPDX](https://spdx.dev/) and [CycloneDX](https://cyclonedx.org/) versions
@@ -78,7 +79,7 @@ func main() {
 
 ### Example 3:  Generate an SBOM document programmatically
 
-Developers can use the `protobom` library to generate SBOM documents based on the content of a separate SBOM document, as shown by the sbom-convert project (https://github.com/protobom/sbom-convert).
+Developers can use the `protobom` library to generate SBOM documents based on the content of a separate SBOM document, as shown by the [sbom-convert](https://github.com/protobom/sbom-convert) project.
 
 However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The protobom v0.2.0 release includes six registered serializer formats for Writer.New(): SPDX23JSON, CDX12JSON, CDX13JSON, CDX14JSON, CDX15JSON, and CDX16JSON.
 

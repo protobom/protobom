@@ -5,13 +5,14 @@ on:
   schedule:
     - cron: '0 0 * * 1'
 
-permissions: read-all
+permissions: {}
 
 jobs:
   analysis:
     name: Scorecard analysis
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       security-events: write
       id-token: write
 

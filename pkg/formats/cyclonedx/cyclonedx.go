@@ -25,6 +25,11 @@ func ParseVersion(version string) (cyclonedx.SpecVersion, error) {
 		specVersion = cyclonedx.SpecVersion1_5
 	case "1.6":
 		specVersion = cyclonedx.SpecVersion1_6
+	case "1.7":
+		// cyclonedx-go does not yet support 1.7. Since 1.7 is additive
+		// and protobom does not need any of the new fields, we parse
+		// and serialize 1.7 documents using the 1.6 spec version.
+		specVersion = cyclonedx.SpecVersion1_6
 	default:
 		return specVersion, fmt.Errorf("unsupported CDX version %s", version)
 	}

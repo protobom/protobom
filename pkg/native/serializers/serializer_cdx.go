@@ -1,6 +1,7 @@
 package serializers
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -501,16 +502,43 @@ func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, _ i
 		return fmt.Errorf("getting CDX encoding: %w", err)
 	}
 
-	encoder := cdx.NewBOMEncoder(wr, encoding)
-	encoder.SetPretty(true)
-
 	cdxdoc, ok := doc.(*cdx.BOM)
 	if !ok {
 		return errors.New("document is not a cyclonedx bom")
 	}
 
+	// When the requested version differs from the library version used for
+	// encoding (e.g. 1.7 encoded as 1.6 because cyclonedx-go lacks native
+	// support), we encode to a buffer and patch the specVersion field before
+	// writing to the final output.
+	if s.version == version.String() {
+		encoder := cdx.NewBOMEncoder(wr, encoding)
+		encoder.SetPretty(true)
+
+		if err := encoder.EncodeVersion(cdxdoc, version); err != nil {
+			return fmt.Errorf("encoding sbom to stream: %w", err)
+		}
+
+		return nil
+	}
+
+	var buf bytes.Buffer
+	encoder := cdx.NewBOMEncoder(&buf, encoding)
+	encoder.SetPretty(true)
+
 	if err := encoder.EncodeVersion(cdxdoc, version); err != nil {
 		return fmt.Errorf("encoding sbom to stream: %w", err)
+	}
+
+	patched := bytes.Replace(
+		buf.Bytes(),
+		[]byte(fmt.Sprintf(`"specVersion": "%s"`, version)),
+		[]byte(fmt.Sprintf(`"specVersion": "%s"`, s.version)),
+		1,
+	)
+
+	if _, err := wr.Write(patched); err != nil {
+		return fmt.Errorf("writing patched sbom to stream: %w", err)
 	}
 
 	return nil

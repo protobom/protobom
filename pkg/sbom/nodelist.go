@@ -220,8 +220,8 @@ func (nl *NodeList) AddNode(n *Node) {
 func (nl *NodeList) Add(nl2 *NodeList) {
 	existingNodes := nl.indexNodes()
 	for i := range nl2.Nodes {
-		if n, ok := existingNodes[nl2.Nodes[i].Id]; ok {
-			existingNodes[nl2.Nodes[i].Id].Augment(n)
+		if _, ok := existingNodes[nl2.Nodes[i].Id]; ok {
+			existingNodes[nl2.Nodes[i].Id].Augment(nl2.Nodes[i])
 		} else {
 			nl.Nodes = append(nl.Nodes, nl2.Nodes[i])
 		}

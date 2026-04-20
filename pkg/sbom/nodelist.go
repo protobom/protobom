@@ -205,7 +205,7 @@ func (nl *NodeList) AddRootNode(n *Node) {
 	nl.RootElements = append(nl.RootElements, n.Id)
 }
 
-// AddEdge adds a new node to the Node List.
+// AddNode adds a new node to the Node List.
 func (nl *NodeList) AddNode(n *Node) {
 	nl.Nodes = append(nl.Nodes, n)
 }
@@ -618,9 +618,11 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 		return false
 	}
 
-	// Compare the flattened rootElements list
-	r1 := nl.RootElements
-	r2 := nl2.RootElements
+	// Compare the flattened rootElements list (copy to avoid mutating originals)
+	r1 := make([]string, len(nl.RootElements))
+	copy(r1, nl.RootElements)
+	r2 := make([]string, len(nl2.RootElements))
+	copy(r2, nl2.RootElements)
 	sort.Strings(r1)
 	sort.Strings(r2)
 	if !reflect.DeepEqual(r1, r2) {

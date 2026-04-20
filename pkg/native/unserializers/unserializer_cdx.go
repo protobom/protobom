@@ -96,6 +96,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	}
 
 	// Cycle all components and get their graph fragments
+	hasRootComponent := bom.Metadata != nil && bom.Metadata.Component != nil
 	if bom.Components != nil {
 		for i := range *bom.Components {
 			nl, err := u.componentToNodeList(&(*bom.Components)[i], &cc)
@@ -106,9 +107,9 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 			// TODO(mod): Write a hack to force one componento to the top
 			// if there is no component in the metadata.
 
-			// If the CDX doc does not have a a top level component,
+			// If the CDX doc does not have a top level component,
 			// then the nodes come in as top level nodes:
-			if bom.Metadata.Component == nil {
+			if !hasRootComponent {
 				doc.NodeList.Add(nl)
 
 				// ... unless we have a top level component. Then we descend
@@ -311,7 +312,7 @@ func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 	for _, lc := range *lcs {
 		// TODO(license): This should handle licenses without an ID and
 		// create custom licenses or another solution that captures the
-		// full cuistom license text.
+		// full custom license text.
 		if lc.Expression == "" && lc.License.ID == "" {
 			continue
 		}
@@ -321,7 +322,6 @@ func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 		} else {
 			list = append(list, lc.License.ID)
 		}
-		return list
 	}
 
 	return list
@@ -336,31 +336,26 @@ func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 	if lcs == nil {
 		return ""
 	}
-	s := ""
+	var parts []string
 	for _, lc := range *lcs {
 		// TODO(license): This should handle licenses without an ID and
 		// create custom licenses or another solution that captures the
-		// full cuistom license text.
+		// full custom license text.
 		if lc.Expression == "" && lc.License.ID == "" {
 			continue
 		}
-		if s != "" {
-			s += fmt.Sprintf("(%s) OR ", s)
-		}
 
-		var newLicense string
 		if lc.Expression != "" {
-			newLicense = lc.Expression
+			parts = append(parts, lc.Expression)
 		} else {
-			newLicense = lc.License.ID
-		}
-		if s == "" {
-			s = newLicense
-		} else {
-			s += fmt.Sprintf(" (%s)", newLicense)
+			parts = append(parts, lc.License.ID)
 		}
 	}
-	return s
+
+	if len(parts) == 1 {
+		return parts[0]
+	}
+	return strings.Join(parts, " OR ")
 }
 
 // phaseToSBOMType converts a CycloneDX lifecycle phase to an SBOM document type

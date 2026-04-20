@@ -237,7 +237,8 @@ func (nl *NodeList) Add(nl2 *NodeList) {
 }
 
 // RemoveNodes removes nodes with specified IDs from the NodeList.
-// It also removes corresponding edges connected to the removed nodes.
+// It also removes corresponding edges connected to the removed nodes
+// and cleans up RootElements references.
 func (nl *NodeList) RemoveNodes(ids []string) {
 	// build an inverse dict of the IDs
 	idDict := map[string]struct{}{}
@@ -253,6 +254,16 @@ func (nl *NodeList) RemoveNodes(ids []string) {
 	}
 
 	nl.Nodes = newNodeList
+
+	// Remove from RootElements too
+	newRoots := make([]string, 0, len(nl.RootElements))
+	for _, id := range nl.RootElements {
+		if _, ok := idDict[id]; !ok {
+			newRoots = append(newRoots, id)
+		}
+	}
+	nl.RootElements = newRoots
+
 	nl.cleanEdges()
 }
 

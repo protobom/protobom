@@ -190,8 +190,9 @@ func (nl *NodeList) MergeEdges(es []*Edge) {
 	}
 }
 
-// AddRootNode adds a node to the NodeList and registers it as a Root Elements.
+// AddRootNode adds a node to the NodeList and registers it as a Root Element.
 // More than one root element can be added to the NodeList.
+// If the node already exists (by ID), it is not added again.
 func (nl *NodeList) AddRootNode(n *Node) {
 	if n.Id == "" {
 		n.Id = NewNodeIdentifier("auto", fmt.Sprintf("%s@%s", n.Name, n.Version))
@@ -201,7 +202,10 @@ func (nl *NodeList) AddRootNode(n *Node) {
 		return
 	}
 
-	nl.AddNode(n)
+	// Only add the node if it doesn't already exist
+	if nl.GetNodeByID(n.Id) == nil {
+		nl.AddNode(n)
+	}
 	nl.RootElements = append(nl.RootElements, n.Id)
 }
 

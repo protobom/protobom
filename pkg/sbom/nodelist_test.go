@@ -137,6 +137,110 @@ func TestRemoveNodes(t *testing.T) {
 	}
 }
 
+func TestRemoveNodesByEdgeType(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		sut       *NodeList
+		types     []Edge_Type
+		wantNodes []string
+		wantEdges int
+	}{
+		{
+			name: "remove dev-only node",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "root"}, {Id: "prod"}, {Id: "dev"},
+				},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "root", To: []string{"prod"}},
+					{Type: Edge_devDependency, From: "root", To: []string{"dev"}},
+				},
+				RootElements: []string{"root"},
+			},
+			types:     []Edge_Type{Edge_devDependency},
+			wantNodes: []string{"root", "prod"},
+			wantEdges: 1,
+		},
+		{
+			name: "keep node reachable by both edge types",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "root"}, {Id: "shared"},
+				},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "root", To: []string{"shared"}},
+					{Type: Edge_devDependency, From: "root", To: []string{"shared"}},
+				},
+				RootElements: []string{"root"},
+			},
+			types:     []Edge_Type{Edge_devDependency},
+			wantNodes: []string{"root", "shared"},
+			wantEdges: 1,
+		},
+		{
+			name: "remove multiple edge types",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "root"}, {Id: "prod"}, {Id: "dev"}, {Id: "build"},
+				},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "root", To: []string{"prod"}},
+					{Type: Edge_devDependency, From: "root", To: []string{"dev"}},
+					{Type: Edge_buildDependency, From: "root", To: []string{"build"}},
+				},
+				RootElements: []string{"root"},
+			},
+			types:     []Edge_Type{Edge_devDependency, Edge_buildDependency},
+			wantNodes: []string{"root", "prod"},
+			wantEdges: 1,
+		},
+		{
+			name: "no types specified does nothing",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "root"}, {Id: "dep"},
+				},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "root", To: []string{"dep"}},
+				},
+				RootElements: []string{"root"},
+			},
+			types:     []Edge_Type{},
+			wantNodes: []string{"root", "dep"},
+			wantEdges: 1,
+		},
+		{
+			name: "edge removed but node kept when other edge remains",
+			sut: &NodeList{
+				Nodes: []*Node{
+					{Id: "root"}, {Id: "A"}, {Id: "B"},
+				},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "root", To: []string{"A"}},
+					{Type: Edge_dependsOn, From: "A", To: []string{"B"}},
+					{Type: Edge_optionalDependency, From: "root", To: []string{"B"}},
+				},
+				RootElements: []string{"root"},
+			},
+			types:     []Edge_Type{Edge_optionalDependency},
+			wantNodes: []string{"root", "A", "B"},
+			wantEdges: 2,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.sut.RemoveNodesByEdgeType(tc.types...)
+
+			var gotNodeIDs []string
+			for _, n := range tc.sut.Nodes {
+				gotNodeIDs = append(gotNodeIDs, n.Id)
+			}
+
+			require.ElementsMatch(t, tc.wantNodes, gotNodeIDs)
+			require.Len(t, tc.sut.Edges, tc.wantEdges)
+		})
+	}
+}
+
 func TestAdd(t *testing.T) {
 	for _, tc := range []struct {
 		sut     *NodeList

@@ -190,8 +190,9 @@ func (nl *NodeList) MergeEdges(es []*Edge) {
 	}
 }
 
-// AddRootNode adds a node to the NodeList and registers it as a Root Elements.
+// AddRootNode adds a node to the NodeList and registers it as a Root Element.
 // More than one root element can be added to the NodeList.
+// If the node already exists (by ID), it is not added again.
 func (nl *NodeList) AddRootNode(n *Node) {
 	if n.Id == "" {
 		n.Id = NewNodeIdentifier("auto", fmt.Sprintf("%s@%s", n.Name, n.Version))
@@ -201,11 +202,14 @@ func (nl *NodeList) AddRootNode(n *Node) {
 		return
 	}
 
-	nl.AddNode(n)
+	// Only add the node if it doesn't already exist
+	if nl.GetNodeByID(n.Id) == nil {
+		nl.AddNode(n)
+	}
 	nl.RootElements = append(nl.RootElements, n.Id)
 }
 
-// AddEdge adds a new node to the Node List.
+// AddNode adds a new node to the Node List.
 func (nl *NodeList) AddNode(n *Node) {
 	nl.Nodes = append(nl.Nodes, n)
 }
@@ -216,8 +220,8 @@ func (nl *NodeList) AddNode(n *Node) {
 func (nl *NodeList) Add(nl2 *NodeList) {
 	existingNodes := nl.indexNodes()
 	for i := range nl2.Nodes {
-		if n, ok := existingNodes[nl2.Nodes[i].Id]; ok {
-			existingNodes[nl2.Nodes[i].Id].Augment(n)
+		if _, ok := existingNodes[nl2.Nodes[i].Id]; ok {
+			existingNodes[nl2.Nodes[i].Id].Augment(nl2.Nodes[i])
 		} else {
 			nl.Nodes = append(nl.Nodes, nl2.Nodes[i])
 		}
@@ -237,7 +241,8 @@ func (nl *NodeList) Add(nl2 *NodeList) {
 }
 
 // RemoveNodes removes nodes with specified IDs from the NodeList.
-// It also removes corresponding edges connected to the removed nodes.
+// It also removes corresponding edges connected to the removed nodes
+// and cleans up RootElements references.
 func (nl *NodeList) RemoveNodes(ids []string) {
 	// build an inverse dict of the IDs
 	idDict := map[string]struct{}{}
@@ -253,7 +258,70 @@ func (nl *NodeList) RemoveNodes(ids []string) {
 	}
 
 	nl.Nodes = newNodeList
+
+	// Remove from RootElements too
+	newRoots := make([]string, 0, len(nl.RootElements))
+	for _, id := range nl.RootElements {
+		if _, ok := idDict[id]; !ok {
+			newRoots = append(newRoots, id)
+		}
+	}
+	nl.RootElements = newRoots
+
 	nl.cleanEdges()
+}
+
+// RemoveNodesByEdgeType removes nodes and edges associated with the specified
+// edge types. For nodes that are ONLY reachable via the specified edge types,
+// the nodes are removed entirely. For nodes that are reachable via both
+// specified and non-specified edge types, only the edges of the specified
+// types are removed while the nodes are kept.
+func (nl *NodeList) RemoveNodesByEdgeType(edgeTypes ...Edge_Type) {
+	if len(edgeTypes) == 0 {
+		return
+	}
+
+	// Build a set of edge types to remove
+	removeTypes := make(map[Edge_Type]struct{}, len(edgeTypes))
+	for _, t := range edgeTypes {
+		removeTypes[t] = struct{}{}
+	}
+
+	// Track which node IDs are targets of excluded vs included edges
+	includedTargets := make(map[string]struct{})
+	excludedTargets := make(map[string]struct{})
+
+	for _, edge := range nl.Edges {
+		_, isExcluded := removeTypes[edge.Type]
+		for _, toID := range edge.To {
+			if isExcluded {
+				excludedTargets[toID] = struct{}{}
+			} else {
+				includedTargets[toID] = struct{}{}
+			}
+		}
+	}
+
+	// Remove edges of the specified types
+	var keptEdges []*Edge
+	for _, edge := range nl.Edges {
+		if _, remove := removeTypes[edge.Type]; !remove {
+			keptEdges = append(keptEdges, edge)
+		}
+	}
+	nl.Edges = keptEdges
+
+	// Remove nodes that were only reachable via the excluded edge types
+	var toRemove []string
+	for id := range excludedTargets {
+		if _, kept := includedTargets[id]; !kept {
+			toRemove = append(toRemove, id)
+		}
+	}
+
+	if len(toRemove) > 0 {
+		nl.RemoveNodes(toRemove)
+	}
 }
 
 // GetEdgeByType returns the first edge of the specified type (t) originating from the given node ID (fromElement).
@@ -565,9 +633,11 @@ func (nl *NodeList) Equal(nl2 *NodeList) bool {
 		return false
 	}
 
-	// Compare the flattened rootElements list
-	r1 := nl.RootElements
-	r2 := nl2.RootElements
+	// Compare the flattened rootElements list (copy to avoid mutating originals)
+	r1 := make([]string, len(nl.RootElements))
+	copy(r1, nl.RootElements)
+	r2 := make([]string, len(nl2.RootElements))
+	copy(r2, nl2.RootElements)
 	sort.Strings(r1)
 	sort.Strings(r2)
 	if !reflect.DeepEqual(r1, r2) {

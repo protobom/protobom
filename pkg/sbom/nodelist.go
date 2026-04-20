@@ -256,6 +256,59 @@ func (nl *NodeList) RemoveNodes(ids []string) {
 	nl.cleanEdges()
 }
 
+// RemoveNodesByEdgeType removes nodes and edges associated with the specified
+// edge types. For nodes that are ONLY reachable via the specified edge types,
+// the nodes are removed entirely. For nodes that are reachable via both
+// specified and non-specified edge types, only the edges of the specified
+// types are removed while the nodes are kept.
+func (nl *NodeList) RemoveNodesByEdgeType(edgeTypes ...Edge_Type) {
+	if len(edgeTypes) == 0 {
+		return
+	}
+
+	// Build a set of edge types to remove
+	removeTypes := make(map[Edge_Type]struct{}, len(edgeTypes))
+	for _, t := range edgeTypes {
+		removeTypes[t] = struct{}{}
+	}
+
+	// Track which node IDs are targets of excluded vs included edges
+	includedTargets := make(map[string]struct{})
+	excludedTargets := make(map[string]struct{})
+
+	for _, edge := range nl.Edges {
+		_, isExcluded := removeTypes[edge.Type]
+		for _, toID := range edge.To {
+			if isExcluded {
+				excludedTargets[toID] = struct{}{}
+			} else {
+				includedTargets[toID] = struct{}{}
+			}
+		}
+	}
+
+	// Remove edges of the specified types
+	var keptEdges []*Edge
+	for _, edge := range nl.Edges {
+		if _, remove := removeTypes[edge.Type]; !remove {
+			keptEdges = append(keptEdges, edge)
+		}
+	}
+	nl.Edges = keptEdges
+
+	// Remove nodes that were only reachable via the excluded edge types
+	var toRemove []string
+	for id := range excludedTargets {
+		if _, kept := includedTargets[id]; !kept {
+			toRemove = append(toRemove, id)
+		}
+	}
+
+	if len(toRemove) > 0 {
+		nl.RemoveNodes(toRemove)
+	}
+}
+
 // GetEdgeByType returns the first edge of the specified type (t) originating from the given node ID (fromElement).
 // If no such edge is found, it returns nil.
 func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {

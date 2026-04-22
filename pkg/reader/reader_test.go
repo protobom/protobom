@@ -496,7 +496,7 @@ func TestReaderSourceData(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	require.Equal(t, "text/spdx+json;version=2.3", doc.Metadata.SourceData.Format)
+	require.Equal(t, "application/spdx+json;version=2.3", doc.Metadata.SourceData.Format)
 	require.Len(t, doc.Metadata.SourceData.Hashes, 3)
 	require.Equal(t, int64(1472), doc.Metadata.SourceData.Size)
 	require.Equal(t, "2f48db1a89d5e7f8b2d4d1a412be14d932f5613f", doc.Metadata.SourceData.Hashes[int32(sbom.HashAlgorithm_SHA1)])

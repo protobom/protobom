@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
+	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -64,7 +65,7 @@ func NewCDX(version, encoding string) *CDX {
 	}
 }
 
-func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts interface{}) (interface{}, error) {
+func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptions, rawopts interface{}) (interface{}, error) {
 	// Load the context with the CDX value. We initialize a context here
 	// but we should get it as part of the method to capture cancelations
 	// from the CLI or REST API.
@@ -108,6 +109,9 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 	}
 	doc.Metadata = md
 
+	// Check if we have headless support on
+	headless := serializeopts != nil && serializeopts.IsModEnabled(mod.CYCLONEDX_MULTIROOT_HEADLESS)
+
 	// Check if the protobom has no root elements:
 	if len(bom.NodeList.RootElements) == 0 {
 		// Empty (nodeless) document
@@ -119,38 +123,62 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 		return nil, fmt.Errorf("unable to build cyclonedx document, no root nodes found")
 	}
 
-	// .. or has too many root elements:
-
-	// TODO(deprecation): If there are more root nodes we need to hack them
-	// into the CycloneDX graph or error
-	if l := len(bom.NodeList.RootElements); l > 1 {
-		return nil, fmt.Errorf("unable to serialize multiroot cyclonedx, document has %d root nodes", l)
+	// Reject documents with more than one root unless the caller opted into
+	// the headless mod, which promotes all roots to top-level components.
+	if l := len(bom.NodeList.RootElements); l > 1 && !headless {
+		return nil, fmt.Errorf("unable to serialize multiroot (%d) cyclonedx, (mod.CYCLONEDX_MULTIROOT_HEADLESS disabled)", l)
 	}
 
-	// Convert all nodes to cdx cmponents
+	// Convert all nodes to cdx components
 	components := map[string]*cdx.Component{}
 	for _, node := range bom.NodeList.Nodes {
 		components[node.Id] = s.nodeToComponent(node)
 	}
 
-	// CLear the protobom generated bomrefs
+	// Clear the protobom generated bomrefs
 	clearAutoRefs(components)
 
-	rootNode := bom.NodeList.GetNodeByID(bom.NodeList.RootElements[0])
-	if rootNode == nil {
-		return nil, fmt.Errorf("integrity error: root node %q not found", bom.NodeList.RootElements[0])
-	}
+	if headless && len(bom.NodeList.RootElements) > 1 {
+		// Drop metadata.component entirely and promote each protobom root to
+		// a top-level CycloneDX component, attaching its contained subtree.
+		doc.Metadata.Component = nil
 
-	doc.Metadata.Component = s.nodeToComponent(rootNode)
+		seen := map[string]struct{}{}
+		for _, rootID := range bom.NodeList.RootElements {
+			seen[rootID] = struct{}{}
+		}
 
-	// Extract the component tree
-	componentTree, err := recurseComponentComponents(
-		rootNode.Id, bom.NodeList, components, &map[string]struct{}{rootNode.Id: {}},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("building component tree: %w", err)
+		topComponents := []cdx.Component{}
+		for _, rootID := range bom.NodeList.RootElements {
+			rootComp, ok := components[rootID]
+			if !ok {
+				return nil, fmt.Errorf("integrity error: root component %q not found", rootID)
+			}
+			subtree, err := recurseComponentComponents(rootID, bom.NodeList, components, &seen)
+			if err != nil {
+				return nil, fmt.Errorf("building component tree for root %q: %w", rootID, err)
+			}
+			rootComp.Components = subtree
+			topComponents = append(topComponents, *rootComp)
+		}
+		doc.Components = &topComponents
+	} else {
+		rootNode := bom.NodeList.GetNodeByID(bom.NodeList.RootElements[0])
+		if rootNode == nil {
+			return nil, fmt.Errorf("integrity error: root node %q not found", bom.NodeList.RootElements[0])
+		}
+
+		doc.Metadata.Component = s.nodeToComponent(rootNode)
+
+		// Extract the component tree
+		componentTree, err := recurseComponentComponents(
+			rootNode.Id, bom.NodeList, components, &map[string]struct{}{rootNode.Id: {}},
+		)
+		if err != nil {
+			return nil, fmt.Errorf("building component tree: %w", err)
+		}
+		doc.Components = componentTree
 	}
-	doc.Components = componentTree
 
 	// Build the dependency graph:
 	deps, err := buildDependencies(bom.NodeList, components)
@@ -159,7 +187,7 @@ func (s *CDX) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopts 
 	}
 	doc.Dependencies = &deps
 
-	if bom.Metadata != nil && bom.GetMetadata().GetName() != "" {
+	if !headless && bom.Metadata != nil && bom.GetMetadata().GetName() != "" {
 		doc.Metadata.Component.Name = bom.GetMetadata().GetName()
 	}
 

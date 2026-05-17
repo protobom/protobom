@@ -95,7 +95,10 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		}
 	}
 
-	// Cycle all components and get their graph fragments
+	// Cycle all components and get their graph fragments. A CycloneDX BOM
+	// without a metadata.component is treated as "headless": each top-level
+	// component becomes a protobom root node. This matches the inverse of
+	// the mod.CYCLONEDX_MULTIROOT_HEADLESS write path.
 	hasRootComponent := bom.Metadata != nil && bom.Metadata.Component != nil
 	if bom.Components != nil {
 		for i := range *bom.Components {
@@ -103,9 +106,6 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 			if err != nil {
 				return nil, fmt.Errorf("converting component to node: %w", err)
 			}
-
-			// TODO(mod): Write a hack to force one componento to the top
-			// if there is no component in the metadata.
 
 			// If the CDX doc does not have a top level component,
 			// then the nodes come in as top level nodes:

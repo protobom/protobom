@@ -21,7 +21,7 @@ type SPDX3Options struct {
 }
 
 func init() {
-	writer.RegisterSerializer(formats.Format("text/spdx+json;version=3.0"), &SPDX3{})
+	writer.RegisterSerializer(formats.Format("application/spdx+json;version=3.0"), &SPDX3{})
 }
 
 func NewSPDX3() *SPDX3 {

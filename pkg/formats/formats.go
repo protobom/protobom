@@ -13,10 +13,10 @@ const (
 	JSON       = "json"
 	XML        = "xml"
 	TEXT       = "text"
-	SPDX23TV   = Format("text/spdx+text;version=2.3")
-	SPDX23JSON = Format("text/spdx+json;version=2.3")
-	SPDX22TV   = Format("text/spdx+text;version=2.2")
-	SPDX22JSON = Format("text/spdx+json;version=2.2")
+	SPDX23TV   = Format("text/spdx;version=2.3")
+	SPDX23JSON = Format("application/spdx+json;version=2.3")
+	SPDX22TV   = Format("text/spdx;version=2.2")
+	SPDX22JSON = Format("application/spdx+json;version=2.2")
 	CDX10JSON  = Format("application/vnd.cyclonedx+json;version=1.0")
 	CDX11JSON  = Format("application/vnd.cyclonedx+json;version=1.1")
 	CDX12JSON  = Format("application/vnd.cyclonedx+json;version=1.2")

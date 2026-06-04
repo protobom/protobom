@@ -195,7 +195,7 @@ func (nl *NodeList) MergeEdges(es []*Edge) {
 // If the node already exists (by ID), it is not added again.
 func (nl *NodeList) AddRootNode(n *Node) {
 	if n.Id == "" {
-		n.Id = NewNodeIdentifier("auto", fmt.Sprintf("%s@%s", n.Name, n.Version))
+		n.Id = NewNodeIdentifier(NodeIdentifierPrefixAuto, fmt.Sprintf("%s@%s", n.Name, n.Version))
 	}
 
 	if slices.Contains(nl.RootElements, n.Id) {
@@ -337,7 +337,7 @@ func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
 
 // copyEdgeList is a utility function that deep copies a list of edges
 func copyEdgeList(original []*Edge) []*Edge {
-	edgeCopy := []*Edge{}
+	edgeCopy := make([]*Edge, 0, len(original))
 	for _, e := range original {
 		edgeCopy = append(edgeCopy, e.Copy())
 	}
@@ -346,7 +346,7 @@ func copyEdgeList(original []*Edge) []*Edge {
 
 // copyNodeSlice is a utility function that deep copies a list of nodes
 func copyNodeSlice(original []*Node) []*Node {
-	nodeCopy := []*Node{}
+	nodeCopy := make([]*Node, 0, len(original))
 	for _, n := range original {
 		nodeCopy = append(nodeCopy, n.Copy())
 	}

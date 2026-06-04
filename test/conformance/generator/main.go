@@ -55,7 +55,9 @@ func main() {
 				logrus.Fatalf("marshalling sbom to protobuf: %v", err)
 			}
 
-			if err := os.WriteFile(sbomPath+".proto", raw, os.FileMode(0o644)); err != nil {
+			// sbomPath is derived from a controlled fixtures directory listing,
+			// not from untrusted input.
+			if err := os.WriteFile(sbomPath+".proto", raw, os.FileMode(0o644)); err != nil { //nolint:gosec // path is built from controlled test fixtures
 				logrus.Fatalf("wiriting protobuf of %s: %v", f.Name(), err)
 			}
 			logrus.Infof("Wrote %s sample to %s", format, sbomPath+".proto")

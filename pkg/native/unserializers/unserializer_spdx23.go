@@ -24,6 +24,10 @@ import (
 
 var _ native.Unserializer = &SPDX23{}
 
+// protobomAnnotator is the fixed annotator string protobom writes when storing
+// properties as SPDX annotations. See [mod.SPDX_READ_ANNOTATIONS_TO_PROPERTIES].
+const protobomAnnotator = "protobom - v1.0.0"
+
 type SPDX23 struct{}
 
 func NewSPDX23() *SPDX23 {
@@ -67,7 +71,7 @@ func (u *SPDX23) Unserialize(r io.Reader, opts *native.UnserializeOptions, _ int
 		if spdxDoc.CreationInfo.Creators != nil {
 			for _, c := range spdxDoc.CreationInfo.Creators {
 				// TODO: We need to create a parser library in formats/spdx
-				if c.CreatorType == "Tool" {
+				if c.CreatorType == protospdx.Tool {
 					// TODO: Split the version from the Tool string here.
 					bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: c.Creator})
 					continue
@@ -91,7 +95,7 @@ func (u *SPDX23) Unserialize(r io.Reader, opts *native.UnserializeOptions, _ int
 
 	for _, r := range spdxDoc.Relationships {
 		// The SPDX go library surfaces the JSON top-level elements as relationships:
-		if r.RefA.ElementRefID == "DOCUMENT" && strings.EqualFold(r.Relationship, "DESCRIBES") {
+		if r.RefA.ElementRefID == protospdx.DOCUMENT && strings.EqualFold(r.Relationship, "DESCRIBES") {
 			bom.NodeList.RootElements = append(bom.NodeList.RootElements, string(r.RefB.ElementRefID))
 		} else {
 			bom.NodeList.AddEdge(u.relationshipToEdge(r))
@@ -233,8 +237,8 @@ func (u *SPDX23) packageToNode(opts *native.UnserializeOptions, p *spdx23.Packag
 	// created by protobom:
 	if opts.IsModEnabled(mod.SPDX_READ_ANNOTATIONS_TO_PROPERTIES) {
 		for i := range p.Annotations {
-			if p.Annotations[i].Annotator.AnnotatorType != "Tool" ||
-				p.Annotations[i].Annotator.Annotator != "protobom - v1.0.0" {
+			if p.Annotations[i].Annotator.AnnotatorType != protospdx.Tool ||
+				p.Annotations[i].Annotator.Annotator != protobomAnnotator {
 				continue
 			}
 

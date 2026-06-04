@@ -276,7 +276,7 @@ func (n *Node) flatString() string {
 			}
 		case "protobom.protobom.Node.identifiers":
 			// Index the keys and sort them to make the string deterministic
-			idKeys := []int{}
+			idKeys := make([]int, 0, len(n.Identifiers))
 			for t := range n.Identifiers {
 				idKeys = append(idKeys, int(t))
 			}
@@ -320,7 +320,7 @@ func (n *Node) flatString() string {
 // flatStringStrSlice returns a deterministic string representation of a Protobuf List.
 // It returns a string composed of slice of strings shorted by values.
 func flatStringStrSlice(name protoreflect.FullName, protoSlice protoreflect.List) string {
-	vals := []string{}
+	vals := make([]string, 0, protoSlice.Len())
 	for i := range protoSlice.Len() {
 		vals = append(vals, protoSlice.Get(i).String())
 	}

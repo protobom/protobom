@@ -222,7 +222,7 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 	}
 
 	if c.Properties != nil && len(*c.Properties) > 0 {
-		ps := []*sbom.Property{}
+		ps := make([]*sbom.Property, 0, len(*c.Properties))
 		for _, p := range *c.Properties {
 			protoprop := sbom.NewProperty()
 			protoprop.Name = p.Name

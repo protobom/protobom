@@ -18,38 +18,26 @@ jobs:
       contents: write # needed to write releases
 
     steps:
-      - name: Set tag name
-        shell: bash
-        run: |
-          echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
       - name: Check out code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Resolve Go versions
-        id: go-versions
-        uses: carabiner-dev/actions/go/versions@94f29392187fe5082d1195a7d4cae3a7ddf09d9c # v1.2.1
-
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version: ${{ steps.go-versions.outputs.GO_VERSION_PREVIOUS }}
-          check-latest: true
-
-      - name: Install bom
-        uses: kubernetes-sigs/release-actions/setup-bom@8753ea6bdadb814d779c6ec34eaca689dbfb492b # v0.4.3
-
       - name: Generate SBOM
-        shell: bash
-        run: |
-          bom generate --format=json -o /tmp/protobom-$TAG.spdx.json .
+        id: sbom
+        uses: carabiner-dev/actions/unpack/sbom@94f29392187fe5082d1195a7d4cae3a7ddf09d9c # v1.2.1
+        with:
+          format: spdx
+          output-path: /tmp
+          codebases: "golang:." # Only generate the SBOM for the main go codebase
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Publish Release
         uses: kubernetes-sigs/release-actions/publish-release@8753ea6bdadb814d779c6ec34eaca689dbfb492b # v0.4.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          assets: "/tmp/protobom-$TAG.spdx.json"
+          assets: ${{ steps.sbom.outputs.files }}
           sbom: false

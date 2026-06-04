@@ -11,7 +11,13 @@ import (
 
 const (
 	EmptyFormat = Format("")
+
+	spdxVersion22 = "2.2"
+	spdxVersion23 = "2.3"
 )
+
+// sniffedSPDXVersions lists the SPDX versions the sniffer can detect.
+var sniffedSPDXVersions = []string{spdxVersion22, spdxVersion23}
 
 var sniffFormats = []sniffFormat{
 	cdxSniff{},
@@ -168,9 +174,9 @@ func (c spdxSniff) sniff(data []byte) Format {
 
 	if strings.Contains(stringValue, "SPDXVersion:") {
 		state.Type = "text/spdx"
-		state.Encoding = "text"
+		state.Encoding = TEXT
 
-		for _, ver := range []string{"2.2", "2.3"} {
+		for _, ver := range sniffedSPDXVersions {
 			if strings.Contains(stringValue, fmt.Sprintf("SPDX-%s", ver)) {
 				state.Version = ver
 				return state.Format()
@@ -181,7 +187,7 @@ func (c spdxSniff) sniff(data []byte) Format {
 	// Removed the strings.Contains to check for the JSON version
 	//  JSON version should be detected above in SniffReader via json.NewDecoder()
 
-	for _, ver := range []string{"2.2", "2.3"} {
+	for _, ver := range sniffedSPDXVersions {
 		if strings.Contains(stringValue, fmt.Sprintf("'SPDX-%s'", ver)) ||
 			strings.Contains(stringValue, fmt.Sprintf("\"SPDX-%s\"", ver)) {
 			state.Version = ver

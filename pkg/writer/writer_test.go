@@ -432,8 +432,6 @@ func TestSerializerRegistry(t *testing.T) {
 
 func TestStore(t *testing.T) {
 	t.Parallel()
-	w := writer.New()
-	w.Storage = &storage.Fake{}
 	defaultOpts := &writer.Options{}
 
 	for _, tc := range []struct {
@@ -446,7 +444,7 @@ func TestStore(t *testing.T) {
 			name:    "no-errors",
 			opts:    defaultOpts,
 			mustErr: false,
-			prepare: func(r *writer.Writer) {
+			prepare: func(w *writer.Writer) {
 				t.Helper()
 				//nolint:errcheck,forcetypeassert // This is a controlled test
 				w.Storage.(*storage.Fake).StoreReturns = nil
@@ -474,8 +472,9 @@ func TestStore(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			w := *w
-			tc.prepare(&w)
+			w := writer.New()
+			w.Storage = &storage.Fake{}
+			tc.prepare(w)
 			err := w.StoreWithOptions(sbom.NewDocument(), tc.opts)
 			if tc.mustErr {
 				require.Error(t, err)

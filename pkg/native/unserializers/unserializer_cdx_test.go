@@ -1,6 +1,7 @@
 package unserializers
 
 import (
+	"strings"
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
@@ -120,6 +121,158 @@ func TestCdxExtRefTypeToProtobomType(t *testing.T) {
 	} {
 		res := cdxu.cdxExtRefTypeToProtobomType(cdxRefType)
 		require.Equal(t, protoType, res)
+	}
+}
+
+func TestMetadataToolsToTools(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	for _, tc := range []struct {
+		name     string
+		sut      *cdx.ToolsChoice
+		expected []*sbom.Tool
+	}{
+		{
+			name:     "nil choice",
+			sut:      nil,
+			expected: []*sbom.Tool{},
+		},
+		{
+			name: "legacy tools array",
+			sut: &cdx.ToolsChoice{
+				Tools: &[]cdx.Tool{ //nolint:staticcheck
+					{Vendor: "anchore", Name: "syft", Version: "0.100.0"},
+					{Name: "cyclonedx-gomod", Version: "1.4.0"},
+				},
+			},
+			expected: []*sbom.Tool{
+				{Name: "syft", Version: "0.100.0", Vendor: "anchore"},
+				{Name: "cyclonedx-gomod", Version: "1.4.0"},
+			},
+		},
+		{
+			name: "legacy empty tool skipped",
+			sut: &cdx.ToolsChoice{
+				Tools: &[]cdx.Tool{{}}, //nolint:staticcheck
+			},
+			expected: []*sbom.Tool{},
+		},
+		{
+			name: "components form with publisher",
+			sut: &cdx.ToolsChoice{
+				Components: &[]cdx.Component{
+					{Type: cdx.ComponentTypeApplication, Publisher: "anchore", Name: "syft", Version: "1.0.0"},
+				},
+			},
+			expected: []*sbom.Tool{
+				{Name: "syft", Version: "1.0.0", Vendor: "anchore"},
+			},
+		},
+		{
+			name: "components form vendor fallbacks",
+			sut: &cdx.ToolsChoice{
+				Components: &[]cdx.Component{
+					{Name: "tool-manufacturer", Version: "1", Manufacturer: &cdx.OrganizationalEntity{Name: "trivy-org"}},
+					{Name: "tool-author", Version: "2", Author: "syft-author"}, //nolint:staticcheck
+					{Name: "tool-group", Version: "3", Group: "aquasecurity"},
+					{Name: "tool-noname-skipped-when-empty", Version: "4"},
+				},
+			},
+			expected: []*sbom.Tool{
+				{Name: "tool-manufacturer", Version: "1", Vendor: "trivy-org"},
+				{Name: "tool-author", Version: "2", Vendor: "syft-author"},
+				{Name: "tool-group", Version: "3", Vendor: "aquasecurity"},
+				{Name: "tool-noname-skipped-when-empty", Version: "4"},
+			},
+		},
+		{
+			name: "component without a name is skipped",
+			sut: &cdx.ToolsChoice{
+				Components: &[]cdx.Component{{Type: cdx.ComponentTypeApplication, Publisher: "anchore"}},
+			},
+			expected: []*sbom.Tool{},
+		},
+		{
+			name: "services form",
+			sut: &cdx.ToolsChoice{
+				Services: &[]cdx.Service{
+					{Name: "hosted-scanner", Version: "9", Provider: &cdx.OrganizationalEntity{Name: "vendor-inc"}},
+				},
+			},
+			expected: []*sbom.Tool{
+				{Name: "hosted-scanner", Version: "9", Vendor: "vendor-inc"},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			got := cdxu.metadataToolsToTools(tc.sut)
+			require.Len(t, got, len(tc.expected))
+			for i := range tc.expected {
+				require.Equal(t, tc.expected[i].Name, got[i].Name)
+				require.Equal(t, tc.expected[i].Version, got[i].Version)
+				require.Equal(t, tc.expected[i].Vendor, got[i].Vendor)
+			}
+		})
+	}
+}
+
+// TestUnserializeMetadataTools is the end-to-end regression guard for
+// protobom/protobom#417: a parsed CycloneDX document must surface its
+// metadata.tools entries in Document.Metadata.Tools for both the legacy array
+// shape and the 1.5+ components object shape.
+func TestUnserializeMetadataTools(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		version string
+		doc     string
+		want    []*sbom.Tool
+	}{
+		{
+			name:    "legacy tools array",
+			version: "1.4",
+			doc: `{
+			  "bomFormat": "CycloneDX",
+			  "specVersion": "1.4",
+			  "version": 1,
+			  "metadata": {
+			    "tools": [
+			      { "vendor": "anchore", "name": "syft", "version": "0.100.0" }
+			    ]
+			  },
+			  "components": []
+			}`,
+			want: []*sbom.Tool{{Name: "syft", Version: "0.100.0", Vendor: "anchore"}},
+		},
+		{
+			name:    "components object form",
+			version: "1.5",
+			doc: `{
+			  "bomFormat": "CycloneDX",
+			  "specVersion": "1.5",
+			  "version": 1,
+			  "metadata": {
+			    "tools": {
+			      "components": [
+			        { "type": "application", "publisher": "anchore", "name": "syft", "version": "1.0.0" }
+			      ]
+			    }
+			  },
+			  "components": []
+			}`,
+			want: []*sbom.Tool{{Name: "syft", Version: "1.0.0", Vendor: "anchore"}},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			u := NewCDX(tc.version, cdxUnserializerTestEncoding)
+			doc, err := u.Unserialize(strings.NewReader(tc.doc), nil, nil)
+			require.NoError(t, err)
+			got := doc.GetMetadata().GetTools()
+			require.Len(t, got, len(tc.want), "metadata.tools should be surfaced, not dropped")
+			for i := range tc.want {
+				require.Equal(t, tc.want[i].Name, got[i].Name)
+				require.Equal(t, tc.want[i].Version, got[i].Version)
+				require.Equal(t, tc.want[i].Vendor, got[i].Vendor)
+			}
+		})
 	}
 }
 

@@ -93,6 +93,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				md.Date = timestamppb.New(t)
 			}
 		}
+		md.Tools = append(md.Tools, u.metadataToolsToTools(bom.Metadata.Tools)...)
 	}
 
 	// Cycle all components and get their graph fragments. A CycloneDX BOM
@@ -129,6 +130,92 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	doc.NodeList.MergeEdges(deps)
 
 	return doc, nil
+}
+
+// metadataToolsToTools converts the tools recorded in a CycloneDX
+// metadata.tools field into protobom Tool entries. CycloneDX exposes two
+// shapes here and both are live in the wild: the legacy array of Tool objects
+// (CDX 1.4 and still emitted by some generators under 1.6) and the 1.5+ object
+// form that nests tools as components and services. This reads whichever shape
+// the document uses so the data survives the round trip; previously it was
+// silently dropped. This mirrors how the SPDX unserializer surfaces the Tool
+// creators it finds in CreationInfo.
+func (u *CDX) metadataToolsToTools(tc *cdx.ToolsChoice) []*sbom.Tool {
+	tools := []*sbom.Tool{}
+	if tc == nil {
+		return tools
+	}
+
+	// Legacy array form: metadata.tools: [ { vendor, name, version }, ... ]
+	if tc.Tools != nil {
+		for _, t := range *tc.Tools { //nolint:staticcheck // Tools is deprecated in CDX but still read for older documents
+			if t.Name == "" && t.Vendor == "" && t.Version == "" {
+				continue
+			}
+			tools = append(tools, &sbom.Tool{
+				Name:    t.Name,
+				Version: t.Version,
+				Vendor:  t.Vendor,
+			})
+		}
+	}
+
+	// CDX 1.5+ object form: metadata.tools.components are the generators. There
+	// is no single vendor field on a component, so fall back through the fields
+	// real generators populate: publisher, then manufacturer.name, then the
+	// (deprecated) author string, then group.
+	if tc.Components != nil {
+		for _, c := range *tc.Components {
+			if c.Name == "" {
+				continue
+			}
+			tools = append(tools, &sbom.Tool{
+				Name:    c.Name,
+				Version: c.Version,
+				Vendor:  componentVendor(&c),
+			})
+		}
+	}
+
+	// Services may also appear under the 1.5+ object form (for example a hosted
+	// scanner). Provider.Name or group is the closest analog to a vendor.
+	if tc.Services != nil {
+		for _, s := range *tc.Services {
+			if s.Name == "" {
+				continue
+			}
+			vendor := s.Group
+			if s.Provider != nil && s.Provider.Name != "" {
+				vendor = s.Provider.Name
+			}
+			tools = append(tools, &sbom.Tool{
+				Name:    s.Name,
+				Version: s.Version,
+				Vendor:  vendor,
+			})
+		}
+	}
+
+	return tools
+}
+
+// componentVendor picks the best available "vendor" for a tool recorded as a
+// CycloneDX component, since a component has no dedicated vendor field.
+func componentVendor(c *cdx.Component) string {
+	switch {
+	case c.Publisher != "":
+		return c.Publisher
+	case c.Manufacturer != nil && c.Manufacturer.Name != "":
+		return c.Manufacturer.Name
+	case c.Author != "": //nolint:staticcheck // Author is deprecated in CDX but still emitted by some generators
+		return c.Author
+	case c.Group != "":
+		return c.Group
+	case c.Supplier != nil && c.Supplier.Name != "":
+		return c.Supplier.Name
+	default:
+		return ""
+	}
 }
 
 // componentToNodes takes a CycloneDX component and computes its graph fragment,

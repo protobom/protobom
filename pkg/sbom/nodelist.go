@@ -488,7 +488,11 @@ func (nl *NodeList) GetNodesByName(name string) []*Node {
 	return ret
 }
 
-// GetNodeByID returns a node with the specified ID
+// GetNodeByID returns a node with the specified ID.
+//
+// This is a linear scan of the node list — O(number of nodes). Callers that
+// need to resolve many IDs (e.g. while walking the dependency graph) should
+// avoid calling this in a loop and instead build an id->node map once.
 func (nl *NodeList) GetNodeByID(id string) *Node {
 	for i := range nl.Nodes {
 		if nl.Nodes[i].Id == id {
@@ -873,7 +877,8 @@ func (nl *NodeList) NodeGraph(id string) *NodeList {
 // stop when reaching them.
 func (nl *NodeList) indexConnectedNodes(id string) nodeIndex {
 	index := nodeIndex{}
-	node := nl.GetNodeByID(id)
+	nodeIdx := nl.indexNodes()
+	node := nodeIdx[id]
 	if node == nil {
 		return index
 	}
@@ -881,30 +886,47 @@ func (nl *NodeList) indexConnectedNodes(id string) nodeIndex {
 	index[id] = node
 
 	boundaries := nl.indexRootElements()
-	nl.connectedIndexRecursion(node.Id, &boundaries, &index)
+	edgeIdx := nl.indexEdges()
+	nl.connectedIndexRecursion(node.Id, &boundaries, edgeIdx, nodeIdx, &index)
 	return index
 }
 
 // connectedIndexRecursion traverses the NodeList graph starting at id to
 // populate the connectedNodes index stopping at the end of the edges or when
-// it hits a node in the boundaries list.
-func (nl *NodeList) connectedIndexRecursion(id string, boundaries *rootElementsIndex, connectedNodes *nodeIndex) {
-	siblings := nl.NodeSiblings(id)
-	for _, s := range siblings.Nodes {
-		// If we've seen it, skip
-		if _, ok := (*connectedNodes)[s.Id]; ok {
-			continue
+// it hits a node in the boundaries list. The edge and node indexes are built
+// once by the caller and threaded through, so the whole traversal is
+// O(nodes+edges) rather than resolving each neighbor with a linear scan.
+func (nl *NodeList) connectedIndexRecursion(
+	id string,
+	boundaries *rootElementsIndex,
+	edgeIdx edgeIndex,
+	nodeIdx nodeIndex,
+	connectedNodes *nodeIndex,
+) {
+	for _, edgesByType := range edgeIdx[id] {
+		for _, e := range edgesByType {
+			for _, to := range e.To {
+				// If we've seen it, skip
+				if _, ok := (*connectedNodes)[to]; ok {
+					continue
+				}
+
+				// If the node is in the boundaries list, skip
+				if _, ok := (*boundaries)[to]; ok {
+					continue
+				}
+
+				s := nodeIdx[to]
+				if s == nil {
+					continue
+				}
+
+				(*connectedNodes)[to] = s
+
+				// Traverse the node path:
+				nl.connectedIndexRecursion(to, boundaries, edgeIdx, nodeIdx, connectedNodes)
+			}
 		}
-
-		// If the node is in the boundaries list, skip
-		if _, ok := (*boundaries)[s.Id]; ok {
-			continue
-		}
-
-		(*connectedNodes)[s.Id] = s
-
-		// Traverse the node path:
-		nl.connectedIndexRecursion(s.Id, boundaries, connectedNodes)
 	}
 }
 
@@ -919,7 +941,8 @@ func (nl *NodeList) NodeSiblings(id string) *NodeList {
 	}
 
 	// Check that the node actually exists
-	node := nl.GetNodeByID(id)
+	nodeIdx := nl.indexNodes()
+	node := nodeIdx[id]
 	if node == nil {
 		return nodelist
 	}
@@ -933,7 +956,7 @@ func (nl *NodeList) NodeSiblings(id string) *NodeList {
 
 		for _, to := range r.To {
 			if _, ok := ni[to]; !ok {
-				n := nl.GetNodeByID(to)
+				n := nodeIdx[to]
 				if n == nil {
 					continue
 				}
@@ -960,7 +983,8 @@ func (nl *NodeList) NodeSiblings(id string) *NodeList {
 func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
 	rootIdx := nl.indexRootElements()
 	edgeIdx := nl.indexEdges()
-	startNode := nl.GetNodeByID(id)
+	nodeIdx := nl.indexNodes()
+	startNode := nodeIdx[id]
 	if startNode == nil {
 		return &NodeList{}
 	}
@@ -1008,7 +1032,7 @@ func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
 							continue
 						}
 
-						sibling := nl.GetNodeByID(siblingID)
+						sibling := nodeIdx[siblingID]
 						if sibling != nil {
 							newLoopNodes = append(newLoopNodes, sibling)
 						}
@@ -1018,14 +1042,21 @@ func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
 		}
 	}
 
-	// Assign found nodes to nodelist and connect them
+	// Assign found nodes to nodelist and connect them. Every descendant
+	// attaches to the same root (id) with an Edge_ancestor relationship, so
+	// build that single edge and add the nodes in one pass. Calling
+	// RelateNodeAtID per descendant instead rebuilds the node and edge indexes
+	// on every call, making this loop O(descendants * (nodes+edges)).
+	ancestorEdge := &Edge{Type: Edge_ancestor, From: id, To: []string{}}
 	for _, n := range descendants {
 		if n.Id == id {
 			continue
 		}
-		// RelateNodeAtID can return an error but it will never happen as the
-		// nodelist was synthesized here
-		_ = nl2.RelateNodeAtID(n, id, Edge_ancestor) //nolint: errcheck
+		nl2.Nodes = append(nl2.Nodes, n)
+		ancestorEdge.To = append(ancestorEdge.To, n.Id)
+	}
+	if len(ancestorEdge.To) > 0 {
+		nl2.Edges = append(nl2.Edges, ancestorEdge)
 	}
 	return &nl2
 }

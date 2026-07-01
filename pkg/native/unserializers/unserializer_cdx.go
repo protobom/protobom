@@ -101,23 +101,40 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	// the mod.CYCLONEDX_MULTIROOT_HEADLESS write path.
 	hasRootComponent := bom.Metadata != nil && bom.Metadata.Component != nil
 	if bom.Components != nil {
+		// Accumulate every component fragment into a single NodeList, then
+		// merge it into the document once. Merging per component made parsing
+		// O(components^2): both Add and RelateNodeListAtID rebuild a full
+		// node/edge index of the (ever-growing) document on every call, so a
+		// doc with N components re-indexed the whole graph N times. Batching
+		// the merge indexes once, making this O(nodes+edges).
+		combined := &sbom.NodeList{}
+		seen := make(map[string]struct{})
 		for i := range *bom.Components {
 			nl, err := u.componentToNodeList(&(*bom.Components)[i], &cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting component to node: %w", err)
 			}
-
-			// If the CDX doc does not have a top level component,
-			// then the nodes come in as top level nodes:
-			if !hasRootComponent {
-				doc.NodeList.Add(nl)
-
-				// ... unless we have a top level component. Then we descend
-				// all body nodes from it:
-			} else {
-				if err := doc.NodeList.RelateNodeListAtID(nl, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
-					return nil, fmt.Errorf("relating components to root node: %w", err)
+			for _, n := range nl.Nodes {
+				if _, ok := seen[n.GetId()]; ok {
+					continue
 				}
+				seen[n.GetId()] = struct{}{}
+				combined.Nodes = append(combined.Nodes, n)
+			}
+			combined.Edges = append(combined.Edges, nl.Edges...)
+			combined.RootElements = append(combined.RootElements, nl.RootElements...)
+		}
+
+		// If the CDX doc does not have a top level component,
+		// then the nodes come in as top level nodes:
+		if !hasRootComponent {
+			doc.NodeList.Add(combined)
+
+			// ... unless we have a top level component. Then we descend
+			// all body nodes from it:
+		} else {
+			if err := doc.NodeList.RelateNodeListAtID(combined, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
+				return nil, fmt.Errorf("relating components to root node: %w", err)
 			}
 		}
 	}

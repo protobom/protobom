@@ -93,6 +93,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				md.Date = timestamppb.New(t)
 			}
 		}
+		md.Tools = u.cdxToolsToSBOMTools(bom.Metadata.Tools)
 	}
 
 	// Cycle all components and get their graph fragments. A CycloneDX BOM
@@ -146,6 +147,82 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	doc.NodeList.MergeEdges(deps)
 
 	return doc, nil
+}
+
+// cdxToolsToSBOMTools reads the metadata.tools of a CycloneDX document and
+// returns the protobom tools it describes. CycloneDX allows two shapes here:
+// the legacy 1.4 array of Tool objects (vendor/name/version), and the 1.5+
+// object form that carries tools as Components and Services. Both are still
+// emitted in the wild (for example cyclonedx-gomod keeps writing the legacy
+// array), so we surface whichever the document happens to use. Everything is
+// nil-guarded so a document with no tools just yields an empty slice.
+func (u *CDX) cdxToolsToSBOMTools(tc *cdx.ToolsChoice) []*sbom.Tool {
+	tools := []*sbom.Tool{}
+	if tc == nil {
+		return tools
+	}
+
+	// Legacy 1.4 array form: vendor/name/version map straight across.
+	if tc.Tools != nil {
+		for _, t := range *tc.Tools {
+			tools = append(tools, &sbom.Tool{
+				Name:    t.Name,
+				Version: t.Version,
+				Vendor:  t.Vendor,
+			})
+		}
+	}
+
+	// 1.5+ object form: tool components. There is no single vendor field on a
+	// component, so derive one from the first populated of publisher,
+	// manufacturer name, author, or group. Different generators fill different
+	// fields (mikebom uses publisher, trivy manufacturer.name, syft author).
+	if tc.Components != nil {
+		for _, c := range *tc.Components {
+			tools = append(tools, &sbom.Tool{
+				Name:    c.Name,
+				Version: c.Version,
+				Vendor:  componentVendor(&c),
+			})
+		}
+	}
+
+	// 1.5+ object form: services. A service has no vendor either, so fall back
+	// to its provider name and then its group.
+	if tc.Services != nil {
+		for _, s := range *tc.Services {
+			vendor := ""
+			if s.Provider != nil {
+				vendor = s.Provider.Name
+			}
+			if vendor == "" {
+				vendor = s.Group
+			}
+			tools = append(tools, &sbom.Tool{
+				Name:    s.Name,
+				Version: s.Version,
+				Vendor:  vendor,
+			})
+		}
+	}
+
+	return tools
+}
+
+// componentVendor picks a best-effort vendor for a CycloneDX tool component.
+// A component has no dedicated vendor field, so we take the first non-empty of
+// publisher, manufacturer name, author, or group.
+func componentVendor(c *cdx.Component) string {
+	if c.Publisher != "" {
+		return c.Publisher
+	}
+	if c.Manufacturer != nil && c.Manufacturer.Name != "" {
+		return c.Manufacturer.Name
+	}
+	if c.Author != "" {
+		return c.Author
+	}
+	return c.Group
 }
 
 // componentToNodes takes a CycloneDX component and computes its graph fragment,

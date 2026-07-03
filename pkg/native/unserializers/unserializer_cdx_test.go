@@ -1,6 +1,7 @@
 package unserializers
 
 import (
+	"strings"
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
@@ -173,6 +174,140 @@ func TestDeterministicIds(t *testing.T) {
 				names = append(names, nodelist.Nodes[i].Id)
 			}
 			require.Equal(t, tc.expected, names)
+		})
+	}
+}
+
+func TestCdxToolsToSBOMTools(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	for _, tc := range []struct {
+		name     string
+		sut      *cdx.ToolsChoice
+		expected []*sbom.Tool
+	}{
+		{
+			name:     "nil choice",
+			sut:      nil,
+			expected: []*sbom.Tool{},
+		},
+		{
+			name: "legacy 1.4 array",
+			sut: &cdx.ToolsChoice{
+				Tools: &[]cdx.Tool{
+					{Vendor: "CycloneDX", Name: "cyclonedx-gomod", Version: "v1.4.0"},
+					{Name: "syft"},
+				},
+			},
+			expected: []*sbom.Tool{
+				{Name: "cyclonedx-gomod", Version: "v1.4.0", Vendor: "CycloneDX"},
+				{Name: "syft"},
+			},
+		},
+		{
+			name: "1.5 components with vendor fallbacks",
+			sut: &cdx.ToolsChoice{
+				Components: &[]cdx.Component{
+					// publisher wins
+					{Name: "mikebom", Version: "1.0.0", Publisher: "Mike", Author: "ignored"},
+					// manufacturer.name is next when publisher is empty
+					{Name: "trivy", Version: "0.50.0", Manufacturer: &cdx.OrganizationalEntity{Name: "Aqua Security"}},
+					// author is next
+					{Name: "syft", Version: "1.0.0", Author: "anchore"},
+					// group is the last resort
+					{Name: "tool-x", Version: "2.0.0", Group: "acme"},
+					// nothing populated leaves vendor empty
+					{Name: "bare", Version: "3.0.0"},
+				},
+			},
+			expected: []*sbom.Tool{
+				{Name: "mikebom", Version: "1.0.0", Vendor: "Mike"},
+				{Name: "trivy", Version: "0.50.0", Vendor: "Aqua Security"},
+				{Name: "syft", Version: "1.0.0", Vendor: "anchore"},
+				{Name: "tool-x", Version: "2.0.0", Vendor: "acme"},
+				{Name: "bare", Version: "3.0.0"},
+			},
+		},
+		{
+			name: "1.5 services",
+			sut: &cdx.ToolsChoice{
+				Services: &[]cdx.Service{
+					{Name: "scan-svc", Version: "1.2.3", Provider: &cdx.OrganizationalEntity{Name: "ProviderCo"}},
+					{Name: "group-svc", Version: "0.1.0", Group: "grp"},
+				},
+			},
+			expected: []*sbom.Tool{
+				{Name: "scan-svc", Version: "1.2.3", Vendor: "ProviderCo"},
+				{Name: "group-svc", Version: "0.1.0", Vendor: "grp"},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			got := cdxu.cdxToolsToSBOMTools(tc.sut)
+			require.Len(t, got, len(tc.expected))
+			for i := range tc.expected {
+				require.Equal(t, tc.expected[i].GetName(), got[i].GetName())
+				require.Equal(t, tc.expected[i].GetVersion(), got[i].GetVersion())
+				require.Equal(t, tc.expected[i].GetVendor(), got[i].GetVendor())
+			}
+		})
+	}
+}
+
+// TestCDXUnserializeMetadataTools exercises the full parse path (the exact
+// symptom from the issue: GetMetadata().GetTools() coming back empty) for both
+// the legacy 1.4 array and the 1.5+ component object forms.
+func TestCDXUnserializeMetadataTools(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		doc      string
+		expected []*sbom.Tool
+	}{
+		{
+			name: "cdx 1.4 legacy tools array",
+			doc: `{
+				"bomFormat": "CycloneDX",
+				"specVersion": "1.4",
+				"version": 1,
+				"metadata": {
+					"tools": [
+						{"vendor": "CycloneDX", "name": "cyclonedx-gomod", "version": "v1.4.0"}
+					]
+				}
+			}`,
+			expected: []*sbom.Tool{
+				{Name: "cyclonedx-gomod", Version: "v1.4.0", Vendor: "CycloneDX"},
+			},
+		},
+		{
+			name: "cdx 1.5 tools object with components",
+			doc: `{
+				"bomFormat": "CycloneDX",
+				"specVersion": "1.5",
+				"version": 1,
+				"metadata": {
+					"tools": {
+						"components": [
+							{"type": "application", "name": "trivy", "version": "0.50.0", "manufacturer": {"name": "Aqua Security"}}
+						]
+					}
+				}
+			}`,
+			expected: []*sbom.Tool{
+				{Name: "trivy", Version: "0.50.0", Vendor: "Aqua Security"},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cdxu := NewCDX("", cdxUnserializerTestEncoding)
+			doc, err := cdxu.Unserialize(strings.NewReader(tc.doc), nil, nil)
+			require.NoError(t, err)
+			tools := doc.GetMetadata().GetTools()
+			require.Len(t, tools, len(tc.expected))
+			for i := range tc.expected {
+				require.Equal(t, tc.expected[i].GetName(), tools[i].GetName())
+				require.Equal(t, tc.expected[i].GetVersion(), tools[i].GetVersion())
+				require.Equal(t, tc.expected[i].GetVendor(), tools[i].GetVendor())
+			}
 		})
 	}
 }

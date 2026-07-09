@@ -1,6 +1,7 @@
 package serializers
 
 import (
+	"encoding/json"
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
@@ -77,6 +78,38 @@ func TestComponentType(t *testing.T) {
 		tc.prepare(node)
 		comp := sut.nodeToComponent(node)
 		require.Equal(t, comp.Type, tc.compType, s)
+	}
+}
+
+func TestNodeToComponentScope(t *testing.T) {
+	sut := CDX{}
+	for name, tc := range map[string]struct {
+		scope    sbom.Node_Scope
+		expected cdx.Scope
+	}{
+		"required":    {sbom.Node_SCOPE_REQUIRED, cdx.ScopeRequired},
+		"optional":    {sbom.Node_SCOPE_OPTIONAL, cdx.ScopeOptional},
+		"excluded":    {sbom.Node_SCOPE_EXCLUDED, cdx.ScopeExcluded},
+		"unspecified": {sbom.Node_SCOPE_UNSPECIFIED, cdx.Scope("")},
+	} {
+		t.Run(name, func(t *testing.T) {
+			comp := sut.nodeToComponent(&sbom.Node{
+				Id:    "test-node",
+				Name:  "test",
+				Scope: tc.scope,
+			})
+			require.Equal(t, tc.expected, comp.Scope)
+
+			// An unspecified scope must be omitted from the JSON output,
+			// not serialized as an empty string.
+			data, err := json.Marshal(comp)
+			require.NoError(t, err)
+			if tc.scope == sbom.Node_SCOPE_UNSPECIFIED {
+				require.NotContains(t, string(data), `"scope"`)
+			} else {
+				require.Contains(t, string(data), `"scope":"`+string(tc.expected)+`"`)
+			}
+		})
 	}
 }
 

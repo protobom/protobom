@@ -455,12 +455,31 @@ message Node {
   // Property collection of the node.
   repeated Property properties = 31;
 
+  // Scope conveys the relevance of the software component at runtime,
+  // as expressed by the CycloneDX component scope field.
+  // SCOPE_UNSPECIFIED means the source document did not declare a scope
+  // (CycloneDX semantics default an absent scope to "required").
+  Scope scope = 32;
+
   // Type of the software component.
   enum NodeType {
     // Software component type is a package.
     PACKAGE = 0;
     // Software component type is a file.
     FILE = 1;
+  }
+
+  // Scope of the software component, from the CycloneDX component scope field.
+  enum Scope {
+    // The source document did not declare a scope.
+    SCOPE_UNSPECIFIED = 0;
+    // The component is required for runtime.
+    SCOPE_REQUIRED = 1;
+    // The component is optional at runtime.
+    SCOPE_OPTIONAL = 2;
+    // The component is excluded, it is not relevant at runtime
+    // (for example, a development or test dependency).
+    SCOPE_EXCLUDED = 3;
   }
 }
 

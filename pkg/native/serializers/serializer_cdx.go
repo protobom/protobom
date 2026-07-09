@@ -395,6 +395,18 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		ExternalReferences: &[]cdx.ExternalReference{},
 	}
 
+	switch n.Scope {
+	case sbom.Node_SCOPE_REQUIRED:
+		c.Scope = cdx.ScopeRequired
+	case sbom.Node_SCOPE_OPTIONAL:
+		c.Scope = cdx.ScopeOptional
+	case sbom.Node_SCOPE_EXCLUDED:
+		c.Scope = cdx.ScopeExcluded
+	case sbom.Node_SCOPE_UNSPECIFIED:
+		// The node does not declare a scope, leave it unset so it is
+		// omitted from the serialized component.
+	}
+
 	if n.Type == sbom.Node_FILE {
 		c.Type = cdx.ComponentTypeFile
 	} else if len(n.PrimaryPurpose) > 0 {

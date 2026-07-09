@@ -207,6 +207,20 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 		node.Type = sbom.Node_FILE
 	}
 
+	switch c.Scope {
+	case cdx.ScopeRequired:
+		node.Scope = sbom.Node_SCOPE_REQUIRED
+	case cdx.ScopeOptional:
+		node.Scope = sbom.Node_SCOPE_OPTIONAL
+	case cdx.ScopeExcluded:
+		node.Scope = sbom.Node_SCOPE_EXCLUDED
+	default:
+		// TODO(degradation): An unknown scope value is dropped. An absent
+		// scope stays unspecified to preserve round-trip fidelity, even
+		// though CycloneDX semantics default it to "required".
+		node.Scope = sbom.Node_SCOPE_UNSPECIFIED
+	}
+
 	node.ExternalReferences = u.unserializeExternalReferences(c.ExternalReferences)
 
 	// Named external references:

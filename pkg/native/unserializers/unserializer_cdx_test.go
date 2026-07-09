@@ -123,6 +123,31 @@ func TestCdxExtRefTypeToProtobomType(t *testing.T) {
 	}
 }
 
+func TestComponentToNodeScope(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	for name, tc := range map[string]struct {
+		scope    cdx.Scope
+		expected sbom.Node_Scope
+	}{
+		"required": {cdx.ScopeRequired, sbom.Node_SCOPE_REQUIRED},
+		"optional": {cdx.ScopeOptional, sbom.Node_SCOPE_OPTIONAL},
+		"excluded": {cdx.ScopeExcluded, sbom.Node_SCOPE_EXCLUDED},
+		"absent":   {cdx.Scope(""), sbom.Node_SCOPE_UNSPECIFIED},
+		"unknown":  {cdx.Scope("not-a-scope"), sbom.Node_SCOPE_UNSPECIFIED},
+	} {
+		t.Run(name, func(t *testing.T) {
+			cc := 0
+			node, err := cdxu.componentToNode(&cdx.Component{
+				Type:  cdx.ComponentTypeLibrary,
+				Name:  "test",
+				Scope: tc.scope,
+			}, &cc)
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, node.Scope)
+		})
+	}
+}
+
 func TestDeterministicIds(t *testing.T) {
 	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
 	for _, tc := range []struct {

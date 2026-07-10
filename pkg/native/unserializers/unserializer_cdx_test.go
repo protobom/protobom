@@ -176,3 +176,37 @@ func TestDeterministicIds(t *testing.T) {
 		})
 	}
 }
+
+func TestLicenseChoicesNilLicense(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	for _, tc := range []struct {
+		name     string
+		licenses cdx.Licenses
+	}{
+		{
+			name:     "empty license choice",
+			licenses: cdx.Licenses{{}},
+		},
+		{
+			name:     "nil license pointer with empty expression",
+			licenses: cdx.Licenses{{License: nil, Expression: ""}},
+		},
+		{
+			name:     "nil license mixed with a real id",
+			licenses: cdx.Licenses{{}, {License: &cdx.License{ID: "MIT"}}},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// A CycloneDX document can carry a license choice with no
+			// license object at all (for example "licenses":[{}]). These
+			// helpers must not dereference the nil License pointer.
+			licenses := tc.licenses
+			require.NotPanics(t, func() {
+				cdxu.licenseChoicesToLicenseList(&licenses)
+			})
+			require.NotPanics(t, func() {
+				cdxu.licenseChoicesToLicenseString(&licenses)
+			})
+		})
+	}
+}

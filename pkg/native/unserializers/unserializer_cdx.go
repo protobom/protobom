@@ -330,7 +330,7 @@ func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 		// TODO(license): This should handle licenses without an ID and
 		// create custom licenses or another solution that captures the
 		// full custom license text.
-		if lc.Expression == "" && lc.License.ID == "" {
+		if lc.Expression == "" && (lc.License == nil || lc.License.ID == "") {
 			continue
 		}
 
@@ -358,7 +358,7 @@ func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 		// TODO(license): This should handle licenses without an ID and
 		// create custom licenses or another solution that captures the
 		// full custom license text.
-		if lc.Expression == "" && lc.License.ID == "" {
+		if lc.Expression == "" && (lc.License == nil || lc.License.ID == "") {
 			continue
 		}
 

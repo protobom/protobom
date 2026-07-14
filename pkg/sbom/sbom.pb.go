@@ -13,13 +13,12 @@
 package sbom
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -996,63 +995,6 @@ func (Node_NodeType) EnumDescriptor() ([]byte, []int) {
 	return file_sbom_proto_rawDescGZIP(), []int{5, 0}
 }
 
-// Scope of the software component, from the CycloneDX component scope field.
-type Node_Scope int32
-
-const (
-	// The source document did not declare a scope.
-	Node_SCOPE_UNSPECIFIED Node_Scope = 0
-	// The component is required for runtime.
-	Node_SCOPE_REQUIRED Node_Scope = 1
-	// The component is optional at runtime.
-	Node_SCOPE_OPTIONAL Node_Scope = 2
-	// The component is excluded, it is not relevant at runtime
-	Node_SCOPE_EXCLUDED Node_Scope = 3
-)
-
-// Enum value maps for Node_Scope.
-var (
-	Node_Scope_name = map[int32]string{
-		0: "SCOPE_UNSPECIFIED",
-		1: "SCOPE_REQUIRED",
-		2: "SCOPE_OPTIONAL",
-		3: "SCOPE_EXCLUDED",
-	}
-	Node_Scope_value = map[string]int32{
-		"SCOPE_UNSPECIFIED": 0,
-		"SCOPE_REQUIRED":    1,
-		"SCOPE_OPTIONAL":    2,
-		"SCOPE_EXCLUDED":    3,
-	}
-)
-
-func (x Node_Scope) Enum() *Node_Scope {
-	p := new(Node_Scope)
-	*p = x
-	return p
-}
-
-func (x Node_Scope) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Node_Scope) Descriptor() protoreflect.EnumDescriptor {
-	return file_sbom_proto_enumTypes[7].Descriptor()
-}
-
-func (Node_Scope) Type() protoreflect.EnumType {
-	return &file_sbom_proto_enumTypes[7]
-}
-
-func (x Node_Scope) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Node_Scope.Descriptor instead.
-func (Node_Scope) EnumDescriptor() ([]byte, []int) {
-	return file_sbom_proto_rawDescGZIP(), []int{5, 1}
-}
-
 // Document is the top-level structure representing the entire Software Bill of Materials (SBOM).
 // It serves as the core neutral ground for the SBOM translation process, encapsulating metadata,
 // components (nodes), and the graph structure (edges).
@@ -1507,12 +1449,7 @@ type Node struct {
 	// Primary purpose or role assigned to the software component.
 	PrimaryPurpose []Purpose `protobuf:"varint,30,rep,packed,name=primary_purpose,json=primaryPurpose,proto3,enum=protobom.protobom.Purpose" json:"primary_purpose,omitempty"`
 	// Property collection of the node.
-	Properties []*Property `protobuf:"bytes,31,rep,name=properties,proto3" json:"properties,omitempty"`
-	// Scope conveys the relevance of the software component at runtime,
-	// as expressed by the CycloneDX component scope field.
-	// SCOPE_UNSPECIFIED means the source document did not declare a scope
-	// (CycloneDX semantics default an absent scope to "required").
-	Scope         Node_Scope `protobuf:"varint,32,opt,name=scope,proto3,enum=protobom.protobom.Node_Scope" json:"scope,omitempty"`
+	Properties    []*Property `protobuf:"bytes,31,rep,name=properties,proto3" json:"properties,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1734,13 +1671,6 @@ func (x *Node) GetProperties() []*Property {
 		return x.Properties
 	}
 	return nil
-}
-
-func (x *Node) GetScope() Node_Scope {
-	if x != nil {
-		return x.Scope
-	}
-	return Node_SCOPE_UNSPECIFIED
 }
 
 // NodeList represents a collection of nodes and edges forming the Software Bill of Materials (SBOM) graph.
@@ -2261,7 +2191,8 @@ const file_sbom_proto_rawDesc = "" +
 	"\acomment\x18\a \x01(\tR\acomment\x12E\n" +
 	"\rdocumentTypes\x18\b \x03(\v2\x1f.protobom.protobom.DocumentTypeR\rdocumentTypes\x12>\n" +
 	"\vsource_data\x18\t \x01(\v2\x1d.protobom.protobom.SourceDataR\n" +
-	"sourceData\"\xf8\v\n" +
+	"sourceData\"\xe7\n" +
+	"\n" +
 	"\x04Node\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x124\n" +
 	"\x04type\x18\x02 \x01(\x0e2 .protobom.protobom.Node.NodeTypeR\x04type\x12\x12\n" +
@@ -2295,8 +2226,7 @@ const file_sbom_proto_rawDesc = "" +
 	"\x0fprimary_purpose\x18\x1e \x03(\x0e2\x1a.protobom.protobom.PurposeR\x0eprimaryPurpose\x12;\n" +
 	"\n" +
 	"properties\x18\x1f \x03(\v2\x1b.protobom.protobom.PropertyR\n" +
-	"properties\x123\n" +
-	"\x05scope\x18  \x01(\x0e2\x1d.protobom.protobom.Node.ScopeR\x05scope\x1a>\n" +
+	"properties\x1a>\n" +
 	"\x10IdentifiersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
@@ -2305,12 +2235,7 @@ const file_sbom_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"!\n" +
 	"\bNodeType\x12\v\n" +
 	"\aPACKAGE\x10\x00\x12\b\n" +
-	"\x04FILE\x10\x01\"Z\n" +
-	"\x05Scope\x12\x15\n" +
-	"\x11SCOPE_UNSPECIFIED\x10\x00\x12\x12\n" +
-	"\x0eSCOPE_REQUIRED\x10\x01\x12\x12\n" +
-	"\x0eSCOPE_OPTIONAL\x10\x02\x12\x12\n" +
-	"\x0eSCOPE_EXCLUDED\x10\x03J\x04\b\f\x10\rJ\x04\b\x0e\x10\x0fJ\x04\b\x19\x10\x1a\"\x8d\x01\n" +
+	"\x04FILE\x10\x01J\x04\b\f\x10\rJ\x04\b\x0e\x10\x0fJ\x04\b\x19\x10\x1a\"\x8d\x01\n" +
 	"\bNodeList\x12-\n" +
 	"\x05nodes\x18\x01 \x03(\v2\x17.protobom.protobom.NodeR\x05nodes\x12-\n" +
 	"\x05edges\x18\x02 \x03(\v2\x17.protobom.protobom.EdgeR\x05edges\x12#\n" +
@@ -2420,7 +2345,7 @@ func file_sbom_proto_rawDescGZIP() []byte {
 	return file_sbom_proto_rawDescData
 }
 
-var file_sbom_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
+var file_sbom_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_sbom_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_sbom_proto_goTypes = []any{
 	(HashAlgorithm)(0),                           // 0: protobom.protobom.HashAlgorithm
@@ -2430,57 +2355,55 @@ var file_sbom_proto_goTypes = []any{
 	(Edge_Type)(0),                               // 4: protobom.protobom.Edge.Type
 	(ExternalReference_ExternalReferenceType)(0), // 5: protobom.protobom.ExternalReference.ExternalReferenceType
 	(Node_NodeType)(0),                           // 6: protobom.protobom.Node.NodeType
-	(Node_Scope)(0),                              // 7: protobom.protobom.Node.Scope
-	(*Document)(nil),                             // 8: protobom.protobom.Document
-	(*DocumentType)(nil),                         // 9: protobom.protobom.DocumentType
-	(*Edge)(nil),                                 // 10: protobom.protobom.Edge
-	(*ExternalReference)(nil),                    // 11: protobom.protobom.ExternalReference
-	(*Metadata)(nil),                             // 12: protobom.protobom.Metadata
-	(*Node)(nil),                                 // 13: protobom.protobom.Node
-	(*NodeList)(nil),                             // 14: protobom.protobom.NodeList
-	(*Person)(nil),                               // 15: protobom.protobom.Person
-	(*Property)(nil),                             // 16: protobom.protobom.Property
-	(*SourceData)(nil),                           // 17: protobom.protobom.SourceData
-	(*Tool)(nil),                                 // 18: protobom.protobom.Tool
-	nil,                                          // 19: protobom.protobom.ExternalReference.HashesEntry
-	nil,                                          // 20: protobom.protobom.Node.IdentifiersEntry
-	nil,                                          // 21: protobom.protobom.Node.HashesEntry
-	nil,                                          // 22: protobom.protobom.SourceData.HashesEntry
-	(*timestamppb.Timestamp)(nil),                // 23: google.protobuf.Timestamp
+	(*Document)(nil),                             // 7: protobom.protobom.Document
+	(*DocumentType)(nil),                         // 8: protobom.protobom.DocumentType
+	(*Edge)(nil),                                 // 9: protobom.protobom.Edge
+	(*ExternalReference)(nil),                    // 10: protobom.protobom.ExternalReference
+	(*Metadata)(nil),                             // 11: protobom.protobom.Metadata
+	(*Node)(nil),                                 // 12: protobom.protobom.Node
+	(*NodeList)(nil),                             // 13: protobom.protobom.NodeList
+	(*Person)(nil),                               // 14: protobom.protobom.Person
+	(*Property)(nil),                             // 15: protobom.protobom.Property
+	(*SourceData)(nil),                           // 16: protobom.protobom.SourceData
+	(*Tool)(nil),                                 // 17: protobom.protobom.Tool
+	nil,                                          // 18: protobom.protobom.ExternalReference.HashesEntry
+	nil,                                          // 19: protobom.protobom.Node.IdentifiersEntry
+	nil,                                          // 20: protobom.protobom.Node.HashesEntry
+	nil,                                          // 21: protobom.protobom.SourceData.HashesEntry
+	(*timestamppb.Timestamp)(nil),                // 22: google.protobuf.Timestamp
 }
 var file_sbom_proto_depIdxs = []int32{
-	12, // 0: protobom.protobom.Document.metadata:type_name -> protobom.protobom.Metadata
-	14, // 1: protobom.protobom.Document.node_list:type_name -> protobom.protobom.NodeList
+	11, // 0: protobom.protobom.Document.metadata:type_name -> protobom.protobom.Metadata
+	13, // 1: protobom.protobom.Document.node_list:type_name -> protobom.protobom.NodeList
 	3,  // 2: protobom.protobom.DocumentType.type:type_name -> protobom.protobom.DocumentType.SBOMType
 	4,  // 3: protobom.protobom.Edge.type:type_name -> protobom.protobom.Edge.Type
-	19, // 4: protobom.protobom.ExternalReference.hashes:type_name -> protobom.protobom.ExternalReference.HashesEntry
+	18, // 4: protobom.protobom.ExternalReference.hashes:type_name -> protobom.protobom.ExternalReference.HashesEntry
 	5,  // 5: protobom.protobom.ExternalReference.type:type_name -> protobom.protobom.ExternalReference.ExternalReferenceType
-	23, // 6: protobom.protobom.Metadata.date:type_name -> google.protobuf.Timestamp
-	18, // 7: protobom.protobom.Metadata.tools:type_name -> protobom.protobom.Tool
-	15, // 8: protobom.protobom.Metadata.authors:type_name -> protobom.protobom.Person
-	9,  // 9: protobom.protobom.Metadata.documentTypes:type_name -> protobom.protobom.DocumentType
-	17, // 10: protobom.protobom.Metadata.source_data:type_name -> protobom.protobom.SourceData
+	22, // 6: protobom.protobom.Metadata.date:type_name -> google.protobuf.Timestamp
+	17, // 7: protobom.protobom.Metadata.tools:type_name -> protobom.protobom.Tool
+	14, // 8: protobom.protobom.Metadata.authors:type_name -> protobom.protobom.Person
+	8,  // 9: protobom.protobom.Metadata.documentTypes:type_name -> protobom.protobom.DocumentType
+	16, // 10: protobom.protobom.Metadata.source_data:type_name -> protobom.protobom.SourceData
 	6,  // 11: protobom.protobom.Node.type:type_name -> protobom.protobom.Node.NodeType
-	15, // 12: protobom.protobom.Node.suppliers:type_name -> protobom.protobom.Person
-	15, // 13: protobom.protobom.Node.originators:type_name -> protobom.protobom.Person
-	23, // 14: protobom.protobom.Node.release_date:type_name -> google.protobuf.Timestamp
-	23, // 15: protobom.protobom.Node.build_date:type_name -> google.protobuf.Timestamp
-	23, // 16: protobom.protobom.Node.valid_until_date:type_name -> google.protobuf.Timestamp
-	11, // 17: protobom.protobom.Node.external_references:type_name -> protobom.protobom.ExternalReference
-	20, // 18: protobom.protobom.Node.identifiers:type_name -> protobom.protobom.Node.IdentifiersEntry
-	21, // 19: protobom.protobom.Node.hashes:type_name -> protobom.protobom.Node.HashesEntry
+	14, // 12: protobom.protobom.Node.suppliers:type_name -> protobom.protobom.Person
+	14, // 13: protobom.protobom.Node.originators:type_name -> protobom.protobom.Person
+	22, // 14: protobom.protobom.Node.release_date:type_name -> google.protobuf.Timestamp
+	22, // 15: protobom.protobom.Node.build_date:type_name -> google.protobuf.Timestamp
+	22, // 16: protobom.protobom.Node.valid_until_date:type_name -> google.protobuf.Timestamp
+	10, // 17: protobom.protobom.Node.external_references:type_name -> protobom.protobom.ExternalReference
+	19, // 18: protobom.protobom.Node.identifiers:type_name -> protobom.protobom.Node.IdentifiersEntry
+	20, // 19: protobom.protobom.Node.hashes:type_name -> protobom.protobom.Node.HashesEntry
 	1,  // 20: protobom.protobom.Node.primary_purpose:type_name -> protobom.protobom.Purpose
-	16, // 21: protobom.protobom.Node.properties:type_name -> protobom.protobom.Property
-	7,  // 22: protobom.protobom.Node.scope:type_name -> protobom.protobom.Node.Scope
-	13, // 23: protobom.protobom.NodeList.nodes:type_name -> protobom.protobom.Node
-	10, // 24: protobom.protobom.NodeList.edges:type_name -> protobom.protobom.Edge
-	15, // 25: protobom.protobom.Person.contacts:type_name -> protobom.protobom.Person
-	22, // 26: protobom.protobom.SourceData.hashes:type_name -> protobom.protobom.SourceData.HashesEntry
-	27, // [27:27] is the sub-list for method output_type
-	27, // [27:27] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	15, // 21: protobom.protobom.Node.properties:type_name -> protobom.protobom.Property
+	12, // 22: protobom.protobom.NodeList.nodes:type_name -> protobom.protobom.Node
+	9,  // 23: protobom.protobom.NodeList.edges:type_name -> protobom.protobom.Edge
+	14, // 24: protobom.protobom.Person.contacts:type_name -> protobom.protobom.Person
+	21, // 25: protobom.protobom.SourceData.hashes:type_name -> protobom.protobom.SourceData.HashesEntry
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_sbom_proto_init() }
@@ -2495,7 +2418,7 @@ func file_sbom_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sbom_proto_rawDesc), len(file_sbom_proto_rawDesc)),
-			NumEnums:      8,
+			NumEnums:      7,
 			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,

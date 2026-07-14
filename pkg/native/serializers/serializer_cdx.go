@@ -134,6 +134,9 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 		components[node.Id] = s.nodeToComponent(node)
 	}
 
+	// Apply the scope relationships to the components.
+	applyScopeEdges(bom.NodeList, components)
+
 	// Clear the protobom generated bomrefs
 	clearAutoRefs(components)
 
@@ -193,9 +196,48 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 	return doc, nil
 }
 
+// applyScopeEdges projects the relationships carrying CycloneDX scope
+// semantics back into the scope attribute of the (From) component.
+func applyScopeEdges(nl *sbom.NodeList, components map[string]*cdx.Component) {
+	for _, e := range nl.Edges {
+		scope, ok := edgeTypeToScope(e.Type)
+		if !ok {
+			continue
+		}
+		// TODO(degradation): The CycloneDX scope is an attribute of the
+		// component, not of the relationship. If a node relates to more
+		// than one parent with different scope semantics, only one survives.
+		if c, exists := components[e.From]; exists {
+			c.Scope = scope
+		}
+	}
+}
+
+// edgeTypeToScope returns the CycloneDX component scope equivalent to a
+// protobom edge type. It is the inverse of the unserializer scope mapping and
+// also translates data originating in the equivalent SPDX relationships
+// (OPTIONAL_COMPONENT_OF, DEV_DEPENDENCY_OF, RUNTIME_DEPENDENCY_OF).
+func edgeTypeToScope(t sbom.Edge_Type) (cdx.Scope, bool) {
+	switch t {
+	case sbom.Edge_runtimeDependency:
+		return cdx.ScopeRequired, true
+	case sbom.Edge_optionalComponent:
+		return cdx.ScopeOptional, true
+	case sbom.Edge_devDependency:
+		return cdx.ScopeExcluded, true
+	default:
+		return "", false
+	}
+}
+
 func buildDependencies(nl *sbom.NodeList, components map[string]*cdx.Component) ([]cdx.Dependency, error) {
 	ret := []cdx.Dependency{}
 	for _, e := range nl.Edges {
+		// Scope-carrying relationships surface as the scope attribute of
+		// their components, they are not part of the dependency graph.
+		if _, ok := edgeTypeToScope(e.Type); ok {
+			continue
+		}
 		if _, ok := components[e.From]; !ok {
 			return nil, fmt.Errorf("node %q not found in components list", e.From)
 		}
@@ -393,18 +435,6 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		Description:        n.Description,
 		Hashes:             &[]cdx.Hash{},
 		ExternalReferences: &[]cdx.ExternalReference{},
-	}
-
-	switch n.Scope {
-	case sbom.Node_SCOPE_REQUIRED:
-		c.Scope = cdx.ScopeRequired
-	case sbom.Node_SCOPE_OPTIONAL:
-		c.Scope = cdx.ScopeOptional
-	case sbom.Node_SCOPE_EXCLUDED:
-		c.Scope = cdx.ScopeExcluded
-	case sbom.Node_SCOPE_UNSPECIFIED:
-		// The node does not declare a scope, leave it unset so it is
-		// omitted from the serialized component.
 	}
 
 	if n.Type == sbom.Node_FILE {

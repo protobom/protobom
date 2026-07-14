@@ -101,6 +101,9 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 	// the mod.CYCLONEDX_MULTIROOT_HEADLESS write path.
 	hasRootComponent := bom.Metadata != nil && bom.Metadata.Component != nil
 	if bom.Components != nil {
+		// Scope relationships of the top level components to the document
+		// root node, collected while cycling the components:
+		scopeEdges := []*sbom.Edge{}
 		// Accumulate every component fragment into a single NodeList, then
 		// merge it into the document once. Merging per component made parsing
 		// O(components^2): both Add and RelateNodeListAtID rebuild a full
@@ -110,7 +113,8 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		combined := &sbom.NodeList{}
 		seen := make(map[string]struct{})
 		for i := range *bom.Components {
-			nl, err := u.componentToNodeList(&(*bom.Components)[i], &cc)
+			component := &(*bom.Components)[i]
+			nl, err := u.componentToNodeList(component, &cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting component to node: %w", err)
 			}
@@ -123,6 +127,22 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 			}
 			combined.Edges = append(combined.Edges, nl.Edges...)
 			combined.RootElements = append(combined.RootElements, nl.RootElements...)
+
+			// The component scope describes how it relates to the node it
+			// descends from, here the document root. We capture it as an
+			// edge of the equivalent relationship type.
+			if et, ok := u.scopeToEdgeType(component.Scope); ok {
+				if hasRootComponent {
+					scopeEdges = append(scopeEdges, &sbom.Edge{
+						Type: et,
+						From: nl.RootElements[0],
+						To:   []string{doc.NodeList.RootElements[0]},
+					})
+				}
+				// TODO(degradation): In a headless document the top level
+				// components have no parent node to relate to, so their
+				// scope is lost.
+			}
 		}
 
 		// If the CDX doc does not have a top level component,
@@ -136,6 +156,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 			if err := doc.NodeList.RelateNodeListAtID(combined, doc.NodeList.RootElements[0], sbom.Edge_contains); err != nil {
 				return nil, fmt.Errorf("relating components to root node: %w", err)
 			}
+			doc.NodeList.MergeEdges(scopeEdges)
 		}
 	}
 
@@ -164,17 +185,54 @@ func (u *CDX) componentToNodeList(component *cdx.Component, cc *int) (*sbom.Node
 
 	if component.Components != nil {
 		for i := range *component.Components {
-			subList, err := u.componentToNodeList(&(*component.Components)[i], cc)
+			subComponent := &(*component.Components)[i]
+			subList, err := u.componentToNodeList(subComponent, cc)
 			if err != nil {
 				return nil, fmt.Errorf("converting subcomponent to nodelist: %w", err)
 			}
+			subRoot := subList.RootElements[0]
 			if err := nl.RelateNodeListAtID(subList, node.Id, sbom.Edge_contains); err != nil {
 				return nil, fmt.Errorf("relating subcomponents to new node: %w", err)
+			}
+
+			// The subcomponent scope describes how it relates to the
+			// component containing it. We capture it as an edge of the
+			// equivalent relationship type.
+			if et, ok := u.scopeToEdgeType(subComponent.Scope); ok {
+				nl.Edges = append(nl.Edges, &sbom.Edge{
+					Type: et,
+					From: subRoot,
+					To:   []string{node.Id},
+				})
 			}
 		}
 	}
 
 	return nl, nil
+}
+
+// scopeToEdgeType returns the protobom edge type equivalent to a CycloneDX
+// component scope. Scope is structural data: it describes how the component
+// relates to the node it descends from, so protobom abstracts it into the
+// graph as a relationship from the scoped component to its parent. The
+// resulting edge types reserialize to the equivalent SPDX relationships
+// (OPTIONAL_COMPONENT_OF, DEV_DEPENDENCY_OF, RUNTIME_DEPENDENCY_OF).
+//
+// The second return value is false when the scope does not translate to an
+// edge: an absent scope produces no relationship to preserve round-trip
+// fidelity, even though CycloneDX semantics default it to "required".
+func (u *CDX) scopeToEdgeType(scope cdx.Scope) (sbom.Edge_Type, bool) {
+	switch scope {
+	case cdx.ScopeRequired:
+		return sbom.Edge_runtimeDependency, true
+	case cdx.ScopeOptional:
+		return sbom.Edge_optionalComponent, true
+	case cdx.ScopeExcluded:
+		return sbom.Edge_devDependency, true
+	default:
+		// TODO(degradation): An unknown scope value is dropped.
+		return sbom.Edge_UNKNOWN, false
+	}
 }
 
 func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { //nolint:unparam
@@ -205,20 +263,6 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 	// type file. In that case we flip the type bit:
 	if u.componentTypeToPurpose(c.Type) == sbom.Purpose_FILE {
 		node.Type = sbom.Node_FILE
-	}
-
-	switch c.Scope {
-	case cdx.ScopeRequired:
-		node.Scope = sbom.Node_SCOPE_REQUIRED
-	case cdx.ScopeOptional:
-		node.Scope = sbom.Node_SCOPE_OPTIONAL
-	case cdx.ScopeExcluded:
-		node.Scope = sbom.Node_SCOPE_EXCLUDED
-	default:
-		// TODO(degradation): An unknown scope value is dropped. An absent
-		// scope stays unspecified to preserve round-trip fidelity, even
-		// though CycloneDX semantics default it to "required".
-		node.Scope = sbom.Node_SCOPE_UNSPECIFIED
 	}
 
 	node.ExternalReferences = u.unserializeExternalReferences(c.ExternalReferences)

@@ -109,9 +109,6 @@ func (n *Node) Update(n2 *Node) {
 	if len(n2.Properties) > 0 {
 		n.Properties = n2.Properties
 	}
-	if n2.Scope != Node_SCOPE_UNSPECIFIED {
-		n.Scope = n2.Scope
-	}
 }
 
 // Augment updates fields in n with data from n2 which is not already defined
@@ -192,9 +189,6 @@ func (n *Node) Augment(n2 *Node) {
 	if len(n.Properties) == 0 && len(n2.Properties) > 0 {
 		n.Properties = n2.Properties
 	}
-	if n.Scope == Node_SCOPE_UNSPECIFIED && n2.Scope != Node_SCOPE_UNSPECIFIED {
-		n.Scope = n2.Scope
-	}
 }
 
 // Copy returns a duplicate of the Node.
@@ -226,7 +220,6 @@ func (n *Node) Copy() *Node {
 		ExternalReferences: []*ExternalReference{},
 		Identifiers:        maps.Clone(n.Identifiers),
 		FileTypes:          slices.Clone(n.FileTypes),
-		Scope:              n.Scope,
 	}
 
 	if n.ReleaseDate != nil {

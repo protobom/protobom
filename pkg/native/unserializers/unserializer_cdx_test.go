@@ -1,6 +1,8 @@
 package unserializers
 
 import (
+	"slices"
+	"strings"
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
@@ -123,28 +125,98 @@ func TestCdxExtRefTypeToProtobomType(t *testing.T) {
 	}
 }
 
-func TestComponentToNodeScope(t *testing.T) {
+// findEdge returns true if the edge list has an edge of type et going from
+// the from node to the to node.
+func findEdge(edges []*sbom.Edge, et sbom.Edge_Type, from, to string) bool {
+	for _, e := range edges {
+		if e.Type == et && e.From == from && slices.Contains(e.To, to) {
+			return true
+		}
+	}
+	return false
+}
+
+func TestComponentScopeToEdge(t *testing.T) {
 	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
 	for name, tc := range map[string]struct {
 		scope    cdx.Scope
-		expected sbom.Node_Scope
+		edgeType sbom.Edge_Type
+		hasEdge  bool
 	}{
-		"required": {cdx.ScopeRequired, sbom.Node_SCOPE_REQUIRED},
-		"optional": {cdx.ScopeOptional, sbom.Node_SCOPE_OPTIONAL},
-		"excluded": {cdx.ScopeExcluded, sbom.Node_SCOPE_EXCLUDED},
-		"absent":   {cdx.Scope(""), sbom.Node_SCOPE_UNSPECIFIED},
-		"unknown":  {cdx.Scope("not-a-scope"), sbom.Node_SCOPE_UNSPECIFIED},
+		"required": {cdx.ScopeRequired, sbom.Edge_runtimeDependency, true},
+		"optional": {cdx.ScopeOptional, sbom.Edge_optionalComponent, true},
+		"excluded": {cdx.ScopeExcluded, sbom.Edge_devDependency, true},
+		"absent":   {cdx.Scope(""), sbom.Edge_UNKNOWN, false},
+		"unknown":  {cdx.Scope("not-a-scope"), sbom.Edge_UNKNOWN, false},
 	} {
 		t.Run(name, func(t *testing.T) {
 			cc := 0
-			node, err := cdxu.componentToNode(&cdx.Component{
-				Type:  cdx.ComponentTypeLibrary,
-				Name:  "test",
-				Scope: tc.scope,
+			nl, err := cdxu.componentToNodeList(&cdx.Component{
+				BOMRef: "parent",
+				Type:   cdx.ComponentTypeApplication,
+				Name:   "parent",
+				Components: &[]cdx.Component{
+					{
+						BOMRef: "child",
+						Type:   cdx.ComponentTypeLibrary,
+						Name:   "child",
+						Scope:  tc.scope,
+					},
+				},
 			}, &cc)
 			require.NoError(t, err)
-			require.Equal(t, tc.expected, node.Scope)
+
+			// The structural relationship is always captured:
+			require.True(t, findEdge(nl.Edges, sbom.Edge_contains, "parent", "child"))
+
+			// The scope becomes an edge from the child to its parent:
+			extraEdges := 0
+			for _, e := range nl.Edges {
+				if e.Type != sbom.Edge_contains {
+					extraEdges++
+				}
+			}
+			if tc.hasEdge {
+				require.Equal(t, 1, extraEdges)
+				require.True(t, findEdge(nl.Edges, tc.edgeType, "child", "parent"))
+			} else {
+				require.Equal(t, 0, extraEdges)
+			}
 		})
+	}
+}
+
+func TestUnserializeComponentScope(t *testing.T) {
+	data := `{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"component": {"bom-ref": "root", "type": "application", "name": "root"}
+		},
+		"components": [
+			{"bom-ref": "opt", "type": "library", "name": "opt", "scope": "optional"},
+			{"bom-ref": "excl", "type": "library", "name": "excl", "scope": "excluded"},
+			{"bom-ref": "plain", "type": "library", "name": "plain"}
+		]
+	}`
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(data), nil, nil)
+	require.NoError(t, err)
+
+	// All top level components descend from the root node:
+	for _, id := range []string{"opt", "excl", "plain"} {
+		require.True(t, findEdge(doc.NodeList.Edges, sbom.Edge_contains, "root", id))
+	}
+
+	// The scoped components also relate back to the root node with their
+	// scope relationship:
+	require.True(t, findEdge(doc.NodeList.Edges, sbom.Edge_optionalComponent, "opt", "root"))
+	require.True(t, findEdge(doc.NodeList.Edges, sbom.Edge_devDependency, "excl", "root"))
+
+	// An absent scope produces no extra relationship:
+	for _, e := range doc.NodeList.Edges {
+		require.NotEqual(t, "plain", e.From)
 	}
 }
 

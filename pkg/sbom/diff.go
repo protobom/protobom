@@ -155,11 +155,6 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 	nd.Removed.Properties = removedPr
 	nd.DiffCount += count
 
-	if n.Scope != n2.Scope {
-		nd.Added.Scope = n2.Scope
-		nd.DiffCount++
-	}
-
 	if nd.DiffCount > 0 {
 		return &nd
 	}

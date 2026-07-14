@@ -1,7 +1,6 @@
 package serializers
 
 import (
-	"encoding/json"
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
@@ -81,35 +80,65 @@ func TestComponentType(t *testing.T) {
 	}
 }
 
-func TestNodeToComponentScope(t *testing.T) {
-	sut := CDX{}
-	for name, tc := range map[string]struct {
-		scope    sbom.Node_Scope
-		expected cdx.Scope
-	}{
-		"required":    {sbom.Node_SCOPE_REQUIRED, cdx.ScopeRequired},
-		"optional":    {sbom.Node_SCOPE_OPTIONAL, cdx.ScopeOptional},
-		"excluded":    {sbom.Node_SCOPE_EXCLUDED, cdx.ScopeExcluded},
-		"unspecified": {sbom.Node_SCOPE_UNSPECIFIED, cdx.Scope("")},
+func TestEdgeTypeToScope(t *testing.T) {
+	for edgeType, expected := range map[sbom.Edge_Type]cdx.Scope{
+		sbom.Edge_runtimeDependency: cdx.ScopeRequired,
+		sbom.Edge_optionalComponent: cdx.ScopeOptional,
+		sbom.Edge_devDependency:     cdx.ScopeExcluded,
 	} {
-		t.Run(name, func(t *testing.T) {
-			comp := sut.nodeToComponent(&sbom.Node{
-				Id:    "test-node",
-				Name:  "test",
-				Scope: tc.scope,
-			})
-			require.Equal(t, tc.expected, comp.Scope)
+		scope, ok := edgeTypeToScope(edgeType)
+		require.True(t, ok)
+		require.Equal(t, expected, scope)
+	}
 
-			// An unspecified scope must be omitted from the JSON output,
-			// not serialized as an empty string.
-			data, err := json.Marshal(comp)
-			require.NoError(t, err)
-			if tc.scope == sbom.Node_SCOPE_UNSPECIFIED {
-				require.NotContains(t, string(data), `"scope"`)
-			} else {
-				require.Contains(t, string(data), `"scope":"`+string(tc.expected)+`"`)
-			}
-		})
+	for _, edgeType := range []sbom.Edge_Type{
+		sbom.Edge_contains, sbom.Edge_dependsOn, sbom.Edge_UNKNOWN,
+	} {
+		_, ok := edgeTypeToScope(edgeType)
+		require.False(t, ok)
+	}
+}
+
+func TestSerializeComponentScope(t *testing.T) {
+	sut := NewCDX("1.5", "json")
+	doc := &sbom.Document{
+		Metadata: &sbom.Metadata{Version: "1"},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{
+				{Id: "root", Name: "root"},
+				{Id: "opt", Name: "opt"},
+				{Id: "excl", Name: "excl"},
+				{Id: "plain", Name: "plain"},
+			},
+			Edges: []*sbom.Edge{
+				{Type: sbom.Edge_contains, From: "root", To: []string{"opt", "excl", "plain"}},
+				{Type: sbom.Edge_optionalComponent, From: "opt", To: []string{"root"}},
+				{Type: sbom.Edge_devDependency, From: "excl", To: []string{"root"}},
+			},
+			RootElements: []string{"root"},
+		},
+	}
+
+	res, err := sut.Serialize(doc, nil, nil)
+	require.NoError(t, err)
+	bom, ok := res.(*cdx.BOM)
+	require.True(t, ok)
+
+	// The scope relationships surface as the scope of the components:
+	require.NotNil(t, bom.Components)
+	scopes := map[string]cdx.Scope{}
+	for _, c := range *bom.Components {
+		scopes[c.BOMRef] = c.Scope
+	}
+	require.Equal(t, cdx.ScopeOptional, scopes["opt"])
+	require.Equal(t, cdx.ScopeExcluded, scopes["excl"])
+	require.Equal(t, cdx.Scope(""), scopes["plain"])
+
+	// ... and must not leak into the dependency graph:
+	require.NotNil(t, bom.Dependencies)
+	for _, d := range *bom.Dependencies {
+		require.NotEqual(t, "opt", d.Ref)
+		require.NotEqual(t, "excl", d.Ref)
 	}
 }
 

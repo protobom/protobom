@@ -26,7 +26,7 @@ jobs:
 
       - name: Generate SBOM
         id: sbom
-        uses: carabiner-dev/actions/unpack/sbom@94f29392187fe5082d1195a7d4cae3a7ddf09d9c # v1.2.1
+        uses: carabiner-dev/actions/unpack/sbom@2a4b2cd115ede14629b03ef7e77586d3269d4c72 # v1.2.3
         with:
           format: spdx
           output-path: /tmp
@@ -35,7 +35,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Publish Release
-        uses: kubernetes-sigs/release-actions/publish-release@8753ea6bdadb814d779c6ec34eaca689dbfb492b # v0.4.3
+        uses: kubernetes-sigs/release-actions/publish-release@c130b4494862d330a1aa4de320076c666d0708da # v0.4.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

@@ -367,13 +367,7 @@ func (s *SPDX23) buildPackages(
 		if len(node.PrimaryPurpose) > 0 && (node.PrimaryPurpose[0] != sbom.Purpose_UNKNOWN_PURPOSE) {
 			// Allowed values: APPLICATION, FRAMEWORK, LIBRARY, CONTAINER, OPERATING-SYSTEM, DEVICE, FIRMWARE, SOURCE, ARCHIVE, FILE, INSTALL, OTHER
 
-			if len(node.PrimaryPurpose) > 1 {
-				// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but spdx.Package only allows single PrimaryPackagePurpose so we are using the first
-				if true { // temp workaround in favor of adding a lint tag
-					break
-				}
-			}
-
+			// TODO(degradation): Multiple PrimaryPurpose in protobom.Node, but spdx.Package only allows single PrimaryPackagePurpose so we are using the first
 			switch node.PrimaryPurpose[0] {
 			case sbom.Purpose_APPLICATION, sbom.Purpose_EXECUTABLE:
 				p.PrimaryPackagePurpose = "APPLICATION"

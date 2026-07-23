@@ -380,6 +380,42 @@ func TestBuildPackages(t *testing.T) {
 			},
 		},
 		{
+			name: "primary-purpose-multiple-does-not-drop-packages",
+			doc: func() *sbom.Document {
+				doc := sbom.NewDocument()
+
+				first := sbom.NewNode()
+				first.Id = "first-node"
+				first.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY}
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, first)
+
+				// A node with more than one PrimaryPurpose. SPDX keeps only the first.
+				multi := sbom.NewNode()
+				multi.Id = "multi-purpose-node"
+				multi.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_LIBRARY, sbom.Purpose_APPLICATION}
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, multi)
+
+				last := sbom.NewNode()
+				last.Id = "last-node"
+				last.PrimaryPurpose = []sbom.Purpose{sbom.Purpose_APPLICATION}
+				doc.NodeList.Nodes = append(doc.NodeList.Nodes, last)
+
+				return doc
+			}(),
+			spdxopts: SPDX23Options{},
+			validate: func(t *testing.T, packages []*spdx.Package, err error) {
+				require.NoError(t, err)
+				// A node with multiple PrimaryPurpose values must not drop itself
+				// or any later package from the SBOM; all three must be present.
+				require.Len(t, packages, 3)
+				for _, pkg := range packages {
+					if string(pkg.PackageSPDXIdentifier) == "multi-purpose-node" {
+						require.Equal(t, "LIBRARY", pkg.PrimaryPackagePurpose)
+					}
+				}
+			},
+		},
+		{
 			name: "checksums-mapping",
 			doc: func() *sbom.Document {
 				doc := sbom.NewDocument()

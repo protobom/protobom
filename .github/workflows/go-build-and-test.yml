@@ -23,7 +23,7 @@ jobs:
 
     - name: Determine Go versions
       id: versions
-      uses: carabiner-dev/actions/go/versions@2a4b2cd115ede14629b03ef7e77586d3269d4c72 # v1.2.3
+      uses: carabiner-dev/actions/go/versions@36a39ef667efe7112df8b1a534a4e37f35fad6fd # v1.2.6
 
   verify:
     needs: go-versions

@@ -53,6 +53,8 @@ func init() {
 	unserializers[formats.SPDX23JSON] = drivers.NewSPDX23()
 	unserializers[formats.SPDX3JSON] = drivers.NewSPDX3()
 	unserializers[formats.SPDX23TV] = drivers.NewSPDX23TV()
+	unserializers[formats.SPDX22JSON] = drivers.NewSPDX22()
+	unserializers[formats.SPDX22TV] = drivers.NewSPDX22TV()
 	regMtx.Unlock()
 }
 

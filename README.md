@@ -26,14 +26,16 @@ the golang library.
 
 | Format | Version | Encoding | Read | Write |
 | --- | --- | --- | --- | --- |
-| SPDX | 2.2 | JSON | planned | - |
-| SPDX | 2.2 | tag-value | planned | - |
-| SPDX | 2.3 | JSON | supported | supported|
-| SPDX | 2.3 | tag-value | planned | - |
+| SPDX | 2.2 | JSON | supported | supported |
+| SPDX | 2.2 | tag-value | supported | supported |
+| SPDX | 2.3 | JSON | supported | supported |
+| SPDX | 2.3 | tag-value | supported | supported |
 | SPDX | 3.0 | JSON | planned | planned |
+| SPDX | 3.1 | JSON | planned | planned |
 | CycloneDX | 1.4 | JSON | supported | supported |
 | CycloneDX | 1.5 | JSON | supported | supported |
 | CycloneDX | 1.6 | JSON | supported | supported |
+| CycloneDX | 1.7 | JSON | supported | supported |
 
 Other read and write implementations can potentially be written in
 other [languages supported by protobuf](https://protobuf.dev/getting-started/)

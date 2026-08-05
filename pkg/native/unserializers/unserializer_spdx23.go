@@ -57,6 +57,13 @@ func (u *SPDX23) Unserialize(r io.Reader, opts *native.UnserializeOptions, _ int
 		return nil, fmt.Errorf("parsing SPDX json: %w", err)
 	}
 
+	return u.unserializeDocument(spdxDoc, opts)
+}
+
+// unserializeDocument converts an SPDX 2.3 document parsed by
+// spdx/tools-golang into its protobom representation. It is shared by
+// the encoding-specific unserializers (JSON and tag-value).
+func (u *SPDX23) unserializeDocument(spdxDoc *spdx23.Document, opts *native.UnserializeOptions) (*sbom.Document, error) {
 	bom := sbom.NewDocument()
 	bom.Metadata.Id = buildDocumentIdentifier(spdxDoc)
 	bom.Metadata.Name = spdxDoc.DocumentName

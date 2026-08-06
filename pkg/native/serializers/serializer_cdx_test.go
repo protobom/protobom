@@ -80,6 +80,68 @@ func TestComponentType(t *testing.T) {
 	}
 }
 
+func TestEdgeTypeToScope(t *testing.T) {
+	for edgeType, expected := range map[sbom.Edge_Type]cdx.Scope{
+		sbom.Edge_runtimeDependency: cdx.ScopeRequired,
+		sbom.Edge_optionalComponent: cdx.ScopeOptional,
+		sbom.Edge_devDependency:     cdx.ScopeExcluded,
+	} {
+		scope, ok := edgeTypeToScope(edgeType)
+		require.True(t, ok)
+		require.Equal(t, expected, scope)
+	}
+
+	for _, edgeType := range []sbom.Edge_Type{
+		sbom.Edge_contains, sbom.Edge_dependsOn, sbom.Edge_UNKNOWN,
+	} {
+		_, ok := edgeTypeToScope(edgeType)
+		require.False(t, ok)
+	}
+}
+
+func TestSerializeComponentScope(t *testing.T) {
+	sut := NewCDX("1.5", "json")
+	doc := &sbom.Document{
+		Metadata: &sbom.Metadata{Version: "1"},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{
+				{Id: "root", Name: "root"},
+				{Id: "opt", Name: "opt"},
+				{Id: "excl", Name: "excl"},
+				{Id: "plain", Name: "plain"},
+			},
+			Edges: []*sbom.Edge{
+				{Type: sbom.Edge_contains, From: "root", To: []string{"opt", "excl", "plain"}},
+				{Type: sbom.Edge_optionalComponent, From: "opt", To: []string{"root"}},
+				{Type: sbom.Edge_devDependency, From: "excl", To: []string{"root"}},
+			},
+			RootElements: []string{"root"},
+		},
+	}
+
+	res, err := sut.Serialize(doc, nil, nil)
+	require.NoError(t, err)
+	bom, ok := res.(*cdx.BOM)
+	require.True(t, ok)
+
+	// The scope relationships surface as the scope of the components:
+	require.NotNil(t, bom.Components)
+	scopes := map[string]cdx.Scope{}
+	for _, c := range *bom.Components {
+		scopes[c.BOMRef] = c.Scope
+	}
+	require.Equal(t, cdx.ScopeOptional, scopes["opt"])
+	require.Equal(t, cdx.ScopeExcluded, scopes["excl"])
+	require.Equal(t, cdx.Scope(""), scopes["plain"])
+
+	// ... and must not leak into the dependency graph:
+	require.NotNil(t, bom.Dependencies)
+	for _, d := range *bom.Dependencies {
+		require.NotEqual(t, "opt", d.Ref)
+		require.NotEqual(t, "excl", d.Ref)
+	}
+}
+
 func TestProtobomExtRefTypeToCdxType(t *testing.T) {
 	cdxs := NewCDX("1.5", "json")
 	for cdxRefType, protoType := range map[sbom.ExternalReference_ExternalReferenceType]cdx.ExternalReferenceType{

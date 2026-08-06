@@ -106,16 +106,23 @@ func TestSniffReaderConcurrent(t *testing.T) {
 	const workers = 50
 	var wg sync.WaitGroup
 	wg.Add(workers)
-	for i := 0; i < workers; i++ {
+	// Collect per-worker results and assert on them from the test goroutine:
+	// require may only be called there, since it stops the goroutine it runs in.
+	formats := make([]Format, workers)
+	errs := make([]error, workers)
+	for i := range workers {
 		go func() {
 			defer wg.Done()
 			fs := Sniffer{}
-			format, err := fs.SniffReader(bytes.NewReader(data))
-			require.NoError(t, err)
-			require.NotEmpty(t, format)
+			formats[i], errs[i] = fs.SniffReader(bytes.NewReader(data))
 		}()
 	}
 	wg.Wait()
+
+	for i := range workers {
+		require.NoError(t, errs[i])
+		require.NotEmpty(t, formats[i])
+	}
 }
 
 func TestSniffFile(t *testing.T) {

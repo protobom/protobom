@@ -43,10 +43,22 @@ type SPDX3Options struct {
 	// GenerateDocumentID causes the serializer to generate a document
 	// identifier when the protobom has none.
 	GenerateDocumentID bool
+
+	// ListCollectionElements causes the document to name its members with
+	// the element[] property, as well as saying what it is about with
+	// rootElement.
+	//
+	// It is off by default. The property is optional, the graph already
+	// carries every element, and naming them again roughly doubles the
+	// references in the document. Most documents in the wild leave it out
+	// so we chose to not enable this by default. Turn it on for a consumer
+	// that reads the collection rather than the graph.
+	ListCollectionElements bool
 }
 
 var DefaultSPDX3Options = SPDX3Options{
-	GenerateDocumentID: true,
+	GenerateDocumentID:     true,
+	ListCollectionElements: false,
 }
 
 // Render writes the SPDX 3 document. The indent of the render options is not
@@ -141,9 +153,11 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 
 	// Listed once everything else is in place, so the collection names all of
 	// its members and not only those built before the document.
-	for _, node := range env.Graph {
-		if _, isElement := node.(core.ElementDescendant); isElement && node != document {
-			document.AddElement(spdx3types.NodeRef{ID: node.GetSPDXID()})
+	if opts.ListCollectionElements {
+		for _, node := range env.Graph {
+			if _, isElement := node.(core.ElementDescendant); isElement && node != document {
+				document.AddElement(spdx3types.NodeRef{ID: node.GetSPDXID()})
+			}
 		}
 	}
 
@@ -161,8 +175,8 @@ type spdx3Translator struct {
 	counter   int
 }
 
-// elementID returns an identifier for an element. SPDX 3 identifies elements
-// with a URI, so an identifier that is not one is taken to name an element of
+// elementID returns an identifier for an element. SPDX3 identifies elements
+// with an IRI, so an identifier that is not one is taken to name an element of
 // this document and is resolved against its namespace.
 func (t *spdx3Translator) elementID(id string) string {
 	if id == "" {

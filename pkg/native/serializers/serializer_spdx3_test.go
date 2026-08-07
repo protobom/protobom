@@ -143,13 +143,8 @@ func TestSPDX3Serialize(t *testing.T) {
 	require.Equal(t, document["spdxId"], describes[0]["from"])
 	require.Equal(t, sbomElement["spdxId"], asSlice(t, describes[0]["to"])[0])
 
-	// The collection names every element, the describes relationship too.
-	listed := map[string]bool{}
-	for _, e := range asSlice(t, document["element"]) {
-		listed[fmt.Sprint(e)] = true
-	}
-	require.True(t, listed[fmt.Sprint(describes[0]["spdxId"])],
-		"element[] is built after everything else, so it names the whole graph")
+	// The collection does not name its members unless asked to.
+	require.Nil(t, document["element"])
 
 	// The package carries what the node said.
 	require.Len(t, elements["software_Package"], 1)
@@ -277,6 +272,40 @@ func TestSPDX3InvertedEdgeFansOut(t *testing.T) {
 	require.Len(t, contains, 2)
 	for _, rel := range contains {
 		require.Contains(t, asSlice(t, rel["to"])[0], "#pkg-1")
+	}
+}
+
+// element is optional, the graph already carries every element, and naming
+// them again roughly doubles the references, so it is written only on request.
+func TestSPDX3ListCollectionElements(t *testing.T) {
+	opts := DefaultSPDX3Options
+	opts.ListCollectionElements = true
+
+	doc, err := (&SPDX3{}).Serialize(testDocument(), &native.SerializeOptions{}, opts)
+	require.NoError(t, err)
+	env, ok := doc.(*spdx3.Envelope)
+	require.True(t, ok)
+
+	buf := &bytes.Buffer{}
+	require.NoError(t, (&SPDX3{}).Render(env, buf, &native.RenderOptions{}, nil))
+	rendered := map[string]any{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &rendered))
+
+	elements := byType(t, rendered)
+	document := elements["SpdxDocument"][0]
+	listed := asSlice(t, document["element"])
+	require.NotEmpty(t, listed)
+
+	// Everything but the document itself, including the relationships built
+	// after it.
+	names := map[string]bool{}
+	for _, e := range listed {
+		names[fmt.Sprint(e)] = true
+	}
+	require.False(t, names[fmt.Sprint(document["spdxId"])], "a collection is not its own member")
+	for _, rel := range elements["Relationship"] {
+		require.True(t, names[fmt.Sprint(rel["spdxId"])],
+			"the list is built last, so it names the relationships too")
 	}
 }
 

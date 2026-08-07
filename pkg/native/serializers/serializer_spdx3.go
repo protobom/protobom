@@ -109,7 +109,17 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 		t.edge(edge)
 	}
 
-	// And the document that holds it all, naming what it is about.
+	// The bill of materials itself. SPDX 3 separates the document, which is
+	// the file and says how it was made, from the bill of materials it
+	// carries, which is a subject in its own right: what kind of bill it is
+	// belongs to the software, not to the file.
+	sbomElement := software.NewSbom(t.newID("sbom"), documentTypesToSPDX3(bom.Metadata.DocumentTypes)...)
+	for _, id := range bom.NodeList.RootElements {
+		sbomElement.AddRootElement(spdx3types.NodeRef{ID: t.elementID(id)})
+	}
+	env.Graph.AddNode(sbomElement)
+
+	// And the document that holds it, naming what it is about.
 	document := core.NewSpdxDocument(namespace)
 	document.Name = bom.Metadata.Name
 	document.Comment = bom.Metadata.Comment
@@ -118,21 +128,16 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 		core.ProfileIdentifierTypeSoftware,
 		core.ProfileIdentifierTypeSimpleLicensing,
 	}
-	for _, id := range bom.NodeList.RootElements {
-		document.AddRootElement(spdx3types.NodeRef{ID: t.elementID(id)})
-	}
+	document.AddRootElement(sbomElement)
 	env.Graph.AddNode(document)
 
 	// A document names what it is about twice: with rootElement, and with a
 	// describes relationship. Both are how the tools that write SPDX 3 do it,
-	// and a reader that only understands one of them still finds the roots.
-	// One relationship per root, again as they do.
-	for _, id := range bom.NodeList.RootElements {
-		env.Graph.Relate(
-			t.newID("relationship"), document,
-			core.RelationshipTypeDescribes, spdx3types.NodeRef{ID: t.elementID(id)},
-		)
-	}
+	// and a reader that only understands one of them still finds its way in.
+	env.Graph.Relate(
+		t.newID("relationship"), document,
+		core.RelationshipTypeDescribes, sbomElement,
+	)
 
 	// Listed once everything else is in place, so the collection names all of
 	// its members and not only those built before the document.
@@ -516,6 +521,36 @@ var edgeTypeToSPDX3 = map[sbom.Edge_Type]spdx3Relationship{
 	// TODO(degradation): SPDX 3 has no relationship for a file modified from
 	// another, so modifiedBy is the closest thing to what protobom means.
 	sbom.Edge_fileModified: {relType: core.RelationshipTypeModifiedBy},
+}
+
+// documentTypesToSPDX3 names the kinds of bill of materials a document is.
+func documentTypesToSPDX3(types []*sbom.DocumentType) []software.SbomType {
+	names := []software.SbomType{}
+	for _, dt := range types {
+		if dt == nil || dt.Type == nil {
+			continue
+		}
+		// TODO(degradation): a document type's name and description have no
+		// home in SPDX 3, which names the kind and nothing else.
+		switch *dt.Type {
+		case sbom.DocumentType_DESIGN:
+			names = append(names, software.SbomTypeDesign)
+		case sbom.DocumentType_SOURCE:
+			names = append(names, software.SbomTypeSource)
+		case sbom.DocumentType_BUILD:
+			names = append(names, software.SbomTypeBuild)
+		case sbom.DocumentType_ANALYZED:
+			names = append(names, software.SbomTypeAnalyzed)
+		case sbom.DocumentType_DEPLOYED:
+			names = append(names, software.SbomTypeDeployed)
+		case sbom.DocumentType_RUNTIME:
+			names = append(names, software.SbomTypeRuntime)
+		default:
+			// TODO(degradation): SPDX 3 has no kind for OTHER, DISCOVERY or
+			// DECOMISSION, the last two of which come from CycloneDX.
+		}
+	}
+	return names
 }
 
 // identifierTypeToSPDX3 returns the SPDX 3 external identifier type naming a

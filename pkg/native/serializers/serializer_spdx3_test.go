@@ -28,6 +28,9 @@ func testDocument() *sbom.Document {
 			Date:    timestamppb.New(time.Date(2026, 8, 6, 12, 0, 0, 0, time.UTC)),
 			Tools:   []*sbom.Tool{{Name: "scanner", Version: "1.2.3"}},
 			Authors: []*sbom.Person{{Name: "Alice", Email: "alice@example.com"}},
+			DocumentTypes: []*sbom.DocumentType{
+				{Type: sbom.DocumentType_BUILD.Enum()},
+			},
 		},
 		NodeList: &sbom.NodeList{
 			RootElements: []string{"pkg-1"},
@@ -107,16 +110,29 @@ func TestSPDX3Serialize(t *testing.T) {
 	require.Equal(t, spdx3.ContextURL301, rendered["@context"])
 	elements := byType(t, rendered)
 
-	// The document names what it is about.
+	// SPDX 3 separates the document, which is the file, from the bill of
+	// materials it carries. The document's root is the bill; the bill's roots
+	// are the software.
 	require.Len(t, elements["SpdxDocument"], 1)
 	document := elements["SpdxDocument"][0]
 	require.Equal(t, "test document", document["name"])
+
+	require.Len(t, elements["software_Sbom"], 1)
+	sbomElement := elements["software_Sbom"][0]
+
 	roots := asSlice(t, document["rootElement"])
 	require.Len(t, roots, 1)
-	require.Contains(t, roots[0], "pkg-1")
+	require.Equal(t, sbomElement["spdxId"], roots[0], "the document is about the bill of materials")
 
-	// A document names its roots twice, as the tools that write SPDX 3 do:
-	// with rootElement, and with one describes relationship per root.
+	sbomRoots := asSlice(t, sbomElement["rootElement"])
+	require.Len(t, sbomRoots, 1)
+	require.Contains(t, sbomRoots[0], "pkg-1", "the bill of materials is about the software")
+
+	// What kind of bill it is belongs to the software, not to the file.
+	require.Equal(t, []any{"build"}, sbomElement["software_sbomType"])
+
+	// The document says what it is about twice, as the tools that write
+	// SPDX 3 do: with rootElement, and with a describes relationship.
 	describes := []map[string]any{}
 	for _, rel := range elements["Relationship"] {
 		if rel["relationshipType"] == "describes" {
@@ -125,8 +141,7 @@ func TestSPDX3Serialize(t *testing.T) {
 	}
 	require.Len(t, describes, 1)
 	require.Equal(t, document["spdxId"], describes[0]["from"])
-	require.Contains(t, asSlice(t, describes[0]["to"])[0], "pkg-1")
-	require.Len(t, asSlice(t, describes[0]["to"]), 1, "one relationship per root")
+	require.Equal(t, sbomElement["spdxId"], asSlice(t, describes[0]["to"])[0])
 
 	// The collection names every element, the describes relationship too.
 	listed := map[string]bool{}

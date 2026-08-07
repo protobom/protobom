@@ -13,6 +13,7 @@ const (
 	JSON       = "json"
 	XML        = "xml"
 	TEXT       = "text"
+	SPDX3JSON  = Format("text/spdx+json;version=3.0.1")
 	SPDX23TV   = Format("text/spdx+text;version=2.3")
 	SPDX23JSON = Format("text/spdx+json;version=2.3")
 	SPDX22TV   = Format("text/spdx+text;version=2.2")
@@ -46,9 +47,8 @@ func (f *Format) Version() string {
 }
 
 func (f *Format) Major() string {
-	ver := f.Version()
-	parts := strings.Split(ver, ".")
-	if len(parts) != 2 {
+	parts := strings.Split(f.Version(), ".")
+	if len(parts) < 2 {
 		return ""
 	}
 
@@ -56,13 +56,23 @@ func (f *Format) Major() string {
 }
 
 func (f *Format) Minor() string {
-	ver := f.Version()
-	parts := strings.Split(ver, ".")
-	if len(parts) != 2 {
+	parts := strings.Split(f.Version(), ".")
+	if len(parts) < 2 {
 		return ""
 	}
 
 	return parts[1]
+}
+
+// Patch returns the patch level of the format version, which only the SPDX 3
+// releases carry.
+func (f *Format) Patch() string {
+	parts := strings.Split(f.Version(), ".")
+	if len(parts) < 3 {
+		return ""
+	}
+
+	return parts[2]
 }
 
 func (f *Format) URI() string {

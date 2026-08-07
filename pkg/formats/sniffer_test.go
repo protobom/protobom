@@ -1,7 +1,9 @@
 package formats
 
 import (
+	"bytes"
 	"os"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -91,6 +93,35 @@ func TestSniffReader(t *testing.T) {
 		require.Equal(t, tc.encoding, sbomFormat.Encoding())
 		require.Equal(t, tc.formatType, sbomFormat.Type())
 		require.Equal(t, tc.version, sbomFormat.Version())
+	}
+}
+
+func TestSniffReaderConcurrent(t *testing.T) {
+	// A tag-value SPDX document falls through the JSON decode and exercises
+	// the shared, map-based line scanner. Running many sniffs at once must
+	// not race on that map. Run this with -race to catch regressions.
+	data, err := os.ReadFile("testdata/nginx.spdx")
+	require.NoError(t, err)
+
+	const workers = 50
+	var wg sync.WaitGroup
+	wg.Add(workers)
+	// Collect per-worker results and assert on them from the test goroutine:
+	// require may only be called there, since it stops the goroutine it runs in.
+	formats := make([]Format, workers)
+	errs := make([]error, workers)
+	for i := range workers {
+		go func() {
+			defer wg.Done()
+			fs := Sniffer{}
+			formats[i], errs[i] = fs.SniffReader(bytes.NewReader(data))
+		}()
+	}
+	wg.Wait()
+
+	for i := range workers {
+		require.NoError(t, errs[i])
+		require.NotEmpty(t, formats[i])
 	}
 }
 

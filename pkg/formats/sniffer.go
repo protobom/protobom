@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 )
 
 const (
@@ -25,6 +26,10 @@ var sniffFormats = []sniffFormat{
 }
 
 var state = make(map[string]sniffState, len(sniffFormats))
+
+// stateMu guards the package-level state map, which SniffReader reassigns
+// and the sniffers read and write while scanning a non-JSON document.
+var stateMu sync.Mutex
 
 type sniffFormat interface {
 	sniff(data []byte) Format
@@ -111,6 +116,11 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	fileScanner.Split(bufio.ScanLines)
 
 	var format Format
+
+	// The scan below reads and writes the shared state map, so serialize
+	// concurrent sniffs to keep them from racing on it.
+	stateMu.Lock()
+	defer stateMu.Unlock()
 
 	initSniffState()
 	for fileScanner.Scan() {

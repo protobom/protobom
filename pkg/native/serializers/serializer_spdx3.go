@@ -88,7 +88,7 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 	}
 
 	env := spdx3.NewEnvelope()
-	t := &spdx3Translator{namespace: namespace, env: env}
+	t := &spdx3Translator{namespace: namespace, env: env, nodeList: bom.NodeList}
 
 	// The agents and tools the document credits, which its creation
 	// information points at.
@@ -138,6 +138,7 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 type spdx3Translator struct {
 	namespace string
 	env       *spdx3.Envelope
+	nodeList  *sbom.NodeList
 	counter   int
 }
 
@@ -261,6 +262,18 @@ func (t *spdx3Translator) pkg(n *sbom.Node) *software.Package {
 	p.AttributionText = n.Attribution
 	p.PackageUrl = string(n.Purl())
 	p.PrimaryPurpose, p.AdditionalPurpose = purposesToSPDX3(n.PrimaryPurpose)
+
+	// The verification code is derived from the package's files rather than
+	// carried in the protobom, so it is computed as the document is written.
+	if code := packageVerificationCode(t.nodeList, n); code != "" {
+		p.VerifiedUsing = append(p.VerifiedUsing, &core.PackageVerificationCode{
+			IntegrityMethod: core.IntegrityMethod{
+				PreNode: base.PreNode{Type: core.PackageVerificationCodeClass},
+			},
+			Algorithm: core.HashAlgorithmSha1,
+			HashValue: code,
+		})
+	}
 
 	return p
 }

@@ -6,6 +6,7 @@ package serializers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -113,6 +114,27 @@ func TestSPDX3Serialize(t *testing.T) {
 	roots := asSlice(t, document["rootElement"])
 	require.Len(t, roots, 1)
 	require.Contains(t, roots[0], "pkg-1")
+
+	// A document names its roots twice, as the tools that write SPDX 3 do:
+	// with rootElement, and with one describes relationship per root.
+	describes := []map[string]any{}
+	for _, rel := range elements["Relationship"] {
+		if rel["relationshipType"] == "describes" {
+			describes = append(describes, rel)
+		}
+	}
+	require.Len(t, describes, 1)
+	require.Equal(t, document["spdxId"], describes[0]["from"])
+	require.Contains(t, asSlice(t, describes[0]["to"])[0], "pkg-1")
+	require.Len(t, asSlice(t, describes[0]["to"]), 1, "one relationship per root")
+
+	// The collection names every element, the describes relationship too.
+	listed := map[string]bool{}
+	for _, e := range asSlice(t, document["element"]) {
+		listed[fmt.Sprint(e)] = true
+	}
+	require.True(t, listed[fmt.Sprint(describes[0]["spdxId"])],
+		"element[] is built after everything else, so it names the whole graph")
 
 	// The package carries what the node said.
 	require.Len(t, elements["software_Package"], 1)

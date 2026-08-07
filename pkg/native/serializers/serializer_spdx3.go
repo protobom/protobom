@@ -121,12 +121,26 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 	for _, id := range bom.NodeList.RootElements {
 		document.AddRootElement(spdx3types.NodeRef{ID: t.elementID(id)})
 	}
+	env.Graph.AddNode(document)
+
+	// A document names what it is about twice: with rootElement, and with a
+	// describes relationship. Both are how the tools that write SPDX 3 do it,
+	// and a reader that only understands one of them still finds the roots.
+	// One relationship per root, again as they do.
+	for _, id := range bom.NodeList.RootElements {
+		env.Graph.Relate(
+			t.newID("relationship"), document,
+			core.RelationshipTypeDescribes, spdx3types.NodeRef{ID: t.elementID(id)},
+		)
+	}
+
+	// Listed once everything else is in place, so the collection names all of
+	// its members and not only those built before the document.
 	for _, node := range env.Graph {
-		if _, isElement := node.(core.ElementDescendant); isElement {
+		if _, isElement := node.(core.ElementDescendant); isElement && node != document {
 			document.AddElement(spdx3types.NodeRef{ID: node.GetSPDXID()})
 		}
 	}
-	env.Graph.AddNode(document)
 
 	// Said once, and shared by every element that has none of its own.
 	env.Graph.SetCreationInfo(creation)

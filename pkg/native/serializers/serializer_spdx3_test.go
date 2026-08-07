@@ -267,3 +267,32 @@ func TestSPDX3ElementIdentifiers(t *testing.T) {
 	require.NotNil(t, pkg)
 	require.Equal(t, "https://example.com/spdx/document#pkg-1", pkg.GetSPDXID())
 }
+
+// TestSPDX3EdgeMappingIsExhaustive guards the mapping table against protobom
+// growing an edge type nobody maps. An edge the table does not know is not an
+// error when serializing, it simply does not reach the document, so a new one
+// would go missing from every SBOM this writes without anything saying so.
+func TestSPDX3EdgeMappingIsExhaustive(t *testing.T) {
+	for value, name := range sbom.Edge_Type_name {
+		edge := sbom.Edge_Type(value)
+		if edge == sbom.Edge_UNKNOWN {
+			continue
+		}
+
+		mapping, ok := edgeTypeToSPDX3[edge]
+		require.True(t, ok,
+			"edge type %q has no entry in edgeTypeToSPDX3, so edges of that type "+
+				"would be left out of the document", name)
+		require.NotEmpty(t, mapping.relType,
+			"edge type %q maps to no SPDX 3 relationship type", name)
+		require.True(t, mapping.relType.IsValid(),
+			"edge type %q maps to %q, which is not a member of the SPDX 3 "+
+				"relationship vocabulary", name, mapping.relType)
+
+		if mapping.scope != "" {
+			require.True(t, mapping.scope.IsValid(),
+				"edge type %q maps to lifecycle scope %q, which is not a member "+
+					"of the SPDX 3 vocabulary", name, mapping.scope)
+		}
+	}
+}

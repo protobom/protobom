@@ -18,7 +18,7 @@ func (e *Edge) Copy() *Edge {
 	return &Edge{
 		Type: e.Type,
 		From: e.From,
-		To:   e.To,
+		To:   slices.Clone(e.To),
 	}
 }
 

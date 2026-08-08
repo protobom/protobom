@@ -2,7 +2,6 @@ package sbom
 
 import (
 	"slices"
-	"sort"
 	"strings"
 )
 
@@ -18,7 +17,7 @@ func (e *Edge) Copy() *Edge {
 	return &Edge{
 		Type: e.Type,
 		From: e.From,
-		To:   e.To,
+		To:   slices.Clone(e.To),
 	}
 }
 
@@ -40,8 +39,11 @@ func (e *Edge) Equal(e2 *Edge) bool {
 // flatString returns a serialized representation of the edge as a string,
 // suitable for indexing or comparison of the contents of the current edge.
 func (e *Edge) flatString() string {
-	tos := e.To
-	sort.Strings(tos)
+	// The destinations are sorted on a copy. Two edges are equal whatever
+	// order they list the same destinations in, but reading an edge must not
+	// reorder the one being read: the order is what the document said, and
+	// it is what gets written back out.
+	tos := slices.Sorted(slices.Values(e.To))
 	return e.From + ":" + e.Type.String() + ":" + strings.Join(tos, "+")
 }
 

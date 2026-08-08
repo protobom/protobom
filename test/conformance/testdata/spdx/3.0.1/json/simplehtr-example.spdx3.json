@@ -1,0 +1,1677 @@
+{
+	"@context": "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+	"@graph": [
+		{
+			"type": "Person",
+			"spdxId": "https://my-first-aibom.com/gopi",
+			"creationInfo": "_:creationinfo",
+			"name": "Gopi Krishnan Rajbahadur",
+			"externalIdentifier": [
+				{
+					"type": "ExternalIdentifier",
+					"externalIdentifierType": "email",
+					"identifier": "iamironman@616.com"
+				}
+			]
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://github.com/githubharald",
+			"creationInfo": "_:creationinfo",
+			"name": "Harald Scheidl"
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://my-first-aibom.com/gopi"
+			],
+			"created": "2024-05-09T13:50:30Z"
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_package",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://github.com/githubharald"
+			],
+			"created": "2023-08-07T00:00:00Z"
+		},
+		{
+			"type": "SpdxDocument",
+			"spdxId": "https://my-first-aibom.com/document1",
+			"creationInfo": "_:creationinfo",
+			"profileConformance": [
+				"core",
+				"software",
+				"ai",
+				"dataset"
+			],
+			"rootElement": [
+				"https://my-first-aibom.com/BOM1"
+			]
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "SimpleHTR",
+			"software_downloadLocation": "https://github.com/githubharald/SimpleHTR/tree/master",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			]
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/src/main",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/src/main.py",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "executable",
+			"software_additionalPurpose": [
+				"source"
+			],
+			"comment": "This file is the main entry point for execution of the Handwriting recognition application. ",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/src/create_lmdb",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/src/create_lmdb.py",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "executable",
+			"software_additionalPurpose": [
+				"source"
+			],
+			"comment": "This file is to store images into lmdb as pickled grayscale images",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/src/dataloader_iam",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/src/dataloader_iam.py",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "executable",
+			"software_additionalPurpose": [
+				"source"
+			],
+			"comment": "Loads data which corresponds to IAM format",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/src/model",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/src/model.py",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"executable",
+				"source"
+			],
+			"comment": "Source code for the AI model that is used in this application",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/src/preprocessor",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/src/preprocessor.py",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "source",
+			"software_additionalPurpose": [
+				"executable"
+			],
+			"comment": "Source code for preprocessing the data that is used for training and testing the model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/src",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/src",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "source",
+			"comment": "This directory contains all the source code files that is required for SimpleHTR application",
+			"software_fileKind": "directory"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/src-contains",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "contains",
+			"from": "https://github.com/githubharald/SimpleHTR/tree/master/src",
+			"to": [
+				"https://github.com/githubharald/SimpleHTR/tree/master/src/create_lmdb",
+				"https://github.com/githubharald/SimpleHTR/tree/master/src/dataloader_iam",
+				"https://github.com/githubharald/SimpleHTR/tree/master/src/main",
+				"https://github.com/githubharald/SimpleHTR/tree/master/src/model",
+				"https://github.com/githubharald/SimpleHTR/tree/master/src/preprocessor"
+			]
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/doc",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/doc",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "documentation",
+			"comment": "This directory contains several images required for documentation",
+			"software_fileKind": "directory"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/doc/decoder_comparision",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/doc/decoder_comparision.png",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "documentation",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "An image that shows documentation related information for simpleHTR options",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/doc/graphics",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/doc/graphics.svg",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "documentation",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "An image that shows documentation related information for simpleHTR options",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/doc/htr",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/doc/htr.png",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "documentation",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "An image that shows documentation related information for simpleHTR options",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/doc-contains",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "contains",
+			"from": "https://github.com/githubharald/SimpleHTR/tree/master/doc",
+			"to": [
+				"https://github.com/githubharald/SimpleHTR/tree/master/doc/decoder_comparision",
+				"https://github.com/githubharald/SimpleHTR/tree/master/doc/graphics",
+				"https://github.com/githubharald/SimpleHTR/tree/master/doc/htr"
+			]
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"library"
+			],
+			"comment": "This directory contains several images required for documentation",
+			"software_fileKind": "directory"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/.gitignore",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/.gitignore",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "other",
+			"comment": "The gitignore file for the directory",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/wordCharList",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/wordCharList.txt",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "configuration",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "Configuration/parameter file for the beam search decoder of the model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "word-model",
+			"software_downloadLocation": "https://www.dropbox.com/s/7xwkcilho10rthn/word-model.zip?dl=1",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"archive"
+			],
+			"description": "The simpleHTR application uses two AI models which is distributed as a Zip file. This model is a word -level handwriting recognition model",
+			"comment": "This file is not present at the source repo in VCS, but the users of the application are required to download it from the specified download location and present make it a part of the ./model/ directory"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/charList",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/word-model/CharList.txt",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"file",
+				"configuration"
+			],
+			"comment": "Configuration/parameter file for the beam search decoder of the model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/checkpoint",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/word-model/checkpoint",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "Saved checkpoint of the model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.data-00000-of-00001",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/word-model/snapshot-33.data-00000-of-00001",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "Actual values of all variables that make up the word level handwriting recognition AI model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.index",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/word-model/snapshot-33.index",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "The name and shape of all the variables that make up the word level handwriting recognition AI model thier actual data is stored in /model/word-model/snapshot-33.index",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.meta",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/word-model/snapshot-33.meta",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "Its a file storing all the information required to restore a training or information process including the graph that describes the data flow and additional annotations that describes the variables, input pipelines and other relevant information",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/summary.json",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/word-model/summary.json",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "evidence",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "Records the character level error rates of each letter in a json format",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model-contains",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "contains",
+			"from": "https://github.com/githubharald/SimpleHTR/tree/master/model/word-model",
+			"to": [
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/charList",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/checkpoint",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.data-00000-of-00001",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.index",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.meta",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/word-model/summary.json"
+			]
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "line-model",
+			"software_downloadLocation": "https://www.dropbox.com/s/7xwkcilho10rthn/line-model.zip?dl=1",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"archive"
+			],
+			"description": "The simpleHTR application uses two AI models which is distributed as a Zip file. This model is a line-level handwriting recognition model",
+			"comment": "This file is not present at the source repo in VCS, but the users of the application are required to download it from the specified download location and present make it a part of the ./model/ directory"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/charList",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/line-model/CharList.txt",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"file",
+				"configuration"
+			],
+			"comment": "Configuration/parameter file for the beam search decoder of the model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/checkpoint",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/line-model/checkpoint",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "Saved checkpoint of the model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.data-00000-of-00001",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/line-model/snapshot-13.data-00000-of-00001",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "Actual values of all variables that make up the line level handwriting recognition AI model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.index",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/line-model/snapshot-13.index",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "The name and shape of all the variables that make up the line level handwriting recognition AI model thier actual data is stored in /model/line-model/snapshot-13.index",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.meta",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/line-model/snapshot-13.meta",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "model",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "Its a file storing all the information required to restore a training or information process including the graph that describes the data flow and additional annotations that describes the variables, input pipelines and other relevant information",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/summary.json",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/model/line-model/summary.json",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "evidence",
+			"software_additionalPurpose": [
+				"data",
+				"file"
+			],
+			"comment": "Records the character level error rates of each letter in a json format",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model-contains",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "contains",
+			"from": "https://github.com/githubharald/SimpleHTR/tree/master/model/line-model",
+			"to": [
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/charList",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/checkpoint",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.data-00000-of-00001",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.index",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.meta",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/line-model/summary.json"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/model-contains",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "contains",
+			"from": "https://github.com/githubharald/SimpleHTR/tree/master/model",
+			"to": [
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/.gitignore",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/line-model",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/word-model",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model/wordCharList"
+			]
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/data",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/data",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "data",
+			"comment": "This directory contains all the data and examples required to train the simpleHTR AI model",
+			"software_fileKind": "directory"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/data/corpus",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/data/corpus.txt",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "data",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "The data corpus extracted from IAM dataset and this data is used to train the underlying simpleHTR AI model",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/data/line",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/data/line.png",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "data",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "An example image to test the model's line level character recognition capability",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/data/word",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/data/word.png",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "data",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "An example image to test the model's word level character recognition capability",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/data-contains",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "contains",
+			"from": "https://github.com/githubharald/SimpleHTR/tree/master/data",
+			"to": [
+				"https://github.com/githubharald/SimpleHTR/tree/master/data/corpus",
+				"https://github.com/githubharald/SimpleHTR/tree/master/data/line",
+				"https://github.com/githubharald/SimpleHTR/tree/master/data/word"
+			]
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/.gitignore",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/master/.gitignore",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "other",
+			"comment": "The git ignore file for the directory",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/LICENSE",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/master/LICENSE.md",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "documentation",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "License of the software",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/README",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/master/README.md",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "documentation",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "The overall documentation and getting started of the document",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://github.com/githubharald/SimpleHTR/tree/master/requirements",
+			"creationInfo": "_:creationinfo_of_package",
+			"name": "/master/requirements.txt",
+			"originatedBy": [
+				"https://github.com/githubharald"
+			],
+			"software_primaryPurpose": "requirement",
+			"software_additionalPurpose": [
+				"file"
+			],
+			"comment": "Lists the external package dependencies that are required to be satisfied for the application to execute",
+			"software_fileKind": "file"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-contains",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "contains",
+			"from": "https://my-first-aibom.com/SimpleHTR",
+			"to": [
+				"https://github.com/githubharald/SimpleHTR/tree/master/.gitignore",
+				"https://github.com/githubharald/SimpleHTR/tree/master/LICENSE",
+				"https://github.com/githubharald/SimpleHTR/tree/master/README",
+				"https://github.com/githubharald/SimpleHTR/tree/master/data",
+				"https://github.com/githubharald/SimpleHTR/tree/master/doc",
+				"https://github.com/githubharald/SimpleHTR/tree/master/model",
+				"https://github.com/githubharald/SimpleHTR/tree/master/requirements",
+				"https://github.com/githubharald/SimpleHTR/tree/master/src"
+			]
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/aflc/",
+			"creationInfo": "_:creationinfo",
+			"name": "Hiroyuki Tanaka"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://pypi.org/project/editdistance/0.5.2/",
+			"creationInfo": "_:creationinfo_of_editdistance",
+			"name": "editdistance",
+			"software_downloadLocation": "https://pypi.org/project/editdistance/0.5.2/",
+			"software_homePage": "https://github.com/roy-ht/editdistance",
+			"software_packageVersion": "0.5.2",
+			"originatedBy": [
+				"https://pypi.org/user/aflc/"
+			],
+			"software_primaryPurpose": "library",
+			"description": "This library simply implements Levenshtein distance with C++ and Cython."
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_editdistance",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://pypi.org/user/aflc/"
+			],
+			"created": "2018-09-17T00:00:00Z"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/dw/",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/jnwatson/",
+			"creationInfo": "_:creationinfo",
+			"name": "Nic Watson"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://pypi.org/project/lmdb/1.0.0/",
+			"creationInfo": "_:creationinfo_of_lmdb",
+			"name": "lmdb",
+			"software_downloadLocation": "https://pypi.org/project/lmdb/1.0.0/",
+			"software_homePage": "https://github.com/jnwatson/py-lmdb/",
+			"software_packageVersion": "1.0.0",
+			"originatedBy": [
+				"https://pypi.org/user/dw/",
+				"https://pypi.org/user/jnwatson/"
+			],
+			"software_primaryPurpose": "library",
+			"description": "This is a universal Python binding for the LMDB ‘Lightning’ Database."
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_lmdb",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://pypi.org/user/dw/",
+				"https://pypi.org/user/jnwatson/"
+			],
+			"created": "2020-08-28T00:00:00Z"
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_matplotlib",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://pypi.org/org/matplotlib/"
+			],
+			"created": "2018-09-19T00:00:00Z"
+		},
+		{
+			"type": "Organization",
+			"spdxId": "https://pypi.org/org/matplotlib/",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://pypi.org/project/matplotlib/3.2.1/",
+			"creationInfo": "_:creationinfo_of_matplotlib",
+			"name": "lmdb",
+			"software_downloadLocation": "https://pypi.org/project/matplotlib/3.2.1/",
+			"software_homePage": "https://matplotlib.org/",
+			"software_packageVersion": "3.2.1",
+			"originatedBy": [
+				"https://pypi.org/org/matplotlib/"
+			],
+			"software_primaryPurpose": "library",
+			"description": "Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python."
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_creationinfo_of_numpy",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://pypi.org/org/matplotlib/"
+			],
+			"created": "2020-03-18T00:00:00Z"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/charlesr.harris/",
+			"creationInfo": "_:creationinfo",
+			"name": "Charles R. Harris"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/matthew.brett/",
+			"creationInfo": "_:creationinfo",
+			"name": "Matthew Brett"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/mattip/",
+			"creationInfo": "_:creationinfo",
+			"name": "Matti Picus"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/rgommers/",
+			"creationInfo": "_:creationinfo",
+			"name": "Ralf Gommers"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/teoliphant/",
+			"creationInfo": "_:creationinfo",
+			"name": "Travis Oliphant"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://pypi.org/project/numpy/1.19.5/",
+			"creationInfo": "_:creationinfo_of_matplotlib",
+			"name": "numpy",
+			"software_downloadLocation": "https://pypi.org/project/numpy/1.19.5/",
+			"software_homePage": "https://numpy.org/",
+			"software_packageVersion": "1.19.5",
+			"originatedBy": [
+				"https://pypi.org/user/charlesr.harris/",
+				"https://pypi.org/user/matthew.brett/",
+				"https://pypi.org/user/mattip/",
+				"https://pypi.org/user/rgommers/",
+				"https://pypi.org/user/teoliphant/"
+			],
+			"software_primaryPurpose": "library",
+			"description": "NumPy is the fundamental package for scientific computing with Python."
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_numpy",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://pypi.org/user/charlesr.harris/",
+				"https://pypi.org/user/matthew.brett/",
+				"https://pypi.org/user/mattip/",
+				"https://pypi.org/user/rgommers/",
+				"https://pypi.org/user/teoliphant/"
+			],
+			"created": "2021-01-05T00:00:00Z"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/andrey.senyaev/",
+			"creationInfo": "_:creationinfo",
+			"name": "Andrey Senyaev"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/asmorkalov/",
+			"creationInfo": "_:creationinfo",
+			"name": "Alexander Smorkalov"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/sergregory/",
+			"creationInfo": "_:creationinfo",
+			"name": "Grigory"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/skvark/",
+			"creationInfo": "_:creationinfo",
+			"name": "Olli-Pekka Heinisuo"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://pypi.org/project/opencv-python/4.4.0.46/",
+			"creationInfo": "_:creationinfo_of_opencv-python",
+			"name": "opencv-python",
+			"software_downloadLocation": "https://pypi.org/project/opencv-python/4.4.0.46/",
+			"software_homePage": "https://github.com/opencv/opencv-python",
+			"software_packageVersion": "4.4.0.46",
+			"originatedBy": [
+				"https://pypi.org/user/andrey.senyaev/",
+				"https://pypi.org/user/asmorkalov/",
+				"https://pypi.org/user/sergregory/",
+				"https://pypi.org/user/skvark/"
+			],
+			"software_primaryPurpose": "library",
+			"description": "Pre-built CPU-only OpenCV packages for Python."
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_opencv-python",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://pypi.org/user/andrey.senyaev/",
+				"https://pypi.org/user/asmorkalov/",
+				"https://pypi.org/user/sergregory/",
+				"https://pypi.org/user/skvark/"
+			],
+			"created": "2020-11-02T00:00:00Z"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/jaraco/",
+			"creationInfo": "_:creationinfo",
+			"name": "Jason R. Coombs"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://pypi.org/project/path/15.0.0/",
+			"creationInfo": "_:creationinfo_of_path",
+			"name": "path",
+			"software_downloadLocation": "https://pypi.org/project/path/15.0.0/",
+			"software_homePage": "https://github.com/jaraco/path",
+			"software_packageVersion": "15.0.0",
+			"originatedBy": [
+				"https://pypi.org/user/jaraco/"
+			],
+			"software_primaryPurpose": "library",
+			"description": "path (aka path pie, formerly path.py) implements path objects as first-class entities, allowing common operations on files to be invoked on those path objects directly"
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_path",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://pypi.org/user/jaraco/"
+			],
+			"created": "2020-07-27T00:00:00Z"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://pypi.org/project/tensorflow/2.4.0/",
+			"creationInfo": "_:creationinfo_of_tensorflow",
+			"name": "tensorflow",
+			"software_downloadLocation": "https://pypi.org/project/tensorflow/2.4.0/",
+			"software_homePage": "https://www.tensorflow.org/",
+			"software_packageVersion": "2.4.0",
+			"originatedBy": [
+				"https://pypi.org/user/jaraco/"
+			],
+			"software_primaryPurpose": "library",
+			"description": "TensorFlow is an open source software library for high performance numerical computation. Its flexible architecture allows easy deployment of computation across a variety of platforms (CPUs, GPUs, TPUs), and from desktops to clusters of servers to mobile and edge devices."
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/mihaimaruseac/",
+			"creationInfo": "_:creationinfo",
+			"name": "Mihai Maruseac"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/rishikasinha/",
+			"creationInfo": "_:creationinfo",
+			"name": "Rishika Sinha"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/rostam/",
+			"creationInfo": "_:creationinfo",
+			"name": "Rostam Dinyari"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://pypi.org/user/tf-nightly/",
+			"creationInfo": "_:creationinfo",
+			"name": "TensorFlow Nightly Team"
+		},
+		{
+			"type": "CreationInfo",
+			"@id": "_:creationinfo_of_tensorflow",
+			"specVersion": "3.0.1",
+			"createdBy": [
+				"https://pypi.org/user/mihaimaruseac/",
+				"https://pypi.org/user/rishikasinha/",
+				"https://pypi.org/user/rostam/",
+				"https://pypi.org/user/tf-nightly/"
+			],
+			"created": "2020-12-14T00:00:00Z"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-depends-on",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "dependsOn",
+			"from": "https://my-first-aibom.com/SimpleHTR",
+			"to": [
+				"https://pypi.org/project/editdistance/0.5.2/",
+				"https://pypi.org/project/lmdb/1.0.0/",
+				"https://pypi.org/project/matplotlib/3.2.1/",
+				"https://pypi.org/project/numpy/1.19.5/",
+				"https://pypi.org/project/opencv-python/4.4.0.46/",
+				"https://pypi.org/project/path/15.0.0/",
+				"https://pypi.org/project/tensorflow/2.4.0/"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/editdistance/0.5.2/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://pypi.org/project/editdistance/0.5.2/",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-concludedLicense/editdistance/0.5.2/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasConcludedLicense",
+			"from": "https://pypi.org/project/editdistance/0.5.2/",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		},
+		{
+			"type": "simplelicensing_LicenseExpression",
+			"spdxId": "https://spdx.org/licenses/MIT",
+			"creationInfo": "_:creationinfo",
+			"simplelicensing_licenseExpression": "MIT",
+			"simplelicensing_licenseListVersion": "3.24.0"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/lmdb/1.0.0/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://pypi.org/project/lmdb/1.0.0/",
+			"to": [
+				"https://spdx.org/licenses/OLDAP-2.8"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-concludedLicense/lmdb/1.0.0/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasConcludedLicense",
+			"from": "https://pypi.org/project/lmdb/1.0.0/",
+			"to": [
+				"https://spdx.org/licenses/OLDAP-2.8"
+			]
+		},
+		{
+			"type": "simplelicensing_LicenseExpression",
+			"spdxId": "https://spdx.org/licenses/OLDAP-2.8",
+			"creationInfo": "_:creationinfo",
+			"simplelicensing_licenseExpression": "OLDAP-2.8",	
+			"simplelicensing_licenseListVersion": "3.24.0"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/matplotlib/3.2.1/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://pypi.org/project/matplotlib/3.2.1/",
+			"to": [
+				"https://spdx.org/licenses/PSF-2.0"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-concludedLicense/matplotlib/3.2.1/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasConcludedLicense",
+			"from": "https://pypi.org/project/matplotlib/3.2.1/",
+			"to": [
+				"https://spdx.org/licenses/PSF-2.0"
+			]
+		},
+		{
+			"type": "simplelicensing_LicenseExpression",
+			"spdxId": "https://spdx.org/licenses/PSF-2.0",
+			"creationInfo": "_:creationinfo",
+			"simplelicensing_licenseExpression": "PSF-2.0",	
+			"simplelicensing_licenseListVersion": "3.24.0"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/numpy/1.19.5/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://pypi.org/project/numpy/1.19.5/",
+			"to": [
+				"https://spdx.org/licenses/BSD-2-Clause-FreeBSD"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-concludedLicense/numpy/1.19.5/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasConcludedLicense",
+			"from": "https://pypi.org/project/numpy/1.19.5/",
+			"to": [
+				"https://spdx.org/licenses/BSD-2-Clause-FreeBSD"
+			]
+		},
+		{
+			"type": "simplelicensing_LicenseExpression",
+			"spdxId": "https://spdx.org/licenses/BSD-2-Clause-FreeBSD",
+			"creationInfo": "_:creationinfo",
+			"simplelicensing_licenseExpression": "BSD-2-Clause-FreeBSD",	
+			"simplelicensing_licenseListVersion": "3.24.0"
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/opencv-python/4.4.0.46/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://pypi.org/project/opencv-python/4.4.0.46/",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-concludedLicense/opencv-python/4.4.0.46/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasConcludedLicense",
+			"from": "https://pypi.org/project/opencv-python/4.4.0.46/",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/path/15.0.0/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://pypi.org/project/path/15.0.0/",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-concludedLicense/path/15.0.0/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasConcludedLicense",
+			"from": "https://pypi.org/project/path/15.0.0/",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/tensorflow/2.4.0/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://pypi.org/project/tensorflow/2.4.0/",
+			"to": [
+				"https://spdx.org/licenses/OLDAP-2.8"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-concludedLicense/tensorflow/2.4.0/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasConcludedLicense",
+			"from": "https://pypi.org/project/tensorflow/2.4.0/",
+			"to": [
+				"https://spdx.org/licenses/OLDAP-2.8"
+			]
+		},
+		{
+			"type": "simplelicensing_LicenseExpression",
+			"spdxId": "https://spdx.org/licenses/Apache-2.0",
+			"creationInfo": "_:creationinfo",
+			"simplelicensing_licenseExpression": "Apache-2.0",	
+			"simplelicensing_licenseListVersion": "3.24.0"
+		},
+		{
+			"type": "ai_AIPackage",
+			"spdxId": "https://my-first-aibom.com/word-model",
+			"creationInfo": "_:creationinfo",
+			"name": "word-model",
+			"releaseTime": "2023-09-07T00:00:00Z",
+			"suppliedBy": "https://github.com/githubharald",
+			"software_downloadLocation": "https://www.dropbox.com/s/mya8hw6jyzqm0a3/word-model.zip?dl=1",
+			"software_packageVersion": "0.0",
+			"software_primaryPurpose": "application",
+			"comment": "Word level handwriting recognition model",
+			"ai_autonomyType": "no",
+			"ai_domain": [
+				"handwriting recognition",
+				"image recognition",
+				"optical character recognition"
+			],
+			"ai_hyperparameter": [
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_kernel_vals",
+					"value": "[5, 5, 3, 3, 3]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_nfeature_vals",
+					"value": "[1, 32, 64, 128, 128, 256]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_stride_vals",
+					"value": "[(2, 2), (2, 2), (1, 2), (1, 2), (1, 2)]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_pool_vals",
+					"value": "[(2, 2), (2, 2), (1, 2), (1, 2), (1, 2)]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_num_layers",
+					"value": "5"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_activation",
+					"value": "relu"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_padding",
+					"value": "SAME"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_pooling_layer_padding",
+					"value": "VALID"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_kernal_stddev",
+					"value": "0.1"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_conv2d_strides",
+					"value": "(1,1,1,1)"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_num_layers",
+					"value": "2"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_hidden_layers",
+					"value": "256"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_LSTM_state_is_tuple",
+					"value": "True"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_MultiRNNCell_state_is_tuple",
+					"value": "True"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_filters_sttdev",
+					"value": "0.1"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_output_rate",
+					"value": "1"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_output_padding",
+					"value": "SAME"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "loss",
+					"value": "CTCLoss"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "Decode",
+					"value": "CTCDecode"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "beam_serach_decoder_beam_width",
+					"value": "50"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "beam_search_scoring_mode",
+					"value": "Words"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "beam_search_smoothing",
+					"value": "0.1"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "beam_search_encoding",
+					"value": "UTF-8"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "optimizer",
+					"value": "RMSprop"
+				}
+			],
+			"ai_informationAboutApplication": "Offline Handwritten Text Recognition (HTR) systems transcribe text contained in scanned images into digital text, an example is shown in Fig. 1. We will build a Neural Network (NN) which is trained on word-images from the IAM dataset.",
+			"ai_informationAboutTraining": "We use a NN for our task. It consists of convolutional NN (CNN) layers, recurrent NN (RNN) layers and a final Connectionist Temporal Classification (CTC) layer. CNN: the input image is fed into the CNN layers. These layers are trained to extract relevant features from the image. Each layer consists of three operation. First, the convolution operation, which applies a filter kernel of size 5×5 in the first two layers and 3×3 in the last three layers to the input. Then, the non-linear RELU function is applied. Finally, a pooling layer summarizes image regions and outputs a downsized version of the input. While the image height is downsized by 2 in each layer, feature maps (channels) are added, so that the output feature map (or sequence) has a size of 32×256. RNN the feature sequence contains 256 features per time-step, the RNN propagates relevant information through this sequence. The popular Long Short-Term Memory (LSTM) implementation of RNNs is used, as it is able to propagate information through longer distances and provides more robust training-characteristics than vanilla RNN. The RNN output sequence is mapped to a matrix of size 32×80. The IAM dataset consists of 79 different characters, further one additional character is needed for the CTC operation (CTC blank label), therefore there are 80 entries for each of the 32 time-steps. CTC while training the NN, the CTC is given the RNN output matrix and the ground truth text and it computes the loss value. While inferring, the CTC is only given the matrix and it decodes it into the final text. Both the ground truth text and the recognized text can be at most 32 characters long.",
+			"ai_metric": [
+				{
+					"type": "DictionaryEntry",
+					"key": "charErrorRates",
+					"value": "[ 0.9838042269187987, 0.8809788654060067, 0.5203559510567297, 0.33205784204671857, 0.29054505005561737, 0.2439599555061179, 0.2181979977753059, 0.20262513904338153, 0.18593993325917688, 0.18740823136818688, 0.17259176863181314, 0.1646273637374861, 0.16347052280311458, 0.15830923248053394, 0.14696329254727475, 0.1495884315906563, 0.14197997775305896, 0.1457174638487208, 0.14189098998887653, 0.137174638487208, 0.13490545050055616, 0.13152391546162404, 0.13094549499443828, 0.1332146829810901, 0.13090100111234707, 0.1254282536151279, 0.12525027808676306, 0.12529477196885427, 0.12596218020022246, 0.12596218020022246, 0.12182424916573971, 0.12262513904338153, 0.11942157953281424, 0.12031145717463848, 0.11839822024471636, 0.11661846496106786, 0.12195773081201335, 0.11853170189099, 0.11608453837597331, 0.11719688542825361, 0.12048943270300334, 0.12088987764182425, 0.11599555061179088, 0.11781979977753058, 0.11506117908787541, 0.11546162402669632, 0.11692992213570634, 0.11790878754171301, 0.11612903225806452, 0.11412680756395996, 0.11688542825361513, 0.11101223581757508, 0.11568409343715239, 0.12017797552836484, 0.11350389321468297, 0.11541713014460511, 0.1181757508342603, 0.11875417130144605, 0.11105672969966629, 0.11350389321468297, 0.11234705228031146, 0.11688542825361513, 0.11461624026696329, 0.11154616240266964, 0.11359288097886541, 0.10914349276974417, 0.11283648498331479, 0.11332591768631813, 0.11394883203559511, 0.11492769744160178, 0.11119021134593993, 0.11145717463848721, 0.11265850945494994, 0.11804226918798665, 0.11092324805339265, 0.11648498331479422, 0.1135483870967742, 0.11599555061179088, 0.11154616240266964, 0.11279199110122358, 0.11421579532814238 ]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "wordAccuracies",
+					"value": "[ 0.061394380853277836, 0.10353798126951093, 0.2443635102323968, 0.3935137010058966, 0.449531737773153, 0.5071106486298994, 0.5483870967741935, 0.5613943808532779, 0.5872355185570586, 0.591918140825529, 0.6122095039889005, 0.6184530003468609, 0.620013874436351, 0.6304197016996185, 0.6546999653139092, 0.6481096080471731, 0.6625043357613597, 0.654873395768297, 0.6626777662157475, 0.6722164412070759, 0.6758584807492196, 0.6833159902878946, 0.6817551161984045, 0.6770724939299341, 0.6855705861949358, 0.701179327089837, 0.6945889698231009, 0.690426638917794, 0.6959764134582033, 0.6888657648283039, 0.7034339229968782, 0.7010058966354492, 0.7103711411723899, 0.7065556711758585, 0.7105445716267776, 0.7133194588969823, 0.7018730489073881, 0.7089836975372875, 0.7124523066250433, 0.7129725979882068, 0.7072493929934096, 0.7043010752688172, 0.7169614984391259, 0.7114117238987167, 0.7211238293444329, 0.719389524800555, 0.7134928893513701, 0.7131460284425946, 0.7171349288935137, 0.7221644120707597, 0.7166146375303504, 0.7273673257023934, 0.7190426638917794, 0.7124523066250433, 0.7271938952480056, 0.7238987166146376, 0.7167880679847382, 0.7070759625390218, 0.7278876170655567, 0.723551855705862, 0.7289281997918835, 0.7155740548040236, 0.7225112729795352, 0.723551855705862, 0.7263267429760666, 0.7348248352410683, 0.725979882067291, 0.7282344779743323, 0.7206035379812695, 0.7232049947970863, 0.7273673257023934, 0.7315296566077003, 0.7280610475199445, 0.711064862989941, 0.7337842525147416, 0.723551855705862, 0.7277141866111689, 0.7230315643426986, 0.7351716961498439, 0.7261533125216788, 0.7232049947970863 ]"
+				}
+			],
+			"ai_modelDataPreprocessing": [
+				"Usually, the images from the dataset do not have exactly this size, therefore we resize it (without distortion) until it either has a width of 128 or a height of 32.",
+				"Then, we copy the image into a (white) target image of size 128*32."
+			],
+			"ai_safetyRiskAssessment": "low",
+			"ai_typeOfModel": [
+				"Deep Neural network composed of CNN and RNN layers with CTC loss and CTC Decoder which can use either word beam search or best path"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-depends-on",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "dependsOn",
+			"from": "https://my-first-aibom.com/SimpleHTR",
+			"to": [
+				"https://pypi.org/project/editdistance/0.5.2/",
+				"https://pypi.org/project/lmdb/1.0.0/",
+				"https://pypi.org/project/matplotlib/3.2.1/",
+				"https://pypi.org/project/numpy/1.19.5/",
+				"https://pypi.org/project/opencv-python/4.4.0.46/",
+				"https://pypi.org/project/path/15.0.0/",
+				"https://pypi.org/project/tensorflow/2.4.0/"
+			]
+		},
+		{
+			"type": "ai_AIPackage",
+			"spdxId": "https://my-first-aibom.com/line-model",
+			"creationInfo": "_:creationinfo",
+			"name": "line-model",
+			"releaseTime": "2023-09-07T00:00:00Z",
+			"suppliedBy": "https://github.com/githubharald",
+			"software_downloadLocation": "https://www.dropbox.com/s/mya8hw6jyzqm0a3/word-model.zip?dl=1",
+			"software_packageVersion": "0.0",
+			"software_primaryPurpose": "application",
+			"comment": "Line level handwriting recognition model",
+			"ai_autonomyType": "no",
+			"ai_domain": [
+				"handwriting recognition",
+				"image recognition",
+				"optical character recognition"
+			],
+			"ai_hyperparameter": [
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_kernel_vals",
+					"value": "[5, 5, 3, 3, 3]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_nfeature_vals",
+					"value": "[1, 32, 64, 128, 128, 256]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_stride_vals",
+					"value": "[(2, 2), (2, 2), (1, 2), (1, 2), (1, 2)]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_pool_vals",
+					"value": "[(2, 2), (2, 2), (1, 2), (1, 2), (1, 2)]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_num_layers",
+					"value": "5"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_activation",
+					"value": "relu"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_padding",
+					"value": "SAME"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_pooling_layer_padding",
+					"value": "VALID"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_kernal_stddev",
+					"value": "0.1"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "cnn_conv2d_strides",
+					"value": "(1,1,1,1)"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_num_layers",
+					"value": "2"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_hidden_layers",
+					"value": "256"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_LSTM_state_is_tuple",
+					"value": "True"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_MultiRNNCell_state_is_tuple",
+					"value": "True"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_filters_sttdev",
+					"value": "0.1"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_output_rate",
+					"value": "1"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "rnn_output_padding",
+					"value": "SAME"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "loss",
+					"value": "CTCLoss"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "Decode",
+					"value": "CTCDecode"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "beam_serach_decoder_beam_width",
+					"value": "50"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "beam_search_scoring_mode",
+					"value": "Words"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "beam_search_smoothing",
+					"value": "0.1"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "beam_search_encoding",
+					"value": "UTF-8"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "optimizer",
+					"value": "RMSprop"
+				}
+			],
+			"ai_informationAboutApplication": "Offline Handwritten Text Recognition (HTR) systems transcribe text contained in scanned images into digital text, an example is shown in Fig. 1. We will build a Neural Network (NN) which is trained on word-images from the IAM dataset.",
+			"ai_informationAboutTraining": "We use a NN for our task. It consists of convolutional NN (CNN) layers, recurrent NN (RNN) layers and a final Connectionist Temporal Classification (CTC) layer. CNN: the input image is fed into the CNN layers. These layers are trained to extract relevant features from the image. Each layer consists of three operation. First, the convolution operation, which applies a filter kernel of size 5×5 in the first two layers and 3×3 in the last three layers to the input. Then, the non-linear RELU function is applied. Finally, a pooling layer summarizes image regions and outputs a downsized version of the input. While the image height is downsized by 2 in each layer, feature maps (channels) are added, so that the output feature map (or sequence) has a size of 32×256. RNN the feature sequence contains 256 features per time-step, the RNN propagates relevant information through this sequence. The popular Long Short-Term Memory (LSTM) implementation of RNNs is used, as it is able to propagate information through longer distances and provides more robust training-characteristics than vanilla RNN. The RNN output sequence is mapped to a matrix of size 32×80. The IAM dataset consists of 79 different characters, further one additional character is needed for the CTC operation (CTC blank label), therefore there are 80 entries for each of the 32 time-steps. CTC while training the NN, the CTC is given the RNN output matrix and the ground truth text and it computes the loss value. While inferring, the CTC is only given the matrix and it decodes it into the final text. Both the ground truth text and the recognized text can be at most 32 characters long.",
+			"ai_metric": [
+				{
+					"type": "DictionaryEntry",
+					"key": "charErrorRates",
+					"value": "[ 0.9838042269187987, 0.8809788654060067, 0.5203559510567297, 0.33205784204671857, 0.29054505005561737, 0.2439599555061179, 0.2181979977753059, 0.20262513904338153, 0.18593993325917688, 0.18740823136818688, 0.17259176863181314, 0.1646273637374861, 0.16347052280311458, 0.15830923248053394, 0.14696329254727475, 0.1495884315906563, 0.14197997775305896, 0.1457174638487208, 0.14189098998887653, 0.137174638487208, 0.13490545050055616, 0.13152391546162404, 0.13094549499443828, 0.1332146829810901, 0.13090100111234707, 0.1254282536151279, 0.12525027808676306, 0.12529477196885427, 0.12596218020022246, 0.12596218020022246, 0.12182424916573971, 0.12262513904338153, 0.11942157953281424, 0.12031145717463848, 0.11839822024471636, 0.11661846496106786, 0.12195773081201335, 0.11853170189099, 0.11608453837597331, 0.11719688542825361, 0.12048943270300334, 0.12088987764182425, 0.11599555061179088, 0.11781979977753058, 0.11506117908787541, 0.11546162402669632, 0.11692992213570634, 0.11790878754171301, 0.11612903225806452, 0.11412680756395996, 0.11688542825361513, 0.11101223581757508, 0.11568409343715239, 0.12017797552836484, 0.11350389321468297, 0.11541713014460511, 0.1181757508342603, 0.11875417130144605, 0.11105672969966629, 0.11350389321468297, 0.11234705228031146, 0.11688542825361513, 0.11461624026696329, 0.11154616240266964, 0.11359288097886541, 0.10914349276974417, 0.11283648498331479, 0.11332591768631813, 0.11394883203559511, 0.11492769744160178, 0.11119021134593993, 0.11145717463848721, 0.11265850945494994, 0.11804226918798665, 0.11092324805339265, 0.11648498331479422, 0.1135483870967742, 0.11599555061179088, 0.11154616240266964, 0.11279199110122358, 0.11421579532814238 ]"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "wordAccuracies",
+					"value": "[ 0.061394380853277836, 0.10353798126951093, 0.2443635102323968, 0.3935137010058966, 0.449531737773153, 0.5071106486298994, 0.5483870967741935, 0.5613943808532779, 0.5872355185570586, 0.591918140825529, 0.6122095039889005, 0.6184530003468609, 0.620013874436351, 0.6304197016996185, 0.6546999653139092, 0.6481096080471731, 0.6625043357613597, 0.654873395768297, 0.6626777662157475, 0.6722164412070759, 0.6758584807492196, 0.6833159902878946, 0.6817551161984045, 0.6770724939299341, 0.6855705861949358, 0.701179327089837, 0.6945889698231009, 0.690426638917794, 0.6959764134582033, 0.6888657648283039, 0.7034339229968782, 0.7010058966354492, 0.7103711411723899, 0.7065556711758585, 0.7105445716267776, 0.7133194588969823, 0.7018730489073881, 0.7089836975372875, 0.7124523066250433, 0.7129725979882068, 0.7072493929934096, 0.7043010752688172, 0.7169614984391259, 0.7114117238987167, 0.7211238293444329, 0.719389524800555, 0.7134928893513701, 0.7131460284425946, 0.7171349288935137, 0.7221644120707597, 0.7166146375303504, 0.7273673257023934, 0.7190426638917794, 0.7124523066250433, 0.7271938952480056, 0.7238987166146376, 0.7167880679847382, 0.7070759625390218, 0.7278876170655567, 0.723551855705862, 0.7289281997918835, 0.7155740548040236, 0.7225112729795352, 0.723551855705862, 0.7263267429760666, 0.7348248352410683, 0.725979882067291, 0.7282344779743323, 0.7206035379812695, 0.7232049947970863, 0.7273673257023934, 0.7315296566077003, 0.7280610475199445, 0.711064862989941, 0.7337842525147416, 0.723551855705862, 0.7277141866111689, 0.7230315643426986, 0.7351716961498439, 0.7261533125216788, 0.7232049947970863 ]"
+				}
+			],
+			"ai_modelDataPreprocessing": [
+				"Usually, the images from the dataset do not have exactly this size, therefore we resize it (without distortion) until it either has a width of 128 or a height of 32.",
+				"Then, we copy the image into a (white) target image of size 128*32."
+			],
+			"ai_safetyRiskAssessment": "low",
+			"ai_typeOfModel": [
+				"Deep Neural network composed of CNN and RNN layers with CTC loss and CTC Decoder which can use either word beam search or best path"
+			]
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://spdx.org/spdxdocs/Person2-29791633-ba83-413d-a888-f96a9f450ca1",
+			"creationInfo": "_:creationinfo",
+			"name": "U. Marti"
+		},
+		{
+			"type": "Person",
+			"spdxId": "https://spdx.org/spdxdocs/Person3-384c284c-4da8-4a0c-a9ef-fcbfa4a4083d",
+			"creationInfo": "_:creationinfo",
+			"name": "H. Bunke."
+		},
+		{
+			"type": "dataset_DatasetPackage",
+			"spdxId": "https://my-first-aibom.com/IAMdataset",
+			"creationInfo": "_:creationinfo",
+			"name": "IAMdataset",
+			"builtTime": "1999-09-20T00:00:00Z",
+			"originatedBy": [
+				"https://spdx.org/spdxdocs/Person2-29791633-ba83-413d-a888-f96a9f450ca1",
+				"https://spdx.org/spdxdocs/Person3-384c284c-4da8-4a0c-a9ef-fcbfa4a4083d"
+			],
+			"software_downloadLocation": "https://fki.tic.heia-fr.ch/databases/iam-handwriting-database",
+			"software_primaryPurpose": "data",
+			"comment": "The IAM Handwriting Database contains forms of handwritten English text which can be used to train and test handwritten text recognizers and to perform writer identification and verification experiments.",
+			"dataset_confidentialityLevel": "clear",
+			"dataset_dataCollectionProcess": "It was decided to use the Lancaster - Oslo/Bergen corpus (LOB), a collection of 500 English texts, each consisting of about 2,000 words as a basis of our database. The LOB corpus is the British pendant to the Brown corpus, which has a structure similar to that of the\n LOB corpus. Then, we split the texts in the corpus into fragments of about three to six sentences with at least 50 words each. These text fragments were printed onto forms and we asked a number of persons to write the text printed on the forms by hand. We extracted the sentences of each text fragment from the corpus and generated a LATEX document containing the text and the structure of the form. The formatted documents were printed by a HP Laserjet 4000TN at a resolution of 600 dpi. Each form consists of four parts. The first part comprises the title “Sentence Database” and a number assigned to the text. The first character of this number shows which category the text belongs to,\n and the following two digits identify the text number. For example in Fig. 1, M01 indicates that the text on the form is extracted from text “01“ in the text category “Science fiction“. The next three digits show with which sentence the text starts. In the second part of the form, the text the individual persons were asked to write is printed. The third part of the form is a blank zone where the writers have to put in their handwriting. In the last part, the writer can voluntarily enter his or her name. All four parts are separated from each other by a horizontal line. This makes it easy to automatically extract the individual parts from a form. It was decided that the writers had to use rulers. These guiding lines, with 1.5 cm space between them, were printed on a separate sheet of paper which\n was put under the form. The writers were asked to use their every day writing in order to get the most natural and unconstrained way of writing. We also told the writers to stop writing, if there was not enough space left on the form to write the whole text. No restrictions were imposed on the writing instrument. Hence, text produced with a number of different writing instruments is included in the database (ballpoint pens, ink pens, and pencils, all with various stroke widths). The filled forms were scanned with a HP-Scanjet 6100 connected to a Sun Ultra 1. The software used to scan the data is xvscan version 1.62. It is an add-on to the wellknown image tool xv. The resolution was set to 300 dpi at a grey-level resolution of 8 bits. The images were saved in TIFF-format with LZW compression. Each form was\n completely scanned, including the printed and handwritten text. To create the label files, the text of a form was copied twice into the label file, once for the machine-printed text and once for the handwritten text. Then the line feeds were filled in manually. In some cases corrections were necessary, because the handwritten text did not exactly correspond to the printed text. These corrections include deletions, insertions, and changes of words so as to make the text in the label file of each form identical to the handwritten text. All corrections were done manually, but they did not take a long. Typically, only approximately 30s of manual processing time for the generation of the label files and the correction of errors were spent\n on each document, which is less than the time required for scanning.",
+			"dataset_dataPreprocessing": [
+				"First, the skew of the document is corrected.",
+				"Then the positions of the three horizontal lines are computed by a projection method. Given this positional information the handwriting is extracted.",
+				"Next, the handwritten text is segmented into text lines.",
+				"Finally, each text line is segmented into individual words. To find the first horizontal line, the form is scanned top-down in the middle of the image. The first black pixel found is assumed to belong to the first horizontal line.\n By following the line to the left and to the right, the end points of the line are found. Once the left and right end of the first horizontal line has been determined, its angle is used to correct the skew of the whole document by a rotation. Then, the form is segmented into its four main parts (see Sect. 2). This is a relatively easy task because the four parts are separated from each other by very long\n horizontal lines, which are easy to detect by horizontal projection. To make the projection algorithm more robust, not only the horizontal projection profile is considered, but also the value of the longest horizontal black run in each row. A horizontal line separating two parts from each other is characterized by a value in the horizontal grey-value projection histogram greater than a threshold t and a value of the longest horizontal black run greater than a threshold t\n (see Fig. 5). After all three horizontal lines have been found, we are able to extract the part of the form that contains the handwriting. Over the whole database the handwritten zone was automatically extracted by means of this procedure without any\n error. The next step in preprocessing is to cut the text into\n individual lines. For this purpose a histogram of the horizontal black/white transitions is used. In this histogram we look for local minima. If the value at a local minimum is zero, a cut has been found that does not touch any word. If the value is greater than zero, we have found a position where we can horizontally cut the image with a minimal number of intersections with strokes belonging to words of the previous or the following text line. To handle intersections of this kind a method based on the center of gravity is used. If the center of gravity of the connected component that is cut is in the range of the\n previous (the following) text line, the connected component is assumed to belong to that text line. If the center of gravity is near the cutting line, the component is cut into two parts, one belonging to the previous and one to the following text line. With this method we could extract almost all text lines correctly. Only in about 1.2% (113 of 9157) of the lines did errors occur. The 113 segmentation errors can be classified into acceptable and serious errors. An acceptable error is defined as one where only single punctuation marks or i-dots are assigned to the wrong line, but no cut component. By contrast, parts of letters or words assigned to the wrong text line are considered serious errors. There were 52 acceptable and 61serious errors out of a total of 113. The correction of these errors is left to\n the user of the database. That is, no attempts were made\n to include any manual corrections of the segmentation errors in the database. To segment the text lines into single words, a method\n similar to those described in the paper 'External word segmentation of off-line handwritten text lines.'' and the paper 'Gap metrics for\n word separation in handwritten lines' is used. Because a word can be split into several components, the goal is to cluster the connected components of a text line image into words. First, the convex hull and the center of gravity of each connected component in a line of text is\n computed. Then for each pair of connected components, c1 and c2, the straight line segment s that connects the center of gravity of c1 with the center of gravity of c2 is considered. The distance d between the two points where s intersects the convex hull of c1 and c2 is determined. This distance d is assigned to s as a weight. A graphical illustration is shown in Fig. 7. By means of this procedure, a completely connected and weighted graph is obtained, where each node corresponds to a connected component in the image and the weight on an edge represents the distance between two connected components. Given such a graph, its minimum spanning tree is computed. Finally, all distances that occur as weights on the edges of the minimum spanning tree are clustered into two groups, namely, intra-word and inter-word distance. For this purpose, Otsu's thresholding algorithm is used, which yields a threshold t. Any two connected components, c1\n and c2, that are linked by an edge in the minimum spanning tree with a weight d ≤ t are considered to be part of the same word. By contrast, if the weight d is larger than t, c1 and c2 are regarded as belonging to two different words. Applied on 541 text lines with 3,899 words,\n a correct word extraction of 94.92%, with 3.62% of the words over- and 1.46% undersegmented, was achieved. The primary goal of the preprocessing and segmentation procedures described in this section is to support the labeling of the text. However, these procedures can be\n integrated in any recognizer as well. All procedures have been implemented in C++ and can be compiled under Unix/Solaris and Linux. To actually run the procedures only the TIFF library for image read and write, but no other software utilities are needed."
+			],
+			"dataset_datasetAvailability": "registration",
+			"dataset_datasetSize": 4620000000,
+			"dataset_datasetType": [
+				"image"
+			],
+			"dataset_intendedUse": "For line level or word level character recognition",
+			"dataset_sensor": [
+				{
+					"type": "DictionaryEntry",
+					"key": "printer",
+					"value": "HP Laserjet 4000TN"
+				},
+				{
+					"type": "DictionaryEntry",
+					"key": "scanner",
+					"value": "HP-Scanjet 6100"
+				}
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/word-model-trained-on",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "trainedOn",
+			"from": "https://my-first-aibom.com/word-model",
+			"to": [
+				"https://my-first-aibom.com/IAMdataset"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/word-model-tested-on",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "testedOn",
+			"from": "https://my-first-aibom.com/word-model",
+			"to": [
+				"https://my-first-aibom.com/IAMdataset"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/line-model-trained-on",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "trainedOn",
+			"from": "https://my-first-aibom.com/line-model",
+			"to": [
+				"https://my-first-aibom.com/IAMdataset"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/line-model-tested-on",
+			"creationInfo": "_:creationinfo_of_package",
+			"relationshipType": "testedOn",
+			"from": "https://my-first-aibom.com/line-model",
+			"to": [
+				"https://my-first-aibom.com/IAMdataset"
+			]
+		},
+		{
+			"type": "software_Sbom",
+			"spdxId": "https://my-first-aibom.com/BOM1",
+			"creationInfo": "_:creationinfo",
+			"rootElement": [
+				"https://my-first-aibom.com/SimpleHTR"
+			],
+			"software_sbomType": [
+				"analyzed"
+			]
+		},
+		{
+			"type": "expandedlicensing_CustomLicense",
+			"spdxId": "https://spdx.org/spdxdocs/CustomLicense-c63547c2-62e0-48ec-b98d-ff1b917d67db",
+			"creationInfo": "_:creationinfo",
+			"simplelicensing_licenseText": "This database may be used for non-commercial research purpose only. If you publish material based on this database, we request you to include a reference to paper. U. Marti and H. Bunke. The IAM-database: An English Sentence Database for Off-line Handwriting Recognition. Int. Journal on Document Analysis and Recognition, Volume 5, pages 39 - 46, 2002.",
+			"expandedlicensing_isFsfLibre": false,
+			"expandedlicensing_isOsiApproved": false
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/IAMdataset",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://my-first-aibom.com/IAMdataset",
+			"to": [
+				"https://spdx.org/spdxdocs/CustomLicense-c63547c2-62e0-48ec-b98d-ff1b917d67db"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-concludedLicense/IAMdataset",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasConcludedLicense",
+			"from": "https://my-first-aibom.com/IAMdataset",
+			"to": [
+				"https://spdx.org/spdxdocs/CustomLicense-c63547c2-62e0-48ec-b98d-ff1b917d67db"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://my-first-aibom.com/SimpleHTR",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/word-model",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://my-first-aibom.com/word-model",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		},
+		{
+			"type": "Relationship",
+			"spdxId": "https://my-first-aibom.com/SimpleHTR-declaredLicense/line-model",
+			"creationInfo": "_:creationinfo",
+			"relationshipType": "hasDeclaredLicense",
+			"from": "https://my-first-aibom.com/line-model",
+			"to": [
+				"https://spdx.org/licenses/MIT"
+			]
+		}
+
+	]
+}

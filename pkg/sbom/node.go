@@ -67,6 +67,12 @@ func (n *Node) Update(n2 *Node) {
 	if n2.SourceInfo != "" {
 		n.SourceInfo = n2.SourceInfo
 	}
+	if n2.ContentType != "" {
+		n.ContentType = n2.ContentType
+	}
+	if n2.FileKind != Node_UNKNOWN_FILE_KIND {
+		n.FileKind = n2.FileKind
+	}
 	if len(n2.PrimaryPurpose) > 0 {
 		n.PrimaryPurpose = n2.PrimaryPurpose
 	}
@@ -147,6 +153,8 @@ func (n *Node) Augment(n2 *Node) {
 	if n.SourceInfo == "" && n2.SourceInfo != "" {
 		n.SourceInfo = n2.SourceInfo
 	}
+	augmentIfUnset(&n.ContentType, n2.ContentType)
+	augmentIfUnset(&n.FileKind, n2.FileKind)
 	if len(n.PrimaryPurpose) == 0 && len(n2.PrimaryPurpose) > 0 {
 		n.PrimaryPurpose = n2.PrimaryPurpose
 	}
@@ -192,6 +200,15 @@ func (n *Node) Augment(n2 *Node) {
 }
 
 // Copy returns a duplicate of the Node.
+// augmentIfUnset gives a field the other node's value when this node has none
+// and the other does, which is what augmenting means for a single value.
+func augmentIfUnset[T comparable](field *T, other T) {
+	var unset T
+	if *field == unset && other != unset {
+		*field = other
+	}
+}
+
 func (n *Node) Copy() *Node {
 	no := &Node{
 		Id:                 n.Id,
@@ -207,7 +224,9 @@ func (n *Node) Copy() *Node {
 		Copyright:          n.Copyright,
 		Hashes:             maps.Clone(n.Hashes),
 		SourceInfo:         n.SourceInfo,
-		PrimaryPurpose:     n.PrimaryPurpose,
+		ContentType:        n.ContentType,
+		FileKind:           n.FileKind,
+		PrimaryPurpose:     slices.Clone(n.PrimaryPurpose),
 		Comment:            n.Comment,
 		Summary:            n.Summary,
 		Description:        n.Description,

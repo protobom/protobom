@@ -1,0 +1,71 @@
+name: verify-spdx
+
+on:
+  pull_request:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  go-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      stable: ${{ steps.versions.outputs.GO_MINOR_VERSION_STABLE }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Determine Go versions
+      id: versions
+      uses: carabiner-dev/actions/go/versions@36a39ef667efe7112df8b1a534a4e37f35fad6fd # v1.2.6
+
+  verify-spdx:
+    needs: go-versions
+    name: Check our SPDX output with the SPDX tools
+    permissions:
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version: ${{ needs.go-versions.outputs.stable }}
+        check-latest: true
+        cache: true
+
+    # The SPDX Java tools run the Verify command, the reference
+    # implementation, over both SPDX 2.3 and SPDX 3.0.1.
+    - name: Set up Java
+      uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # v4.5.0
+      with:
+        distribution: temurin
+        java-version: "21"
+
+    - name: Set up Python
+      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+      with:
+        python-version: "3.13"
+
+    - name: Install check-jsonschema
+      run: pip install --disable-pip-version-check check-jsonschema==0.37.4
+
+    - name: Verify the documents protobom writes
+      run: |
+        hack/verify-spdx.sh --keep spdx-output
+
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      if: ${{ always() }}
+      with:
+        name: spdx-output
+        path: spdx-output

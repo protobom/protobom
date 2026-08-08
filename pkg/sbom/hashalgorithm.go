@@ -162,3 +162,45 @@ func (ha HashAlgorithm) ToSPDX3() string {
 		return ""
 	}
 }
+
+// HashAlgorithmFromSPDX3 returns the protobom algorithm an SPDX 3 algorithm
+// name states. It is the inverse of [HashAlgorithm.ToSPDX3].
+func HashAlgorithmFromSPDX3(spdxAlgo string) HashAlgorithm {
+	switch spdxAlgo {
+	case "md4":
+		return HashAlgorithm_MD4
+	case "md5":
+		return HashAlgorithm_MD5
+	case "md6":
+		return HashAlgorithm_MD6
+	case "sha1":
+		return HashAlgorithm_SHA1
+	case "sha224":
+		return HashAlgorithm_SHA224
+	case "sha256":
+		return HashAlgorithm_SHA256
+	case "sha384":
+		return HashAlgorithm_SHA384
+	case "sha512":
+		return HashAlgorithm_SHA512
+	case "sha3_256":
+		return HashAlgorithm_SHA3_256
+	case "sha3_384":
+		return HashAlgorithm_SHA3_384
+	case "sha3_512":
+		return HashAlgorithm_SHA3_512
+	case "blake2b256":
+		return HashAlgorithm_BLAKE2B_256
+	case "blake2b384":
+		return HashAlgorithm_BLAKE2B_384
+	case "blake2b512":
+		return HashAlgorithm_BLAKE2B_512
+	case "blake3":
+		return HashAlgorithm_BLAKE3
+	default:
+		// TODO(degradation): the SPDX 3 vocabulary also names adler32,
+		// crystalsDilithium, crystalsKyber, falcon and sha3_224, which
+		// protobom has no algorithm for.
+		return HashAlgorithm_UNKNOWN
+	}
+}

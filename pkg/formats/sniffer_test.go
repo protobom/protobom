@@ -75,6 +75,13 @@ func TestSniffReader(t *testing.T) {
 			encoding:   "json",
 		},
 		{
+			filename:   "testdata/minimal.spdx3.json",
+			mustError:  false,
+			version:    "3.0.1",
+			formatType: "spdx",
+			encoding:   "json",
+		},
+		{
 			filename:  "testdata/syft.json",
 			mustError: true,
 		},

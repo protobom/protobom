@@ -503,3 +503,28 @@ func TestReaderSourceData(t *testing.T) {
 	require.Equal(t, "f042095476ef416fae33e9a76a4e406ff337cfc15a6f694894e6ff0070adb089", doc.Metadata.SourceData.Hashes[int32(sbom.HashAlgorithm_SHA256)])
 	require.Equal(t, "71b04d63bc55dc78b91dfb376484a20a4e410fd58db893ed6e20637ccb495f7bf83b1aa76ab377bd9a6ef96d0d19f8cfa834d152dbf4880c2400be9a89dea429", doc.Metadata.SourceData.Hashes[int32(sbom.HashAlgorithm_SHA512)])
 }
+
+// TestReadSPDX3 checks the reader finds its way from a file to the SPDX 3
+// driver: the sniffer has to recognize JSON-LD with an SPDX 3 context, and
+// the format has to have a driver registered for it.
+func TestReadSPDX3(t *testing.T) {
+	// Registered explicitly: other tests in this package leave fakes behind
+	// in the registry.
+	reader.RegisterUnserializer(formats.SPDX3JSON, unserializers.NewSPDX3())
+
+	// Options are passed rather than taken from the defaults, which other
+	// tests in this package mutate.
+	doc, err := reader.New().ParseFileWithOptions(
+		"../formats/testdata/minimal.spdx3.json",
+		&reader.Options{
+			UnserializeOptions: &native.UnserializeOptions{TrackSource: true},
+		},
+	)
+	require.NoError(t, err)
+	require.Equal(t, "https://spdx.org/spdxdocs/protobom/minimal", doc.Metadata.Id)
+	require.Equal(t, "minimal", doc.Metadata.Name)
+
+	// The format was sniffed, not told: an SPDX 3 document says its version
+	// in its JSON-LD context, not in a spdxVersion property.
+	require.Equal(t, string(formats.SPDX3JSON), doc.Metadata.SourceData.Format)
+}

@@ -333,10 +333,7 @@ func (s *SPDX23) buildPackages(
 			PackageFileName:       node.FileName,
 			// PackageSupplier:             &common.Supplier{},
 			// PackageOriginator:           &common.Originator{},
-			PackageDownloadLocation: node.UrlDownload,
-			// FilesAnalyzed:               false,
-			// IsFilesAnalyzedTagPresent:   false,
-			// PackageVerificationCode:     &common.PackageVerificationCode{},
+			PackageDownloadLocation:     node.UrlDownload,
 			PackageChecksums:            []common.Checksum{},
 			PackageHomePage:             node.UrlHome,
 			PackageSourceInfo:           node.SourceInfo,
@@ -507,6 +504,15 @@ func (s *SPDX23) buildPackages(
 		}
 
 		// TODO(puerco): Reconcile file in packages
+		// The verification code lets a consumer check that the files it has
+		// are the files the document describes. It is derived from those
+		// files, so it is computed here rather than carried in the protobom.
+		if code := packageVerificationCode(bom.NodeList, node); code != "" {
+			p.FilesAnalyzed = true
+			p.IsFilesAnalyzedTagPresent = true
+			p.PackageVerificationCode = &common.PackageVerificationCode{Value: code}
+		}
+
 		packages = append(packages, &p)
 	}
 	return packages, nil

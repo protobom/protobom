@@ -5,7 +5,7 @@ set -euxo pipefail
 source hack/common.sh
 
 # These are pinned to the versions used in the latest generated code
-export PROTOC_GO_VER="v1.36.7"
+export PROTOC_GO_VER="v1.36.11"
 export BUF_VERSION="v1.56.0"
 
 # Install protoc-gen-go plugin

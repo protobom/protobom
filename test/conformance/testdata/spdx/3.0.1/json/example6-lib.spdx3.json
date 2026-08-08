@@ -1,0 +1,249 @@
+{
+  "@context" : "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+  "@graph" : [ {
+    "@id" : "_:creationInfo_0",
+    "type" : "CreationInfo",
+    "specVersion" : "3.0.1",
+    "createdBy" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd0" ],
+    "created" : "2021-08-26T01:55:00Z"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd1",
+    "type" : "Relationship",
+    "relationshipType" : "describes",
+    "completeness" : "noAssertion",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/document0",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd3",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd4" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd5",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd4",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd7",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd4",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd8",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd9" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd10",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd9",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd11",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd9",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd12",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd13" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd14",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd13",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd15",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd13",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd16",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd17" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd18",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd17",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd20",
+    "type" : "Relationship",
+    "relationshipType" : "hasDistributionArtifact",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd19" ],
+    "completeness" : "complete",
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd17",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd21",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd17",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd22",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd25",
+    "type" : "Relationship",
+    "relationshipType" : "hasDistributionArtifact",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd24" ],
+    "completeness" : "complete",
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd27",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd28" ],
+    "from" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/document0",
+    "type" : "SpdxDocument",
+    "dataLicense" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd29",
+    "rootElement" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2" ],
+    "name" : "go-lib",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd6",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "NOASSERTION",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd28",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "LicenseRef-Golang-BSD-plus-Patents",
+    "simplelicensing_customIdToUri" : [ {
+      "type" : "DictionaryEntry",
+      "value" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/LicenseRef-Golang-BSD-plus-Patents",
+      "key" : "LicenseRef-Golang-BSD-plus-Patents"
+    } ],
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd29",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "CC0-1.0",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd23",
+    "type" : "Organization",
+    "name" : "Google LLC",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd26",
+    "type" : "Organization",
+    "name" : "Canonical Ltd.",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd0",
+    "type" : "Person",
+    "externalIdentifier" : [ {
+      "type" : "ExternalIdentifier",
+      "identifier" : "steve@swinslow.net",
+      "externalIdentifierType" : "email"
+    } ],
+    "name" : "Steve Winslow",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd19",
+    "type" : "software_File",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha256",
+      "hashValue" : "4448b9e62b3c364a073808e22643985d9f49c4ad44aa11d8e4a17c49600a7c3a"
+    } ],
+    "name" : "go",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd24",
+    "type" : "software_File",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha256",
+      "hashValue" : "0d6e1420facd978e532eae7bd5cb6378b65522c12fa9dcf682129e698c34d1b2"
+    } ],
+    "name" : "go_6715.snap",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2",
+    "type" : "software_Package",
+    "software_copyrightText" : "Copyright (c) 2009 The Go Authors. All rights reserved.",
+    "suppliedBy" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd26",
+    "software_downloadLocation" : "NOASSERTION",
+    "summary" : "Ubuntu snap distribution of Golang v1.15.4 linux/amd64",
+    "software_packageVersion" : "1.15.4",
+    "software_homePage" : "https://golang.org/",
+    "name" : "go-1.15",
+    "originatedBy" : [ "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd23" ],
+    "software_sourceInfo" : "installed using Ubuntu snap file, see https://snapcraft.io/go",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd4",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "NOASSERTION",
+    "software_packageVersion" : "1.15.4",
+    "name" : "go.strconv",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd9",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "NOASSERTION",
+    "software_packageVersion" : "1.15.4",
+    "name" : "go.reflect",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd13",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "NOASSERTION",
+    "software_packageVersion" : "1.15.4",
+    "name" : "go.fmt",
+    "comment" : "This represents the fmt standard library, not the gofmt command.",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "https://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd17",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "NOASSERTION",
+    "software_packageVersion" : "1.15.4",
+    "name" : "go",
+    "creationInfo" : "_:creationInfo_0"
+  } ]
+}

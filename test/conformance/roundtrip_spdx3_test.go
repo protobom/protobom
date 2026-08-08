@@ -530,3 +530,104 @@ func roundTripNodeIn(t *testing.T, ns string, node *sbom.Node) *sbom.Node {
 	require.NotNil(t, read, "the node did not survive the round trip")
 	return read
 }
+
+// TestRoundTripSPDX3Licenses writes licensing and reads it back.
+//
+// This is the mapping with the least in common between the two models:
+// protobom holds a concluded licence and a list of declared ones as strings
+// on the node, and SPDX 3 holds neither, stating each as an element of the
+// graph with a relationship pointing at it. The round trip has to put the
+// graph back into the fields without leaving the elements behind as nodes.
+func TestRoundTripSPDX3Licenses(t *testing.T) {
+	const ns = "https://example.com/spdxdocs/licenses"
+
+	for name, tc := range map[string]struct {
+		concluded string
+		declared  []string
+		expected  []string
+	}{
+		"one of each": {
+			"Apache-2.0", []string{"MIT"}, []string{"MIT"},
+		},
+		// The writer joins the list into one expression and the reader takes
+		// it apart, so a plain list comes back as itself.
+		"several declared licences": {
+			"Apache-2.0", []string{"MIT", "BSD-3-Clause"}, []string{"MIT", "BSD-3-Clause"},
+		},
+		"no licence at all": {
+			"", nil, nil,
+		},
+		"concluded only": {
+			"GPL-3.0-or-later", nil, nil,
+		},
+		// TODO(degradation): a declared licence that is itself an expression
+		// is joined with the others and cannot be taken apart again, because
+		// a piece of a bracketed expression is not a licence.
+		"a declared licence that is an expression": {
+			"",
+			[]string{"(MIT OR Apache-2.0)", "BSD-3-Clause"},
+			[]string{"(MIT OR Apache-2.0) AND BSD-3-Clause"},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			got := roundTripNodeIn(t, ns, &sbom.Node{
+				Id: ns + "#pkg", Type: sbom.Node_PACKAGE, Name: "a package",
+				LicenseConcluded: tc.concluded,
+				Licenses:         tc.declared,
+				Identifiers:      map[int32]string{}, Hashes: map[int32]string{},
+			})
+			require.Equal(t, tc.concluded, got.LicenseConcluded)
+			require.Equal(t, tc.expected, got.Licenses)
+		})
+	}
+}
+
+// TestRoundTripSPDX3LicensesLeaveNoGraph is the half of the licence mapping
+// that is easy to get wrong: the elements SPDX 3 states a licence with are
+// consumed, so reading a document protobom wrote must give back the graph it
+// started with, not one with a licence element and a relationship added.
+func TestRoundTripSPDX3LicensesLeaveNoGraph(t *testing.T) {
+	const ns = "https://example.com/spdxdocs/licensegraph"
+
+	pkg := &sbom.Node{
+		Id: ns + "#pkg", Type: sbom.Node_PACKAGE, Name: "a package",
+		LicenseConcluded: "Apache-2.0", Licenses: []string{"MIT"},
+		Identifiers: map[int32]string{}, Hashes: map[int32]string{},
+	}
+	file := &sbom.Node{
+		Id: ns + "#file", Type: sbom.Node_FILE, Name: "a/file.txt",
+		LicenseConcluded: "MIT",
+		Identifiers:      map[int32]string{}, Hashes: map[int32]string{},
+	}
+
+	var out bytes.Buffer
+	require.NoError(t, writer.New().WriteStreamWithOptions(
+		&sbom.Document{
+			Metadata: &sbom.Metadata{Id: ns},
+			NodeList: &sbom.NodeList{
+				Nodes:        []*sbom.Node{pkg, file},
+				Edges:        []*sbom.Edge{{Type: sbom.Edge_contains, From: pkg.Id, To: []string{file.Id}}},
+				RootElements: []string{pkg.Id},
+			},
+		},
+		&out, &writer.Options{Format: formats.SPDX3JSON},
+	))
+
+	got, err := reader.New().ParseStreamWithOptions(
+		bytes.NewReader(out.Bytes()),
+		&reader.Options{
+			Format:             formats.SPDX3JSON,
+			UnserializeOptions: &native.UnserializeOptions{},
+		},
+	)
+	require.NoError(t, err)
+
+	// Two nodes and one edge went out, and two nodes and one edge come back:
+	// the three licence elements and three relationships the document states
+	// them with are consumed into fields.
+	require.Len(t, got.NodeList.Nodes, 2)
+	require.Equal(t, []*sbom.Edge{
+		{Type: sbom.Edge_contains, From: pkg.Id, To: []string{file.Id}},
+	}, got.NodeList.Edges)
+	require.Equal(t, []string{pkg.Id}, got.NodeList.RootElements)
+}

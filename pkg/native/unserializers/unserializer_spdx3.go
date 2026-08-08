@@ -75,11 +75,9 @@ func (u *SPDX3) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interfa
 	}
 
 	rd.elements(bom.NodeList)
+	rd.licenses()
 	rd.roots(bom.NodeList)
 	rd.relationships(bom.NodeList)
-
-	// The licenses the elements are under are read in the step that follows
-	// this one.
 
 	return bom, nil
 }

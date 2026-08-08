@@ -1,0 +1,147 @@
+
+—
+$https://my-first-aibom.com/document11"¶©Û±2.
+Gopi Krishnan Rajbahaduriamironman@616.comJÌ
+text/spdx+json;version=3.0.1,(9337b3a44bf6497d7877352336c9d135e4c8c40dD@2b3765b58ace83fc9bcd53e6f12438839618d18e99e2f7546f6b334aa94f232bÖÄaca34b7cdabd47358a3635109786a1ea73f11038be3d6edb11931c90dee8ee50c055474481006682749289de6b2871503c3334eb4d7b5eca6c51f1756f9af540Æª"Mfile://test/conformance/testdata/spdx/3.0.1/json/simplehtr-example.spdx3.jsonËm
+Ä
+$https://my-first-aibom.com/SimpleHTR	SimpleHTR:5https://github.com/githubharald/SimpleHTR/tree/masterBMIT¢
+Harald Scheidl
+…
+>https://github.com/githubharald/SimpleHTR/tree/master/src/main/src/main.pyz\This file is the main entry point for execution of the Handwriting recognition application. ¢
+Harald ScheidlÚà
+Ω
+Ehttps://github.com/githubharald/SimpleHTR/tree/master/src/create_lmdb/src/create_lmdb.pyzBThis file is to store images into lmdb as pickled grayscale images¢
+Harald ScheidlÚà
+´
+Hhttps://github.com/githubharald/SimpleHTR/tree/master/src/dataloader_iam/src/dataloader_iam.pyz*Loads data which corresponds to IAM format¢
+Harald ScheidlÚà
+≠
+?https://github.com/githubharald/SimpleHTR/tree/master/src/model/src/model.pyz=Source code for the AI model that is used in this application¢
+Harald ScheidlÚà
+”
+Fhttps://github.com/githubharald/SimpleHTR/tree/master/src/preprocessor/src/preprocessor.pyzVSource code for preprocessing the data that is used for training and testing the model¢
+Harald ScheidlÚà
+ª
+9https://github.com/githubharald/SimpleHTR/tree/master/src/srcz\This directory contains all the source code files that is required for SimpleHTR application¢
+Harald ScheidlÚà
+†
+9https://github.com/githubharald/SimpleHTR/tree/master/doc/doczAThis directory contains several images required for documentation¢
+Harald ScheidlÚ	à
+◊
+Mhttps://github.com/githubharald/SimpleHTR/tree/master/doc/decoder_comparision/doc/decoder_comparision.pngzKAn image that shows documentation related information for simpleHTR options¢
+Harald ScheidlÚ	à
+¡
+Bhttps://github.com/githubharald/SimpleHTR/tree/master/doc/graphics/doc/graphics.svgzKAn image that shows documentation related information for simpleHTR options¢
+Harald ScheidlÚ	à
+∑
+=https://github.com/githubharald/SimpleHTR/tree/master/doc/htr/doc/htr.pngzKAn image that shows documentation related information for simpleHTR options¢
+Harald ScheidlÚ	à
+•
+;https://github.com/githubharald/SimpleHTR/tree/master/model/modelzAThis directory contains several images required for documentation¢
+Harald ScheidlÚà
+ù
+Fhttps://github.com/githubharald/SimpleHTR/tree/master/model/.gitignore/model/.gitignorez$The gitignore file for the directory¢
+Harald ScheidlÚà
+«
+Hhttps://github.com/githubharald/SimpleHTR/tree/master/model/wordCharList/model/wordCharList.txtzEConfiguration/parameter file for the beam search decoder of the model¢
+Harald ScheidlÚà
+Ü
+Fhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model
+word-model:=https://www.dropbox.com/s/7xwkcilho10rthn/word-model.zip?dl=1z This file is not present at the source repo in VCS, but the users of the application are required to download it from the specified download location and present make it a part of the ./model/ directoryääThe simpleHTR application uses two AI models which is distributed as a Zip file. This model is a word -level handwriting recognition model¢
+Harald ScheidlÚ
+÷
+Ohttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/charList/model/word-model/CharList.txtzEConfiguration/parameter file for the beam search decoder of the model¢
+Harald ScheidlÚà
+Æ
+Qhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/checkpoint/model/word-model/checkpointzSaved checkpoint of the model¢
+Harald ScheidlÚà
+ñ
+fhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.data-00000-of-000011/model/word-model/snapshot-33.data-00000-of-00001z[Actual values of all variables that make up the word level handwriting recognition AI model¢
+Harald ScheidlÚà
+«
+Xhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.index#/model/word-model/snapshot-33.indexzßThe name and shape of all the variables that make up the word level handwriting recognition AI model thier actual data is stored in /model/word-model/snapshot-33.index¢
+Harald ScheidlÚà
+ì
+Whttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.meta"/model/word-model/snapshot-33.metazıIts a file storing all the information required to restore a training or information process including the graph that describes the data flow and additional annotations that describes the variables, input pipelines and other relevant information¢
+Harald ScheidlÚà
+‹
+Shttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/summary.json/model/word-model/summary.jsonzGRecords the character level error rates of each letter in a json format¢
+Harald ScheidlÚ
+à
+Ö
+Fhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model
+line-model:=https://www.dropbox.com/s/7xwkcilho10rthn/line-model.zip?dl=1z This file is not present at the source repo in VCS, but the users of the application are required to download it from the specified download location and present make it a part of the ./model/ directoryäâThe simpleHTR application uses two AI models which is distributed as a Zip file. This model is a line-level handwriting recognition model¢
+Harald ScheidlÚ
+÷
+Ohttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/charList/model/line-model/CharList.txtzEConfiguration/parameter file for the beam search decoder of the model¢
+Harald ScheidlÚà
+Æ
+Qhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/checkpoint/model/line-model/checkpointzSaved checkpoint of the model¢
+Harald ScheidlÚà
+ñ
+fhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.data-00000-of-000011/model/line-model/snapshot-13.data-00000-of-00001z[Actual values of all variables that make up the line level handwriting recognition AI model¢
+Harald ScheidlÚà
+«
+Xhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.index#/model/line-model/snapshot-13.indexzßThe name and shape of all the variables that make up the line level handwriting recognition AI model thier actual data is stored in /model/line-model/snapshot-13.index¢
+Harald ScheidlÚà
+ì
+Whttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.meta"/model/line-model/snapshot-13.metazıIts a file storing all the information required to restore a training or information process including the graph that describes the data flow and additional annotations that describes the variables, input pipelines and other relevant information¢
+Harald ScheidlÚà
+‹
+Shttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/summary.json/model/line-model/summary.jsonzGRecords the character level error rates of each letter in a json format¢
+Harald ScheidlÚ
+à
+ª
+:https://github.com/githubharald/SimpleHTR/tree/master/data/datazZThis directory contains all the data and examples required to train the simpleHTR AI model¢
+Harald ScheidlÚà
+ﬂ
+Ahttps://github.com/githubharald/SimpleHTR/tree/master/data/corpus/data/corpus.txtzkThe data corpus extracted from IAM dataset and this data is used to train the underlying simpleHTR AI model¢
+Harald ScheidlÚà
+¿
+?https://github.com/githubharald/SimpleHTR/tree/master/data/line/data/line.pngzPAn example image to test the model's line level character recognition capability¢
+Harald ScheidlÚà
+¿
+?https://github.com/githubharald/SimpleHTR/tree/master/data/word/data/word.pngzPAn example image to test the model's word level character recognition capability¢
+Harald ScheidlÚà
+ô
+@https://github.com/githubharald/SimpleHTR/tree/master/.gitignore/master/.gitignorez%The git ignore file for the directory¢
+Harald ScheidlÚà
+â
+=https://github.com/githubharald/SimpleHTR/tree/master/LICENSE/master/LICENSE.mdzLicense of the software¢
+Harald ScheidlÚ	à
+≠
+<https://github.com/githubharald/SimpleHTR/tree/master/README/master/README.mdz=The overall documentation and getting started of the document¢
+Harald ScheidlÚ	à
+Â
+Bhttps://github.com/githubharald/SimpleHTR/tree/master/requirements/master/requirements.txtzhLists the external package dependencies that are required to be satisfied for the application to execute¢
+Harald ScheidlÚà
+Ü
+,https://pypi.org/project/editdistance/0.5.2/editdistance"0.5.22&https://github.com/roy-ht/editdistance:,https://pypi.org/project/editdistance/0.5.2/BMITJMITäHThis library simply implements Levenshtein distance with C++ and Cython.¢
+Hiroyuki TanakaÚ
+˜
+$https://pypi.org/project/lmdb/1.0.0/lmdb"1.0.02$https://github.com/jnwatson/py-lmdb/:$https://pypi.org/project/lmdb/1.0.0/B	OLDAP-2.8J	OLDAP-2.8äIThis is a universal Python binding for the LMDB ‚ÄòLightning‚Äô Database.¢ ¢
+
+Nic WatsonÚ
+ä
+*https://pypi.org/project/matplotlib/3.2.1/lmdb"3.2.12https://matplotlib.org/:*https://pypi.org/project/matplotlib/3.2.1/BPSF-2.0JPSF-2.0änMatplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python.¢Ú
+…
+&https://pypi.org/project/numpy/1.19.5/numpy"1.19.52https://numpy.org/:&https://pypi.org/project/numpy/1.19.5/BBSD-2-Clause-FreeBSDJBSD-2-Clause-FreeBSDäFNumPy is the fundamental package for scientific computing with Python.¢
+Charles R. Harris¢
+Matthew Brett¢
+Matti Picus¢
+Ralf Gommers¢
+Travis OliphantÚ
+¥
+0https://pypi.org/project/opencv-python/4.4.0.46/opencv-python"4.4.0.462'https://github.com/opencv/opencv-python:0https://pypi.org/project/opencv-python/4.4.0.46/BMITJMITä.Pre-built CPU-only OpenCV packages for Python.¢
+Andrey Senyaev¢
+Alexander Smorkalov¢	
+Grigory¢
+Olli-Pekka HeinisuoÚ
+…
+%https://pypi.org/project/path/15.0.0/path"15.0.02https://github.com/jaraco/path:%https://pypi.org/project/path/15.0.0/BMITJMITäßpath (aka path pie, formerly path.py) implements path objects as first-class entities, allowing common operations on files to be invoked on those path objects directly¢
+Jason R. CoombsÚ
+ 
+*https://pypi.org/project/tensorflow/2.4.0/
+tensorflow"2.4.02https://www.tensorflow.org/:*https://pypi.org/project/tensorflow/2.4.0/B	OLDAP-2.8J	OLDAP-2.8äêTensorFlow is an open source software library for high performance numerical computation. Its flexible architecture allows easy deployment of computation across a variety of platforms (CPUs, GPUs, TPUs), and from desktops to clusters of servers to mobile and edge devices.¢
+Jason R. CoombsÚó9https://github.com/githubharald/SimpleHTR/tree/master/srcEhttps://github.com/githubharald/SimpleHTR/tree/master/src/create_lmdbHhttps://github.com/githubharald/SimpleHTR/tree/master/src/dataloader_iam>https://github.com/githubharald/SimpleHTR/tree/master/src/main?https://github.com/githubharald/SimpleHTR/tree/master/src/modelFhttps://github.com/githubharald/SimpleHTR/tree/master/src/preprocessorè9https://github.com/githubharald/SimpleHTR/tree/master/docMhttps://github.com/githubharald/SimpleHTR/tree/master/doc/decoder_comparisionBhttps://github.com/githubharald/SimpleHTR/tree/master/doc/graphics=https://github.com/githubharald/SimpleHTR/tree/master/doc/htrﬁFhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-modelOhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/charListQhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/checkpointfhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.data-00000-of-00001Xhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.indexWhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/snapshot-33.metaShttps://github.com/githubharald/SimpleHTR/tree/master/model/word-model/summary.jsonﬁFhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-modelOhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/charListQhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/checkpointfhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.data-00000-of-00001Xhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.indexWhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/snapshot-13.metaShttps://github.com/githubharald/SimpleHTR/tree/master/model/line-model/summary.json·;https://github.com/githubharald/SimpleHTR/tree/master/modelFhttps://github.com/githubharald/SimpleHTR/tree/master/model/.gitignoreFhttps://github.com/githubharald/SimpleHTR/tree/master/model/line-modelFhttps://github.com/githubharald/SimpleHTR/tree/master/model/word-modelHhttps://github.com/githubharald/SimpleHTR/tree/master/model/wordCharListÉ:https://github.com/githubharald/SimpleHTR/tree/master/dataAhttps://github.com/githubharald/SimpleHTR/tree/master/data/corpus?https://github.com/githubharald/SimpleHTR/tree/master/data/line?https://github.com/githubharald/SimpleHTR/tree/master/data/wordö$https://my-first-aibom.com/SimpleHTR@https://github.com/githubharald/SimpleHTR/tree/master/.gitignore=https://github.com/githubharald/SimpleHTR/tree/master/LICENSE<https://github.com/githubharald/SimpleHTR/tree/master/README:https://github.com/githubharald/SimpleHTR/tree/master/data9https://github.com/githubharald/SimpleHTR/tree/master/doc;https://github.com/githubharald/SimpleHTR/tree/master/modelBhttps://github.com/githubharald/SimpleHTR/tree/master/requirements9https://github.com/githubharald/SimpleHTR/tree/master/src’
+$https://my-first-aibom.com/SimpleHTR,https://pypi.org/project/editdistance/0.5.2/$https://pypi.org/project/lmdb/1.0.0/*https://pypi.org/project/matplotlib/3.2.1/&https://pypi.org/project/numpy/1.19.5/0https://pypi.org/project/opencv-python/4.4.0.46/%https://pypi.org/project/path/15.0.0/*https://pypi.org/project/tensorflow/2.4.0/$https://my-first-aibom.com/SimpleHTR

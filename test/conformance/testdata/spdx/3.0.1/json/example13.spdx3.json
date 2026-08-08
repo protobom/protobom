@@ -1,0 +1,153 @@
+{
+	 "@context": "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+	 "@graph": [
+		 {
+			 "type": "Person",
+			 "spdxId": "urn:jane-doe-1@acme.com-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "name": "Application Owner Jane Doe",
+			 "externalIdentifier": [
+				 {
+					 "type": "ExternalIdentifier",
+					 "externalIdentifierType": "email",
+					 "identifier": "jane-doe-1@acme.com"
+				 }
+			 ]
+		 },
+		 {
+			 "type": "Organization",
+			 "spdxId": "urn:acme.com-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "name": "Acme Company"
+		 },
+		 {
+			 "type": "Person",
+			 "spdxId": "urn:github.com-indutny-c4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "name": "Fedor Indutny",
+			 "externalIdentifier": [
+				 {
+					 "type": "ExternalIdentifier",
+					 "externalIdentifierType": "other",
+					 "identifier": "https://github.com/indutny"
+				 }
+			 ]
+		 },
+		 {
+			 "type": "Organization",
+			 "spdxId": "urn:github.com-alpinelinux-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "name": "Alpine Linux"
+
+		 },
+		 {
+			 "type": "CreationInfo",
+			 "@id": "_:creationinfo",
+			 "specVersion": "3.0.1",
+			 "createdBy": [
+				 "urn:jane-doe-1@acme.com-4fe40e24-20e3-11ee-be56-0242ac120002",
+				 "urn:acme.com-4fe40e24-20e3-11ee-be56-0242ac120002"
+			 ],
+			 "created": "2024-05-02T00:00:00Z"
+		 },
+		 {
+			 "type": "SpdxDocument",
+			 "spdxId": "http://spdx.example.com/Document1",
+			 "creationInfo": "_:creationinfo",
+			 "profileConformance": [
+				 "core",
+				 "software"
+			 ],
+			 "rootElement": [
+				 "urn:example13-sbom.com-4fe40e24-20e3-11ee-be56-0242ac120002"
+			 ]
+		 },
+		 {
+			 "type": "software_Sbom",
+			 "spdxId": "urn:example13-sbom.com-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "profileConformance": [
+                                 "core",
+                                 "software"
+                         ],
+			 "rootElement": [
+				 "urn:product-acme-application-1.3-4fe40e24-20e3-11ee-be56-0242ac120002"
+			 ]
+		 },
+		 {
+			 "type": "software_Package",
+			 "spdxId": "urn:product-acme-application-1.3-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "name": "Acme Application",
+			 "software_packageVersion": "1.3",
+			 "suppliedBy": "urn:acme.com-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "software_primaryPurpose": "application"
+		 },
+		 {
+			 "type": "software_Package",
+			 "spdxId": "urn:npm-elliptic-6.5.2-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "name": "npm-elliptic",
+			 "software_packageVersion": "6.5.2",
+			 "suppliedBy": "urn:github.com-indutny-c4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "software_primaryPurpose": "library",
+			 "externalIdentifier": [
+				 {
+					 "type": "ExternalIdentifier",
+					 "externalIdentifierType": "other",
+					 "identifier": "https://github.com/indutny/elliptic/releases/tag/v6.5.2"
+                                 }
+                         ]
+
+		 },
+		 {
+			 "type": "software_Package",
+			 "spdxId": "urn:container-alpine-latest-sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "name": "alpine:latest",
+			 "software_packageVersion": "69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a",
+			 "suppliedBy": "urn:github.com-alpinelinux-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "software_primaryPurpose": "container"
+		 },
+		 {
+			 "type": "software_Package",
+			 "spdxId": "urn:openssl-3.0.4-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "name": "openssl",
+			 "software_packageVersion": "3.0.4",
+			 "software_primaryPurpose": "library"
+		 },
+		 {
+			 "type": "Relationship",
+			 "spdxId": "urn:acme-relationship-1-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "from": "urn:product-acme-application-1.3-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "to": ["urn:jane-doe-1@acme.com-4fe40e24-20e3-11ee-be56-0242ac120002"],
+			 "relationshipType": "availableFrom"
+		 },
+		 {
+			 "type": "Relationship",
+			 "spdxId": "urn:acme-relationship-2-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "from": "urn:product-acme-application-1.3-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "to": ["urn:npm-elliptic-6.5.2-4fe40e24-20e3-11ee-be56-0242ac120002"],
+			 "relationshipType": "contains"
+		 },
+		 {
+			 "type": "Relationship",
+			 "spdxId": "urn:acme-relationship-3-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "from": "urn:product-acme-application-1.3-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "to": ["urn:container-alpine-latest-sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a-4fe40e24-20e3-11ee-be56-0242ac120002"],
+			 "relationshipType": "dependsOn"
+		 },
+		 {
+			 "type": "Relationship",
+			 "spdxId": "urn:acme-relationship-4-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "creationInfo": "_:creationinfo",
+			 "from": "urn:container-alpine-latest-sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a-4fe40e24-20e3-11ee-be56-0242ac120002",
+			 "to": ["urn:openssl-3.0.4-4fe40e24-20e3-11ee-be56-0242ac120002"],
+			 "relationshipType": "contains"
+		 }
+	 ]
+}

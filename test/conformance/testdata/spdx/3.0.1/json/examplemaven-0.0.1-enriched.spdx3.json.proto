@@ -1,0 +1,37 @@
+
+ä
+Fhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/document01examplemaven"‘™Ïπ*
+spdx-maven-plugin*
+Parlay2
+Gary O'NeallJ˜
+text/spdx+json;version=3.0.1,(b2e7e384249525120a975085495d15539846e46eD@6023d2edd5814bc6ea9f47dd6502447595a5469457ea275d5ae23fbc120730b3ÖÄ3660ae824f24dd67b97700549fb734f015141a023042d413090579a33132a217aeabd4f68b877c7d235bc36e120414faccd0311ca9aef2be8e73b8a3fcbbeb03Â≠"Wfile://test/conformance/testdata/spdx/3.0.1/json/examplemaven-0.0.1-enriched.spdx3.jsonÜ!
+˚
+Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd6../src/main/java/org/spdx/examplemaven/App.javaB
+Apache-2.0J
+Apache-2.0Z&Copyright (c) 2020 Source Auditor Inc.z:This file contains SPDX-License-Identifiers for Apache-2.0íJSPDX-License-Identifier: Apache-2.0
+Copyright (c) 2022 Source Auditor Inc.Í,(a6f47dbc7e4615058490055172fe0065c55f8fc5Ú
+Ä
+Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd122./src/test/java/org/spdx/examplemaven/AppTest.javaB
+Apache-2.0J
+Apache-2.0Z&Copyright (c) 2020 Source Auditor Inc.z:This file contains SPDX-License-Identifiers for Apache-2.0íJSPDX-License-Identifier: Apache-2.0
+Copyright (c) 2022 Source Auditor Inc.Í,(4b4df52d36588c8e9482d56eebc42336447f3dadÚ
+ó
+Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd35examplemaven-0.0.1.jarÍ,(b8a7e6c75001e6d78625cfc9a3103bf121abf8b4
+ﬁ
+Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4examplemaven"0.0.12%https://github.com/spdx/spdx-examples:NOASSERTIONB
+Apache-2.0J
+Apache-2.0Z&Copyright (c) 2022 Source Auditor Inc.ÇnThis is a simple example Maven project created using the Maven quickstart archetype with one dependency added.änThis is a simple example Maven project created using the Maven quickstart archetype with one dependency added.ö
+SPDX¢
+Linux FoundationÚ
+ø
+Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd17Apache Log4j Core:NOASSERTIONZUNSPECIFIEDÇThe Apache Log4j ImplementationäThe Apache Log4j Implementation
+®
+Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd22Apache Log4j API:NOASSERTIONZUNSPECIFIEDÇThe Apache Log4j APIäThe Apache Log4j API
+∞
+Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd26SLF4J API Module2http://www.slf4j.org:NOASSERTIONZUNSPECIFIEDÇThe slf4j APIäThe slf4j API
+Ó
+Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd30Apache Log4j SLF4J Binding:NOASSERTIONZUNSPECIFIEDÇ2The Apache Log4j SLF4J API binding to Log4j 2 Coreä2The Apache Log4j SLF4J API binding to Log4j 2 Core
+Ω
+Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd44JUnit"3.8.12http://junit.org:NOASSERTIONBCPL-1.0ZUNSPECIFIEDÇåJUnit is a regression testing framework written by Erich Gamma and Kent Beck. It is used by the developer who implements unit tests in Java.äåJUnit is a regression testing framework written by Erich Gamma and Kent Beck. It is used by the developer who implements unit tests in Java.¢	
+JUnitÍKhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd6Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd12úKhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd6Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4ù)Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd12Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4ùLhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd17Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4ùLhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd22Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4ùLhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd26Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4ùLhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd30Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4ùKhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd35ù
+Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4Lhttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd44Khttp://spdx.org/documents/examplemaven-0.0.1/enriched-specv3/SPDXRef-gnrtd4

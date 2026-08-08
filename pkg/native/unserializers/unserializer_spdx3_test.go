@@ -4,6 +4,7 @@
 package unserializers
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -705,4 +706,141 @@ func TestSPDX3ToolNameSplit(t *testing.T) {
 			require.Equal(t, want.Version, tool.Version)
 		})
 	}
+}
+
+// spdx3Licensed is a document with one package, licensed however the test
+// says. SPDX 3 states a licence as an element plus a relationship, so both
+// have to be written out.
+func spdx3Licensed(relType, expression string) string {
+	return spdx3Doc(spdx3CreationInfo + `,
+		{
+			"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#pkg",
+			"creationInfo": "_:creationinfo", "name": "a package"
+		},
+		{
+			"type": "simplelicensing_LicenseExpression",
+			"spdxId": "https://example.com/doc#license",
+			"creationInfo": "_:creationinfo",
+			"simplelicensing_licenseExpression": ` + strconv.Quote(expression) + `
+		},
+		{
+			"type": "Relationship", "spdxId": "https://example.com/doc#r",
+			"creationInfo": "_:creationinfo",
+			"from": "https://example.com/doc#pkg",
+			"relationshipType": "` + relType + `",
+			"to": ["https://example.com/doc#license"]
+		}`)
+}
+
+func TestSPDX3UnserializeLicenses(t *testing.T) {
+	t.Parallel()
+
+	for name, tc := range map[string]struct {
+		relType          string
+		expression       string
+		licenseConcluded string
+		licenses         []string
+	}{
+		"a concluded licence": {
+			"hasConcludedLicense", "Apache-2.0", "Apache-2.0", nil,
+		},
+		"a declared licence": {
+			"hasDeclaredLicense", "Apache-2.0", "", []string{"Apache-2.0"},
+		},
+
+		// The writer joins protobom's list of declared licences into the one
+		// expression SPDX 3 wants, and this takes it apart again.
+		"declared licences joined with AND": {
+			"hasDeclaredLicense", "MIT AND Apache-2.0", "", []string{"MIT", "Apache-2.0"},
+		},
+
+		// A bracket or an OR means the licences relate to each other in a
+		// way a flat list cannot hold, so the expression is kept whole.
+		"a bracketed conjunction": {
+			"hasDeclaredLicense", "(BSD-3-Clause AND GPL-3.0-or-later)", "",
+			[]string{"(BSD-3-Clause AND GPL-3.0-or-later)"},
+		},
+		"a choice of licences": {
+			"hasDeclaredLicense", "MIT OR Apache-2.0", "", []string{"MIT OR Apache-2.0"},
+		},
+		"a choice between a conjunction": {
+			"hasDeclaredLicense", "(MIT AND BSD-3-Clause) OR Apache-2.0", "",
+			[]string{"(MIT AND BSD-3-Clause) OR Apache-2.0"},
+		},
+
+		// An exception belongs to the licence it applies to.
+		"a licence with an exception": {
+			"hasDeclaredLicense", "GPL-2.0-only WITH Classpath-exception-2.0 AND MIT", "",
+			[]string{"GPL-2.0-only WITH Classpath-exception-2.0", "MIT"},
+		},
+
+		// NOASSERTION says the document declines to state a licence, so it
+		// is not read as one. Nearly half the licence relationships in the
+		// SPDX examples corpus are this.
+		"a declared NOASSERTION":  {"hasDeclaredLicense", "NOASSERTION", "", nil},
+		"a concluded NOASSERTION": {"hasConcludedLicense", "NOASSERTION", "", nil},
+
+		// NONE is an assertion: there is no licence, which is not the same
+		// as declining to say.
+		"NONE": {"hasDeclaredLicense", "NONE", "", []string{"NONE"}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			doc, err := NewSPDX3().Unserialize(
+				strings.NewReader(spdx3Licensed(tc.relType, tc.expression)), nil, nil)
+			require.NoError(t, err)
+
+			// The licence is a field on the package, not an element beside
+			// it, and the relationship saying so is not an edge.
+			require.Len(t, doc.NodeList.Nodes, 1)
+			require.Empty(t, doc.NodeList.Edges)
+
+			pkg := doc.NodeList.Nodes[0]
+			require.Equal(t, tc.licenseConcluded, pkg.LicenseConcluded)
+			require.Equal(t, tc.licenses, pkg.Licenses)
+		})
+	}
+}
+
+// TestSPDX3LicensesOfElementsNotRead covers a licence stated for something
+// protobom has no node for. There is nowhere to put it, and it must not
+// land on some other element.
+func TestSPDX3LicensesOfElementsNotRead(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+		{
+			"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#pkg",
+			"creationInfo": "_:creationinfo", "name": "a package"
+		},
+		{
+			"type": "ai_AIPackage", "spdxId": "https://example.com/doc#ai",
+			"creationInfo": "_:creationinfo", "name": "an AI package"
+		},
+		{
+			"type": "simplelicensing_LicenseExpression",
+			"spdxId": "https://example.com/doc#license",
+			"creationInfo": "_:creationinfo",
+			"simplelicensing_licenseExpression": "Apache-2.0"
+		},
+		{
+			"type": "Relationship", "spdxId": "https://example.com/doc#r",
+			"creationInfo": "_:creationinfo",
+			"from": "https://example.com/doc#ai",
+			"relationshipType": "hasDeclaredLicense",
+			"to": ["https://example.com/doc#license"]
+		}`)), nil, nil)
+	require.NoError(t, err)
+
+	require.Len(t, doc.NodeList.Nodes, 1)
+	require.Empty(t, doc.NodeList.Nodes[0].Licenses)
+	require.Empty(t, doc.NodeList.Edges)
 }

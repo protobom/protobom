@@ -1,0 +1,852 @@
+{
+  "@context" : "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+  "@graph" : [ {
+    "@id" : "_:creationInfo_0",
+    "type" : "CreationInfo",
+    "specVersion" : "3.0.1",
+    "createdBy" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd0" ],
+    "createdUsing" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/additionalToolSPDXRef-gnrtd1" ],
+    "created" : "2021-09-02T13:46:32Z"
+  }, {
+    "@id" : "_:creationInfo_1",
+    "type" : "CreationInfo",
+    "specVersion" : "3.0.1",
+    "createdBy" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd71" ],
+    "createdUsing" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/additionalToolSPDXRef-gnrtd72" ],
+    "created" : "2021-09-02T13:46:32Z"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd2",
+    "type" : "Relationship",
+    "relationshipType" : "describes",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/document0",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd4",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd5" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd6",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd5" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd7",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd5",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd9",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd5",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd11",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd12" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd13",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd12" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd14",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd12",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd15",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd12",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd16",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd17" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd18",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd17" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd19",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd17",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd20",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd17",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd21",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd22" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd23",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd22" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd24",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd22",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd25",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd22",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd26",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd27" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd28",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd27" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd29",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd30",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd31" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd29",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd32",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd31" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd29",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd33",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd31" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd27",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd34",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd27",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd35",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd36" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd37",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd36" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd38",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd39",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd38",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd40",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd38",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd41",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd36",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd42",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd36",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd43",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd44" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd45",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd44" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd38",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd46",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd44",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd47",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd44",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd48",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd49" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd50",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd51" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd49",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd52",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd49",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd53",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd54" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd55",
+    "type" : "Relationship",
+    "relationshipType" : "hasMetadata",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd54" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd56",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd57" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd54",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd58",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd54",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd59",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "completeness" : "noAssertion",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd60" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd61",
+    "type" : "Relationship",
+    "relationshipType" : "contains",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd60" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd62",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd60",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd63",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd60",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd64",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd65" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd68",
+    "type" : "Relationship",
+    "relationshipType" : "hasDistributionArtifact",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd67" ],
+    "completeness" : "complete",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd70",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd75",
+    "type" : "Relationship",
+    "relationshipType" : "dependsOn",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd74" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd76",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd78",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd79" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd76",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd81",
+    "type" : "Relationship",
+    "relationshipType" : "hasDistributionArtifact",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd80" ],
+    "completeness" : "complete",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd76",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd82",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd79" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd76",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd83",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd84" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd74",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd86",
+    "type" : "Relationship",
+    "relationshipType" : "hasDistributionArtifact",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd85" ],
+    "completeness" : "complete",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd74",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd87",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd74",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd89",
+    "type" : "Relationship",
+    "relationshipType" : "dependsOn",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd88" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd90",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd88",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd92",
+    "type" : "Relationship",
+    "relationshipType" : "hasDistributionArtifact",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd91" ],
+    "completeness" : "complete",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd88",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd93",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd88",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd95",
+    "type" : "Relationship",
+    "relationshipType" : "dependsOn",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd94" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd96",
+    "type" : "Relationship",
+    "relationshipType" : "hasConcludedLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd94",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd98",
+    "type" : "Relationship",
+    "relationshipType" : "hasDistributionArtifact",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd97" ],
+    "completeness" : "complete",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd94",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd99",
+    "type" : "Relationship",
+    "relationshipType" : "hasDeclaredLicense",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10" ],
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd94",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/document0",
+    "type" : "SpdxDocument",
+    "dataLicense" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd73",
+    "rootElement" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3" ],
+    "name" : "SpdxDoc for App-BOM-ination",
+    "creationInfo" : "_:creationInfo_1"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/additionalToolSPDXRef-gnrtd1",
+    "type" : "Tool",
+    "name" : "Source Auditor Open Source Console",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/additionalToolSPDXRef-gnrtd72",
+    "type" : "Tool",
+    "name" : "Source Auditor Open Source Console",
+    "creationInfo" : "_:creationInfo_1"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd8",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "Apache-2.0",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd10",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "NOASSERTION",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd31",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "LicenseRef-1",
+    "simplelicensing_customIdToUri" : [ {
+      "type" : "DictionaryEntry",
+      "value" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/LicenseRef-1",
+      "key" : "LicenseRef-1"
+    } ],
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd51",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "(Apache-2.0 AND LicenseRef-1)",
+    "simplelicensing_customIdToUri" : [ {
+      "type" : "DictionaryEntry",
+      "value" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/LicenseRef-1",
+      "key" : "LicenseRef-1"
+    } ],
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd57",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "(LGPL-2.0-or-later OR WTFPL)",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd65",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "(Apache-2.0 AND LicenseRef-1)",
+    "simplelicensing_customIdToUri" : [ {
+      "type" : "DictionaryEntry",
+      "value" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/LicenseRef-1",
+      "key" : "LicenseRef-1"
+    } ],
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd73",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "CC0-1.0",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd79",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "EPL-1.0",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd84",
+    "type" : "simplelicensing_LicenseExpression",
+    "simplelicensing_licenseExpression" : "BSD-3-Clause",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd77",
+    "type" : "LifecycleScopedRelationship",
+    "relationshipType" : "dependsOn",
+    "scope" : "test",
+    "to" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd76" ],
+    "completeness" : "noAssertion",
+    "from" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd69",
+    "type" : "Organization",
+    "name" : "ACT Project",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd0",
+    "type" : "Person",
+    "name" : "Gary O'Neall",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd66",
+    "type" : "Person",
+    "name" : "Yevester",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd71",
+    "type" : "Person",
+    "name" : "Gary O'Neall",
+    "creationInfo" : "_:creationInfo_1"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd5",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "92170cdc034b2ff819323ff670d3b7266c8bffcd"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/LICENSE",
+    "software_primaryPurpose" : "other",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd12",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "1458a5c5fb1189d2cc8212052975f39ae710d622"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/settings.gradle",
+    "software_primaryPurpose" : "other",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd17",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "340e8b696bc50d76cf50df943dbaf46591da9ef4"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/logo.png",
+    "contentType" : "application/octet-stream",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd22",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "2b7b936a3f185a53528724e4f4141030906963c2"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/src/main/java/com/github/appbomination/Main.java",
+    "software_primaryPurpose" : "source",
+    "comment" : "Seen licenses generated by Source Auditor Scanner.  Results should be manually verified.",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd27",
+    "type" : "software_File",
+    "software_copyrightText" : "Copyright Faust Inc. All, and I mean ALL, rights are reserved",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "fd668bc0096794e4d8125a29f9a746c0ab1edc57"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/src/main/java/com/github/appbomination/InsufficientKarmaException.java",
+    "software_primaryPurpose" : "source",
+    "comment" : "BOMNOTE:File|Matched Notice='Faust Proprietary Notice'|",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd36",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "d841ffc9855dcc642901e8abf28dee20b0485864"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/gradlew.bat",
+    "software_primaryPurpose" : "source",
+    "comment" : "BOMNOTE:File|",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd44",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "b86a8c3bab5a3ed0441b3fe3b1f6b31ec1ead901"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/gradlew",
+    "software_primaryPurpose" : "other",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd49",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "67174de726d5caae455cd22e9c4450e9c490ac6b"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/gradle/wrapper/gradle-wrapper.properties",
+    "software_primaryPurpose" : "other",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd54",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "9c55f0e3bd70363a02377f729d139a5d91325d40"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/build.gradle",
+    "software_primaryPurpose" : "other",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd60",
+    "type" : "software_File",
+    "software_copyrightText" : "NOASSERTION",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "15399fcbbe6f3ff84c82039d446d820ecbbc3ac6"
+    } ],
+    "software_attributionText" : [ "NOASSERTION" ],
+    "name" : "./App-BOM-ination-1.0/README.md",
+    "software_primaryPurpose" : "other",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd67",
+    "type" : "software_File",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "498cebd51a4483d6e68c2fc62d27008252fa4f7b"
+    } ],
+    "name" : "App-BOM-ination-1.0.zip",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd80",
+    "type" : "software_File",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "4e6be5af63e3373b4f0cbc4c151c13e059151e00"
+    } ],
+    "name" : "junit-4.12.jar",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd85",
+    "type" : "software_File",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "42a25dc3219429f0e5d060061f71acb49bf010a0"
+    } ],
+    "name" : "hamcrest-core-1.3.jar",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd91",
+    "type" : "software_File",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "5fe28b9518e58819180a43a850fbc0dd24b7c050"
+    } ],
+    "name" : "commons-lang3-3.4.jar",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd97",
+    "type" : "software_File",
+    "verifiedUsing" : [ {
+      "type" : "Hash",
+      "algorithm" : "sha1",
+      "hashValue" : "466308a5554594190da5fe2c86b4a8e5037c37cc"
+    } ],
+    "name" : "slf4j-api-1.7.21.jar",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd3",
+    "type" : "software_Package",
+    "software_copyrightText" : "Copyright (c) 2016 Faust, Inc.",
+    "suppliedBy" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd69",
+    "verifiedUsing" : [ {
+      "type" : "PackageVerificationCode",
+      "algorithm" : "sha1",
+      "hashValue" : "be2fb65c6b22b81f1b273442d70479a41a3093e7"
+    } ],
+    "name" : "App-BOM-ination",
+    "software_sourceInfo" : "",
+    "comment" : "Faust proprietary notice was found in one or more source files.  LGPL-2.0-or-later OR WTFPL was in a build configuration file and does not apply to the concluded license.",
+    "software_downloadLocation" : "https://github.com/act-project/App-BOM-ination/archive/refs/tags/1.0.zip",
+    "summary" : "A uniquely useless project with a cataclysmic software supply chain, to serve a test case for BOM solutions.",
+    "software_packageVersion" : "1.0",
+    "software_homePage" : "https://github.com/act-project/App-BOM-ination",
+    "description" : "A uniquely useless project with a cataclysmic software supply chain, to serve a test case for BOM solutions.",
+    "originatedBy" : [ "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd66" ],
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd29",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "NOASSERTION",
+    "summary" : "Files containing a Faust Proprietary Notice",
+    "software_homePage" : "https://github.com/act-project/App-BOM-ination/blob/master/src/main/java/com/github/appbomination/InsufficientKarmaException.java",
+    "description" : "Files containing a Faust Proprietary Notice",
+    "name" : "Faust Proprietary File",
+    "comment" : "Package info generated from Source Auditor package database",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd38",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "NOASSERTION",
+    "software_homePage" : "https://gradle.org/",
+    "name" : "Gradle",
+    "comment" : "Package info generated from Source Auditor package database",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd74",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+    "software_packageVersion" : "1.3",
+    "name" : "hamcrest-core",
+    "comment" : "Package info from Maven Central POM file",
+    "software_packageUrl" : "pkg:maven/org.hamcrest/hamcrest-core@1.3",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd76",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "https://repo1.maven.org/maven2/junit/junit/4.12/junit-4.12.jar",
+    "software_packageVersion" : "4.12",
+    "software_homePage" : "http://junit.org",
+    "name" : "junit",
+    "comment" : "Package info from Maven Central POM file",
+    "software_packageUrl" : "pkg:maven/junit/junit@4.12",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd88",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar",
+    "software_packageVersion" : "3.4",
+    "software_homePage" : "http://commons.apache.org/proper/commons-lang/",
+    "name" : "commons-lang3",
+    "comment" : "Package info from Maven Central POM file",
+    "software_packageUrl" : "pkg:maven/org.apache.commons/commons-lang3@3.4",
+    "creationInfo" : "_:creationInfo_0"
+  }, {
+    "spdxId" : "http://www.sourceauditor.com/spdxdocs/appbomination-src/e3b71037-57de-44c9-8b7f-4e8a62f45311-specv3/SPDXRef-gnrtd94",
+    "type" : "software_Package",
+    "software_copyrightText" : "NOASSERTION",
+    "software_downloadLocation" : "https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar",
+    "software_packageVersion" : "1.7.21",
+    "software_homePage" : "http://www.slf4j.org",
+    "name" : "slf4j-api",
+    "comment" : "Package info from Maven Central POM file",
+    "software_packageUrl" : "pkg:maven/org.slf4j/slf4j-api@1.7.21",
+    "creationInfo" : "_:creationInfo_0"
+  } ]
+}

@@ -34,7 +34,7 @@ type Document interface{}
 
 var (
 	ListFormats = []Format{CDXFORMAT, SPDXFORMAT}
-	List        = []Format{SPDX23TV, SPDX23JSON, SPDX22TV, SPDX22JSON, CDX14JSON, CDX15JSON, CDX16JSON, CDX17JSON}
+	List        = []Format{SPDX23TV, SPDX23JSON, SPDX22TV, SPDX22JSON, SPDX3JSON, CDX14JSON, CDX15JSON, CDX16JSON, CDX17JSON}
 )
 
 // Version returns the version of the format

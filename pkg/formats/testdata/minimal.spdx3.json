@@ -1,0 +1,46 @@
+{
+  "@context": "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+  "@graph": [
+    {
+      "type": "CreationInfo",
+      "@id": "_:creationinfo",
+      "specVersion": "3.0.1",
+      "created": "2026-08-07T00:00:00Z",
+      "createdBy": [
+        "https://spdx.org/rdf/3.0.1/terms/Core/SpdxOrganization"
+      ]
+    },
+    {
+      "type": "software_Sbom",
+      "spdxId": "https://spdx.org/spdxdocs/protobom/minimal#sbom-1",
+      "creationInfo": "_:creationinfo",
+      "software_sbomType": [
+        "build"
+      ]
+    },
+    {
+      "type": "SpdxDocument",
+      "spdxId": "https://spdx.org/spdxdocs/protobom/minimal",
+      "name": "minimal",
+      "comment": "a document with nothing in it",
+      "creationInfo": "_:creationinfo",
+      "profileConformance": [
+        "core",
+        "software"
+      ],
+      "rootElement": [
+        "https://spdx.org/spdxdocs/protobom/minimal#sbom-1"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://spdx.org/spdxdocs/protobom/minimal#relationship-1",
+      "creationInfo": "_:creationinfo",
+      "from": "https://spdx.org/spdxdocs/protobom/minimal",
+      "relationshipType": "describes",
+      "to": [
+        "https://spdx.org/spdxdocs/protobom/minimal#sbom-1"
+      ]
+    }
+  ]
+}

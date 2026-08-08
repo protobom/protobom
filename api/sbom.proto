@@ -455,12 +455,31 @@ message Node {
   // Property collection of the node.
   repeated Property properties = 31;
 
+  // Media type of the node's contents, as defined by RFC 6838. For example
+  // "text/plain" or "image/png". SPDX 3 calls this contentType and
+  // CycloneDX calls it mimeType.
+  string content_type = 32;
+
+  // Kind of file the node is, when it is a file: whether it is a file
+  // proper or a directory. Empty for packages.
+  FileKind file_kind = 33;
+
   // Type of the software component.
   enum NodeType {
     // Software component type is a package.
     PACKAGE = 0;
     // Software component type is a file.
     FILE = 1;
+  }
+
+  // Kind of file a node stands for, when the node is a file.
+  enum FileKind {
+    // The kind of file is not stated.
+    UNKNOWN_FILE_KIND = 0;
+    // The node is a file.
+    FILE_KIND_FILE = 1;
+    // The node is a directory.
+    FILE_KIND_DIRECTORY = 2;
   }
 }
 
@@ -497,6 +516,11 @@ message Person {
 
   // Contacts associated with the person or organization.
   repeated Person contacts = 6;
+
+  // Indicates whether the entity is a piece of software acting on its own
+  // behalf, such as a scanner or a build system, rather than a person or an
+  // organization. An entity cannot be both this and an organization.
+  bool is_software_agent = 7;
 
   // repeated PersonIdentifier identifiers // Support?
 }

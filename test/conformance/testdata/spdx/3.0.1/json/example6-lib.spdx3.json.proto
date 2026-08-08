@@ -1,0 +1,24 @@
+
+Í
+Fhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/document01go-lib"ÙËõâ2#
+Steve Winslowsteve@swinslow.netJÁ
+text/spdx+json;version=3.0.1,(f80e09958070ae0d80cd6207920cfc747dafd754D@f3b09540f79bc52a247d234e731d4d21e9acebcb72e29bc18165aab8f07d781aÖÄ5f44b6036ff0f8345997e5a1638537f2f62ccea4dd7a505c0139e1b9afb744ca9487db899f5b9f7471e67e29bc7eaeb4b710c4d0bb670ca067eb92396cacfa14Úa"Hfile://test/conformance/testdata/spdx/3.0.1/json/example6-lib.spdx3.jsoná
+õ
+Lhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd19goÍD@4448b9e62b3c364a073808e22643985d9f49c4ad44aa11d8e4a17c49600a7c3a
+•
+Lhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd24go_6715.snapÍD@0d6e1420facd978e532eae7bd5cb6378b65522c12fa9dcf682129e698c34d1b2
+˚
+Khttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2go-1.15"1.15.42https://golang.org/:NOASSERTIONB"LicenseRef-Golang-BSD-plus-PatentsZ7Copyright (c) 2009 The Go Authors. All rights reserved.j=installed using Ubuntu snap file, see https://snapcraft.io/goÇ6Ubuntu snap distribution of Golang v1.15.4 linux/amd64ö
+Canonical Ltd.¢
+
+Google LLC
+{
+Khttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd4
+go.strconv"1.15.4:NOASSERTIONZNOASSERTION
+{
+Khttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd9
+go.reflect"1.15.4:NOASSERTIONZNOASSERTION
+∫
+Lhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd13go.fmt"1.15.4:NOASSERTIONZNOASSERTIONz@This represents the fmt standard library, not the gofmt command.
+t
+Lhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd17go"1.15.4:NOASSERTIONZNOASSERTIONÖKhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2Khttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd4Khttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd9Lhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd13Lhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd17ûLhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd17Lhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd19ùKhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2Lhttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd24Khttps://swinslow.net/spdx-examples/example6/go-lib-v2-specv3/SPDXRef-gnrtd2

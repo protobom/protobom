@@ -19,6 +19,41 @@ const (
 // sniffedSPDXVersions lists the SPDX versions the sniffer can detect.
 var sniffedSPDXVersions = []string{spdxVersion22, spdxVersion23}
 
+// spdx3ContextURLs maps the JSON-LD contexts an SPDX 3 document is written
+// against to the format that context is. A document may state its context as
+// a string or as an array of them, so both shapes are looked through.
+var spdx3ContextURLs = map[string]Format{
+	"https://spdx.org/rdf/3.0.1/spdx-context.jsonld": SPDX3JSON,
+}
+
+// sniffJSONLDContext returns the format an SPDX 3 document's @context names,
+// or EmptyFormat when the context is absent, malformed or unrecognized.
+func sniffJSONLDContext(raw json.RawMessage) Format {
+	if len(raw) == 0 {
+		return EmptyFormat
+	}
+
+	var url string
+	if err := json.Unmarshal(raw, &url); err == nil {
+		return spdx3ContextURLs[url]
+	}
+
+	// An array context: the SPDX one is in there somewhere.
+	var urls []json.RawMessage
+	if err := json.Unmarshal(raw, &urls); err != nil {
+		return EmptyFormat
+	}
+	for _, item := range urls {
+		if err := json.Unmarshal(item, &url); err != nil {
+			continue
+		}
+		if format, ok := spdx3ContextURLs[url]; ok {
+			return format
+		}
+	}
+	return EmptyFormat
+}
+
 var sniffFormats = []sniffFormat{
 	cdxSniff{},
 	spdxSniff{},
@@ -60,9 +95,10 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 	}()
 
 	type SpecVersionStruct struct {
-		BomFormat       string `json:"bomFormat"`
-		CDXSpecVersion  string `json:"specVersion"`
-		SPDXSpecVersion string `json:"spdxVersion"`
+		BomFormat       string          `json:"bomFormat"`
+		CDXSpecVersion  string          `json:"specVersion"`
+		SPDXSpecVersion string          `json:"spdxVersion"`
+		Context         json.RawMessage `json:"@context"`
 	}
 
 	decoder := json.NewDecoder(f)
@@ -93,6 +129,14 @@ func (fs *Sniffer) SniffReader(f io.ReadSeeker) (Format, error) {
 				return SPDX22JSON, nil
 			case "SPDX-2.3":
 				return SPDX23JSON, nil
+			case "":
+				// SPDX 3 is JSON-LD. It has no spdxVersion of its own: the
+				// version is stated by the context it is written against,
+				// and again by the creation information of its elements.
+				if format := sniffJSONLDContext(specversionjson.Context); format != EmptyFormat {
+					return format, nil
+				}
+				return "", fmt.Errorf("unknown SBOM format")
 			default:
 				// JSON + not CycloneDX but spdxVersion not SPDX-2.2 or SPDX-2.3
 				return "", fmt.Errorf("unknown SBOM format")

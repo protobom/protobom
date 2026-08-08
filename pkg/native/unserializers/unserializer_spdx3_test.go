@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/protobom/pkg/sbom"
 )
 
 // spdx3Doc wraps a graph in the envelope every SPDX 3 document has, so the
@@ -112,5 +114,231 @@ func TestSPDX3UnserializeRejects(t *testing.T) {
 		t.Parallel()
 		_, err := NewSPDX3().Unserialize(strings.NewReader("not a document"), nil, nil)
 		require.Error(t, err)
+	})
+}
+
+func TestSPDX3UnserializeElements(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+		{
+			"type": "SpdxDocument",
+			"spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://example.com/doc#pkg-1",
+			"creationInfo": "_:creationinfo",
+			"name": "a package",
+			"summary": "a summary",
+			"description": "a description",
+			"comment": "a comment",
+			"software_packageVersion": "1.2.3",
+			"software_downloadLocation": "https://example.com/pkg.tar.gz",
+			"software_homePage": "https://example.com/",
+			"software_sourceInfo": "built from source",
+			"software_copyrightText": "Copyright someone",
+			"software_attributionText": ["attributed to someone"],
+			"software_packageUrl": "pkg:generic/a-package@1.2.3",
+			"software_primaryPurpose": "library",
+			"software_additionalPurpose": ["source", "diskImage"],
+			"builtTime": "2026-08-01T00:00:00Z",
+			"releaseTime": "2026-08-02T00:00:00Z",
+			"validUntilTime": "2026-08-03T00:00:00Z",
+			"verifiedUsing": [
+				{"type": "Hash", "algorithm": "sha256", "hashValue": "abc123"},
+				{"type": "Hash", "algorithm": "adler32", "hashValue": "nope"}
+			],
+			"externalIdentifier": [
+				{"type": "ExternalIdentifier", "externalIdentifierType": "cpe23", "identifier": "cpe:2.3:a:x"},
+				{"type": "ExternalIdentifier", "externalIdentifierType": "email", "identifier": "nope@example.com"}
+			],
+			"externalRef": [
+				{"type": "ExternalRef", "externalRefType": "altWebPage", "locator": ["https://example.com/web"], "comment": "the site"}
+			]
+		},
+		{
+			"type": "software_File",
+			"spdxId": "https://example.com/doc#file-1",
+			"creationInfo": "_:creationinfo",
+			"name": "a/file.txt",
+			"contentType": "text/plain",
+			"software_fileKind": "file",
+			"software_contentIdentifier": [{
+				"type": "software_ContentIdentifier",
+				"software_contentIdentifierType": "gitoid",
+				"software_contentIdentifierValue": "gitoid:blob:sha1:abc"
+			}]
+		}`)), nil, nil)
+	require.NoError(t, err)
+	require.Len(t, doc.NodeList.Nodes, 2)
+
+	pkg := doc.NodeList.GetNodeByID("https://example.com/doc#pkg-1")
+	require.NotNil(t, pkg)
+	require.Equal(t, sbom.Node_PACKAGE, pkg.Type)
+	require.Equal(t, "a package", pkg.Name)
+	require.Equal(t, "a summary", pkg.Summary)
+	require.Equal(t, "a description", pkg.Description)
+	require.Equal(t, "a comment", pkg.Comment)
+	require.Equal(t, "1.2.3", pkg.Version)
+	require.Equal(t, "https://example.com/pkg.tar.gz", pkg.UrlDownload)
+	require.Equal(t, "https://example.com/", pkg.UrlHome)
+	require.Equal(t, "built from source", pkg.SourceInfo)
+	require.Equal(t, "Copyright someone", pkg.Copyright)
+	require.Equal(t, []string{"attributed to someone"}, pkg.Attribution)
+
+	// The purpose SPDX 3 calls primary comes first, and one protobom has no
+	// name for is dropped rather than turning into UNKNOWN_PURPOSE.
+	require.Equal(t, []sbom.Purpose{sbom.Purpose_LIBRARY, sbom.Purpose_SOURCE}, pkg.PrimaryPurpose)
+
+	require.Equal(t, "2026-08-01T00:00:00Z", pkg.BuildDate.AsTime().Format(time.RFC3339))
+	require.Equal(t, "2026-08-02T00:00:00Z", pkg.ReleaseDate.AsTime().Format(time.RFC3339))
+	require.Equal(t, "2026-08-03T00:00:00Z", pkg.ValidUntilDate.AsTime().Format(time.RFC3339))
+
+	// An algorithm or identifier type protobom has no name for is dropped,
+	// and does not displace the ones it does.
+	require.Equal(t, map[int32]string{int32(sbom.HashAlgorithm_SHA256): "abc123"}, pkg.Hashes)
+	require.Equal(t, map[int32]string{
+		int32(sbom.SoftwareIdentifierType_PURL):  "pkg:generic/a-package@1.2.3",
+		int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:x",
+	}, pkg.Identifiers)
+
+	require.Len(t, pkg.ExternalReferences, 1)
+	require.Equal(t, "https://example.com/web", pkg.ExternalReferences[0].Url)
+	require.Equal(t, sbom.ExternalReference_WEBSITE, pkg.ExternalReferences[0].Type)
+	require.Equal(t, "the site", pkg.ExternalReferences[0].Comment)
+
+	file := doc.NodeList.GetNodeByID("https://example.com/doc#file-1")
+	require.NotNil(t, file)
+	require.Equal(t, sbom.Node_FILE, file.Type)
+	require.Equal(t, "a/file.txt", file.Name)
+	require.Equal(t, "text/plain", file.ContentType)
+	require.Equal(t, sbom.Node_FILE_KIND_FILE, file.FileKind)
+	require.Equal(t, "gitoid:blob:sha1:abc",
+		file.Identifiers[int32(sbom.SoftwareIdentifierType_GITOID)])
+}
+
+// TestSPDX3ElementsAreSelectedByClass is the test for the rule that keeps
+// the reader honest. SPDX 3 puts AIPackage and DatasetPackage under Package,
+// and Snippet under SoftwareArtifact, so a reader that asks what an element
+// descends from ingests three classes protobom has no node for — as packages
+// and files, silently, with their profile's data missing.
+func TestSPDX3ElementsAreSelectedByClass(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+		{
+			"type": "SpdxDocument",
+			"spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "software_Package",
+			"spdxId": "https://example.com/doc#pkg",
+			"creationInfo": "_:creationinfo",
+			"name": "the one real package"
+		},
+		{
+			"type": "ai_AIPackage",
+			"spdxId": "https://example.com/doc#ai",
+			"creationInfo": "_:creationinfo",
+			"name": "an AI package"
+		},
+		{
+			"type": "dataset_DatasetPackage",
+			"spdxId": "https://example.com/doc#dataset",
+			"creationInfo": "_:creationinfo",
+			"name": "a dataset package"
+		},
+		{
+			"type": "software_Snippet",
+			"spdxId": "https://example.com/doc#snippet",
+			"creationInfo": "_:creationinfo",
+			"name": "a snippet"
+		}`)), nil, nil)
+	require.NoError(t, err)
+
+	require.Len(t, doc.NodeList.Nodes, 1)
+	require.Equal(t, "the one real package", doc.NodeList.Nodes[0].Name)
+}
+
+func TestSPDX3UnserializeRoots(t *testing.T) {
+	t.Parallel()
+
+	// A document says it is about a bill of materials, and the bill of
+	// materials says it is about the software. Both hops have to be
+	// followed, or the root is a collection protobom has no node for.
+	t.Run("through the collections", func(t *testing.T) {
+		t.Parallel()
+		doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+			{
+				"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+				"creationInfo": "_:creationinfo",
+				"rootElement": ["https://example.com/doc#sbom"]
+			},
+			{
+				"type": "software_Sbom", "spdxId": "https://example.com/doc#sbom",
+				"creationInfo": "_:creationinfo",
+				"rootElement": ["https://example.com/doc#pkg"]
+			},
+			{
+				"type": "software_Package", "spdxId": "https://example.com/doc#pkg",
+				"creationInfo": "_:creationinfo", "name": "a package"
+			},
+			{
+				"type": "software_File", "spdxId": "https://example.com/doc#file",
+				"creationInfo": "_:creationinfo", "name": "a file"
+			}`)), nil, nil)
+		require.NoError(t, err)
+		require.Equal(t, []string{"https://example.com/doc#pkg"}, doc.NodeList.RootElements)
+	})
+
+	// A root that is not an element protobom reads names nothing: the AI
+	// and dataset examples in the SPDX corpus are exactly this.
+	t.Run("a root protobom has no node for", func(t *testing.T) {
+		t.Parallel()
+		doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+			{
+				"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+				"creationInfo": "_:creationinfo",
+				"rootElement": ["https://example.com/doc#sbom"]
+			},
+			{
+				"type": "software_Sbom", "spdxId": "https://example.com/doc#sbom",
+				"creationInfo": "_:creationinfo",
+				"rootElement": ["https://example.com/doc#ai"]
+			},
+			{
+				"type": "ai_AIPackage", "spdxId": "https://example.com/doc#ai",
+				"creationInfo": "_:creationinfo", "name": "an AI package"
+			}`)), nil, nil)
+		require.NoError(t, err)
+		require.Empty(t, doc.NodeList.RootElements)
+	})
+
+	// A collection that names itself is followed once rather than forever.
+	t.Run("a collection naming itself", func(t *testing.T) {
+		t.Parallel()
+		doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+			{
+				"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+				"creationInfo": "_:creationinfo",
+				"rootElement": ["https://example.com/doc#sbom"]
+			},
+			{
+				"type": "software_Sbom", "spdxId": "https://example.com/doc#sbom",
+				"creationInfo": "_:creationinfo",
+				"rootElement": [
+					"https://example.com/doc#sbom",
+					"https://example.com/doc#pkg"
+				]
+			},
+			{
+				"type": "software_Package", "spdxId": "https://example.com/doc#pkg",
+				"creationInfo": "_:creationinfo", "name": "a package"
+			}`)), nil, nil)
+		require.NoError(t, err)
+		require.Equal(t, []string{"https://example.com/doc#pkg"}, doc.NodeList.RootElements)
 	})
 }

@@ -67,18 +67,40 @@ func (u *SPDX3) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interfa
 	// TODO(degradation): SPDX 3 has no version for the document itself, so
 	// Metadata.Version has nothing to read.
 
-	if ci := document.CreationInfo; ci != nil && ci.Created != nil {
-		bom.Metadata.Date = timestamppb.New(ci.Created.Value)
+	if ci := document.CreationInfo; ci != nil {
+		if ci.Created != nil {
+			bom.Metadata.Date = timestamppb.New(ci.Created.Value)
+		}
+		rd.creators(bom.Metadata, ci)
 	}
 
 	rd.elements(bom.NodeList)
 	rd.roots(bom.NodeList)
 	rd.relationships(bom.NodeList)
 
-	// The agents the document credits and the licenses its elements are
-	// under are read in the steps that follow this one.
+	// The licenses the elements are under are read in the step that follows
+	// this one.
 
 	return bom, nil
+}
+
+// creators reads who and what made the document.
+//
+// Only the document's own creation information is read. SPDX 3 lets every
+// element state its own, and documents assembled from several sources do,
+// but protobom has one Metadata for the whole document and no way to hold
+// the rest.
+func (rd *spdx3Reader) creators(metadata *sbom.Metadata, ci *core.CreationInfo) {
+	for _, node := range ci.CreatedBy {
+		if author, ok := agentFromSPDX3(node); ok {
+			metadata.Authors = append(metadata.Authors, author)
+		}
+	}
+	for _, node := range ci.CreatedUsing {
+		if tool, ok := toolFromSPDX3(node); ok {
+			metadata.Tools = append(metadata.Tools, tool)
+		}
+	}
 }
 
 // spdx3Reader carries what reading one document needs.
@@ -201,8 +223,17 @@ func (rd *spdx3Reader) artifact(a *core.Artifact) *sbom.Node {
 		node.ValidUntilDate = timestamppb.New(a.ValidUntilTime.Value)
 	}
 
-	// TODO: suppliedBy and originatedBy are agents, and are read with the
-	// rest of them.
+	// An agent is read where it is referenced rather than becoming a node
+	// of its own: SPDX 3 states who supplied a thing as an element in the
+	// graph, protobom as a field on the thing.
+	if supplier, ok := agentFromSPDX3(a.SuppliedBy); ok {
+		node.Suppliers = append(node.Suppliers, supplier)
+	}
+	for _, originator := range a.OriginatedBy {
+		if person, ok := agentFromSPDX3(originator); ok {
+			node.Originators = append(node.Originators, person)
+		}
+	}
 
 	for _, method := range a.VerifiedUsing {
 		// Only a Hash says something protobom can hold. A package

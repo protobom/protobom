@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/carabiner-dev/spdx3/profiles/core"
 	"github.com/stretchr/testify/require"
 
 	"github.com/protobom/protobom/pkg/sbom"
@@ -563,4 +564,145 @@ func TestSPDX3LifecycleScopeIsDropped(t *testing.T) {
 		From: "https://example.com/doc#a",
 		To:   []string{"https://example.com/doc#b"},
 	}}, doc.NodeList.Edges)
+}
+
+func TestSPDX3UnserializeCreators(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(`
+		{
+			"type": "CreationInfo", "@id": "_:creationinfo",
+			"specVersion": "3.0.1", "created": "2026-08-07T12:30:45Z",
+			"createdBy": [
+				"https://example.com/doc#jane",
+				"https://example.com/doc#acme",
+				"https://example.com/doc#scanner",
+				"https://spdx.org/rdf/3.0.1/terms/Core/SpdxOrganization"
+			],
+			"createdUsing": [
+				"https://example.com/doc#tool-1",
+				"https://example.com/doc#tool-2"
+			]
+		},
+		{
+			"type": "Person", "spdxId": "https://example.com/doc#jane",
+			"creationInfo": "_:creationinfo", "name": "Jane",
+			"externalIdentifier": [
+				{"type": "ExternalIdentifier", "externalIdentifierType": "email", "identifier": "jane@example.com"},
+				{"type": "ExternalIdentifier", "externalIdentifierType": "urlScheme", "identifier": "https://jane.example.com"}
+			]
+		},
+		{
+			"type": "Organization", "spdxId": "https://example.com/doc#acme",
+			"creationInfo": "_:creationinfo", "name": "Acme"
+		},
+		{
+			"type": "SoftwareAgent", "spdxId": "https://example.com/doc#scanner",
+			"creationInfo": "_:creationinfo", "name": "a scanner"
+		},
+		{
+			"type": "Tool", "spdxId": "https://example.com/doc#tool-1",
+			"creationInfo": "_:creationinfo", "name": "protobom-v1.2.3"
+		},
+		{
+			"type": "Tool", "spdxId": "https://example.com/doc#tool-2",
+			"creationInfo": "_:creationinfo", "name": "spdx-maven-plugin"
+		},
+		{
+			"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo"
+		}`)), nil, nil)
+	require.NoError(t, err)
+
+	// The three SPDX 3 agent classes become one protobom person each,
+	// telling themselves apart by their flags. The predefined
+	// SpdxOrganization is not an author: it is how a document says it will
+	// not name one.
+	require.Equal(t, []*sbom.Person{
+		{Name: "Jane", Email: "jane@example.com", Url: "https://jane.example.com"},
+		{Name: "Acme", IsOrg: true},
+		{Name: "a scanner", IsSoftwareAgent: true},
+	}, doc.Metadata.Authors)
+
+	require.Equal(t, []*sbom.Tool{
+		{Name: "protobom", Version: "v1.2.3"},
+		{Name: "spdx-maven-plugin"},
+	}, doc.Metadata.Tools)
+
+	// None of them became a node.
+	require.Empty(t, doc.NodeList.Nodes)
+}
+
+func TestSPDX3UnserializeSuppliersAndOriginators(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+		{
+			"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "Organization", "spdxId": "https://example.com/doc#supplier",
+			"creationInfo": "_:creationinfo", "name": "Supplier Inc"
+		},
+		{
+			"type": "Person", "spdxId": "https://example.com/doc#author",
+			"creationInfo": "_:creationinfo", "name": "An Author",
+			"externalIdentifier": [
+				{"type": "ExternalIdentifier", "externalIdentifierType": "email", "identifier": "author@example.com"}
+			]
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#pkg",
+			"creationInfo": "_:creationinfo", "name": "a package",
+			"suppliedBy": "https://example.com/doc#supplier",
+			"originatedBy": ["https://example.com/doc#author"]
+		}`)), nil, nil)
+	require.NoError(t, err)
+
+	// The agents are read onto the package, not into the graph beside it.
+	require.Len(t, doc.NodeList.Nodes, 1)
+	pkg := doc.NodeList.Nodes[0]
+	require.Equal(t, []*sbom.Person{{Name: "Supplier Inc", IsOrg: true}}, pkg.Suppliers)
+	require.Equal(t, []*sbom.Person{
+		{Name: "An Author", Email: "author@example.com"},
+	}, pkg.Originators)
+}
+
+// TestSPDX3ToolNameSplit covers the answer to a question SPDX 3 leaves open:
+// its Tool has a name and no version, so protobom's writer joins the two
+// with a dash and the reader has to decide where to take them apart.
+func TestSPDX3ToolNameSplit(t *testing.T) {
+	t.Parallel()
+
+	for name, want := range map[string]*sbom.Tool{
+		// What protobom writes, read back as it went out.
+		"protobom-v1.2.3":          {Name: "protobom", Version: "v1.2.3"},
+		"protobom-1.2.3":           {Name: "protobom", Version: "1.2.3"},
+		"Microsoft.SBOMTool-0.2.7": {Name: "Microsoft.SBOMTool", Version: "0.2.7"},
+
+		// Tools whose names simply contain dashes, all of them from the
+		// SPDX examples corpus. Splitting these would invent versions.
+		"spdx-maven-plugin":                    {Name: "spdx-maven-plugin"},
+		"github.com/spdx/tools-golang/builder": {Name: "github.com/spdx/tools-golang/builder"},
+		"Parlay":                               {Name: "Parlay"},
+		"Source Auditor Open Source Console":   {Name: "Source Auditor Open Source Console"},
+
+		// TODO(degradation): a version that does not start with a digit is
+		// not one this can recognize, so it stays part of the name.
+		"protobom-devel": {Name: "protobom-devel"},
+
+		// Nothing to split on either side of the dash.
+		"-1.2.3": {Name: "-1.2.3"},
+		"tool-":  {Name: "tool-"},
+		"":       {Name: ""},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			tool, ok := toolFromSPDX3(core.NewTool("https://example.com/t", name))
+			require.True(t, ok)
+			require.Equal(t, want.Name, tool.Name)
+			require.Equal(t, want.Version, tool.Version)
+		})
+	}
 }

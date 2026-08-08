@@ -412,3 +412,121 @@ func TestRoundTripSPDX3EveryEdgeType(t *testing.T) {
 		})
 	}
 }
+
+// TestRoundTripSPDX3Agents writes the people, organizations and tools a
+// document credits and reads them back.
+//
+// SPDX 3 states an agent as an element of the graph and protobom as a field,
+// so the two have to agree not only on the fields but on where an agent is
+// consumed: an author belongs to the document, a supplier to the thing
+// supplied.
+func TestRoundTripSPDX3Agents(t *testing.T) {
+	const ns = "https://example.com/spdxdocs/agents"
+
+	pkg := &sbom.Node{
+		Id: ns + "#pkg", Type: sbom.Node_PACKAGE, Name: "a package",
+		Identifiers: map[int32]string{}, Hashes: map[int32]string{},
+		Suppliers: []*sbom.Person{
+			{Name: "Supplier Inc", IsOrg: true, Email: "supply@example.com"},
+		},
+		Originators: []*sbom.Person{
+			{Name: "An Author", Email: "author@example.com", Url: "https://author.example.com"},
+			{Name: "Another Org", IsOrg: true},
+		},
+	}
+
+	original := &sbom.Document{
+		Metadata: &sbom.Metadata{
+			Id: ns,
+			Authors: []*sbom.Person{
+				{Name: "Jane", Email: "jane@example.com", Url: "https://jane.example.com"},
+				{Name: "Acme", IsOrg: true, Email: "acme@example.com"},
+				{Name: "a scanner", IsSoftwareAgent: true},
+			},
+			Tools: []*sbom.Tool{
+				{Name: "a-tool", Version: "v1.2.3"},
+				{Name: "spdx-maven-plugin"},
+			},
+		},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{pkg}, Edges: []*sbom.Edge{},
+			RootElements: []string{pkg.Id},
+		},
+	}
+
+	var out bytes.Buffer
+	require.NoError(t, writer.New().WriteStreamWithOptions(
+		original, &out, &writer.Options{Format: formats.SPDX3JSON},
+	))
+
+	got, err := reader.New().ParseStreamWithOptions(
+		bytes.NewReader(out.Bytes()),
+		&reader.Options{
+			Format:             formats.SPDX3JSON,
+			UnserializeOptions: &native.UnserializeOptions{},
+		},
+	)
+	require.NoError(t, err)
+
+	require.Equal(t, original.Metadata.Authors, got.Metadata.Authors)
+
+	// Protobom credits itself as a tool on the way out, so the tools that
+	// come back are the ones written plus that one. Which is the truth: the
+	// document really was written by protobom.
+	require.Len(t, got.Metadata.Tools, len(original.Metadata.Tools)+1)
+	require.Equal(t, original.Metadata.Tools, got.Metadata.Tools[1:])
+	require.Contains(t, got.Metadata.Tools[0].Name, "protobom")
+
+	gotPkg := got.NodeList.GetNodeByID(pkg.Id)
+	require.NotNil(t, gotPkg)
+	require.Equal(t, pkg.Suppliers, gotPkg.Suppliers)
+	require.Equal(t, pkg.Originators, gotPkg.Originators)
+}
+
+// TestRoundTripSPDX3OneSupplier pins a loss worth knowing about: SPDX 3
+// names a single supplier where protobom holds a list, so only the first
+// survives being written.
+func TestRoundTripSPDX3OneSupplier(t *testing.T) {
+	const ns = "https://example.com/spdxdocs/suppliers"
+
+	got := roundTripNodeIn(t, ns, &sbom.Node{
+		Id: ns + "#pkg", Type: sbom.Node_PACKAGE, Name: "a package",
+		Identifiers: map[int32]string{}, Hashes: map[int32]string{},
+		Suppliers: []*sbom.Person{
+			{Name: "First Supplier", IsOrg: true},
+			{Name: "Second Supplier", IsOrg: true},
+		},
+	})
+	require.Equal(t, []*sbom.Person{{Name: "First Supplier", IsOrg: true}}, got.Suppliers)
+}
+
+// roundTripNodeIn is roundTripNode under a namespace of the caller's
+// choosing.
+func roundTripNodeIn(t *testing.T, ns string, node *sbom.Node) *sbom.Node {
+	t.Helper()
+
+	var out bytes.Buffer
+	require.NoError(t, writer.New().WriteStreamWithOptions(
+		&sbom.Document{
+			Metadata: &sbom.Metadata{Id: ns},
+			NodeList: &sbom.NodeList{
+				Nodes: []*sbom.Node{node}, Edges: []*sbom.Edge{},
+				RootElements: []string{node.Id},
+			},
+		},
+		&out, &writer.Options{Format: formats.SPDX3JSON},
+	))
+
+	got, err := reader.New().ParseStreamWithOptions(
+		bytes.NewReader(out.Bytes()),
+		&reader.Options{
+			Format:             formats.SPDX3JSON,
+			UnserializeOptions: &native.UnserializeOptions{},
+		},
+	)
+	require.NoError(t, err)
+
+	read := got.NodeList.GetNodeByID(node.Id)
+	require.NotNil(t, read, "the node did not survive the round trip")
+	return read
+}

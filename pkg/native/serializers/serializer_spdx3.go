@@ -243,10 +243,16 @@ func (t *spdx3Translator) agent(person *sbom.Person) core.AgentDescendant {
 	var node *core.Node
 	var agent core.AgentDescendant
 
-	if person.IsOrg {
+	switch {
+	case person.IsOrg:
 		organization := core.NewOrganization(id, person.Name)
 		node, agent = &organization.Node, organization
-	} else {
+	case person.IsSoftwareAgent:
+		// Something acting on its own behalf, such as a scanner or a build
+		// system, which SPDX 3 has a class of its own for.
+		selfActing := core.NewSoftwareAgent(id, person.Name)
+		node, agent = &selfActing.Node, selfActing
+	default:
 		individual := core.NewPerson(id, person.Name)
 		node, agent = &individual.Node, individual
 	}

@@ -342,3 +342,225 @@ func TestSPDX3UnserializeRoots(t *testing.T) {
 		require.Equal(t, []string{"https://example.com/doc#pkg"}, doc.NodeList.RootElements)
 	})
 }
+
+// spdx3TwoPackages is a document with two packages to relate to each other,
+// leaving the relationship itself to each test.
+func spdx3TwoPackages(relationships string) string {
+	return spdx3Doc(spdx3CreationInfo + `,
+		{
+			"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#a",
+			"creationInfo": "_:creationinfo", "name": "a"
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#b",
+			"creationInfo": "_:creationinfo", "name": "b"
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#c",
+			"creationInfo": "_:creationinfo", "name": "c"
+		},` + relationships)
+}
+
+func spdx3Relationship(id, from, relType string, to ...string) string {
+	quoted := make([]string, 0, len(to))
+	for _, t := range to {
+		quoted = append(quoted, `"`+t+`"`)
+	}
+	return `{
+		"type": "Relationship", "spdxId": "https://example.com/doc#` + id + `",
+		"creationInfo": "_:creationinfo",
+		"from": "` + from + `",
+		"relationshipType": "` + relType + `",
+		"to": [` + strings.Join(quoted, ",") + `]
+	}`
+}
+
+func TestSPDX3UnserializeRelationships(t *testing.T) {
+	t.Parallel()
+
+	const a, b, c = "https://example.com/doc#a", "https://example.com/doc#b", "https://example.com/doc#c"
+
+	for name, tc := range map[string]struct {
+		relationships string
+		expected      []*sbom.Edge
+	}{
+		// SPDX 3 and protobom say this the same way round.
+		"a relationship both say the same way": {
+			spdx3Relationship("r", a, "contains", b),
+			[]*sbom.Edge{{Type: sbom.Edge_contains, From: a, To: []string{b}}},
+		},
+
+		// Protobom has only "is a variant of", so the ends are swapped.
+		"a relationship protobom states the other way round": {
+			spdx3Relationship("r", a, "hasVariant", b),
+			[]*sbom.Edge{{Type: sbom.Edge_variant, From: b, To: []string{a}}},
+		},
+
+		// Turning a relationship around fans it out: each target becomes the
+		// source of an edge of its own.
+		"turning a relationship around fans it out": {
+			spdx3Relationship("r", a, "hasVariant", b, c),
+			[]*sbom.Edge{
+				{Type: sbom.Edge_variant, From: b, To: []string{a}},
+				{Type: sbom.Edge_variant, From: c, To: []string{a}},
+			},
+		},
+
+		// SPDX 3 renamed the ones it kept the direction of.
+		"a renamed relationship": {
+			spdx3Relationship("r", a, "hasDynamicLink", b),
+			[]*sbom.Edge{{Type: sbom.Edge_dynamicLink, From: a, To: []string{b}}},
+		},
+
+		// Said twice, held once.
+		"the same relationship stated twice": {
+			spdx3Relationship("r1", a, "contains", b) + "," +
+				spdx3Relationship("r2", a, "contains", b),
+			[]*sbom.Edge{{Type: sbom.Edge_contains, From: a, To: []string{b}}},
+		},
+
+		// Two relationships of one type from one element are one edge.
+		"two targets of the same type": {
+			spdx3Relationship("r1", a, "contains", b) + "," +
+				spdx3Relationship("r2", a, "contains", c),
+			[]*sbom.Edge{{Type: sbom.Edge_contains, From: a, To: []string{b, c}}},
+		},
+
+		// A relationship belonging to a profile protobom does not model.
+		"a security relationship": {
+			spdx3Relationship("r", a, "hasAssociatedVulnerability", b),
+			[]*sbom.Edge{},
+		},
+
+		// TODO(degradation): protobom names the period a tool is used in as
+		// part of the relationship type, and the scope that would say which
+		// is dropped, so there is no type left to read this as.
+		"usesTool": {
+			spdx3Relationship("r", a, "usesTool", b),
+			[]*sbom.Edge{},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			doc, err := NewSPDX3().Unserialize(
+				strings.NewReader(spdx3TwoPackages(tc.relationships)), nil, nil)
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, doc.NodeList.Edges)
+		})
+	}
+}
+
+// TestSPDX3RelationshipsNeedBothEnds is the rule that keeps the graph
+// coherent. The elements this reader drops are named by relationships, and
+// an edge to an element that is not there is worse than no edge at all.
+func TestSPDX3RelationshipsNeedBothEnds(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+		{
+			"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#pkg",
+			"creationInfo": "_:creationinfo", "name": "a package"
+		},
+		{
+			"type": "software_Snippet", "spdxId": "https://example.com/doc#snippet",
+			"creationInfo": "_:creationinfo", "name": "a snippet"
+		},
+		{
+			"type": "software_File", "spdxId": "https://example.com/doc#file",
+			"creationInfo": "_:creationinfo", "name": "a file"
+		},`+
+		// Pointing at a snippet, which protobom has no node for.
+		spdx3Relationship("r1", "https://example.com/doc#pkg", "contains",
+			"https://example.com/doc#snippet")+","+
+		// Starting from one.
+		spdx3Relationship("r2", "https://example.com/doc#snippet", "contains",
+			"https://example.com/doc#file")+","+
+		// Pointing at something that is not in the document at all.
+		spdx3Relationship("r3", "https://example.com/doc#pkg", "contains",
+			"https://example.com/doc#nowhere")+","+
+		// One naming a snippet and a file: the file survives, the snippet
+		// does not take the whole relationship down with it.
+		spdx3Relationship("r4", "https://example.com/doc#pkg", "hasVariant",
+			"https://example.com/doc#snippet", "https://example.com/doc#file"),
+	)), nil, nil)
+	require.NoError(t, err)
+
+	require.Equal(t, []*sbom.Edge{{
+		Type: sbom.Edge_variant,
+		From: "https://example.com/doc#file",
+		To:   []string{"https://example.com/doc#pkg"},
+	}}, doc.NodeList.Edges)
+}
+
+// TestSPDX3DescribesFromACollection covers the other way a document says
+// what it is about. Protobom has no node for the document element, so such a
+// relationship has no edge to become and is read as a root instead.
+func TestSPDX3DescribesFromACollection(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+		{
+			"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+			"creationInfo": "_:creationinfo",
+			"rootElement": ["https://example.com/doc#sbom"]
+		},
+		{
+			"type": "software_Sbom", "spdxId": "https://example.com/doc#sbom",
+			"creationInfo": "_:creationinfo"
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#a",
+			"creationInfo": "_:creationinfo", "name": "a"
+		},
+		{
+			"type": "software_Package", "spdxId": "https://example.com/doc#b",
+			"creationInfo": "_:creationinfo", "name": "b"
+		},`+
+		// The bill of materials says what it is about.
+		spdx3Relationship("r1", "https://example.com/doc#sbom", "describes",
+			"https://example.com/doc#a")+","+
+		// A package describing another is an ordinary relationship.
+		spdx3Relationship("r2", "https://example.com/doc#a", "describes",
+			"https://example.com/doc#b"),
+	)), nil, nil)
+	require.NoError(t, err)
+
+	require.Equal(t, []string{"https://example.com/doc#a"}, doc.NodeList.RootElements)
+	require.Equal(t, []*sbom.Edge{{
+		Type: sbom.Edge_describes,
+		From: "https://example.com/doc#a",
+		To:   []string{"https://example.com/doc#b"},
+	}}, doc.NodeList.Edges)
+}
+
+// TestSPDX3LifecycleScopeIsDropped covers the decision that protobom holds
+// no lifecycle scope: a scoped relationship is read as the relationship it
+// is, without the period it holds during.
+func TestSPDX3LifecycleScopeIsDropped(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3TwoPackages(`{
+		"type": "LifecycleScopedRelationship",
+		"spdxId": "https://example.com/doc#r",
+		"creationInfo": "_:creationinfo",
+		"from": "https://example.com/doc#a",
+		"relationshipType": "dependsOn",
+		"scope": "build",
+		"to": ["https://example.com/doc#b"]
+	}`)), nil, nil)
+	require.NoError(t, err)
+
+	require.Equal(t, []*sbom.Edge{{
+		Type: sbom.Edge_dependsOn,
+		From: "https://example.com/doc#a",
+		To:   []string{"https://example.com/doc#b"},
+	}}, doc.NodeList.Edges)
+}

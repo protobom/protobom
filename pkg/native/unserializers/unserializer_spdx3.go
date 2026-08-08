@@ -11,6 +11,7 @@ import (
 	spdx3 "github.com/carabiner-dev/spdx3"
 	"github.com/carabiner-dev/spdx3/profiles/core"
 	"github.com/carabiner-dev/spdx3/profiles/software"
+	"github.com/carabiner-dev/spdx3/types"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/protobom/protobom/pkg/native"
@@ -72,10 +73,10 @@ func (u *SPDX3) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interfa
 
 	rd.elements(bom.NodeList)
 	rd.roots(bom.NodeList)
+	rd.relationships(bom.NodeList)
 
-	// The relationships between the elements, the agents the document
-	// credits and the licenses its elements are under are read in the steps
-	// that follow this one.
+	// The agents the document credits and the licenses its elements are
+	// under are read in the steps that follow this one.
 
 	return bom, nil
 }
@@ -283,16 +284,140 @@ func (rd *spdx3Reader) roots(nl *sbom.NodeList) {
 		}
 	}
 
-	// TODO: a document may also say what it is about with a describes
-	// relationship, which is read with the rest of them.
 	follow(rd.document.RootElement)
+
+	// A document usually says what it is about twice, with rootElement and
+	// again with a describes relationship. Both are read, and a root named
+	// by both is named once.
+	for _, element := range rd.env.Graph {
+		relationship, ok := element.(*core.Relationship)
+		if !ok || relationship.RelationshipType != core.RelationshipTypeDescribes {
+			continue
+		}
+		if _, isCollection := spdx3CollectionRoots(relationship.From); !isCollection {
+			continue
+		}
+		follow(spdx3Elements(relationship.To))
+	}
+}
+
+// spdx3Elements narrows the nodes a relationship points at to the elements
+// they are. Everything a relationship can name is an element; the model
+// types the property loosely because a reference is a node before it is
+// resolved to one.
+func spdx3Elements(nodes []types.Node) []core.ElementDescendant {
+	elements := make([]core.ElementDescendant, 0, len(nodes))
+	for _, node := range nodes {
+		if element, ok := node.(core.ElementDescendant); ok {
+			elements = append(elements, element)
+		}
+	}
+	return elements
+}
+
+// relationships reads the graph's relationships into edges.
+//
+// A relationship becomes an edge only when protobom has both a type to say
+// it with and nodes at both ends. That last part is what keeps the graph
+// coherent: the elements this reader drops — snippets, vulnerabilities,
+// license expressions, the collections — are named by relationships that
+// would otherwise become edges to nodes that do not exist.
+func (rd *spdx3Reader) relationships(nl *sbom.NodeList) {
+	edges := make([]*sbom.Edge, 0, len(rd.env.Graph))
+
+	for _, element := range rd.env.Graph {
+		var relationship *core.Relationship
+		switch r := element.(type) {
+		case *core.Relationship:
+			relationship = r
+		case *core.LifecycleScopedRelationship:
+			// TODO(degradation): the period of an element's life the
+			// relationship holds during is dropped. Protobom says that with
+			// the relationship type itself, and the type it reads back as
+			// is the one that does not name a period.
+			relationship = &r.Relationship
+		default:
+			continue
+		}
+
+		// TODO(degradation): a relationship's completeness, start time and
+		// end time have nowhere to go.
+
+		edges = append(edges, rd.edges(relationship)...)
+	}
+
+	// Merged rather than appended, so a document stating the same
+	// relationship in several places produces one edge with several targets,
+	// which is how protobom holds it.
+	nl.MergeEdges(edges)
+}
+
+// edges returns the edges a relationship becomes.
+//
+// A relationship SPDX 3 states one way and protobom the other is turned
+// around, and turning it around fans it out: SPDX 3 lets one relationship
+// name several targets, and each of them becomes the source of an edge of
+// its own. This mirrors what the serializer does in the other direction.
+func (rd *spdx3Reader) edges(relationship *core.Relationship) []*sbom.Edge {
+	mapping, ok := edgeFromSPDX3(relationship.RelationshipType)
+	if !ok {
+		// TODO(degradation): the relationship belongs to a profile protobom
+		// does not model, or says something it has no field for.
+		return nil
+	}
+
+	from := ""
+	if relationship.From != nil {
+		from = relationship.From.GetSPDXID()
+	}
+	to := []string{}
+	for _, target := range relationship.To {
+		if target != nil {
+			to = append(to, target.GetSPDXID())
+		}
+	}
+
+	if !mapping.invert {
+		if to = rd.knownNodes(to); from == "" || len(to) == 0 || !rd.isNode(from) {
+			return nil
+		}
+		return []*sbom.Edge{{Type: mapping.edgeType, From: from, To: to}}
+	}
+
+	if !rd.isNode(from) {
+		return nil
+	}
+	edges := make([]*sbom.Edge, 0, len(to))
+	for _, target := range rd.knownNodes(to) {
+		edges = append(edges, &sbom.Edge{
+			Type: mapping.edgeType, From: target, To: []string{from},
+		})
+	}
+	return edges
+}
+
+// isNode says whether an identifier names an element that became a node.
+func (rd *spdx3Reader) isNode(id string) bool {
+	_, ok := rd.nodes[id]
+	return ok
+}
+
+// knownNodes keeps the identifiers naming elements that became nodes.
+func (rd *spdx3Reader) knownNodes(ids []string) []string {
+	known := make([]string, 0, len(ids))
+	for _, id := range ids {
+		if rd.isNode(id) {
+			known = append(known, id)
+		}
+	}
+	return known
 }
 
 // spdx3CollectionRoots returns the elements a collection names as its roots,
 // and whether the element is a collection at all. The model gives collections
 // no marker of their own, so they are matched by concrete class, which is
 // what the elements themselves get for the same reason.
-func spdx3CollectionRoots(element core.ElementDescendant) ([]core.ElementDescendant, bool) {
+func spdx3CollectionRoots(element types.Node) ([]core.ElementDescendant, bool) {
 	switch c := element.(type) {
 	case *core.SpdxDocument:
 		return c.RootElement, true

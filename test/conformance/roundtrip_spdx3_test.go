@@ -315,3 +315,100 @@ func mustTime(t *testing.T, value string) time.Time {
 	require.NoError(t, err)
 	return parsed
 }
+
+// TestRoundTripSPDX3EveryEdgeType walks every protobom relationship type
+// through SPDX 3 and back.
+//
+// The two tables are each other's inverse only where SPDX 3 kept both
+// directions of a relationship, which it mostly did not: it deleted every
+// inverse type, so twenty of protobom's are written turned around and have
+// to come back turned around again. Where protobom has both directions of a
+// relationship and SPDX 3 only one, the pair collapses onto the forward one.
+func TestRoundTripSPDX3EveryEdgeType(t *testing.T) {
+	const ns = "https://example.com/spdxdocs/edges"
+	const from, to = ns + "#a", ns + "#b"
+
+	// Protobom says these two ways round what SPDX 3 says one way, so the
+	// "... of" form is read back as the form that points the other way,
+	// with its ends swapped to match. Nothing is lost: "a is contained by
+	// b" and "b contains a" are the same statement.
+	collapses := map[sbom.Edge_Type]sbom.Edge_Type{
+		sbom.Edge_contained_by:    sbom.Edge_contains,
+		sbom.Edge_dependencyOf:    sbom.Edge_dependsOn,
+		sbom.Edge_describedBy:     sbom.Edge_describes,
+		sbom.Edge_generatedFrom:   sbom.Edge_generates,
+		sbom.Edge_prerequisiteFor: sbom.Edge_prerequisite,
+	}
+
+	// The relationship types protobom states with a lifecycle scope. SPDX 3
+	// writes the scope on the relationship, the reader drops it, and what is
+	// left is the type that names no period — or, for the tool ones,
+	// nothing at all, since protobom has no way to say a tool is used
+	// without saying when.
+	scoped := map[sbom.Edge_Type]sbom.Edge_Type{
+		sbom.Edge_buildDependency:   sbom.Edge_dependsOn,
+		sbom.Edge_devDependency:     sbom.Edge_dependsOn,
+		sbom.Edge_runtimeDependency: sbom.Edge_dependsOn,
+		sbom.Edge_testDependency:    sbom.Edge_dependsOn,
+		sbom.Edge_buildTool:         sbom.Edge_UNKNOWN,
+		sbom.Edge_devTool:           sbom.Edge_UNKNOWN,
+		sbom.Edge_testTool:          sbom.Edge_UNKNOWN,
+	}
+
+	for value, name := range sbom.Edge_Type_name {
+		edgeType := sbom.Edge_Type(value)
+		if edgeType == sbom.Edge_UNKNOWN {
+			continue
+		}
+
+		t.Run(name, func(t *testing.T) {
+			var out bytes.Buffer
+			require.NoError(t, writer.New().WriteStreamWithOptions(
+				&sbom.Document{
+					Metadata: &sbom.Metadata{Id: ns},
+					NodeList: &sbom.NodeList{
+						Nodes: []*sbom.Node{
+							{Id: from, Type: sbom.Node_PACKAGE, Name: "a", Identifiers: map[int32]string{}, Hashes: map[int32]string{}},
+							{Id: to, Type: sbom.Node_PACKAGE, Name: "b", Identifiers: map[int32]string{}, Hashes: map[int32]string{}},
+						},
+						Edges:        []*sbom.Edge{{Type: edgeType, From: from, To: []string{to}}},
+						RootElements: []string{from},
+					},
+				},
+				&out, &writer.Options{Format: formats.SPDX3JSON},
+			))
+
+			got, err := reader.New().ParseStreamWithOptions(
+				bytes.NewReader(out.Bytes()),
+				&reader.Options{
+					Format:             formats.SPDX3JSON,
+					UnserializeOptions: &native.UnserializeOptions{},
+				},
+			)
+			require.NoError(t, err)
+
+			// A type that loses its "... of" reads back as the type that
+			// points the other way, so its ends swap to keep the statement
+			// the same.
+			want, wantFrom, wantTo := edgeType, from, to
+			if collapsed, ok := collapses[edgeType]; ok {
+				want, wantFrom, wantTo = collapsed, to, from
+			}
+			if unscoped, ok := scoped[edgeType]; ok {
+				want, wantFrom, wantTo = unscoped, to, from
+			}
+
+			if want == sbom.Edge_UNKNOWN {
+				require.Empty(t, got.NodeList.Edges,
+					"%s has no way back, so it should leave no edge behind", name)
+				return
+			}
+
+			require.Len(t, got.NodeList.Edges, 1, "%s did not survive the round trip", name)
+			edge := got.NodeList.Edges[0]
+			require.Equal(t, want, edge.Type, "%s came back as the wrong type", name)
+			require.Equal(t, wantFrom, edge.From, "%s relates the wrong elements", name)
+			require.Equal(t, []string{wantTo}, edge.To, "%s relates the wrong elements", name)
+		})
+	}
+}

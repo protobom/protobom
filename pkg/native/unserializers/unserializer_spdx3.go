@@ -259,15 +259,16 @@ func (rd *spdx3Reader) artifact(a *core.Artifact) *sbom.Node {
 	}
 
 	for _, ref := range a.ExternalRef {
+		// A reference without a locator has no URL to point protobom at,
+		// so it is dropped instead of creating a dangling reference.
+		if len(ref.Locator) == 0 || ref.Locator[0] == "" {
+			continue
+		}
 		// TODO(degradation): SPDX 3 lets a reference carry several
 		// locators where protobom holds one URL, so any after the first
 		// are lost.
-		url := ""
-		if len(ref.Locator) > 0 {
-			url = ref.Locator[0]
-		}
 		node.ExternalReferences = append(node.ExternalReferences, &sbom.ExternalReference{
-			Url:     url,
+			Url:     ref.Locator[0],
 			Type:    externalRefTypeFromSPDX3(ref.ExternalRefType),
 			Comment: ref.Comment,
 		})

@@ -46,3 +46,35 @@ func TestIndexDestinations(t *testing.T) {
 		})
 	}
 }
+
+func TestEdgeEqual(t *testing.T) {
+	t.Parallel()
+
+	// Two edges say the same thing whatever order they list the same
+	// destinations in.
+	a := &Edge{Type: Edge_contains, From: "root", To: []string{"b", "a"}}
+	b := &Edge{Type: Edge_contains, From: "root", To: []string{"a", "b"}}
+	require.True(t, a.Equal(b))
+
+	// ...but comparing them must not reorder either one. The order of the
+	// destinations is what the document said, and it is what gets written
+	// back out, so a read-only comparison that sorts them in place changes
+	// the output of anything that compares an edge before writing it.
+	require.Equal(t, []string{"b", "a"}, a.To)
+	require.Equal(t, []string{"a", "b"}, b.To)
+
+	for name, other := range map[string]*Edge{
+		"a different source":     {Type: Edge_contains, From: "elsewhere", To: []string{"a", "b"}},
+		"a different type":       {Type: Edge_dependsOn, From: "root", To: []string{"a", "b"}},
+		"a missing destination":  {Type: Edge_contains, From: "root", To: []string{"a"}},
+		"an extra destination":   {Type: Edge_contains, From: "root", To: []string{"a", "b", "c"}},
+		"different destinations": {Type: Edge_contains, From: "root", To: []string{"a", "c"}},
+	} {
+		t.Run(name+" is not equal", func(t *testing.T) {
+			t.Parallel()
+			require.False(t, a.Equal(other))
+		})
+	}
+
+	require.False(t, a.Equal(nil))
+}

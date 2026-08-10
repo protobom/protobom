@@ -80,6 +80,47 @@ func TestComponentType(t *testing.T) {
 	}
 }
 
+func TestNodeLicensesToComponent(t *testing.T) {
+	sut := CDX{}
+	for name, tc := range map[string]struct {
+		licenses []string
+		expected cdx.Licenses
+	}{
+		"single identifier": {
+			licenses: []string{"Apache-2.0"},
+			expected: cdx.Licenses{{License: &cdx.License{ID: "Apache-2.0"}}},
+		},
+		"or expression": {
+			licenses: []string{"Apache-2.0 OR MIT"},
+			expected: cdx.Licenses{{Expression: "Apache-2.0 OR MIT"}},
+		},
+		"and expression": {
+			licenses: []string{"MIT AND BSD-3-Clause"},
+			expected: cdx.Licenses{{Expression: "MIT AND BSD-3-Clause"}},
+		},
+		"with exception": {
+			licenses: []string{"GPL-2.0-or-later WITH Classpath-exception-2.0"},
+			expected: cdx.Licenses{{Expression: "GPL-2.0-or-later WITH Classpath-exception-2.0"}},
+		},
+		"grouped expression": {
+			licenses: []string{"(MIT OR Apache-2.0) AND BSD-3-Clause"},
+			expected: cdx.Licenses{{Expression: "(MIT OR Apache-2.0) AND BSD-3-Clause"}},
+		},
+		"identifier and expression": {
+			licenses: []string{"MIT", "Apache-2.0 OR MIT"},
+			expected: cdx.Licenses{
+				{License: &cdx.License{ID: "MIT"}},
+				{Expression: "Apache-2.0 OR MIT"},
+			},
+		},
+	} {
+		node := &sbom.Node{Licenses: tc.licenses}
+		comp := sut.nodeToComponent(node)
+		require.NotNil(t, comp.Licenses, name)
+		require.Equal(t, tc.expected, *comp.Licenses, name)
+	}
+}
+
 func TestEdgeTypeToScope(t *testing.T) {
 	for edgeType, expected := range map[sbom.Edge_Type]cdx.Scope{
 		sbom.Edge_runtimeDependency: cdx.ScopeRequired,

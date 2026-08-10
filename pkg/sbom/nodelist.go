@@ -818,19 +818,27 @@ func (nl *NodeList) GetNodesByPurlType(purlType string) *NodeList {
 // reconnectOrphanNodes cleans the nodelist graph structure by reconnecting all
 // orphaned nodes to the top of the nodelist
 func (nl *NodeList) reconnectOrphanNodes() {
-	edgeIndex := nl.indexEdges()
 	rootIndex := nl.indexRootElements()
 
-	for _, id := range nl.RootElements {
-		rootIndex[id] = struct{}{}
+	// A node is orphaned only when nothing points to it, so index the nodes
+	// that are the destination of an edge. Keying on the edge source instead
+	// would treat a leaf dependency (a node with an incoming edge but no
+	// outgoing one) as an orphan and promote it to a root.
+	connected := map[string]struct{}{}
+	for _, e := range nl.Edges {
+		for _, toID := range e.To {
+			connected[toID] = struct{}{}
+		}
 	}
 
 	for _, n := range nl.Nodes {
-		if _, ok := edgeIndex[n.Id]; !ok {
-			if _, ok := rootIndex[n.Id]; !ok {
-				nl.RootElements = append(nl.RootElements, n.Id)
-			}
+		if _, ok := connected[n.Id]; ok {
+			continue
 		}
+		if _, ok := rootIndex[n.Id]; ok {
+			continue
+		}
+		nl.RootElements = append(nl.RootElements, n.Id)
 	}
 }
 

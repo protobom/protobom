@@ -452,11 +452,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		var licenseChoices []cdx.LicenseChoice
 		var licenses cdx.Licenses
 		for _, l := range n.Licenses {
-			licenseChoices = append(licenseChoices, cdx.LicenseChoice{
-				License: &cdx.License{
-					ID: l,
-				},
-			})
+			licenseChoices = append(licenseChoices, protobomLicenseToCdx(l))
 		}
 
 		licenses = licenseChoices
@@ -671,6 +667,31 @@ func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference
 	default:
 		return cdx.ERTypeOther
 	}
+}
+
+// protobomLicenseToCdx renders a single protobom license string as a CycloneDX
+// license choice. A compound SPDX expression is emitted through the Expression
+// field; a bare license keeps using License.ID. CycloneDX only accepts a single
+// SPDX identifier in License.ID, so placing an expression there (e.g.
+// "Apache-2.0 OR MIT") produces an invalid document and defeats the round-trip:
+// the unserializer already reads an expression back into the same license slice
+// (see licenseChoicesToLicenseList).
+func protobomLicenseToCdx(license string) cdx.LicenseChoice {
+	if isSPDXLicenseExpression(license) {
+		return cdx.LicenseChoice{Expression: license}
+	}
+	return cdx.LicenseChoice{License: &cdx.License{ID: license}}
+}
+
+// isSPDXLicenseExpression reports whether a license string is a compound SPDX
+// expression rather than a single identifier. SPDX identifiers never contain
+// spaces, so the AND/OR/WITH operators and grouping parentheses only ever
+// appear in expressions.
+func isSPDXLicenseExpression(license string) bool {
+	return strings.Contains(license, " AND ") ||
+		strings.Contains(license, " OR ") ||
+		strings.Contains(license, " WITH ") ||
+		strings.ContainsAny(license, "()")
 }
 
 // protoHashAlgoToCdxAlgo converts the protobom algorithm to the CDX

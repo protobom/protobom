@@ -1532,3 +1532,62 @@ func TestRelateNodeListAtId(t *testing.T) {
 		})
 	}
 }
+
+func TestGetNodesByPurlTypeRoots(t *testing.T) {
+	golangNode := func(id string) *Node {
+		return &Node{
+			Id:   id,
+			Type: Node_PACKAGE,
+			Identifiers: map[int32]string{
+				int32(SoftwareIdentifierType_PURL): "pkg:golang/example.com/" + id,
+			},
+		}
+	}
+	npmNode := func(id string) *Node {
+		return &Node{
+			Id:   id,
+			Type: Node_PACKAGE,
+			Identifiers: map[int32]string{
+				int32(SoftwareIdentifierType_PURL): "pkg:npm/" + id,
+			},
+		}
+	}
+
+	for name, tc := range map[string]struct {
+		sut           *NodeList
+		expectedRoots []string
+	}{
+		// A dependency of the retained root has an incoming edge, so it must
+		// stay a dependency and not be promoted alongside (or instead of) the
+		// real root.
+		"dependency is not promoted to root": {
+			sut: &NodeList{
+				Nodes: []*Node{golangNode("app"), golangNode("lib")},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "app", To: []string{"lib"}},
+				},
+				RootElements: []string{"app"},
+			},
+			expectedRoots: []string{"app"},
+		},
+		// The parent of a retained subtree is a different purl type and is
+		// filtered out, so the subtree root loses its incoming edge and must be
+		// reconnected to the top even though it still has an outgoing edge.
+		"node whose parent was filtered out is reconnected": {
+			sut: &NodeList{
+				Nodes: []*Node{npmNode("app"), golangNode("lib"), golangNode("sublib")},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "app", To: []string{"lib"}},
+					{Type: Edge_dependsOn, From: "lib", To: []string{"sublib"}},
+				},
+				RootElements: []string{"app"},
+			},
+			expectedRoots: []string{"lib"},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			got := tc.sut.GetNodesByPurlType("golang")
+			require.Equal(t, tc.expectedRoots, got.RootElements)
+		})
+	}
+}

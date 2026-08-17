@@ -276,10 +276,10 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 			FileTypes:          node.FileTypes,
 			Checksums:          []common.Checksum{},
 			LicenseConcluded:   node.LicenseConcluded,
-			// LicenseInfoInFiles:   []string{}, << bug in SPDX
-			LicenseComments:   node.LicenseComments,
-			FileCopyrightText: strings.TrimSpace(node.Copyright),
-			FileComment:       node.Comment,
+			LicenseInfoInFiles: append([]string{}, node.Licenses...),
+			LicenseComments:    node.LicenseComments,
+			FileCopyrightText:  strings.TrimSpace(node.Copyright),
+			FileComment:        node.Comment,
 			// FileNotice:           node.File, // Missing?
 			FileAttributionTexts: node.Attribution,
 			Annotations:          []v2_3.Annotation{},

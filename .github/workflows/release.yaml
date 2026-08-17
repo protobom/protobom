@@ -35,7 +35,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Publish Release
-        uses: kubernetes-sigs/release-actions/publish-release@c130b4494862d330a1aa4de320076c666d0708da # v0.4.4
+        uses: kubernetes-sigs/release-actions/publish-release@b5b8280a60e6e20607f77068011269b982c60971 # v0.4.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

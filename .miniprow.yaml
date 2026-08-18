@@ -1,0 +1,13 @@
+# Miniprow configuration for protobom/protobom.
+#
+# Org-wide settings — the self-approval gate, the /override allow-list and
+# the release tagging policies — come from
+# github.com/protobom/.github/.miniprow.yaml and are locked there; this
+# file only adds this repository's maintainers.
+owners:
+  teams:
+    # Members of this GitHub team may /approve (and /lgtm) any pull request
+    # in this repository, as if listed in a root OWNERS file. Bare slugs
+    # resolve in the protobom org. Approvers implicitly review; a team that
+    # should only be able to /lgtm goes under `reviewers:` instead.
+    approvers: [core-commiters]

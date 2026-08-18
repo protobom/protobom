@@ -242,6 +242,23 @@ func TestPropertiesMod(t *testing.T) {
 	}
 }
 
+func TestBuildFilesPreservesLicenseInfo(t *testing.T) {
+	doc := sbom.NewDocument()
+	n := sbom.NewNode()
+	n.Id = "file-with-license"
+	n.Type = sbom.Node_FILE
+	n.Name = "./main.go"
+	n.Licenses = []string{"MIT"}
+	n.LicenseConcluded = "MIT"
+	doc.NodeList.Nodes = append(doc.NodeList.Nodes, n)
+
+	files, err := buildFiles(doc)
+	require.NoError(t, err)
+	require.Len(t, files, 1)
+	require.Equal(t, "MIT", files[0].LicenseConcluded)
+	require.Equal(t, []string{"MIT"}, files[0].LicenseInfoInFiles)
+}
+
 func TestBuildPackages(t *testing.T) {
 	s23 := NewSPDX23()
 

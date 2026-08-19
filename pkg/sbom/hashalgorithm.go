@@ -128,6 +128,8 @@ func HashAlgorithmFromSPDX(spdxAlgo common.ChecksumAlgorithm) HashAlgorithm {
 // https://github.com/spdx/spdx-3-model/blob/main/model/Core/Vocabularies/HashAlgorithm.md
 func (ha HashAlgorithm) ToSPDX3() string {
 	switch ha {
+	case HashAlgorithm_ADLER32:
+		return "adler32"
 	case HashAlgorithm_MD4:
 		return "md4"
 	case HashAlgorithm_MD5:
@@ -167,6 +169,8 @@ func (ha HashAlgorithm) ToSPDX3() string {
 // name states. It is the inverse of [HashAlgorithm.ToSPDX3].
 func HashAlgorithmFromSPDX3(spdxAlgo string) HashAlgorithm {
 	switch spdxAlgo {
+	case "adler32":
+		return HashAlgorithm_ADLER32
 	case "md4":
 		return HashAlgorithm_MD4
 	case "md5":
@@ -198,7 +202,7 @@ func HashAlgorithmFromSPDX3(spdxAlgo string) HashAlgorithm {
 	case "blake3":
 		return HashAlgorithm_BLAKE3
 	default:
-		// TODO(degradation): the SPDX 3 vocabulary also names adler32,
+		// TODO(degradation): the SPDX 3 vocabulary also names
 		// crystalsDilithium, crystalsKyber, falcon and sha3_224, which
 		// protobom has no algorithm for.
 		return HashAlgorithm_UNKNOWN

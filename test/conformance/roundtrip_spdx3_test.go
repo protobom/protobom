@@ -244,8 +244,22 @@ func TestRoundTripSPDX3EveryVocabulary(t *testing.T) {
 	})
 
 	t.Run("hash algorithms", func(t *testing.T) {
+		// ADLER32 is named explicitly because it was previously present in
+		// protobom and the SPDX 3 vocabulary, but missing from this mapping.
+		t.Run("ADLER32", func(t *testing.T) {
+			got := roundTripNode(t, &sbom.Node{
+				Id: vocabularyNS + "#n", Type: sbom.Node_PACKAGE, Name: "n",
+				Hashes:      map[int32]string{int32(sbom.HashAlgorithm_ADLER32): "0badf00d"},
+				Identifiers: map[int32]string{},
+			})
+			require.Equal(t, map[int32]string{int32(sbom.HashAlgorithm_ADLER32): "0badf00d"}, got.Hashes)
+		})
+
 		for value, name := range sbom.HashAlgorithm_name {
 			algo := sbom.HashAlgorithm(value)
+			if algo == sbom.HashAlgorithm_ADLER32 {
+				continue
+			}
 			if algo.ToSPDX3() == "" {
 				continue
 			}

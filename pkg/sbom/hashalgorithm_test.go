@@ -14,6 +14,9 @@ import (
 // single mistyped name, which is the kind of mistake that reads correct.
 func TestHashAlgorithmSPDX3RoundTrip(t *testing.T) {
 	t.Parallel()
+	require.Equal(t, "adler32", HashAlgorithm_ADLER32.ToSPDX3())
+	require.Equal(t, HashAlgorithm_ADLER32, HashAlgorithmFromSPDX3("adler32"))
+
 	named := 0
 	for algo := range HashAlgorithm_name {
 		name := HashAlgorithm(algo).ToSPDX3()

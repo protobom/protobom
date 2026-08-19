@@ -592,7 +592,7 @@ enum HashAlgorithm {
   BLAKE3 = 12;
   // MD2 hash algorithm, not supported by SPDX formats.
   MD2 = 13;
-  // Adler-32 hash algorithm, not supported by SPDX formats..
+  // Adler-32 hash algorithm.
   ADLER32 = 14;
   // MD4 hash algorithm, not supported by SPDX formats..
   MD4 = 15;

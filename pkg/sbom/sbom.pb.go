@@ -61,7 +61,7 @@ const (
 	HashAlgorithm_BLAKE3 HashAlgorithm = 12
 	// MD2 hash algorithm, not supported by SPDX formats.
 	HashAlgorithm_MD2 HashAlgorithm = 13
-	// Adler-32 hash algorithm, not supported by SPDX formats..
+	// Adler-32 hash algorithm.
 	HashAlgorithm_ADLER32 HashAlgorithm = 14
 	// MD4 hash algorithm, not supported by SPDX formats..
 	HashAlgorithm_MD4 HashAlgorithm = 15

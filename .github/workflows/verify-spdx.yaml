@@ -22,7 +22,7 @@ jobs:
 
     - name: Determine Go versions
       id: versions
-      uses: carabiner-dev/actions/go/versions@36a39ef667efe7112df8b1a534a4e37f35fad6fd # v1.2.6
+      uses: carabiner-dev/actions/go/versions@32587e82f960d49b36101e8c45d1956e511965d3 # v1.2.9
 
   verify-spdx:
     needs: go-versions

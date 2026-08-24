@@ -26,7 +26,7 @@ jobs:
 
       - name: Generate SBOM
         id: sbom
-        uses: carabiner-dev/actions/unpack/sbom@36a39ef667efe7112df8b1a534a4e37f35fad6fd # v1.2.6
+        uses: carabiner-dev/actions/unpack/sbom@32587e82f960d49b36101e8c45d1956e511965d3 # v1.2.9
         with:
           format: spdx
           output-path: /tmp

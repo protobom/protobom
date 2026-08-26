@@ -97,3 +97,31 @@ func TestOptionsClone(t *testing.T) {
 	// Nil nested options stay nil
 	require.Nil(t, (&Options{}).clone().UnserializeOptions)
 }
+
+// Registering an unserializer while another goroutine looks one up must
+// not race: the registry is a plain map guarded by regMtx, and lookups
+// happen on every parse. Run with -race to check.
+func TestRegistryConcurrentAccess(t *testing.T) {
+	racing := formats.Format("registry-race-test")
+	stable := formats.Format("registry-race-test-stable")
+	RegisterUnserializer(stable, nil)
+	defer UnregisterUnserializer(racing)
+	defer UnregisterUnserializer(stable)
+
+	var wg sync.WaitGroup
+	for i := range 16 {
+		wg.Go(func() {
+			if i%2 == 0 {
+				RegisterUnserializer(racing, nil)
+				return
+			}
+			// The racing format may or may not be registered yet; the
+			// stable one always is.
+			_, _ = GetFormatUnserializer(racing) //nolint:errcheck // lookup may legitimately miss
+			if _, err := GetFormatUnserializer(stable); err != nil {
+				t.Errorf("looking up registered format: %v", err)
+			}
+		})
+	}
+	wg.Wait()
+}

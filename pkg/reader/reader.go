@@ -73,9 +73,12 @@ func UnregisterUnserializer(format formats.Format) {
 	regMtx.Unlock()
 }
 
+// GetFormatUnserializer returns the unserializer registered for the format.
 func GetFormatUnserializer(format formats.Format) (native.Unserializer, error) {
-	if _, ok := unserializers[format]; ok {
-		return unserializers[format], nil
+	regMtx.RLock()
+	defer regMtx.RUnlock()
+	if u, ok := unserializers[format]; ok {
+		return u, nil
 	}
 	return nil, fmt.Errorf("no serializer registered for %s", format)
 }

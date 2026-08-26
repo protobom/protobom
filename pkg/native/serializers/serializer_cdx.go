@@ -412,9 +412,9 @@ func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
 // clear their refs again before output to CDX
 func clearAutoRefs(comps map[string]*cdx.Component) {
 	for i := range comps {
-		if strings.HasPrefix((comps)[i].BOMRef, "protobom-") {
+		if strings.HasPrefix(comps[i].BOMRef, "protobom-") {
 			// Read the flags from the autogen reference
-			flags := strings.Split((comps)[i].BOMRef, "--")
+			flags := strings.Split(comps[i].BOMRef, "--")
 			if strings.Contains(flags[0], "-auto") {
 				comps[i].BOMRef = ""
 			}

@@ -97,11 +97,17 @@ var defaultOptions = &Options{
 	formatOptions:      map[string]interface{}{},
 }
 
+// New creates a reader configured with the package defaults and the
+// supplied options. Each reader gets its own copy of the defaults:
+// ReaderOptions mutate the reader's Options and, through its pointers,
+// the nested option sets, so sharing the package defaults would leak one
+// reader's configuration into every other reader in the process and race
+// under concurrent construction.
 func New(opts ...ReaderOption) *Reader {
 	r := &Reader{
 		sniffer: &formats.Sniffer{},
 		Storage: storage.NewFileSystem(),
-		Options: defaultOptions,
+		Options: defaultOptions.clone(),
 	}
 
 	for _, opt := range opts {

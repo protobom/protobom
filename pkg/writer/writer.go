@@ -32,11 +32,17 @@ var (
 	}
 )
 
+// New creates a writer configured with the package defaults and the
+// supplied options. Each writer gets its own copy of the defaults:
+// WriterOptions mutate the writer's Options and, through its pointers,
+// the nested option sets, so sharing the package defaults would leak one
+// writer's configuration into every other writer in the process and race
+// under concurrent construction.
 func New(opts ...WriterOption) *Writer {
 	ensureSerializersInitialized()
 	w := &Writer{
 		Storage: storage.NewFileSystem(),
-		Options: defaultOptions,
+		Options: defaultOptions.clone(),
 	}
 
 	for _, opt := range opts {

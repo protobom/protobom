@@ -2,6 +2,8 @@ package writer
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 
 	"github.com/protobom/protobom/pkg/datasink"
 	"github.com/protobom/protobom/pkg/formats"
@@ -85,6 +87,32 @@ type Options struct {
 	SerializeOptions *native.SerializeOptions
 	StoreOptions     *storage.StoreOptions
 	formatOptions    map[string]interface{}
+}
+
+// clone returns a copy of the options that shares no mutable state with the
+// original: the nested option structs are copied and the maps and slices
+// are cloned, so WriterOptions applied to the copy cannot reach the source.
+func (o *Options) clone() *Options {
+	if o == nil {
+		return nil
+	}
+	c := *o
+	if o.RenderOptions != nil {
+		ro := *o.RenderOptions
+		c.RenderOptions = &ro
+	}
+	if o.SerializeOptions != nil {
+		so := *o.SerializeOptions
+		so.Mods = maps.Clone(o.SerializeOptions.Mods)
+		c.SerializeOptions = &so
+	}
+	if o.StoreOptions != nil {
+		sto := *o.StoreOptions
+		c.StoreOptions = &sto
+	}
+	c.Listeners = slices.Clone(o.Listeners)
+	c.formatOptions = maps.Clone(o.formatOptions)
+	return &c
 }
 
 // argToOptsKeyVal returns a key value to access the options dictionary by using

@@ -32,11 +32,17 @@ var (
 	}
 )
 
+// New creates a writer configured with the package defaults and the
+// supplied options. Each writer gets its own copy of the defaults:
+// WriterOptions mutate the writer's Options and, through its pointers,
+// the nested option sets, so sharing the package defaults would leak one
+// writer's configuration into every other writer in the process and race
+// under concurrent construction.
 func New(opts ...WriterOption) *Writer {
 	ensureSerializersInitialized()
 	w := &Writer{
 		Storage: storage.NewFileSystem(),
-		Options: defaultOptions,
+		Options: defaultOptions.clone(),
 	}
 
 	for _, opt := range opts {
@@ -112,20 +118,13 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.Writer, o *Opt
 		return fmt.Errorf("getting serializer: %w", err)
 	}
 
-	so := o.SerializeOptions
-	if so == nil {
-		so = defaultOptions.SerializeOptions
-	}
-
-	nativeDoc, err := serializer.Serialize(bom, so, o.GetFormatOptions(serializer))
+	fo := w.formatOptions(o, serializer)
+	nativeDoc, err := serializer.Serialize(bom, w.serializeOptions(o), fo)
 	if err != nil {
 		return fmt.Errorf("serializing SBOM to native format: %w", err)
 	}
 
-	ro := o.RenderOptions
-	if ro == nil {
-		ro = defaultOptions.RenderOptions
-	}
+	ro := w.renderOptions(o)
 
 	// Build the listening chain of all the I/O sinks
 	sinks := []io.Writer{wr}
@@ -134,10 +133,49 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.Writer, o *Opt
 	}
 	stream := io.MultiWriter(sinks...)
 
-	if err := serializer.Render(nativeDoc, stream, ro, o.GetFormatOptions(serializer)); err != nil {
+	if err := serializer.Render(nativeDoc, stream, ro, fo); err != nil {
 		return fmt.Errorf("writing rendered document to string: %w", err)
 	}
 
+	return nil
+}
+
+// serializeOptions resolves the serialize options for a call: the
+// argument's when set, otherwise the writer's own. The package defaults
+// are never handed out.
+func (w *Writer) serializeOptions(o *Options) *native.SerializeOptions {
+	if o != nil && o.SerializeOptions != nil {
+		return o.SerializeOptions
+	}
+	if w.Options != nil && w.Options.SerializeOptions != nil {
+		return w.Options.SerializeOptions
+	}
+	return &native.SerializeOptions{}
+}
+
+// renderOptions resolves the render options for a call the same way.
+func (w *Writer) renderOptions(o *Options) *native.RenderOptions {
+	if o != nil && o.RenderOptions != nil {
+		return o.RenderOptions
+	}
+	if w.Options != nil && w.Options.RenderOptions != nil {
+		return w.Options.RenderOptions
+	}
+	ro := *defaultOptions.RenderOptions
+	return &ro
+}
+
+// formatOptions resolves the driver-specific options for a call: the
+// argument's when it has any for the driver, otherwise the writer's own.
+func (w *Writer) formatOptions(o *Options, driver native.Serializer) interface{} {
+	if o != nil {
+		if fo := o.GetFormatOptions(driver); fo != nil {
+			return fo
+		}
+	}
+	if w.Options != nil {
+		return w.Options.GetFormatOptions(driver)
+	}
 	return nil
 }
 
@@ -162,9 +200,10 @@ func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
 		bom, path, w.Options)
 }
 
-// Store persists a protobom document to disk using the default options
+// Store persists a protobom document using the configured storage backend
+// and the writer's options (see WithStoreOptions).
 func (w *Writer) Store(bom *sbom.Document) error {
-	return w.StoreWithOptions(bom, defaultOptions)
+	return w.StoreWithOptions(bom, w.Options)
 }
 
 // StoreWithOptions stores a protobom document using the configured storage

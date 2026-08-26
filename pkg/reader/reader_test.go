@@ -417,8 +417,6 @@ func TestUnserializerRegistry(t *testing.T) {
 
 func TestRetrieve(t *testing.T) {
 	t.Parallel()
-	r := reader.New()
-	r.Storage = &storage.Fake{}
 	defaultOpts := &reader.Options{}
 
 	for _, tc := range []struct {
@@ -465,8 +463,12 @@ func TestRetrieve(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			r := *r
-			tc.prepare(&r)
+			// Each subtest gets its own reader and fake storage: copying
+			// a shared reader would share the *storage.Fake it points
+			// to, and the parallel subtests would race on it.
+			r := reader.New()
+			r.Storage = &storage.Fake{}
+			tc.prepare(r)
 			doc, err := r.RetrieveWithOptions("test", tc.opts)
 			if tc.mustErr {
 				require.Error(t, err)

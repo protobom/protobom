@@ -2,6 +2,8 @@ package reader
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 
 	"github.com/protobom/protobom/pkg/datasink"
 	"github.com/protobom/protobom/pkg/formats"
@@ -16,6 +18,28 @@ type Options struct {
 	UnserializeOptions *native.UnserializeOptions
 	RetrieveOptions    *storage.RetrieveOptions
 	formatOptions      map[string]interface{}
+}
+
+// clone returns a copy of the options that shares no mutable state with the
+// original: the nested option structs are copied and the maps and slices
+// are cloned, so ReaderOptions applied to the copy cannot reach the source.
+func (o *Options) clone() *Options {
+	if o == nil {
+		return nil
+	}
+	c := *o
+	if o.UnserializeOptions != nil {
+		uo := *o.UnserializeOptions
+		uo.Mods = maps.Clone(o.UnserializeOptions.Mods)
+		c.UnserializeOptions = &uo
+	}
+	if o.RetrieveOptions != nil {
+		ro := *o.RetrieveOptions
+		c.RetrieveOptions = &ro
+	}
+	c.Listeners = slices.Clone(o.Listeners)
+	c.formatOptions = maps.Clone(o.formatOptions)
+	return &c
 }
 
 // argToOptsKeyVal returns a key value to access the options dictionary by using

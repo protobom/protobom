@@ -428,11 +428,12 @@ func (nl *NodeList) Intersect(nl2 *NodeList) *NodeList {
 // Union returns a new NodeList representing the combination of nodes and their relationships
 // from nl and nl2.
 // The resulting NodeList contains common nodes and edges copied from nl, and updates them with data from nl2.
+// The result shares no nodes, edges or root element list with either input.
 func (nl *NodeList) Union(nl2 *NodeList) *NodeList {
 	ret := &NodeList{
 		Nodes:        []*Node{},
 		Edges:        copyEdgeList(nl.Edges),
-		RootElements: nl.RootElements,
+		RootElements: slices.Clone(nl.RootElements),
 	}
 
 	// Copy all nodes from the original nodelist
@@ -446,7 +447,7 @@ func (nl *NodeList) Union(nl2 *NodeList) *NodeList {
 		if _, ok := nodeindex[n.Id]; ok {
 			nodeindex[n.Id].Update(n)
 		} else {
-			ret.Nodes = append(ret.Nodes, n)
+			ret.Nodes = append(ret.Nodes, n.Copy())
 		}
 	}
 

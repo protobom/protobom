@@ -9,6 +9,8 @@ import (
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
+	"github.com/protobom/protobom/pkg/storage"
 )
 
 // Writers must not share the package defaults: configuring one writer
@@ -97,4 +99,34 @@ func TestOptionsClone(t *testing.T) {
 
 	// Nil nested options stay nil
 	require.Nil(t, (&Options{}).clone().StoreOptions)
+}
+
+// capturingStore records the options the writer hands to the backend.
+type capturingStore struct {
+	storage.StoreRetriever
+	opts *storage.StoreOptions
+}
+
+func (c *capturingStore) Store(_ *sbom.Document, opts *storage.StoreOptions) error {
+	c.opts = opts
+	return nil
+}
+
+// Store must use the writer's configured store options, not the package
+// defaults, and must not hand the backend the shared default options.
+func TestStoreUsesWriterOptions(t *testing.T) {
+	backend := &capturingStore{}
+	so := &storage.StoreOptions{NoClobber: true, BackendOptions: "be"}
+	w := New(WithStoreRetriever(backend), WithStoreOptions(so))
+
+	require.NoError(t, w.Store(sbom.NewDocument()))
+	require.Same(t, so, backend.opts)
+
+	// Without configured store options the backend still gets the
+	// writer's own copy, never the package defaults.
+	backend = &capturingStore{}
+	w = New(WithStoreRetriever(backend))
+	require.NoError(t, w.Store(sbom.NewDocument()))
+	require.NotNil(t, backend.opts)
+	require.NotSame(t, defaultOptions.StoreOptions, backend.opts)
 }

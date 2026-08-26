@@ -235,9 +235,9 @@ func (r *Reader) detectFormat(rs io.ReadSeeker) (formats.Format, error) {
 }
 
 // Retrieve reads a document from the configured storage backend using the
-// default options.
+// reader's options (see WithRetrieveOptions).
 func (r *Reader) Retrieve(id string) (*sbom.Document, error) {
-	return r.RetrieveWithOptions(id, defaultOptions)
+	return r.RetrieveWithOptions(id, r.Options)
 }
 
 // RetrieveWithOptions retrieves a document from the configured storage backend

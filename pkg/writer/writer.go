@@ -168,9 +168,10 @@ func (w *Writer) WriteFile(bom *sbom.Document, path string) error {
 		bom, path, w.Options)
 }
 
-// Store persists a protobom document to disk using the default options
+// Store persists a protobom document using the configured storage backend
+// and the writer's options (see WithStoreOptions).
 func (w *Writer) Store(bom *sbom.Document) error {
-	return w.StoreWithOptions(bom, defaultOptions)
+	return w.StoreWithOptions(bom, w.Options)
 }
 
 // StoreWithOptions stores a protobom document using the configured storage

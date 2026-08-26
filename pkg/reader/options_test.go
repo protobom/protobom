@@ -9,6 +9,7 @@ import (
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 )
 
@@ -124,4 +125,27 @@ func TestRegistryConcurrentAccess(t *testing.T) {
 		})
 	}
 	wg.Wait()
+}
+
+// capturingStore records the options the reader hands to the backend.
+type capturingStore struct {
+	storage.StoreRetriever
+	opts *storage.RetrieveOptions
+}
+
+func (c *capturingStore) Retrieve(_ string, opts *storage.RetrieveOptions) (*sbom.Document, error) {
+	c.opts = opts
+	return sbom.NewDocument(), nil
+}
+
+// Retrieve must use the reader's configured retrieve options, not the
+// package defaults.
+func TestRetrieveUsesReaderOptions(t *testing.T) {
+	backend := &capturingStore{}
+	ro := &storage.RetrieveOptions{BackendOptions: "be"}
+	r := New(WithStoreRetriever(backend), WithRetrieveOptions(ro))
+
+	_, err := r.Retrieve("id")
+	require.NoError(t, err)
+	require.Same(t, ro, backend.opts)
 }

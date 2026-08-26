@@ -1,6 +1,10 @@
 package reader
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 
@@ -9,6 +13,7 @@ import (
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/native/nativefakes"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 )
@@ -148,4 +153,50 @@ func TestRetrieveUsesReaderOptions(t *testing.T) {
 	_, err := r.Retrieve("id")
 	require.NoError(t, err)
 	require.Same(t, ro, backend.opts)
+}
+
+// The *WithOptions methods take their options from the argument, fall back
+// to the reader's own for anything the argument leaves unset, and never
+// mix the two or reach the package defaults.
+func TestParseWithOptionsResolvesArgumentThenReader(t *testing.T) {
+	format := formats.Format("resolve-options-test")
+	fake := &nativefakes.FakeUnserializer{}
+	fake.UnserializeReturns(sbom.NewDocument(), nil)
+	RegisterUnserializer(format, fake)
+	defer UnregisterUnserializer(format)
+	driverKey := fmt.Sprintf("%T", fake)
+
+	t.Run("nil nested options fall back to the reader's", func(t *testing.T) {
+		r := New(WithFormatOptions(driverKey, "reader"))
+		_, err := r.ParseStreamWithOptions(strings.NewReader("{}"), &Options{Format: format})
+		require.NoError(t, err)
+		_, uo, fo := fake.UnserializeArgsForCall(fake.UnserializeCallCount() - 1)
+		require.Same(t, r.Options.UnserializeOptions, uo)
+		require.NotSame(t, defaultOptions.UnserializeOptions, uo)
+		require.Equal(t, "reader", fo)
+	})
+
+	t.Run("argument options win over the reader's", func(t *testing.T) {
+		r := New(WithFormatOptions(driverKey, "reader"), WithTrackSource(false))
+		o := &Options{Format: format, UnserializeOptions: &native.UnserializeOptions{TrackSource: true}}
+		o.SetFormatOptions(driverKey, "argument")
+		doc, err := r.ParseStreamWithOptions(strings.NewReader("{}"), o)
+		require.NoError(t, err)
+		_, uo, fo := fake.UnserializeArgsForCall(fake.UnserializeCallCount() - 1)
+		require.Same(t, o.UnserializeOptions, uo)
+		require.Equal(t, "argument", fo)
+		require.NotNil(t, doc.Metadata.SourceData, "TrackSource from the argument must be honored")
+	})
+
+	t.Run("ParseFileWithOptions tracks the source from the argument", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "doc.json")
+		require.NoError(t, os.WriteFile(path, []byte("{}"), 0o600))
+		r := New(WithTrackSource(false))
+		o := &Options{Format: format, UnserializeOptions: &native.UnserializeOptions{TrackSource: true}}
+		doc, err := r.ParseFileWithOptions(path, o)
+		require.NoError(t, err)
+		require.NotNil(t, doc.Metadata.SourceData)
+		require.NotNil(t, doc.Metadata.SourceData.Uri, "the file URI comes from the same options as the hashes")
+		require.Equal(t, "file://"+path, *doc.Metadata.SourceData.Uri)
+	})
 }

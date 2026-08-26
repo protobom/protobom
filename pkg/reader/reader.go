@@ -138,7 +138,7 @@ func (r *Reader) ParseFileWithOptions(path string, o *Options) (*sbom.Document, 
 		return nil, fmt.Errorf("parsing content: %w", err)
 	}
 
-	if doc.Metadata != nil && doc.Metadata.SourceData != nil && r.Options.UnserializeOptions.TrackSource {
+	if doc.Metadata != nil && doc.Metadata.SourceData != nil && r.unserializeOptions(o).TrackSource {
 		docURI := fmt.Sprintf("file://%s", path)
 		doc.Metadata.SourceData.Uri = &docURI
 	}
@@ -182,7 +182,8 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		sbom.HashAlgorithm_SHA512: sha512.New(),
 	}
 
-	if o.UnserializeOptions.TrackSource {
+	uo := r.unserializeOptions(o)
+	if uo.TrackSource {
 		sinks = append(sinks, &counter)
 		for i := range hashers {
 			sinks = append(sinks, hashers[i])
@@ -195,9 +196,7 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 	tee := io.TeeReader(f, multiwriter)
 
 	// Call the format unserializer
-	doc, err := unserializer.Unserialize(
-		tee, o.UnserializeOptions, r.Options.GetFormatOptions(unserializer),
-	)
+	doc, err := unserializer.Unserialize(tee, uo, r.formatOptions(o, unserializer))
 	if err != nil {
 		return nil, fmt.Errorf("unserializing %s: %w", format, err)
 	}
@@ -207,7 +206,7 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 		doc.Metadata = &sbom.Metadata{}
 	}
 
-	if o.UnserializeOptions.TrackSource {
+	if uo.TrackSource {
 		doc.Metadata.SourceData = &sbom.SourceData{
 			Format: string(format),
 			Size:   int64(counter.Len()),
@@ -224,6 +223,33 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 // ParseStreamWithOptions returns a document from a ioreader
 func (r *Reader) ParseStream(f io.ReadSeeker) (*sbom.Document, error) {
 	return r.ParseStreamWithOptions(f, r.Options)
+}
+
+// unserializeOptions resolves the unserialize options for a call: the
+// argument's when set, otherwise the reader's own. The package defaults
+// are never handed out.
+func (r *Reader) unserializeOptions(o *Options) *native.UnserializeOptions {
+	if o != nil && o.UnserializeOptions != nil {
+		return o.UnserializeOptions
+	}
+	if r.Options != nil && r.Options.UnserializeOptions != nil {
+		return r.Options.UnserializeOptions
+	}
+	return &native.UnserializeOptions{}
+}
+
+// formatOptions resolves the driver-specific options for a call: the
+// argument's when it has any for the driver, otherwise the reader's own.
+func (r *Reader) formatOptions(o *Options, driver native.Unserializer) interface{} {
+	if o != nil {
+		if fo := o.GetFormatOptions(driver); fo != nil {
+			return fo
+		}
+	}
+	if r.Options != nil {
+		return r.Options.GetFormatOptions(driver)
+	}
+	return nil
 }
 
 func (r *Reader) detectFormat(rs io.ReadSeeker) (formats.Format, error) {

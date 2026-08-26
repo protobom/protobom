@@ -1,6 +1,8 @@
 package writer
 
 import (
+	"bytes"
+	"fmt"
 	"sync"
 	"testing"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/native/nativefakes"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/storage"
 )
@@ -129,4 +132,45 @@ func TestStoreUsesWriterOptions(t *testing.T) {
 	require.NoError(t, w.Store(sbom.NewDocument()))
 	require.NotNil(t, backend.opts)
 	require.NotSame(t, defaultOptions.StoreOptions, backend.opts)
+}
+
+// WriteStreamWithOptions takes its options from the argument, falls back to
+// the writer's own for anything the argument leaves unset, and never hands
+// the drivers the package defaults.
+func TestWriteStreamWithOptionsResolvesArgumentThenWriter(t *testing.T) {
+	format := formats.Format("resolve-options-test")
+	fake := &nativefakes.FakeSerializer{}
+	fake.SerializeReturns(struct{}{}, nil)
+	RegisterSerializer(format, fake)
+	defer UnregisterSerializer(format)
+	driverKey := fmt.Sprintf("%T", fake)
+
+	t.Run("nil nested options fall back to the writer's", func(t *testing.T) {
+		w := New(WithMod(mod.SPDX_RENDER_PROPERTIES_IN_ANNOTATIONS), WithFormatOptions(driverKey, "writer"))
+		require.NoError(t, w.WriteStreamWithOptions(sbom.NewDocument(), &bytes.Buffer{}, &Options{Format: format}))
+		_, so, fo := fake.SerializeArgsForCall(fake.SerializeCallCount() - 1)
+		_, _, ro, rfo := fake.RenderArgsForCall(fake.RenderCallCount() - 1)
+		require.Same(t, w.Options.SerializeOptions, so)
+		require.Same(t, w.Options.RenderOptions, ro)
+		require.NotSame(t, defaultOptions.SerializeOptions, so)
+		require.NotSame(t, defaultOptions.RenderOptions, ro)
+		require.Equal(t, "writer", fo)
+		require.Equal(t, "writer", rfo)
+	})
+
+	t.Run("argument options win over the writer's", func(t *testing.T) {
+		w := New(WithFormatOptions(driverKey, "writer"))
+		o := &Options{
+			Format:           format,
+			SerializeOptions: &native.SerializeOptions{},
+			RenderOptions:    &native.RenderOptions{Indent: 7},
+		}
+		o.SetFormatOptions(driverKey, "argument")
+		require.NoError(t, w.WriteStreamWithOptions(sbom.NewDocument(), &bytes.Buffer{}, o))
+		_, so, fo := fake.SerializeArgsForCall(fake.SerializeCallCount() - 1)
+		_, _, ro, _ := fake.RenderArgsForCall(fake.RenderCallCount() - 1)
+		require.Same(t, o.SerializeOptions, so)
+		require.Same(t, o.RenderOptions, ro)
+		require.Equal(t, "argument", fo)
+	})
 }

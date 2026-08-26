@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/release-utils/helpers"
 
@@ -49,19 +48,27 @@ func (fs *FileSystem) Store(bom *sbom.Document, opts *StoreOptions) error {
 	if opts == nil {
 		opts = &StoreOptions{}
 	}
+	if fs.Options.Path == "" {
+		return errors.New("unable to persist document: filesystem backend data dir not set")
+	}
+	if bom == nil {
+		return errors.New("unable to persist document: document is nil")
+	}
 
 	i, err := os.Stat(fs.Options.Path)
 	switch {
 	// Check if the data directory exists
 	case err != nil && errors.Is(err, os.ErrNotExist):
-		if err := os.MkdirAll(fs.Options.Path, os.FileMode(0o644)); err != nil {
-			return fmt.Errorf("error creating filesystem backend storage directory")
+		// The directory needs the execute bits or nothing can be
+		// written into it afterwards.
+		if err := os.MkdirAll(fs.Options.Path, os.FileMode(0o755)); err != nil {
+			return fmt.Errorf("creating filesystem backend storage directory: %w", err)
 		}
 	case err != nil:
 		// Any other errors are a true error
 		return fmt.Errorf("checking filesystem backend path directory: %w", err)
 	case !i.IsDir():
-		return fmt.Errorf("the specified filsystem backend patch is not a directory")
+		return errors.New("the specified filesystem backend path is not a directory")
 	}
 
 	if bom.Metadata == nil || bom.Metadata.Id == "" {
@@ -91,7 +98,8 @@ func (fs *FileSystem) Store(bom *sbom.Document, opts *StoreOptions) error {
 }
 
 // Retrieve implements the storage backend Retrieve interface. It looks for a
-// protobom document in a directory
+// protobom document in a directory. A document that was never stored is
+// reported with an error wrapping os.ErrNotExist.
 func (fs *FileSystem) Retrieve(id string, _ *RetrieveOptions) (*sbom.Document, error) {
 	if fs.Options.Path == "" {
 		return nil, fmt.Errorf("unable to retrieve SBOM data: filesystem backend data dir not set")
@@ -107,11 +115,11 @@ func (fs *FileSystem) Retrieve(id string, _ *RetrieveOptions) (*sbom.Document, e
 
 	data, err := os.ReadFile(filepath.Join(fs.Options.Path, filename))
 	if err != nil {
-		logrus.Fatal(fmt.Errorf("reading protobom data from disk: %w", err))
+		return nil, fmt.Errorf("reading protobom data from disk: %w", err)
 	}
 	bom := &sbom.Document{}
 	if err := proto.Unmarshal(data, bom); err != nil {
-		logrus.Fatal(fmt.Errorf("unmarshaling protobom data: %w", err))
+		return nil, fmt.Errorf("unmarshaling protobom data: %w", err)
 	}
 
 	return bom, nil

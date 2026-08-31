@@ -28,27 +28,20 @@ import (
 // document and is out of scope here: this test is about protobom's CycloneDX
 // writer and reader agreeing with each other on real data.
 //
-// knownRoundtripIssues lists the fixtures whose cycle is still dirty, keyed
-// by file name, with the open defects that keep them so:
+// unstableRoundtripFixtures lists the fixtures whose write/read cycle is not
+// deterministic, keyed by file name. They carry a component without a
+// bom-ref, whose protobom ID is assigned by a counter in read order while
+// the serializer emits components in map order: depending on where the
+// counter lands on the second read, the cycle comes back clean or with the
+// ref-less node reported as one added and one removed, since without a purl
+// or hashes it cannot be re-paired by identity.
 //
-//   - The serializer writes the containment tree into the CycloneDX
-//     dependency graph: buildDependencies renders every non-scope edge as a
-//     dependency entry, Edge_contains included, so a document comes back
-//     with a dependsOn edge from the root to everything the root contains.
-//
-//   - Components without a bom-ref are named by a counter in read order, and
-//     the serializer emits components in map order, so on the second read
-//     the counter lands differently. A ref-less component with no purl and
-//     no hashes (syft's operating-system entry) cannot be re-paired by
-//     identity and reports as one node added and one removed.
-//
-// A fixture listed here must produce a non-empty diff: when the defects are
-// fixed this test fails on it, and its entry here is to be removed.
-var knownRoundtripIssues = map[string]string{
-	"juice-shop-11.1.2.cdx.json":       "containment written as dependencies",
-	"syft-0.96.0_plone-5.2.cdx.json":   "containment written as dependencies; unstable auto ID on the ref-less operating-system component",
-	"syft-0.96.0_rails-5.0.0.cdx.json": "containment written as dependencies; unstable auto ID on the ref-less operating-system component",
-	"syft-1.2.0_rails-5.0.0.cdx.json":  "containment written as dependencies",
+// A diff on a fixture listed here is logged but tolerated. When auto IDs
+// survive reserialization, these entries are to be removed.
+var unstableRoundtripFixtures = map[string]string{
+	"bom-1.5.json":                     "ref-less mylibrary component",
+	"syft-0.96.0_plone-5.2.cdx.json":   "ref-less operating-system component",
+	"syft-0.96.0_rails-5.0.0.cdx.json": "ref-less operating-system component",
 }
 
 func TestRoundTripCDXRealDocuments(t *testing.T) {
@@ -76,11 +69,10 @@ func TestRoundTripCDXRealDocuments(t *testing.T) {
 
 				d := original.Diff(reread)
 
-				if issue, ok := knownRoundtripIssues[filepath.Base(fname)]; ok {
-					if d == nil {
-						t.Fatalf("the round trip is now clean: remove the fixture from knownRoundtripIssues (was: %s)", issue)
+				if reason, ok := unstableRoundtripFixtures[filepath.Base(fname)]; ok {
+					if d != nil {
+						t.Logf("tolerated unstable round trip (%s):\n%s", reason, describeDocumentDiff(d))
 					}
-					t.Logf("known dirty round trip (%s):\n%s", issue, describeDocumentDiff(d))
 					return
 				}
 

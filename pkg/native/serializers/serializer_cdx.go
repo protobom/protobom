@@ -238,6 +238,13 @@ func buildDependencies(nl *sbom.NodeList, components map[string]*cdx.Component) 
 		if _, ok := edgeTypeToScope(e.Type); ok {
 			continue
 		}
+		// Containment is structural data: it is already expressed through
+		// the component nesting, so it does not belong in the dependency
+		// graph. Writing it there would claim the parent depends on
+		// everything it contains.
+		if e.Type == sbom.Edge_contains {
+			continue
+		}
 		if _, ok := components[e.From]; !ok {
 			return nil, fmt.Errorf("node %q not found in components list", e.From)
 		}

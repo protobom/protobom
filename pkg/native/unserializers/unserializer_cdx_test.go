@@ -150,7 +150,6 @@ func TestComponentScopeToEdge(t *testing.T) {
 		"unknown":  {cdx.Scope("not-a-scope"), sbom.Edge_UNKNOWN, false},
 	} {
 		t.Run(name, func(t *testing.T) {
-			cc := 0
 			nl, err := cdxu.componentToNodeList(&cdx.Component{
 				BOMRef: "parent",
 				Type:   cdx.ComponentTypeApplication,
@@ -163,7 +162,7 @@ func TestComponentScopeToEdge(t *testing.T) {
 						Scope:  tc.scope,
 					},
 				},
-			}, &cc)
+			}, map[string]int{})
 			require.NoError(t, err)
 
 			// The structural relationship is always captured:
@@ -220,58 +219,70 @@ func TestUnserializeComponentScope(t *testing.T) {
 	}
 }
 
+// TestDeterministicIds checks the identifiers generated for components that
+// have no bom-ref: they are derived from the node's content, so they do not
+// depend on where the component sits in the document, and identical
+// components are told apart by their occurrence number in read order.
 func TestDeterministicIds(t *testing.T) {
 	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
-	for _, tc := range []struct {
-		name     string
-		sut      *cdx.Component
-		expected []string
-		len      int
-		mustErr  bool
-	}{
-		{
-			name: "3 components",
-			sut: &cdx.Component{
-				Type: "application",
-				Components: &[]cdx.Component{
-					{Type: "library"},
-					{Type: "library"},
-				},
-			},
-			expected: []string{"protobom-auto--000000001", "protobom-auto--000000002", "protobom-auto--000000003"},
-			len:      3,
-			mustErr:  false,
-		},
-		{
-			name: "3 components plus one with id",
-			sut: &cdx.Component{
-				Type: "application",
-				Components: &[]cdx.Component{
-					{BOMRef: "i-got-id", Type: "library"},
-					{Type: "library"},
-				},
-			},
-			expected: []string{"protobom-auto--000000001", "i-got-id", "protobom-auto--000000003"},
-			len:      3,
-			mustErr:  false,
-		},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			cc := 0
-			nodelist, err := cdxu.componentToNodeList(tc.sut, &cc)
-			if tc.mustErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			names := []string{}
-			require.Len(t, nodelist.Nodes, tc.len)
-			for i := range nodelist.Nodes {
-				names = append(names, nodelist.Nodes[i].Id)
-			}
-			require.Equal(t, tc.expected, names)
-		})
+
+	parse := func(t *testing.T, sut *cdx.Component) []string {
+		t.Helper()
+		nodelist, err := cdxu.componentToNodeList(sut, map[string]int{})
+		require.NoError(t, err)
+		ids := make([]string, 0, len(nodelist.Nodes))
+		for i := range nodelist.Nodes {
+			ids = append(ids, nodelist.Nodes[i].Id)
+		}
+		return ids
 	}
+
+	t.Run("identical twins get occurrence suffixes", func(t *testing.T) {
+		ids := parse(t, &cdx.Component{
+			Type: "application",
+			Components: &[]cdx.Component{
+				{Type: "library"},
+				{Type: "library"},
+			},
+		})
+		require.Len(t, ids, 3)
+		for _, id := range ids {
+			require.True(t, strings.HasPrefix(id, "protobom-auto--"), id)
+		}
+		// The parent's content differs from the children's, the twins
+		// share a checksum and are numbered apart:
+		require.NotEqual(t, ids[0], ids[1])
+		require.Equal(t, ids[1]+"-2", ids[2])
+	})
+
+	t.Run("explicit refs are preserved", func(t *testing.T) {
+		ids := parse(t, &cdx.Component{
+			Type: "application",
+			Components: &[]cdx.Component{
+				{BOMRef: "i-got-id", Type: "library"},
+				{Type: "library"},
+			},
+		})
+		require.Len(t, ids, 3)
+		require.Equal(t, "i-got-id", ids[1])
+		require.True(t, strings.HasPrefix(ids[2], "protobom-auto--"), ids[2])
+	})
+
+	t.Run("ids do not depend on position", func(t *testing.T) {
+		library := cdx.Component{Type: "library", Name: "a-library"}
+		alone := parse(t, &cdx.Component{
+			Type:       "application",
+			Components: &[]cdx.Component{library},
+		})
+		crowded := parse(t, &cdx.Component{
+			Type: "application",
+			Components: &[]cdx.Component{
+				{BOMRef: "first", Type: "library", Name: "another"},
+				library,
+			},
+		})
+		require.Equal(t, alone[1], crowded[2])
+	})
 }
 
 func TestLicenseChoicesNilLicense(t *testing.T) {

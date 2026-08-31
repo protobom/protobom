@@ -56,7 +56,9 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		NodeList: &sbom.NodeList{},
 	}
 
-	cc := 0
+	// Occurrences of each content checksum among the components read so far
+	// that have no bom-ref, to tell identical ones apart (see componentToNode).
+	autoIDs := map[string]int{}
 
 	if bom.Metadata != nil {
 		if bom.Metadata.Lifecycles != nil {
@@ -76,7 +78,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 			}
 		}
 		if bom.Metadata.Component != nil {
-			nl, err := u.componentToNodeList(bom.Metadata.Component, &cc)
+			nl, err := u.componentToNodeList(bom.Metadata.Component, autoIDs)
 			if err != nil {
 				return nil, fmt.Errorf("converting main bom component to node: %w", err)
 			}
@@ -114,7 +116,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		seen := make(map[string]struct{})
 		for i := range *bom.Components {
 			component := &(*bom.Components)[i]
-			nl, err := u.componentToNodeList(component, &cc)
+			nl, err := u.componentToNodeList(component, autoIDs)
 			if err != nil {
 				return nil, fmt.Errorf("converting component to node: %w", err)
 			}
@@ -171,8 +173,8 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 
 // componentToNodes takes a CycloneDX component and computes its graph fragment,
 // returning a nodelist
-func (u *CDX) componentToNodeList(component *cdx.Component, cc *int) (*sbom.NodeList, error) {
-	node, err := u.componentToNode(component, cc)
+func (u *CDX) componentToNodeList(component *cdx.Component, autoIDs map[string]int) (*sbom.NodeList, error) {
+	node, err := u.componentToNode(component, autoIDs)
 	if err != nil {
 		return nil, fmt.Errorf("converting cdx component to node: %w", err)
 	}
@@ -186,7 +188,7 @@ func (u *CDX) componentToNodeList(component *cdx.Component, cc *int) (*sbom.Node
 	if component.Components != nil {
 		for i := range *component.Components {
 			subComponent := &(*component.Components)[i]
-			subList, err := u.componentToNodeList(subComponent, cc)
+			subList, err := u.componentToNodeList(subComponent, autoIDs)
 			if err != nil {
 				return nil, fmt.Errorf("converting subcomponent to nodelist: %w", err)
 			}
@@ -235,8 +237,7 @@ func (u *CDX) scopeToEdgeType(scope cdx.Scope) (sbom.Edge_Type, bool) {
 	}
 }
 
-func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { //nolint:unparam
-	(*cc)++
+func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.Node, error) { //nolint:unparam
 	node := &sbom.Node{
 		Id:      c.BOMRef,
 		Type:    sbom.Node_PACKAGE,
@@ -307,9 +308,17 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 		node.Properties = ps
 	}
 
-	// Generate a new ID if none is set
+	// Generate a new ID if none is set. The identifier is derived from the
+	// node's content so it does not depend on where the component sits in
+	// the document and survives reserialization. Identical components are
+	// told apart by their occurrence number in read order.
 	if node.Id == "" {
-		node.Id = sbom.NewNodeIdentifier("auto", fmt.Sprintf("%09d", *cc))
+		sum := node.Checksum()[:16]
+		autoIDs[sum]++
+		if n := autoIDs[sum]; n > 1 {
+			sum = fmt.Sprintf("%s-%d", sum, n)
+		}
+		node.Id = sbom.NewNodeIdentifier(sbom.NodeIdentifierPrefixAuto, sum)
 	}
 
 	return node, nil

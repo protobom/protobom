@@ -1,6 +1,9 @@
 package sbom
 
 import (
+	"cmp"
+	"maps"
+	"slices"
 	"time"
 
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -10,20 +13,54 @@ type NodeDiff struct {
 	Added     *Node
 	Removed   *Node
 	DiffCount int
+
+	// Node1 and Node2 reference the pair of nodes the diff describes. They
+	// are populated by NodeList.Diff, where a diff can belong to one of many
+	// matched pairs; Node.Diff leaves them nil.
+	Node1 *Node
+	Node2 *Node
+}
+
+// DiffOption adjusts how the diff functions compare protobom data.
+type DiffOption func(*diffOptions)
+
+// diffOptions captures the adjustments that DiffOptions make to a diff.
+type diffOptions struct {
+	compareIDs bool
+}
+
+// WithIDs returns a DiffOption that makes the diff functions treat node ID
+// changes as content changes. By default IDs are ignored when comparing: an
+// ID identifies a node within a document rather than describing the software,
+// and varies across formats and tools describing the same component.
+func WithIDs() DiffOption {
+	return func(o *diffOptions) {
+		o.compareIDs = true
+	}
 }
 
 // Diff analyses a node and returns a a new node populated with all fields
-// that are different in n2 from n. If no changes are found, Diff returns nil
-func (n *Node) Diff(n2 *Node) *NodeDiff {
+// that are different in n2 from n. If no changes are found, Diff returns nil.
+// Node IDs are not compared unless the [WithIDs] option is passed.
+func (n *Node) Diff(n2 *Node, options ...DiffOption) *NodeDiff {
+	opts := &diffOptions{}
+	for _, apply := range options {
+		apply(opts)
+	}
+
 	nd := NodeDiff{
 		Added:   &Node{},
 		Removed: &Node{},
 	}
 
-	a, r, c := diff(n.Id, n2.Id)
-	nd.Added.Id = a
-	nd.Removed.Id = r
-	nd.DiffCount += c
+	var a, r string
+	var c int
+	if opts.compareIDs {
+		a, r, c = diff(n.Id, n2.Id)
+		nd.Added.Id = a
+		nd.Removed.Id = r
+		nd.DiffCount += c
+	}
 
 	if n.Type != n2.Type {
 		nd.Added.Type = n2.Type
@@ -159,6 +196,223 @@ func (n *Node) Diff(n2 *Node) *NodeDiff {
 		return &nd
 	}
 	return nil
+}
+
+// NodeListDiff captures the differences between two NodeLists. Nodes present
+// in only one of the lists are collected in Added and Removed. Nodes found in
+// both lists whose data differs are captured as NodeDiffs in Modified. Edge
+// and root element changes are expressed in the ID space of the NodeList the
+// diff was computed from (the receiver of NodeList.Diff).
+type NodeListDiff struct {
+	Added    []*Node
+	Removed  []*Node
+	Modified []*NodeDiff
+
+	EdgesAdded   []*Edge
+	EdgesRemoved []*Edge
+
+	RootElementsAdded   []string
+	RootElementsRemoved []string
+
+	// DiffCount totals the changes in the report: one per added or removed
+	// node, edge delta and root element change, plus the DiffCount of each
+	// modified node.
+	DiffCount int
+}
+
+// Diff compares the NodeList to another (nl2) and returns a NodeListDiff
+// describing the changes that transform nl into nl2. If the lists are
+// equivalent, Diff returns nil. A nil nl2 is treated as an empty NodeList.
+//
+// Nodes are paired across the two lists first by ID and then, for nodes
+// without an ID match, by software identity using [NodeList.GetMatchingNode]
+// (hashes, then purl). A node that matches more than one candidate is left
+// unpaired and reported as added or removed rather than guessing a pair.
+// Paired nodes with differing data are reported as [NodeDiff] entries in
+// Modified, with Node1 and Node2 pointing to the paired nodes.
+//
+// While node IDs are used to pair nodes, an ID change in a pair matched by
+// software identity does not count as a change unless the [WithIDs] option
+// is passed.
+//
+// Edges are compared per source node and edge type after translating the IDs
+// of paired nodes in nl2 into their equivalents in nl. The edges in the
+// report carry only the destinations that changed. Root element changes are
+// reported the same way, in the receiver's ID space.
+func (nl *NodeList) Diff(nl2 *NodeList, options ...DiffOption) *NodeListDiff {
+	if nl2 == nil {
+		nl2 = &NodeList{}
+	}
+
+	d := &NodeListDiff{
+		Added:        []*Node{},
+		Removed:      []*Node{},
+		Modified:     []*NodeDiff{},
+		EdgesAdded:   []*Edge{},
+		EdgesRemoved: []*Edge{},
+	}
+
+	// Pair the nodes of the two lists, first by ID:
+	pairs := map[string]*Node{}
+	matched2 := map[string]struct{}{}
+	index2 := nl2.indexNodes()
+	for _, n := range nl.Nodes {
+		if n2, ok := index2[n.Id]; ok {
+			pairs[n.Id] = n2
+			matched2[n2.Id] = struct{}{}
+		}
+	}
+
+	// ...then by software identity. Only nodes not already paired are
+	// eligible and each node can be claimed by a single pair.
+	remaining := &NodeList{}
+	for _, n2 := range nl2.Nodes {
+		if _, ok := matched2[n2.Id]; !ok {
+			remaining.Nodes = append(remaining.Nodes, n2)
+		}
+	}
+	for _, n := range nl.Nodes {
+		if _, ok := pairs[n.Id]; ok {
+			continue
+		}
+		// An ambiguous match (ErrorMoreThanOneMatch) leaves the node
+		// unpaired to be reported as added and removed.
+		n2, err := remaining.GetMatchingNode(n)
+		if err != nil || n2 == nil {
+			continue
+		}
+		pairs[n.Id] = n2
+		matched2[n2.Id] = struct{}{}
+		for i := range remaining.Nodes {
+			if remaining.Nodes[i].Id == n2.Id {
+				remaining.Nodes = slices.Delete(remaining.Nodes, i, i+1)
+				break
+			}
+		}
+	}
+
+	// Classify the nodes based on the pairings:
+	for _, n := range nl.Nodes {
+		n2, ok := pairs[n.Id]
+		if !ok {
+			d.Removed = append(d.Removed, n)
+			continue
+		}
+		if nd := n.Diff(n2, options...); nd != nil {
+			nd.Node1 = n
+			nd.Node2 = n2
+			d.Modified = append(d.Modified, nd)
+			d.DiffCount += nd.DiffCount
+		}
+	}
+	for _, n2 := range nl2.Nodes {
+		if _, ok := matched2[n2.Id]; !ok {
+			d.Added = append(d.Added, n2)
+		}
+	}
+
+	// Translation map from nl2's ID space to the receiver's
+	idmap := map[string]string{}
+	for id1, n2 := range pairs {
+		idmap[n2.Id] = id1
+	}
+
+	d.EdgesAdded, d.EdgesRemoved = diffEdges(nl.Edges, nl2.Edges, idmap)
+
+	roots2 := make([]string, 0, len(nl2.RootElements))
+	for _, id := range nl2.RootElements {
+		roots2 = append(roots2, translateID(idmap, id))
+	}
+	d.RootElementsAdded, d.RootElementsRemoved, _ = diffSlice(nl.RootElements, roots2)
+
+	d.DiffCount += len(d.Added) + len(d.Removed) +
+		len(d.EdgesAdded) + len(d.EdgesRemoved) +
+		len(d.RootElementsAdded) + len(d.RootElementsRemoved)
+
+	if d.DiffCount > 0 {
+		return d
+	}
+	return nil
+}
+
+// edgeSourceKey identifies a group of edge destinations by origin and type
+type edgeSourceKey struct {
+	from     string
+	edgeType Edge_Type
+}
+
+// diffEdges compares two edge lists and returns the added and removed
+// relationships. Edges are compared per source node and type, so the returned
+// edges carry only the destinations that changed. IDs in edges2 are
+// translated through idmap before comparing.
+func diffEdges(edges1, edges2 []*Edge, idmap map[string]string) (added, removed []*Edge) {
+	added = []*Edge{}
+	removed = []*Edge{}
+
+	agg1 := aggregateEdges(edges1, nil)
+	agg2 := aggregateEdges(edges2, idmap)
+
+	keys := slices.Collect(maps.Keys(agg1))
+	for k := range agg2 {
+		if _, ok := agg1[k]; !ok {
+			keys = append(keys, k)
+		}
+	}
+	slices.SortFunc(keys, func(a, b edgeSourceKey) int {
+		return cmp.Or(
+			cmp.Compare(a.from, b.from),
+			cmp.Compare(a.edgeType, b.edgeType),
+		)
+	})
+
+	for _, k := range keys {
+		addedTos := []string{}
+		removedTos := []string{}
+		for to := range agg2[k] {
+			if _, ok := agg1[k][to]; !ok {
+				addedTos = append(addedTos, to)
+			}
+		}
+		for to := range agg1[k] {
+			if _, ok := agg2[k][to]; !ok {
+				removedTos = append(removedTos, to)
+			}
+		}
+		if len(addedTos) > 0 {
+			slices.Sort(addedTos)
+			added = append(added, &Edge{From: k.from, Type: k.edgeType, To: addedTos})
+		}
+		if len(removedTos) > 0 {
+			slices.Sort(removedTos)
+			removed = append(removed, &Edge{From: k.from, Type: k.edgeType, To: removedTos})
+		}
+	}
+	return added, removed
+}
+
+// aggregateEdges collapses a list of edges into destination sets indexed by
+// source node and edge type, translating IDs through idmap.
+func aggregateEdges(edges []*Edge, idmap map[string]string) map[edgeSourceKey]map[string]struct{} {
+	agg := map[edgeSourceKey]map[string]struct{}{}
+	for _, e := range edges {
+		k := edgeSourceKey{from: translateID(idmap, e.From), edgeType: e.Type}
+		if _, ok := agg[k]; !ok {
+			agg[k] = map[string]struct{}{}
+		}
+		for _, to := range e.To {
+			agg[k][translateID(idmap, to)] = struct{}{}
+		}
+	}
+	return agg
+}
+
+// translateID returns the equivalent of id in the ID space idmap translates
+// to, or id itself when it has no translation.
+func translateID(idmap map[string]string, id string) string {
+	if tid, ok := idmap[id]; ok {
+		return tid
+	}
+	return id
 }
 
 type Flattenable interface {

@@ -62,6 +62,7 @@ func TestNodeDiff(t *testing.T) {
 	for _, tc := range []struct {
 		name     string
 		prepare  func(*Node, *Node)
+		options  []DiffOption
 		sut      *Node
 		node     *Node
 		expected *NodeDiff
@@ -72,10 +73,18 @@ func TestNodeDiff(t *testing.T) {
 			expected: nil,
 		},
 		{
-			name: "alter node id",
+			name: "alter node id ignored by default",
 			prepare: func(sutNode, newNode *Node) {
 				newNode.Id = "modified"
 			},
+			expected: nil,
+		},
+		{
+			name: "alter node id with WithIDs",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Id = "modified"
+			},
+			options: []DiffOption{WithIDs()},
 			expected: &NodeDiff{
 				Added: &Node{
 					Id: "modified",
@@ -103,6 +112,21 @@ func TestNodeDiff(t *testing.T) {
 				newNode.Id = "modified"
 				newNode.Name = "newname"
 			},
+			expected: &NodeDiff{
+				Added: &Node{
+					Name: "newname",
+				},
+				Removed:   &Node{},
+				DiffCount: 1,
+			},
+		},
+		{
+			name: "alter node name and id with WithIDs",
+			prepare: func(sutNode, newNode *Node) {
+				newNode.Id = "modified"
+				newNode.Name = "newname"
+			},
+			options: []DiffOption{WithIDs()},
 			expected: &NodeDiff{
 				Added: &Node{
 					Id:   "modified",
@@ -246,7 +270,7 @@ func TestNodeDiff(t *testing.T) {
 			tc.node = testNode.Copy()
 			// The prepare function modifies them for the test
 			tc.prepare(tc.sut, tc.node)
-			result := tc.sut.Diff(tc.node)
+			result := tc.sut.Diff(tc.node, tc.options...)
 			if tc.expected == nil {
 				require.Nil(t, result)
 				return
@@ -313,6 +337,7 @@ func TestNodeListDiff(t *testing.T) {
 	for _, tc := range []struct {
 		name    string
 		prepare func(sut, other *NodeList)
+		options []DiffOption
 		// check verifies the resulting diff. A nil check expects a nil diff.
 		check func(t *testing.T, d *NodeListDiff)
 	}{
@@ -364,9 +389,33 @@ func TestNodeListDiff(t *testing.T) {
 			},
 		},
 		{
+			name: "node rename alone is no change",
+			prepare: func(sut, other *NodeList) {
+				other.Nodes[2].Id = "node-3-renamed"
+				other.Edges[0].To = []string{"node-2", "node-3-renamed"}
+			},
+			check: nil,
+		},
+		{
+			name: "node rename reported with WithIDs",
+			prepare: func(sut, other *NodeList) {
+				other.Nodes[2].Id = "node-3-renamed"
+				other.Edges[0].To = []string{"node-2", "node-3-renamed"}
+			},
+			options: []DiffOption{WithIDs()},
+			check: func(t *testing.T, d *NodeListDiff) {
+				require.Empty(t, d.Added)
+				require.Empty(t, d.Removed)
+				require.Len(t, d.Modified, 1)
+				require.Equal(t, "node-3-renamed", d.Modified[0].Added.Id)
+				require.Equal(t, 1, d.DiffCount)
+			},
+		},
+		{
 			name: "node matched by identity across IDs",
 			prepare: func(sut, other *NodeList) {
 				other.Nodes[2].Id = "node-3-renamed"
+				other.Nodes[2].Version = "0.9.1"
 				other.Edges[0].To = []string{"node-2", "node-3-renamed"}
 			},
 			check: func(t *testing.T, d *NodeListDiff) {
@@ -375,7 +424,8 @@ func TestNodeListDiff(t *testing.T) {
 				require.Len(t, d.Modified, 1)
 				require.Equal(t, "node-3", d.Modified[0].Node1.Id)
 				require.Equal(t, "node-3-renamed", d.Modified[0].Node2.Id)
-				require.Equal(t, "node-3-renamed", d.Modified[0].Added.Id)
+				require.Equal(t, "0.9.1", d.Modified[0].Added.Version)
+				require.Empty(t, d.Modified[0].Added.Id)
 				// The edges must not report changes as the renamed node's
 				// ID translates back to its match in the receiver
 				require.Empty(t, d.EdgesAdded)
@@ -485,7 +535,7 @@ func TestNodeListDiff(t *testing.T) {
 			sut := testDiffNodeList()
 			other := testDiffNodeList()
 			tc.prepare(sut, other)
-			result := sut.Diff(other)
+			result := sut.Diff(other, tc.options...)
 			if tc.check == nil {
 				require.Nil(t, result)
 				return

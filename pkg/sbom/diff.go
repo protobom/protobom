@@ -21,18 +21,46 @@ type NodeDiff struct {
 	Node2 *Node
 }
 
+// DiffOption adjusts how the diff functions compare protobom data.
+type DiffOption func(*diffOptions)
+
+// diffOptions captures the adjustments that DiffOptions make to a diff.
+type diffOptions struct {
+	compareIDs bool
+}
+
+// WithIDs returns a DiffOption that makes the diff functions treat node ID
+// changes as content changes. By default IDs are ignored when comparing: an
+// ID identifies a node within a document rather than describing the software,
+// and varies across formats and tools describing the same component.
+func WithIDs() DiffOption {
+	return func(o *diffOptions) {
+		o.compareIDs = true
+	}
+}
+
 // Diff analyses a node and returns a a new node populated with all fields
-// that are different in n2 from n. If no changes are found, Diff returns nil
-func (n *Node) Diff(n2 *Node) *NodeDiff {
+// that are different in n2 from n. If no changes are found, Diff returns nil.
+// Node IDs are not compared unless the [WithIDs] option is passed.
+func (n *Node) Diff(n2 *Node, options ...DiffOption) *NodeDiff {
+	opts := &diffOptions{}
+	for _, apply := range options {
+		apply(opts)
+	}
+
 	nd := NodeDiff{
 		Added:   &Node{},
 		Removed: &Node{},
 	}
 
-	a, r, c := diff(n.Id, n2.Id)
-	nd.Added.Id = a
-	nd.Removed.Id = r
-	nd.DiffCount += c
+	var a, r string
+	var c int
+	if opts.compareIDs {
+		a, r, c = diff(n.Id, n2.Id)
+		nd.Added.Id = a
+		nd.Removed.Id = r
+		nd.DiffCount += c
+	}
 
 	if n.Type != n2.Type {
 		nd.Added.Type = n2.Type
@@ -203,11 +231,15 @@ type NodeListDiff struct {
 // Paired nodes with differing data are reported as [NodeDiff] entries in
 // Modified, with Node1 and Node2 pointing to the paired nodes.
 //
+// While node IDs are used to pair nodes, an ID change in a pair matched by
+// software identity does not count as a change unless the [WithIDs] option
+// is passed.
+//
 // Edges are compared per source node and edge type after translating the IDs
 // of paired nodes in nl2 into their equivalents in nl. The edges in the
 // report carry only the destinations that changed. Root element changes are
 // reported the same way, in the receiver's ID space.
-func (nl *NodeList) Diff(nl2 *NodeList) *NodeListDiff {
+func (nl *NodeList) Diff(nl2 *NodeList, options ...DiffOption) *NodeListDiff {
 	if nl2 == nil {
 		nl2 = &NodeList{}
 	}
@@ -266,7 +298,7 @@ func (nl *NodeList) Diff(nl2 *NodeList) *NodeListDiff {
 			d.Removed = append(d.Removed, n)
 			continue
 		}
-		if nd := n.Diff(n2); nd != nil {
+		if nd := n.Diff(n2, options...); nd != nil {
 			nd.Node1 = n
 			nd.Node2 = n2
 			d.Modified = append(d.Modified, nd)

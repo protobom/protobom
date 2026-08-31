@@ -335,6 +335,133 @@ func (nl *NodeList) Diff(nl2 *NodeList, options ...DiffOption) *NodeListDiff {
 	return nil
 }
 
+// MetadataDiff captures the changes between two sets of document metadata.
+// Like in NodeDiff, Added and Removed are sparse Metadata structs populated
+// only with the fields that changed.
+type MetadataDiff struct {
+	Added     *Metadata
+	Removed   *Metadata
+	DiffCount int
+}
+
+// Diff compares the metadata to another set (m2) and returns a MetadataDiff
+// capturing the fields that changed, or nil if both are equivalent. Nil
+// metadata is treated as empty.
+//
+// The document identifier is not compared unless the [WithIDs] option is
+// passed: serial numbers and document IDs name the document instance rather
+// than describe its contents. SourceData is never compared as it preserves
+// details of the original document the data was read from.
+func (m *Metadata) Diff(m2 *Metadata, options ...DiffOption) *MetadataDiff {
+	opts := &diffOptions{}
+	for _, apply := range options {
+		apply(opts)
+	}
+
+	if m == nil {
+		m = &Metadata{}
+	}
+	if m2 == nil {
+		m2 = &Metadata{}
+	}
+
+	md := MetadataDiff{
+		Added:   &Metadata{},
+		Removed: &Metadata{},
+	}
+
+	var a, r string
+	var c int
+	if opts.compareIDs {
+		a, r, c = diff(m.Id, m2.Id)
+		md.Added.Id = a
+		md.Removed.Id = r
+		md.DiffCount += c
+	}
+
+	a, r, c = diff(m.Version, m2.Version)
+	md.Added.Version = a
+	md.Removed.Version = r
+	md.DiffCount += c
+
+	a, r, c = diff(m.Name, m2.Name)
+	md.Added.Name = a
+	md.Removed.Name = r
+	md.DiffCount += c
+
+	a, r, c = diff(m.Comment, m2.Comment)
+	md.Added.Comment = a
+	md.Removed.Comment = r
+	md.DiffCount += c
+
+	addedD, removedD, count := diffDates(m.Date, m2.Date)
+	md.Added.Date = addedD
+	md.Removed.Date = removedD
+	md.DiffCount += count
+
+	addedT, removedT, count := diffList(m.Tools, m2.Tools)
+	md.Added.Tools = addedT
+	md.Removed.Tools = removedT
+	md.DiffCount += count
+
+	addedP, removedP, count := diffList(m.Authors, m2.Authors)
+	md.Added.Authors = addedP
+	md.Removed.Authors = removedP
+	md.DiffCount += count
+
+	addedDT, removedDT, count := diffList(m.DocumentTypes, m2.DocumentTypes)
+	md.Added.DocumentTypes = addedDT
+	md.Removed.DocumentTypes = removedDT
+	md.DiffCount += count
+
+	if md.DiffCount > 0 {
+		return &md
+	}
+	return nil
+}
+
+// DocumentDiff captures the differences between two documents: the changes
+// to the document metadata and to the SBOM graph.
+type DocumentDiff struct {
+	Metadata *MetadataDiff
+	NodeList *NodeListDiff
+
+	// DiffCount is the sum of the DiffCounts of the metadata and nodelist
+	// reports.
+	DiffCount int
+}
+
+// Diff compares the document to another (d2) and returns a DocumentDiff
+// describing the changes that transform d into d2, combining the reports of
+// [Metadata.Diff] and [NodeList.Diff]. If the documents are equivalent, Diff
+// returns nil. A nil d2 is treated as an empty document.
+func (d *Document) Diff(d2 *Document, options ...DiffOption) *DocumentDiff {
+	if d2 == nil {
+		d2 = &Document{}
+	}
+
+	dd := DocumentDiff{}
+
+	if md := d.Metadata.Diff(d2.Metadata, options...); md != nil {
+		dd.Metadata = md
+		dd.DiffCount += md.DiffCount
+	}
+
+	nl := d.NodeList
+	if nl == nil {
+		nl = &NodeList{}
+	}
+	if nld := nl.Diff(d2.NodeList, options...); nld != nil {
+		dd.NodeList = nld
+		dd.DiffCount += nld.DiffCount
+	}
+
+	if dd.DiffCount > 0 {
+		return &dd
+	}
+	return nil
+}
+
 // edgeSourceKey identifies a group of edge destinations by origin and type
 type edgeSourceKey struct {
 	from     string

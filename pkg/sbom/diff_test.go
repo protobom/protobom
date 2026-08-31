@@ -557,6 +557,270 @@ func TestNodeListDiffNil(t *testing.T) {
 	require.Equal(t, 5, d.DiffCount)
 }
 
+// testDiffDocument builds the document the Document.Diff tests start from.
+func testDiffDocument() *Document {
+	docType := DocumentType_BUILD
+	return &Document{
+		Metadata: &Metadata{
+			Id:      "urn:uuid:1f860713-54b9-4253-ba5a-9554851904af",
+			Version: "1",
+			Name:    "test-document",
+			Date:    timestamppb.New(time.Date(2024, 5, 1, 12, 0, 0, 0, time.UTC)),
+			Tools: []*Tool{
+				{Name: "protobom", Version: "1.0.0", Vendor: "The Protobom Authors"},
+			},
+			Authors: []*Person{
+				{Name: "The Protobom Authors", IsOrg: true},
+			},
+			Comment:       "This document tests document diffing",
+			DocumentTypes: []*DocumentType{{Type: &docType}},
+			SourceData: &SourceData{
+				Format: "text/spdx+json;version=2.3",
+				Size:   1024,
+			},
+		},
+		NodeList: testDiffNodeList(),
+	}
+}
+
+func TestMetadataDiff(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		prepare func(sut, other *Metadata)
+		options []DiffOption
+		// check verifies the resulting diff. A nil check expects a nil diff.
+		check func(t *testing.T, d *MetadataDiff)
+	}{
+		{
+			name:    "no change",
+			prepare: func(sut, other *Metadata) {},
+			check:   nil,
+		},
+		{
+			name: "document id ignored by default",
+			prepare: func(sut, other *Metadata) {
+				other.Id = "urn:uuid:9laa9f2a-cb90-4b23-b8b1-e17aa7c1cd42"
+			},
+			check: nil,
+		},
+		{
+			name: "document id reported with WithIDs",
+			prepare: func(sut, other *Metadata) {
+				other.Id = "urn:uuid:9laa9f2a-cb90-4b23-b8b1-e17aa7c1cd42"
+			},
+			options: []DiffOption{WithIDs()},
+			check: func(t *testing.T, d *MetadataDiff) {
+				require.Equal(t, "urn:uuid:9laa9f2a-cb90-4b23-b8b1-e17aa7c1cd42", d.Added.Id)
+				require.Equal(t, 1, d.DiffCount)
+			},
+		},
+		{
+			name: "version and name changed",
+			prepare: func(sut, other *Metadata) {
+				other.Version = "2"
+				other.Name = "renamed-document"
+			},
+			check: func(t *testing.T, d *MetadataDiff) {
+				require.Equal(t, "2", d.Added.Version)
+				require.Equal(t, "renamed-document", d.Added.Name)
+				require.Equal(t, 2, d.DiffCount)
+			},
+		},
+		{
+			name: "date changed",
+			prepare: func(sut, other *Metadata) {
+				other.Date = timestamppb.New(time.Date(2024, 6, 1, 12, 0, 0, 0, time.UTC))
+			},
+			check: func(t *testing.T, d *MetadataDiff) {
+				require.NotNil(t, d.Added.Date)
+				require.Equal(t, 1, d.DiffCount)
+			},
+		},
+		{
+			name: "tool added",
+			prepare: func(sut, other *Metadata) {
+				other.Tools = append(other.Tools, &Tool{Name: "other-tool", Version: "0.1.0"})
+			},
+			check: func(t *testing.T, d *MetadataDiff) {
+				require.Len(t, d.Added.Tools, 1)
+				require.Equal(t, "other-tool", d.Added.Tools[0].Name)
+				require.Empty(t, d.Removed.Tools)
+				require.Equal(t, 1, d.DiffCount)
+			},
+		},
+		{
+			name: "author changed",
+			prepare: func(sut, other *Metadata) {
+				other.Authors = []*Person{{Name: "Someone Else"}}
+			},
+			check: func(t *testing.T, d *MetadataDiff) {
+				require.Len(t, d.Added.Authors, 1)
+				require.Len(t, d.Removed.Authors, 1)
+				require.Equal(t, 1, d.DiffCount)
+			},
+		},
+		{
+			name: "document type added",
+			prepare: func(sut, other *Metadata) {
+				docType := DocumentType_ANALYZED
+				other.DocumentTypes = append(other.DocumentTypes, &DocumentType{Type: &docType})
+			},
+			check: func(t *testing.T, d *MetadataDiff) {
+				require.Len(t, d.Added.DocumentTypes, 1)
+				require.Equal(t, 1, d.DiffCount)
+			},
+		},
+		{
+			name: "source data is not compared",
+			prepare: func(sut, other *Metadata) {
+				other.SourceData = &SourceData{Format: "application/vnd.cyclonedx+json;version=1.5"}
+			},
+			check: nil,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			sut := testDiffDocument().Metadata
+			other := testDiffDocument().Metadata
+			tc.prepare(sut, other)
+			result := sut.Diff(other, tc.options...)
+			if tc.check == nil {
+				require.Nil(t, result)
+				return
+			}
+			require.NotNil(t, result)
+			tc.check(t, result)
+		})
+	}
+}
+
+func TestMetadataDiffNil(t *testing.T) {
+	meta := testDiffDocument().Metadata
+
+	d := meta.Diff(nil)
+	require.NotNil(t, d)
+	require.Equal(t, "1", d.Removed.Version)
+	require.Equal(t, "test-document", d.Removed.Name)
+
+	var nilMeta *Metadata
+	d = nilMeta.Diff(meta)
+	require.NotNil(t, d)
+	require.Equal(t, "1", d.Added.Version)
+	require.Equal(t, "test-document", d.Added.Name)
+
+	require.Nil(t, nilMeta.Diff(nil))
+}
+
+func TestDocumentDiff(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		prepare func(sut, other *Document)
+		options []DiffOption
+		// check verifies the resulting diff. A nil check expects a nil diff.
+		check func(t *testing.T, d *DocumentDiff)
+	}{
+		{
+			name:    "no change",
+			prepare: func(sut, other *Document) {},
+			check:   nil,
+		},
+		{
+			name: "metadata change only",
+			prepare: func(sut, other *Document) {
+				other.Metadata.Version = "2"
+			},
+			check: func(t *testing.T, d *DocumentDiff) {
+				require.NotNil(t, d.Metadata)
+				require.Nil(t, d.NodeList)
+				require.Equal(t, "2", d.Metadata.Added.Version)
+				require.Equal(t, 1, d.DiffCount)
+			},
+		},
+		{
+			name: "nodelist change only",
+			prepare: func(sut, other *Document) {
+				other.NodeList.Nodes = append(other.NodeList.Nodes, &Node{Id: "node-4"})
+			},
+			check: func(t *testing.T, d *DocumentDiff) {
+				require.Nil(t, d.Metadata)
+				require.NotNil(t, d.NodeList)
+				require.Len(t, d.NodeList.Added, 1)
+				require.Equal(t, 1, d.DiffCount)
+			},
+		},
+		{
+			name: "metadata and nodelist changes add up",
+			prepare: func(sut, other *Document) {
+				other.Metadata.Version = "2"
+				other.NodeList.Nodes = append(other.NodeList.Nodes, &Node{Id: "node-4"})
+			},
+			check: func(t *testing.T, d *DocumentDiff) {
+				require.NotNil(t, d.Metadata)
+				require.NotNil(t, d.NodeList)
+				require.Equal(t, 2, d.DiffCount)
+			},
+		},
+		{
+			name: "options reach both reports",
+			prepare: func(sut, other *Document) {
+				other.Metadata.Id = "urn:uuid:9laa9f2a-cb90-4b23-b8b1-e17aa7c1cd42"
+				other.NodeList.Nodes[2].Id = "node-3-renamed"
+				other.NodeList.Edges[0].To = []string{"node-2", "node-3-renamed"}
+			},
+			options: []DiffOption{WithIDs()},
+			check: func(t *testing.T, d *DocumentDiff) {
+				require.NotNil(t, d.Metadata)
+				require.NotNil(t, d.NodeList)
+				require.Equal(t, "urn:uuid:9laa9f2a-cb90-4b23-b8b1-e17aa7c1cd42", d.Metadata.Added.Id)
+				require.Len(t, d.NodeList.Modified, 1)
+				require.Equal(t, 2, d.DiffCount)
+			},
+		},
+		{
+			name: "id changes alone are no change by default",
+			prepare: func(sut, other *Document) {
+				other.Metadata.Id = "urn:uuid:9laa9f2a-cb90-4b23-b8b1-e17aa7c1cd42"
+				other.NodeList.Nodes[2].Id = "node-3-renamed"
+				other.NodeList.Edges[0].To = []string{"node-2", "node-3-renamed"}
+			},
+			check: nil,
+		},
+		{
+			name: "missing metadata reports its fields removed",
+			prepare: func(sut, other *Document) {
+				other.Metadata = nil
+			},
+			check: func(t *testing.T, d *DocumentDiff) {
+				require.NotNil(t, d.Metadata)
+				require.Nil(t, d.NodeList)
+				require.Equal(t, "test-document", d.Metadata.Removed.Name)
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			sut := testDiffDocument()
+			other := testDiffDocument()
+			tc.prepare(sut, other)
+			result := sut.Diff(other, tc.options...)
+			if tc.check == nil {
+				require.Nil(t, result)
+				return
+			}
+			require.NotNil(t, result)
+			tc.check(t, result)
+		})
+	}
+}
+
+func TestDocumentDiffNil(t *testing.T) {
+	sut := testDiffDocument()
+	d := sut.Diff(nil)
+	require.NotNil(t, d)
+	require.NotNil(t, d.Metadata)
+	require.NotNil(t, d.NodeList)
+	require.Len(t, d.NodeList.Removed, 3)
+	require.Equal(t, d.Metadata.DiffCount+d.NodeList.DiffCount, d.DiffCount)
+}
+
 func TestDiffString(t *testing.T) {
 	for _, tc := range []struct {
 		name            string

@@ -6,7 +6,6 @@ package conformance
 import (
 	"bytes"
 	"fmt"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -27,23 +26,6 @@ import (
 // Document.Diff. Data the first read cannot capture never reaches the first
 // document and is out of scope here: this test is about protobom's CycloneDX
 // writer and reader agreeing with each other on real data.
-//
-// unstableRoundtripFixtures lists the fixtures whose write/read cycle is not
-// deterministic, keyed by file name. They carry a component without a
-// bom-ref, whose protobom ID is assigned by a counter in read order while
-// the serializer emits components in map order: depending on where the
-// counter lands on the second read, the cycle comes back clean or with the
-// ref-less node reported as one added and one removed, since without a purl
-// or hashes it cannot be re-paired by identity.
-//
-// A diff on a fixture listed here is logged but tolerated. When auto IDs
-// survive reserialization, these entries are to be removed.
-var unstableRoundtripFixtures = map[string]string{
-	"bom-1.5.json":                     "ref-less mylibrary component",
-	"syft-0.96.0_plone-5.2.cdx.json":   "ref-less operating-system component",
-	"syft-0.96.0_rails-5.0.0.cdx.json": "ref-less operating-system component",
-}
-
 func TestRoundTripCDXRealDocuments(t *testing.T) {
 	for _, format := range []formats.Format{
 		formats.CDX14JSON,
@@ -67,16 +49,7 @@ func TestRoundTripCDXRealDocuments(t *testing.T) {
 				reread, err := reader.New().ParseStream(bytes.NewReader(buf.Bytes()))
 				require.NoError(t, err)
 
-				d := original.Diff(reread)
-
-				if reason, ok := unstableRoundtripFixtures[filepath.Base(fname)]; ok {
-					if d != nil {
-						t.Logf("tolerated unstable round trip (%s):\n%s", reason, describeDocumentDiff(d))
-					}
-					return
-				}
-
-				if d != nil {
+				if d := original.Diff(reread); d != nil {
 					t.Errorf("the document changed in the round trip:\n%s", describeDocumentDiff(d))
 				}
 			})

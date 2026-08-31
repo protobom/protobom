@@ -28,8 +28,6 @@ import (
 // document and is out of scope here: this test is about protobom's CycloneDX
 // writer and reader agreeing with each other on real data.
 //
-// CycloneDX 1.7 is omitted because cyclonedx-go cannot decode it back.
-//
 // knownRoundtripIssues lists the fixtures whose cycle is still dirty, keyed
 // by file name, with the open defects that keep them so:
 //
@@ -58,6 +56,7 @@ func TestRoundTripCDXRealDocuments(t *testing.T) {
 		formats.CDX14JSON,
 		formats.CDX15JSON,
 		formats.CDX16JSON,
+		formats.CDX17JSON,
 	} {
 		for _, fname := range findFiles(t, format) {
 			t.Run(fname, func(t *testing.T) {

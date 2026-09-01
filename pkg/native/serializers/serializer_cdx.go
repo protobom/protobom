@@ -525,10 +525,16 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 
 	if n.Suppliers != nil && len(n.GetSuppliers()) > 0 {
 		// TODO(degradation): CDX type Component only supports one Supplier while protobom supports multiple
+		// TODO(degradation): The supplier's own email and phone have no
+		// place on a CycloneDX organizational entity, and a person
+		// supplier is written as an organization.
 
 		nodesupplier := n.GetSuppliers()[0]
 		oe := cdx.OrganizationalEntity{
 			Name: nodesupplier.GetName(),
+		}
+		if nodesupplier.GetUrl() != "" {
+			oe.URL = &[]string{nodesupplier.GetUrl()}
 		}
 		if nodesupplier.Contacts != nil {
 			var contacts []cdx.OrganizationalContact

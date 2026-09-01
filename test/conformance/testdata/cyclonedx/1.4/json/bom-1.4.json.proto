@@ -3,13 +3,16 @@
 -urn:uuid:3e671687-395b-41f5-a30f-a58921a69b791"—“Óô*%
 Awesome Tool9.1.2Awesome Vendor2<
 Samantha Wrightsamantha.wright@example.com*800-555-1212Jí
-*application/vnd.cyclonedx+json;version=1.4,(5165162dc99ade93d52c90ba599e14f66fa253eeD@2af8c8b816c85b01ade4404f8ad529d5f032b09e1929f904a60938dff863c52a…€ace8f7fe110e43f8645ed1dd96e1749bdf3f32efd6c4d9202768e27704be8887d534851df58a5437d3a9f6d77c87a41275289c7fab050927ee32d0c5f8ed5f81´("@file://test/conformance/testdata/cyclonedx/1.4/json/bom-1.4.jsonÝ
+*application/vnd.cyclonedx+json;version=1.4…€ace8f7fe110e43f8645ed1dd96e1749bdf3f32efd6c4d9202768e27704be8887d534851df58a5437d3a9f6d77c87a41275289c7fab050927ee32d0c5f8ed5f81,(5165162dc99ade93d52c90ba599e14f66fa253eeD@2af8c8b816c85b01ade4404f8ad529d5f032b09e1929f904a60938dff863c52a´("@file://test/conformance/testdata/cyclonedx/1.4/json/bom-1.4.json‚
 >
 protobom-auto--8046b0dda1038cedAcme Application"9.1.1ò
 œ
 pkg:npm/acme/component@1.0.0tomcat-catalina"9.0.14B
 Apache-2.0J
 Apache-2.0â pkg:npm/acme/component@1.0.0ê$ 3942447fac867ae5cdb3229b658f4d48ê,(e6b1000b94e835ffd37f4c6dcbdad43f4b48a02aêD@f498a8ff2dd007e29c2074f5e4b01a9a01775c3ff3aeaf6906ea503bc5791b7bê…€e8f33e424f3f4ed6db76a482fde1a5298970e442c531729119e37991884bdffab4f9426b7ee11fccd074eeda0634d71697d6f88a460dce0ac8d627a29f7d1282ò
-7
-protobom-auto--504d797bab8378e7	mylibrary"1.0.0òbprotobom-auto--8046b0dda1038cedpkg:npm/acme/component@1.0.0protobom-auto--504d797bab8378e7>
+Û
+protobom-auto--ea967fe80f36775d	mylibrary"1.0.0š 
+Example, Inc."https://example.com2F
+!Example Support AMER Distributionsupport@example.com*800-555-121220
+Example Support APACsupport@apac.example.comòbprotobom-auto--8046b0dda1038cedpkg:npm/acme/component@1.0.0protobom-auto--ea967fe80f36775d>
 pkg:npm/acme/component@1.0.0pkg:npm/acme/component@1.0.0protobom-auto--8046b0dda1038ced

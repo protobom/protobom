@@ -152,6 +152,78 @@ func TestRoundTripCDXAuthors(t *testing.T) {
 	}
 }
 
+// TestRoundTripCDXSupplier writes a node's suppliers and reads them back.
+// CycloneDX holds a single supplier, an organizational entity: the first
+// supplier survives with its name, URL and contacts, comes back marked as
+// an organization, and its own email and phone are dropped, as the entity
+// has no fields for them.
+func TestRoundTripCDXSupplier(t *testing.T) {
+	for _, format := range []formats.Format{
+		formats.CDX14JSON,
+		formats.CDX15JSON,
+		formats.CDX16JSON,
+		formats.CDX17JSON,
+	} {
+		t.Run(string(format), func(t *testing.T) {
+			original := &sbom.Document{
+				Metadata: &sbom.Metadata{
+					Id: "urn:uuid:11111111-2222-3333-4444-555555555555",
+				},
+				NodeList: &sbom.NodeList{
+					Nodes: []*sbom.Node{
+						{
+							Id:   "root",
+							Type: sbom.Node_PACKAGE,
+							Name: "a package",
+							Suppliers: []*sbom.Person{
+								{
+									Name:  "Jane Doe",
+									Email: "jane@example.com",
+									Phone: "555-1234",
+									Url:   "https://jane.example.com",
+									Contacts: []*sbom.Person{
+										{Name: "Support", Email: "support@example.com"},
+									},
+								},
+								{Name: "Second Supplier", IsOrg: true},
+							},
+						},
+					},
+					Edges:        []*sbom.Edge{},
+					RootElements: []string{"root"},
+				},
+			}
+
+			var buf bytes.Buffer
+			require.NoError(t, writer.New().WriteStreamWithOptions(
+				original, &buf, &writer.Options{
+					Format:        format,
+					RenderOptions: &native.RenderOptions{Indent: 2},
+				},
+			))
+
+			reread, err := reader.New().ParseStream(bytes.NewReader(buf.Bytes()))
+			require.NoError(t, err)
+
+			root := reread.NodeList.GetNodeByID("root")
+			require.NotNil(t, root)
+			require.Equal(t, []*sbom.Person{
+				// TODO(degradation): only the first supplier is written, a
+				// person supplier comes back as an organization, and its
+				// own email and phone cannot be stated on the entity.
+				{
+					Name:  "Jane Doe",
+					IsOrg: true,
+					Url:   "https://jane.example.com",
+					Contacts: []*sbom.Person{
+						{Name: "Support", Email: "support@example.com"},
+					},
+				},
+			}, root.Suppliers)
+		})
+	}
+}
+
 // maxDiffItems caps how many entries of each kind a diff description lists.
 const maxDiffItems = 10
 

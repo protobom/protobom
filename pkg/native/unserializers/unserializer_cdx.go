@@ -276,11 +276,35 @@ func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.N
 		Hashes:             map[int32]string{},
 		Description:        c.Description,
 		Attribution:        []string{},
-		Suppliers:          []*sbom.Person{}, // TODO
+		Suppliers:          []*sbom.Person{},
 		Originators:        []*sbom.Person{}, // TODO
 		ExternalReferences: []*sbom.ExternalReference{},
 		Identifiers:        map[int32]string{},
 		FileTypes:          []string{},
+	}
+
+	// The CycloneDX supplier is an organizational entity, so the person
+	// read back is always marked as an organization.
+	if c.Supplier != nil {
+		supplier := &sbom.Person{
+			Name:  c.Supplier.Name,
+			IsOrg: true,
+		}
+		if c.Supplier.URL != nil && len(*c.Supplier.URL) > 0 {
+			// TODO(degradation): protobom holds a single URL per person,
+			// any additional entity URLs are dropped.
+			supplier.Url = (*c.Supplier.URL)[0]
+		}
+		if c.Supplier.Contact != nil {
+			for _, contact := range *c.Supplier.Contact {
+				supplier.Contacts = append(supplier.Contacts, &sbom.Person{
+					Name:  contact.Name,
+					Email: contact.Email,
+					Phone: contact.Phone,
+				})
+			}
+		}
+		node.Suppliers = []*sbom.Person{supplier}
 	}
 
 	node.PrimaryPurpose = []sbom.Purpose{u.componentTypeToPurpose(c.Type)}

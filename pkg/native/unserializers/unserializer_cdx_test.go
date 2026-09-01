@@ -308,6 +308,46 @@ func TestUnserializeAuthors(t *testing.T) {
 	}, doc.Metadata.Authors)
 }
 
+// TestUnserializeSupplier checks the reading of a component supplier. The
+// CycloneDX supplier is an organizational entity, so the person read back is
+// marked as an organization; its URL and contacts are carried over.
+func TestUnserializeSupplier(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(`{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"component": {
+				"bom-ref": "root",
+				"type": "application",
+				"name": "an app",
+				"supplier": {
+					"name": "Acme Inc",
+					"url": ["https://acme.example", "https://acme.example/second"],
+					"contact": [
+						{"name": "Jane Doe", "email": "jane@acme.example", "phone": "555-1234"}
+					]
+				}
+			}
+		}
+	}`), nil, nil)
+	require.NoError(t, err)
+
+	root := doc.NodeList.GetNodeByID("root")
+	require.NotNil(t, root)
+	require.Equal(t, []*sbom.Person{
+		{
+			Name:  "Acme Inc",
+			IsOrg: true,
+			Url:   "https://acme.example",
+			Contacts: []*sbom.Person{
+				{Name: "Jane Doe", Email: "jane@acme.example", Phone: "555-1234"},
+			},
+		},
+	}, root.Suppliers)
+}
+
 // TestUnserializeTools checks the reading of the document creation tools.
 // Only the legacy tools array maps onto protobom's flat Tool; tools expressed
 // as components or services are deliberately not read (see

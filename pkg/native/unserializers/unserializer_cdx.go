@@ -330,6 +330,23 @@ func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.N
 		node.Identifiers[int32(sbom.SoftwareIdentifierType_PURL)] = c.PackageURL
 	}
 
+	if c.OmniborID != nil && len(*c.OmniborID) > 0 {
+		// OmniBOR identifiers are gitoids.
+		// TODO(degradation): protobom holds one gitoid per node, any
+		// additional OmniBOR identifiers are dropped.
+		node.Identifiers[int32(sbom.SoftwareIdentifierType_GITOID)] = (*c.OmniborID)[0]
+	}
+
+	if c.Authors != nil {
+		for _, author := range *c.Authors {
+			node.Originators = append(node.Originators, &sbom.Person{
+				Name:  author.Name,
+				Email: author.Email,
+				Phone: author.Phone,
+			})
+		}
+	}
+
 	if c.Hashes != nil {
 		for _, h := range *c.Hashes {
 			algo := sbom.HashAlgorithmFromCDX(h.Algorithm)
@@ -435,25 +452,47 @@ func (u *CDX) unserializeExternalReferences(cdxReferences *[]cdx.ExternalReferen
 	return ret
 }
 
-// licenseChoicesToLicenseList returns a flat list of license strings combining
-// expressions and IDs in one. This function should be part of a license package.
+// isConcludedLicense returns true when a license choice carries the
+// concluded acknowledgement, which CycloneDX states inside the license
+// object for a bare license and on the choice for an expression.
+func isConcludedLicense(lc *cdx.LicenseChoice) bool {
+	if lc.Acknowledgement != nil && *lc.Acknowledgement == cdx.LicenseAcknowledgementConcluded {
+		return true
+	}
+	return lc.License != nil && lc.License.Acknowledgement == cdx.LicenseAcknowledgementConcluded
+}
+
+// licenseChoiceString returns the string form of a license choice, or an
+// empty string when the choice states no license.
+func licenseChoiceString(lc *cdx.LicenseChoice) string {
+	// TODO(license): This should handle licenses without an ID and
+	// create custom licenses or another solution that captures the
+	// full custom license text.
+	if lc.Expression != "" {
+		return lc.Expression
+	}
+	if lc.License != nil {
+		return lc.License.ID
+	}
+	return ""
+}
+
+// licenseChoicesToLicenseList returns a flat list of the declared license
+// strings, combining expressions and IDs in one. Licenses marked with the
+// concluded acknowledgement belong to the concluded license instead and are
+// left out. This function should be part of a license package.
 func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 	list := []string{}
 	if lcs == nil {
 		return list
 	}
-	for _, lc := range *lcs {
-		// TODO(license): This should handle licenses without an ID and
-		// create custom licenses or another solution that captures the
-		// full custom license text.
-		if lc.Expression == "" && (lc.License == nil || lc.License.ID == "") {
+	for i := range *lcs {
+		lc := &(*lcs)[i]
+		if isConcludedLicense(lc) {
 			continue
 		}
-
-		if lc.Expression != "" {
-			list = append(list, lc.Expression)
-		} else {
-			list = append(list, lc.License.ID)
+		if s := licenseChoiceString(lc); s != "" {
+			list = append(list, s)
 		}
 	}
 
@@ -461,30 +500,32 @@ func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 }
 
 // licenseChoicesToLicenseString takes the component license data and computes
-// a license expression with its license entries. It will return the license or
-// expression verbatim if its just a single entry.
+// the concluded license expression: the licenses marked with the concluded
+// acknowledgement or, when there are none, the joined declared entries. It
+// will return the license or expression verbatim if its just a single entry.
 // This function is temporary and probably should be part of a more complete
 // license package.
 func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 	if lcs == nil {
 		return ""
 	}
-	var parts []string
-	for _, lc := range *lcs {
-		// TODO(license): This should handle licenses without an ID and
-		// create custom licenses or another solution that captures the
-		// full custom license text.
-		if lc.Expression == "" && (lc.License == nil || lc.License.ID == "") {
+	var parts, concluded []string
+	for i := range *lcs {
+		lc := &(*lcs)[i]
+		s := licenseChoiceString(lc)
+		if s == "" {
 			continue
 		}
-
-		if lc.Expression != "" {
-			parts = append(parts, lc.Expression)
+		if isConcludedLicense(lc) {
+			concluded = append(concluded, s)
 		} else {
-			parts = append(parts, lc.License.ID)
+			parts = append(parts, s)
 		}
 	}
 
+	if len(concluded) > 0 {
+		parts = concluded
+	}
 	if len(parts) == 1 {
 		return parts[0]
 	}

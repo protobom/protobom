@@ -33,11 +33,18 @@ import (
 // cdxRoundTrip writes the document as CycloneDX 1.6 and reads it back.
 func cdxRoundTrip(t *testing.T, doc *sbom.Document) *sbom.Document {
 	t.Helper()
+	return cdxRoundTripIn(t, doc, formats.CDX16JSON)
+}
+
+// cdxRoundTripIn is cdxRoundTrip in a CycloneDX version of the caller's
+// choosing.
+func cdxRoundTripIn(t *testing.T, doc *sbom.Document, format formats.Format) *sbom.Document {
+	t.Helper()
 
 	var buf bytes.Buffer
 	require.NoError(t, writer.New().WriteStreamWithOptions(
 		doc, &buf, &writer.Options{
-			Format:        formats.CDX16JSON,
+			Format:        format,
 			RenderOptions: &native.RenderOptions{Indent: 2},
 		},
 	))
@@ -80,8 +87,13 @@ func TestRoundTripCDXElements(t *testing.T) {
 			int32(sbom.HashAlgorithm_SHA512): "fedcba9876543210",
 		},
 		Identifiers: map[int32]string{
-			int32(sbom.SoftwareIdentifierType_PURL):  "pkg:generic/a-package@1.2.3",
-			int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:example:a-package:1.2.3:*:*:*:*:*:*:*",
+			int32(sbom.SoftwareIdentifierType_PURL):   "pkg:generic/a-package@1.2.3",
+			int32(sbom.SoftwareIdentifierType_CPE23):  "cpe:2.3:a:example:a-package:1.2.3:*:*:*:*:*:*:*",
+			int32(sbom.SoftwareIdentifierType_GITOID): "gitoid:blob:sha256:261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+		},
+		Originators: []*sbom.Person{
+			{Name: "An Author", Email: "author@example.com"},
+			{Name: "Another Author", Phone: "555-1234"},
 		},
 		ExternalReferences: []*sbom.ExternalReference{
 			{
@@ -146,6 +158,7 @@ func TestRoundTripCDXElements(t *testing.T) {
 		{"purposes", pkg.PrimaryPurpose, gotPkg.PrimaryPurpose},
 		{"hashes", pkg.Hashes, gotPkg.Hashes},
 		{"identifiers", pkg.Identifiers, gotPkg.Identifiers},
+		{"originators", pkg.Originators, gotPkg.Originators},
 	} {
 		require.Equal(t, f.want, f.have, "package %s", f.name)
 	}
@@ -175,8 +188,10 @@ func TestRoundTripCDXElements(t *testing.T) {
 }
 
 // TestRoundTripCDXLicenses pins the licensing contract: protobom separates a
-// concluded licence from the declared list, CycloneDX holds a single license
-// collection, and the reader derives the concluded expression by joining it.
+// concluded licence from the declared list, and from 1.6 on CycloneDX can
+// state the same distinction through the license acknowledgement. Without a
+// stated concluded license, the reader derives one by joining the declared
+// entries.
 func TestRoundTripCDXLicenses(t *testing.T) {
 	for name, tc := range map[string]struct {
 		concluded         string
@@ -193,12 +208,14 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 		"an expression survives as itself": {
 			"", []string{"(MIT OR GPL-2.0-only)"}, "(MIT OR GPL-2.0-only)", []string{"(MIT OR GPL-2.0-only)"},
 		},
-		// TODO(degradation): CycloneDX below 1.6 cannot state a concluded
-		// license apart from the declared ones (1.6 added the license
-		// acknowledgement field, which the mapping does not use yet), so a
-		// concluded license with no declared counterpart is lost.
-		"concluded alone is lost": {
-			"GPL-3.0-or-later", nil, "", []string{},
+		"concluded alone survives": {
+			"GPL-3.0-or-later", nil, "GPL-3.0-or-later", []string{},
+		},
+		"concluded differing from declared survives": {
+			"Apache-2.0", []string{"MIT"}, "Apache-2.0", []string{"MIT"},
+		},
+		"a concluded expression survives": {
+			"(MIT OR GPL-2.0-only)", []string{"BSD-3-Clause"}, "(MIT OR GPL-2.0-only)", []string{"BSD-3-Clause"},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
@@ -213,6 +230,20 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 			require.Equal(t, tc.expectedDeclared, node.Licenses)
 		})
 	}
+
+	// TODO(degradation): CycloneDX below 1.6 has no license acknowledgement,
+	// so a concluded license that the declared list cannot reproduce is
+	// lost there.
+	t.Run("concluded alone is lost below 1.6", func(t *testing.T) {
+		got := cdxRoundTripIn(t, cdxOneNodeDoc(&sbom.Node{
+			Id: "root", Type: sbom.Node_PACKAGE, Name: "n",
+			LicenseConcluded: "GPL-3.0-or-later",
+		}), formats.CDX15JSON)
+		node := got.NodeList.GetNodeByID("root")
+		require.NotNil(t, node)
+		require.Empty(t, node.LicenseConcluded)
+		require.Empty(t, node.Licenses)
+	})
 }
 
 // TestRoundTripCDXEveryVocabulary walks every value of the vocabularies the
@@ -358,11 +389,8 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 
 	// Identifier types with no CycloneDX component field are dropped on
 	// write.
-	// TODO(degradation): a gitoid could be written to the omniborId field
-	// CycloneDX added in 1.6.
 	droppedIdentifiers := map[sbom.SoftwareIdentifierType]bool{
 		sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE: true,
-		sbom.SoftwareIdentifierType_GITOID:                  true,
 	}
 
 	t.Run("identifier types", func(t *testing.T) {
@@ -375,6 +403,8 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 					identifier = "cpe:/a:example:x:1.0.0"
 				case sbom.SoftwareIdentifierType_CPE23:
 					identifier = "cpe:2.3:a:example:x:1.0.0:*:*:*:*:*:*:*"
+				case sbom.SoftwareIdentifierType_GITOID:
+					identifier = "gitoid:blob:sha256:261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
 				}
 				got := cdxRoundTrip(t, cdxOneNodeDoc(&sbom.Node{
 					Id: "root", Type: sbom.Node_PACKAGE, Name: "n",
@@ -408,6 +438,24 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 			int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:example:x:1.0.0:*:*:*:*:*:*:*",
 		}, node.Identifiers)
 	})
+}
+
+// TestRoundTripCDXDocumentVersion pins the document version contract: a
+// CycloneDX version is an integer, so an integer version survives.
+// TODO(degradation): a version that does not parse as an integer is not
+// written and the document comes back with the CycloneDX default of 1.
+func TestRoundTripCDXDocumentVersion(t *testing.T) {
+	doc := func(version string) *sbom.Document {
+		d := cdxOneNodeDoc(&sbom.Node{Id: "root", Type: sbom.Node_PACKAGE, Name: "n"})
+		d.Metadata.Version = version
+		return d
+	}
+
+	got := cdxRoundTrip(t, doc("7"))
+	require.Equal(t, "7", got.Metadata.Version)
+
+	got = cdxRoundTrip(t, doc("v1.2"))
+	require.Equal(t, "1", got.Metadata.Version)
 }
 
 // edgeSet flattens a nodelist's edges into a comparable map of sorted

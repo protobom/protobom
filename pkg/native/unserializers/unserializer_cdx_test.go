@@ -285,6 +285,53 @@ func TestDeterministicIds(t *testing.T) {
 	})
 }
 
+// TestUnserializeTools checks the reading of the document creation tools.
+// Only the legacy tools array maps onto protobom's flat Tool; tools expressed
+// as components or services are deliberately not read (see
+// docs/tool-representation.md).
+func TestUnserializeTools(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+
+	t.Run("legacy tools array", func(t *testing.T) {
+		doc, err := cdxu.Unserialize(strings.NewReader(`{
+			"bomFormat": "CycloneDX",
+			"specVersion": "1.5",
+			"version": 1,
+			"metadata": {
+				"tools": [
+					{"vendor": "Anchore", "name": "syft", "version": "0.96.0"},
+					{"name": "unversioned-tool"}
+				]
+			}
+		}`), nil, nil)
+		require.NoError(t, err)
+		require.Equal(t, []*sbom.Tool{
+			{Vendor: "Anchore", Name: "syft", Version: "0.96.0"},
+			{Name: "unversioned-tool"},
+		}, doc.Metadata.Tools)
+	})
+
+	t.Run("tool components and services are not read", func(t *testing.T) {
+		doc, err := cdxu.Unserialize(strings.NewReader(`{
+			"bomFormat": "CycloneDX",
+			"specVersion": "1.5",
+			"version": 1,
+			"metadata": {
+				"tools": {
+					"components": [
+						{"type": "application", "name": "syft", "version": "1.2.0"}
+					],
+					"services": [
+						{"name": "a-scanning-service"}
+					]
+				}
+			}
+		}`), nil, nil)
+		require.NoError(t, err)
+		require.Empty(t, doc.Metadata.Tools)
+	})
+}
+
 func TestLicenseChoicesNilLicense(t *testing.T) {
 	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
 	for _, tc := range []struct {

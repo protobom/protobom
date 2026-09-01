@@ -95,6 +95,22 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				md.Date = timestamppb.New(t)
 			}
 		}
+		if bom.Metadata.Tools != nil && bom.Metadata.Tools.Tools != nil {
+			// Only the legacy tools array maps onto protobom's flat Tool.
+			// A tool expressed as a component carries full component data
+			// and possibly a dependency tree that a flat Tool cannot hold,
+			// so those are left unread until protobom can model them as
+			// part of the graph (see docs/tool-representation.md), and
+			// services are out of protobom's scope.
+			// TODO(degradation): tool components and services are dropped.
+			for _, tool := range *bom.Metadata.Tools.Tools {
+				md.Tools = append(md.Tools, &sbom.Tool{
+					Name:    tool.Name,
+					Version: tool.Version,
+					Vendor:  tool.Vendor,
+				})
+			}
+		}
 	}
 
 	// Cycle all components and get their graph fragments. A CycloneDX BOM

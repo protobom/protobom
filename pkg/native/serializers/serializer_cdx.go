@@ -371,6 +371,7 @@ func buildMetadata(doc *sbom.Document) (*cdx.Metadata, error) {
 		var tools []cdx.Tool //nolint:staticcheck
 		for _, bomtool := range doc.GetMetadata().GetTools() {
 			tools = append(tools, cdx.Tool{ //nolint:staticcheck // Tool is needed for older cdx versions
+				Vendor:  bomtool.Vendor,
 				Name:    bomtool.Name,
 				Version: bomtool.Version,
 			})

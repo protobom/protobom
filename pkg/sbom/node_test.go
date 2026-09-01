@@ -922,3 +922,146 @@ func TestAugmentIsComplete(t *testing.T) {
 	set.Augment(other)
 	require.True(t, fullNode().Equal(set), "Augment must not overwrite set fields")
 }
+
+func TestNodeAncestors(t *testing.T) {
+	sutID := "mynode"
+	for _, tc := range []struct {
+		name                string
+		sut                 *NodeList
+		expectedNodesLength int
+		depth               int
+	}{
+		{
+			// Zero depth should return no nodes but the queried one
+			name: "depth-zero",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: sutID}, {Id: "parent"}},
+				Edges:        []*Edge{{Type: Edge_contains, From: "parent", To: []string{sutID}}},
+				RootElements: []string{"parent"},
+			},
+			expectedNodesLength: 1,
+			depth:               0,
+		},
+		{
+			// A chain of three ancestors:
+			//
+			//   root -> mid -> parent -> mynode
+			//
+			// walked one level up.
+			name: "chain-depth-one",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "parent"}, {Id: "mid"}, {Id: "root"}},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "root", To: []string{"mid"}},
+					{Type: Edge_contains, From: "mid", To: []string{"parent"}},
+					{Type: Edge_contains, From: "parent", To: []string{sutID}},
+				},
+				RootElements: []string{"root"},
+			},
+			expectedNodesLength: 2,
+			depth:               1,
+		},
+		{
+			// The same chain walked all the way to the top, including the
+			// document root itself.
+			name: "chain-to-the-root",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "parent"}, {Id: "mid"}, {Id: "root"}},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "root", To: []string{"mid"}},
+					{Type: Edge_contains, From: "mid", To: []string{"parent"}},
+					{Type: Edge_contains, From: "parent", To: []string{sutID}},
+				},
+				RootElements: []string{"root"},
+			},
+			expectedNodesLength: 4,
+			depth:               10,
+		},
+		{
+			// Two direct parents:
+			//
+			//   parent1   parent2
+			//        \     /
+			//        mynode
+			name: "two-parents",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "parent1"}, {Id: "parent2"}},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "parent1", To: []string{sutID}},
+					{Type: Edge_contains, From: "parent2", To: []string{sutID}},
+				},
+				RootElements: []string{"parent1"},
+			},
+			expectedNodesLength: 3,
+			depth:               10,
+		},
+		{
+			// A diamond above the node must not duplicate the grandparent:
+			//
+			//        grandpa
+			//        /     \
+			//   parent1   parent2
+			//        \     /
+			//        mynode
+			name: "diamond",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "parent1"}, {Id: "parent2"}, {Id: "grandpa"}},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "grandpa", To: []string{"parent1", "parent2"}},
+					{Type: Edge_contains, From: "parent1", To: []string{sutID}},
+					{Type: Edge_contains, From: "parent2", To: []string{sutID}},
+				},
+				RootElements: []string{"grandpa"},
+			},
+			expectedNodesLength: 4,
+			depth:               10,
+		},
+		{
+			// The walk stops at ancestors that are document roots: the
+			// root is included, whatever points at it is not.
+			name: "stops-at-roots",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "root"}, {Id: "beyond"}},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "beyond", To: []string{"root"}},
+					{Type: Edge_contains, From: "root", To: []string{sutID}},
+				},
+				RootElements: []string{"root"},
+			},
+			expectedNodesLength: 2,
+			depth:               10,
+		},
+		{
+			name: "node-not-found",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: "other"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"other"},
+			},
+			expectedNodesLength: 0,
+			depth:               10,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ancestors := tc.sut.NodeAncestors(sutID, tc.depth)
+			require.Len(t, ancestors.Nodes, tc.expectedNodesLength)
+		})
+	}
+
+	t.Run("fragment shape", func(t *testing.T) {
+		nl := &NodeList{
+			Nodes: []*Node{{Id: sutID}, {Id: "parent"}},
+			Edges: []*Edge{
+				{Type: Edge_contains, From: "parent", To: []string{sutID}},
+			},
+			RootElements: []string{"parent"},
+		}
+		result := nl.NodeAncestors(sutID, 10)
+		require.Equal(t, []string{sutID}, result.RootElements,
+			"the queried node is the fragment's root")
+		require.Len(t, result.Edges, 1)
+		require.True(t, result.Edges[0].Equal(
+			&Edge{Type: Edge_descendant, From: sutID, To: []string{"parent"}},
+		), "the ancestors relate to the queried node through a descendant edge")
+	})
+}

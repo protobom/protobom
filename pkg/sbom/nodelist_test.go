@@ -1911,3 +1911,95 @@ func TestGetNodesByPurlType(t *testing.T) {
 
 	require.Empty(t, nl.GetNodesByPurlType("deb").Nodes)
 }
+
+// TestGetEdgesFrom checks listing the outgoing relationships of a node.
+func TestGetEdgesFrom(t *testing.T) {
+	deps := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"b"}}
+	contains := &Edge{Type: Edge_contains, From: "a", To: []string{"c"}}
+	other := &Edge{Type: Edge_dependsOn, From: "b", To: []string{"c"}}
+	nl := &NodeList{Edges: []*Edge{deps, contains, other}}
+
+	edges := nl.GetEdgesFrom("a")
+	require.Len(t, edges, 2)
+	require.Same(t, deps, edges[0])
+	require.Same(t, contains, edges[1])
+
+	require.Empty(t, nl.GetEdgesFrom("c"))
+	require.Empty(t, nl.GetEdgesFrom("not-here"))
+}
+
+// TestGetEdgesTo checks listing the relationships pointing to a node.
+func TestGetEdgesTo(t *testing.T) {
+	deps := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}}
+	contains := &Edge{Type: Edge_contains, From: "b", To: []string{"c"}}
+	nl := &NodeList{Edges: []*Edge{deps, contains}}
+
+	edges := nl.GetEdgesTo("c")
+	require.Len(t, edges, 2)
+	require.Same(t, deps, edges[0])
+	require.Same(t, contains, edges[1])
+
+	require.Len(t, nl.GetEdgesTo("b"), 1)
+	require.Empty(t, nl.GetEdgesTo("a"))
+	require.Empty(t, nl.GetEdgesTo("not-here"))
+}
+
+// TestUnrelateNodes checks removing a single relationship: other
+// destinations survive, emptied edges are dropped and everything else is
+// left alone.
+func TestUnrelateNodes(t *testing.T) {
+	build := func() *NodeList {
+		return &NodeList{
+			Nodes: []*Node{{Id: "a"}, {Id: "b"}, {Id: "c"}},
+			Edges: []*Edge{
+				{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}},
+				{Type: Edge_contains, From: "a", To: []string{"b"}},
+			},
+			RootElements: []string{"a"},
+		}
+	}
+
+	t.Run("other destinations survive", func(t *testing.T) {
+		nl := build()
+		nl.UnrelateNodes("a", "b", Edge_dependsOn)
+		require.Len(t, nl.Edges, 2)
+		require.True(t, nl.Edges[0].Equal(&Edge{Type: Edge_dependsOn, From: "a", To: []string{"c"}}))
+		require.True(t, nl.Edges[1].Equal(&Edge{Type: Edge_contains, From: "a", To: []string{"b"}}),
+			"other edge types are left alone")
+	})
+
+	t.Run("an emptied edge is dropped", func(t *testing.T) {
+		nl := build()
+		nl.UnrelateNodes("a", "b", Edge_contains)
+		require.Len(t, nl.Edges, 1)
+		require.Equal(t, Edge_dependsOn, nl.Edges[0].Type)
+	})
+
+	t.Run("an absent relationship is a no-op", func(t *testing.T) {
+		nl := build()
+		nl.UnrelateNodes("b", "a", Edge_dependsOn)
+		nl.UnrelateNodes("a", "not-here", Edge_dependsOn)
+		require.True(t, build().Equal(nl))
+	})
+}
+
+// TestRemoveEdgesFrom checks removing all relationships of one type
+// originating at a node.
+func TestRemoveEdgesFrom(t *testing.T) {
+	nl := &NodeList{
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "a", To: []string{"b"}},
+			{Type: Edge_dependsOn, From: "a", To: []string{"c"}},
+			{Type: Edge_contains, From: "a", To: []string{"b"}},
+			{Type: Edge_dependsOn, From: "b", To: []string{"c"}},
+		},
+	}
+
+	nl.RemoveEdgesFrom("a", Edge_dependsOn)
+	require.Len(t, nl.Edges, 2, "all matching edges go, including duplicates")
+	require.Equal(t, Edge_contains, nl.Edges[0].Type)
+	require.Equal(t, "b", nl.Edges[1].From)
+
+	nl.RemoveEdgesFrom("not-here", Edge_dependsOn)
+	require.Len(t, nl.Edges, 2, "an unknown source is a no-op")
+}

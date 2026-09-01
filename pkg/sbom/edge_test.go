@@ -78,3 +78,14 @@ func TestEdgeEqual(t *testing.T) {
 
 	require.False(t, a.Equal(nil))
 }
+
+// TestEdgePointsTo checks the destination lookup guarding edge merges.
+func TestEdgePointsTo(t *testing.T) {
+	t.Parallel()
+	edge := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}}
+	require.True(t, edge.PointsTo("b"))
+	require.True(t, edge.PointsTo("c"))
+	require.False(t, edge.PointsTo("a"))
+	require.False(t, edge.PointsTo("z"))
+	require.False(t, (&Edge{From: "a"}).PointsTo("b"))
+}

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -707,4 +708,360 @@ func TestMergeEdges(t *testing.T) {
 			require.True(t, tc.sut.Equal(tc.expect))
 		})
 	}
+}
+
+// TestNodeEqual checks the node identity primitive: identical content is
+// equal, nil is not, and a change to any compared field breaks equality.
+func TestNodeEqual(t *testing.T) {
+	base := &Node{
+		Id:      "node-1",
+		Type:    Node_PACKAGE,
+		Name:    "test",
+		Version: "1.0.0",
+		Licenses: []string{
+			"Apache-2.0",
+		},
+		Hashes: map[int32]string{
+			int32(HashAlgorithm_SHA256): "d02b22ab7fc76fe2a17e768b180bf5048889dbcae3a6d7e4a889a916848e5d11",
+		},
+		Identifiers: map[int32]string{
+			int32(SoftwareIdentifierType_PURL): "pkg:generic/test@1.0.0",
+		},
+		Suppliers: []*Person{
+			{Name: "ACME Inc", IsOrg: true},
+		},
+	}
+
+	t.Run("equal to a copy of itself", func(t *testing.T) {
+		require.True(t, base.Equal(base.Copy()))
+		require.True(t, base.Copy().Equal(base))
+	})
+
+	t.Run("not equal to nil", func(t *testing.T) {
+		require.False(t, base.Equal(nil))
+	})
+
+	for name, prepare := range map[string]func(*Node){
+		"id":         func(n *Node) { n.Id = "changed" },
+		"type":       func(n *Node) { n.Type = Node_FILE },
+		"name":       func(n *Node) { n.Name = "changed" },
+		"version":    func(n *Node) { n.Version = "2.0.0" },
+		"license":    func(n *Node) { n.Licenses[0] = "MIT" },
+		"hash":       func(n *Node) { n.Hashes[int32(HashAlgorithm_SHA256)] = "changed" },
+		"identifier": func(n *Node) { n.Identifiers[int32(SoftwareIdentifierType_PURL)] = "pkg:generic/other@1.0.0" },
+		"supplier":   func(n *Node) { n.Suppliers[0].Name = "changed" },
+	} {
+		t.Run("not equal on changed "+name, func(t *testing.T) {
+			changed := base.Copy()
+			prepare(changed)
+			require.False(t, base.Equal(changed))
+			require.False(t, changed.Equal(base))
+		})
+	}
+}
+
+// TestNodeHashesMatch checks the hash comparison behind node matching: only
+// the algorithms both sides know are compared, all of them have to agree,
+// and at least one shared algorithm is required for a match.
+func TestNodeHashesMatch(t *testing.T) {
+	sha1 := int32(HashAlgorithm_SHA1)
+	sha256 := int32(HashAlgorithm_SHA256)
+	sha512 := int32(HashAlgorithm_SHA512)
+
+	for name, tc := range map[string]struct {
+		nodeHashes map[int32]string
+		testHashes map[int32]string
+		expected   bool
+	}{
+		"identical single algorithm": {
+			map[int32]string{sha256: "aaa"}, map[int32]string{sha256: "aaa"}, true,
+		},
+		"identical several algorithms": {
+			map[int32]string{sha1: "aaa", sha256: "bbb"},
+			map[int32]string{sha1: "aaa", sha256: "bbb"},
+			true,
+		},
+		"extra algorithms on the test side are ignored": {
+			map[int32]string{sha256: "aaa"},
+			map[int32]string{sha256: "aaa", sha512: "ccc"},
+			true,
+		},
+		"extra algorithms on the node are ignored": {
+			map[int32]string{sha256: "aaa", sha512: "ccc"},
+			map[int32]string{sha256: "aaa"},
+			true,
+		},
+		"a shared algorithm disagreeing breaks the match": {
+			map[int32]string{sha1: "aaa", sha256: "bbb"},
+			map[int32]string{sha1: "aaa", sha256: "changed"},
+			false,
+		},
+		"no shared algorithms is no match": {
+			map[int32]string{sha1: "aaa"}, map[int32]string{sha256: "bbb"}, false,
+		},
+		"empty node hashes is no match": {
+			map[int32]string{}, map[int32]string{sha256: "aaa"}, false,
+		},
+		"empty test hashes is no match": {
+			map[int32]string{sha256: "aaa"}, map[int32]string{}, false,
+		},
+		"both empty is no match": {
+			map[int32]string{}, map[int32]string{}, false,
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			node := &Node{Hashes: tc.nodeHashes}
+			require.Equal(t, tc.expected, node.HashesMatch(tc.testHashes))
+		})
+	}
+}
+
+// TestNodeChecksum checks the checksum backing NodeList.Equal and the
+// generated identifiers: stable for equal content, changed by any change.
+func TestNodeChecksum(t *testing.T) {
+	node := &Node{
+		Id:      "node-1",
+		Name:    "test",
+		Version: "1.0.0",
+		Hashes:  map[int32]string{int32(HashAlgorithm_SHA256): "aaa"},
+	}
+
+	sum := node.Checksum()
+	require.Len(t, sum, 64, "the checksum is a sha256 hex string")
+	require.Equal(t, sum, node.Copy().Checksum(), "equal content produces an equal checksum")
+
+	changed := node.Copy()
+	changed.Version = "2.0.0"
+	require.NotEqual(t, sum, changed.Checksum())
+}
+
+// TestNodePurl checks reading the node's package URL: only packages have
+// one, and only when the purl identifier is set.
+func TestNodePurl(t *testing.T) {
+	purl := "pkg:generic/test@1.0.0"
+
+	node := &Node{
+		Id:   "node-1",
+		Type: Node_PACKAGE,
+		Identifiers: map[int32]string{
+			int32(SoftwareIdentifierType_PURL): purl,
+		},
+	}
+	require.Equal(t, PackageURL(purl), node.Purl())
+
+	file := &Node{
+		Id:   "file-1",
+		Type: Node_FILE,
+		Identifiers: map[int32]string{
+			int32(SoftwareIdentifierType_PURL): purl,
+		},
+	}
+	require.Equal(t, PackageURL(""), file.Purl(), "files have no package URL")
+
+	require.Equal(t, PackageURL(""), (&Node{Type: Node_PACKAGE}).Purl())
+}
+
+// TestUpdateIsComplete checks Update against every field of the node: an
+// empty node updated from a full one must carry everything except the
+// identity fields (id and type), which Update never touches. A field added
+// to the proto that Update does not learn fails here.
+func TestUpdateIsComplete(t *testing.T) {
+	full := fullNode()
+	updated := &Node{}
+	updated.Update(full)
+
+	identity := map[protoreflect.Name]bool{"id": true, "type": true}
+	full.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, _ protoreflect.Value) bool {
+		if identity[fd.Name()] {
+			require.False(t, updated.ProtoReflect().Has(fd),
+				"Update must not touch the identity field %s", fd.Name())
+			return true
+		}
+		require.True(t, updated.ProtoReflect().Has(fd),
+			"Update does not carry %s", fd.Name())
+		return true
+	})
+
+	expected := fullNode()
+	expected.Id = ""
+	expected.Type = Node_PACKAGE
+	require.True(t, expected.Equal(updated), "the updated values do not match")
+}
+
+// TestUpdateSkipsEmptyFields checks the other half of the Update contract:
+// unset fields in the incoming node preserve the existing values.
+func TestUpdateSkipsEmptyFields(t *testing.T) {
+	full := fullNode()
+	full.Update(&Node{})
+	require.True(t, fullNode().Equal(full))
+}
+
+// TestAugmentIsComplete checks Augment against every field of the node: an
+// empty node augmented from a full one must carry everything except the
+// identity fields, and a full node augmented from anything must not change.
+func TestAugmentIsComplete(t *testing.T) {
+	full := fullNode()
+	augmented := &Node{}
+	augmented.Augment(full)
+
+	identity := map[protoreflect.Name]bool{"id": true, "type": true}
+	full.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, _ protoreflect.Value) bool {
+		if identity[fd.Name()] {
+			return true
+		}
+		require.True(t, augmented.ProtoReflect().Has(fd),
+			"Augment does not carry %s", fd.Name())
+		return true
+	})
+
+	set := fullNode()
+	other := fullNode()
+	other.Name = "a different name"
+	other.Version = "9.9.9"
+	other.Hashes = map[int32]string{int32(HashAlgorithm_SHA512): "fff"}
+	set.Augment(other)
+	require.True(t, fullNode().Equal(set), "Augment must not overwrite set fields")
+}
+
+func TestNodeAncestors(t *testing.T) {
+	sutID := "mynode"
+	for _, tc := range []struct {
+		name                string
+		sut                 *NodeList
+		expectedNodesLength int
+		depth               int
+	}{
+		{
+			// Zero depth should return no nodes but the queried one
+			name: "depth-zero",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: sutID}, {Id: "parent"}},
+				Edges:        []*Edge{{Type: Edge_contains, From: "parent", To: []string{sutID}}},
+				RootElements: []string{"parent"},
+			},
+			expectedNodesLength: 1,
+			depth:               0,
+		},
+		{
+			// A chain of three ancestors:
+			//
+			//   root -> mid -> parent -> mynode
+			//
+			// walked one level up.
+			name: "chain-depth-one",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "parent"}, {Id: "mid"}, {Id: "root"}},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "root", To: []string{"mid"}},
+					{Type: Edge_contains, From: "mid", To: []string{"parent"}},
+					{Type: Edge_contains, From: "parent", To: []string{sutID}},
+				},
+				RootElements: []string{"root"},
+			},
+			expectedNodesLength: 2,
+			depth:               1,
+		},
+		{
+			// The same chain walked all the way to the top, including the
+			// document root itself.
+			name: "chain-to-the-root",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "parent"}, {Id: "mid"}, {Id: "root"}},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "root", To: []string{"mid"}},
+					{Type: Edge_contains, From: "mid", To: []string{"parent"}},
+					{Type: Edge_contains, From: "parent", To: []string{sutID}},
+				},
+				RootElements: []string{"root"},
+			},
+			expectedNodesLength: 4,
+			depth:               10,
+		},
+		{
+			// Two direct parents:
+			//
+			//   parent1   parent2
+			//        \     /
+			//        mynode
+			name: "two-parents",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "parent1"}, {Id: "parent2"}},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "parent1", To: []string{sutID}},
+					{Type: Edge_contains, From: "parent2", To: []string{sutID}},
+				},
+				RootElements: []string{"parent1"},
+			},
+			expectedNodesLength: 3,
+			depth:               10,
+		},
+		{
+			// A diamond above the node must not duplicate the grandparent:
+			//
+			//        grandpa
+			//        /     \
+			//   parent1   parent2
+			//        \     /
+			//        mynode
+			name: "diamond",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "parent1"}, {Id: "parent2"}, {Id: "grandpa"}},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "grandpa", To: []string{"parent1", "parent2"}},
+					{Type: Edge_contains, From: "parent1", To: []string{sutID}},
+					{Type: Edge_contains, From: "parent2", To: []string{sutID}},
+				},
+				RootElements: []string{"grandpa"},
+			},
+			expectedNodesLength: 4,
+			depth:               10,
+		},
+		{
+			// The walk stops at ancestors that are document roots: the
+			// root is included, whatever points at it is not.
+			name: "stops-at-roots",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: sutID}, {Id: "root"}, {Id: "beyond"}},
+				Edges: []*Edge{
+					{Type: Edge_contains, From: "beyond", To: []string{"root"}},
+					{Type: Edge_contains, From: "root", To: []string{sutID}},
+				},
+				RootElements: []string{"root"},
+			},
+			expectedNodesLength: 2,
+			depth:               10,
+		},
+		{
+			name: "node-not-found",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: "other"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"other"},
+			},
+			expectedNodesLength: 0,
+			depth:               10,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ancestors := tc.sut.NodeAncestors(sutID, tc.depth)
+			require.Len(t, ancestors.Nodes, tc.expectedNodesLength)
+		})
+	}
+
+	t.Run("fragment shape", func(t *testing.T) {
+		nl := &NodeList{
+			Nodes: []*Node{{Id: sutID}, {Id: "parent"}},
+			Edges: []*Edge{
+				{Type: Edge_contains, From: "parent", To: []string{sutID}},
+			},
+			RootElements: []string{"parent"},
+		}
+		result := nl.NodeAncestors(sutID, 10)
+		require.Equal(t, []string{sutID}, result.RootElements,
+			"the queried node is the fragment's root")
+		require.Len(t, result.Edges, 1)
+		require.True(t, result.Edges[0].Equal(
+			&Edge{Type: Edge_descendant, From: sutID, To: []string{"parent"}},
+		), "the ancestors relate to the queried node through a descendant edge")
+	})
 }

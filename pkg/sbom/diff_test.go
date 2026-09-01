@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -1173,4 +1174,20 @@ func TestDiffIntStrMap(t *testing.T) {
 			require.Equal(t, tc.expectedCount, c)
 		})
 	}
+}
+
+// TestNodeDiffIsComplete clears each field of a full node in turn and checks
+// the diff notices the change. A field added to the proto that Diff does not
+// compare fails here.
+func TestNodeDiffIsComplete(t *testing.T) {
+	full := fullNode()
+	full.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, _ protoreflect.Value) bool {
+		t.Run(string(fd.Name()), func(t *testing.T) {
+			blanked := full.Copy()
+			blanked.ProtoReflect().Clear(fd)
+			require.NotNil(t, blanked.Diff(full, WithIDs()),
+				"Diff does not see a change in %s", fd.Name())
+		})
+		return true
+	})
 }

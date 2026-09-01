@@ -1,6 +1,7 @@
 package sbom
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -101,12 +102,13 @@ func TestCleanEdges(t *testing.T) {
 
 func TestRemoveNodes(t *testing.T) {
 	for _, tc := range []struct {
+		name     string
 		sut      *NodeList
 		prep     func(*NodeList)
 		expected *NodeList
 	}{
 		{
-			// Two related edges. Remove the second
+			name: "two related edges, remove the second",
 			sut: &NodeList{
 				Nodes: []*Node{
 					{Id: "node1"}, {Id: "node2"},
@@ -131,9 +133,97 @@ func TestRemoveNodes(t *testing.T) {
 				RootElements: []string{"node1"},
 			},
 		},
+		{
+			name: "removing a root cleans the root elements",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}, {Id: "node2"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1", "node2"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"node1"})
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "node2"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node2"},
+			},
+		},
+		{
+			name: "removing one destination keeps the edge for the others",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: "node1"}, {Id: "node2"}, {Id: "node3"}},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "node1", To: []string{"node2", "node3"}},
+				},
+				RootElements: []string{"node1"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"node2"})
+			},
+			expected: &NodeList{
+				Nodes: []*Node{{Id: "node1"}, {Id: "node3"}},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "node1", To: []string{"node3"}},
+				},
+				RootElements: []string{"node1"},
+			},
+		},
+		{
+			name: "removing the edge source drops the edge",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: "node1"}, {Id: "node2"}},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "node1", To: []string{"node2"}},
+				},
+				RootElements: []string{"node1"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"node1"})
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "node2"}},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+		},
+		{
+			name: "several nodes at once",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}, {Id: "node2"}, {Id: "node3"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"node2", "node3"})
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1"},
+			},
+		},
+		{
+			name: "an unknown id is a no-op",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"not-here"})
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1"},
+			},
+		},
 	} {
-		tc.prep(tc.sut)
-		require.Equal(t, tc.expected, tc.sut)
+		t.Run(tc.name, func(t *testing.T) {
+			tc.prep(tc.sut)
+			require.True(t, tc.expected.Equal(tc.sut), "%+v", tc.sut)
+		})
 	}
 }
 
@@ -1590,4 +1680,326 @@ func TestGetNodesByPurlTypeRoots(t *testing.T) {
 			require.Equal(t, tc.expectedRoots, got.RootElements)
 		})
 	}
+}
+
+// TestGetEdgeByType checks the edge lookup that the set operations build on,
+// including its contract of returning the first matching edge.
+func TestGetEdgeByType(t *testing.T) {
+	first := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"b"}}
+	second := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"c"}}
+	contains := &Edge{Type: Edge_contains, From: "a", To: []string{"d"}}
+	nl := &NodeList{Edges: []*Edge{first, second, contains}}
+
+	require.Same(t, first, nl.GetEdgeByType("a", Edge_dependsOn),
+		"the first matching edge is returned")
+	require.Same(t, contains, nl.GetEdgeByType("a", Edge_contains))
+	require.Nil(t, nl.GetEdgeByType("z", Edge_dependsOn))
+	require.Nil(t, nl.GetEdgeByType("a", Edge_testDependency))
+}
+
+// TestAddNode and TestAddEdge check the primitive append operations.
+func TestAddNode(t *testing.T) {
+	nl := &NodeList{}
+	nl.AddNode(&Node{Id: "a"})
+	nl.AddNode(&Node{Id: "b"})
+	require.Len(t, nl.Nodes, 2)
+	require.Empty(t, nl.RootElements, "adding a node does not make it a root")
+}
+
+func TestAddEdge(t *testing.T) {
+	nl := &NodeList{}
+	nl.AddEdge(&Edge{Type: Edge_dependsOn, From: "a", To: []string{"b"}})
+	nl.AddEdge(&Edge{Type: Edge_dependsOn, From: "a", To: []string{"c"}})
+	require.Len(t, nl.Edges, 2, "edges are appended, not merged (see MergeEdges)")
+}
+
+// TestAddRootNode checks adding top level nodes: registration as a root,
+// deduplication, and naming nodes that come without an ID.
+func TestAddRootNode(t *testing.T) {
+	t.Run("adds the node and registers the root", func(t *testing.T) {
+		nl := &NodeList{}
+		nl.AddRootNode(&Node{Id: "root-1", Name: "app"})
+		require.Len(t, nl.Nodes, 1)
+		require.Equal(t, []string{"root-1"}, nl.RootElements)
+	})
+
+	t.Run("an existing root is not duplicated", func(t *testing.T) {
+		nl := &NodeList{}
+		nl.AddRootNode(&Node{Id: "root-1", Name: "app"})
+		nl.AddRootNode(&Node{Id: "root-1", Name: "app"})
+		require.Len(t, nl.Nodes, 1)
+		require.Equal(t, []string{"root-1"}, nl.RootElements)
+	})
+
+	t.Run("an existing node is promoted without duplicating it", func(t *testing.T) {
+		nl := &NodeList{}
+		nl.AddNode(&Node{Id: "node-1", Name: "app"})
+		nl.AddRootNode(&Node{Id: "node-1", Name: "app"})
+		require.Len(t, nl.Nodes, 1)
+		require.Equal(t, []string{"node-1"}, nl.RootElements)
+	})
+
+	t.Run("a node without an ID is named after its name and version", func(t *testing.T) {
+		nl := &NodeList{}
+		node := &Node{Name: "app", Version: "1.0.0"}
+		nl.AddRootNode(node)
+		require.NotEmpty(t, node.Id)
+		require.True(t, strings.HasPrefix(node.Id, "protobom-auto-"), node.Id)
+		require.Equal(t, []string{node.Id}, nl.RootElements)
+
+		// The generated name is deterministic, so adding another nameless
+		// node describing the same software dedups against the first.
+		nl.AddRootNode(&Node{Name: "app", Version: "1.0.0"})
+		require.Len(t, nl.Nodes, 1)
+		require.Len(t, nl.RootElements, 1)
+	})
+}
+
+// TestUnionMergesEdges checks that union merges the destinations of edges
+// sharing a source and type instead of duplicating the edge.
+func TestUnionMergesEdges(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes: []*Node{{Id: "a"}, {Id: "b"}},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "a", To: []string{"b"}},
+		},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes: []*Node{{Id: "a"}, {Id: "b"}, {Id: "c"}},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}},
+		},
+		RootElements: []string{"a"},
+	}
+
+	result := nl1.Union(nl2)
+	require.Len(t, result.Nodes, 3)
+	require.Len(t, result.Edges, 1, "equivalent edges must merge")
+	require.True(t, result.Edges[0].Equal(
+		&Edge{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}},
+	), result.Edges[0].flatString())
+}
+
+// TestUnionMergesRoots checks that the root elements of both sides are
+// combined without duplicates.
+func TestUnionMergesRoots(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes:        []*Node{{Id: "a"}},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes:        []*Node{{Id: "a"}, {Id: "b"}},
+		RootElements: []string{"a", "b"},
+	}
+
+	require.Equal(t, []string{"a", "b"}, nl1.Union(nl2).RootElements)
+}
+
+// TestUnionUpdatesNodes checks the merge semantics for nodes on both sides:
+// set fields in the second list win, unset ones preserve the first.
+func TestUnionUpdatesNodes(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes:        []*Node{{Id: "a", Name: "app", Version: "1.0.0", Comment: "from one"}},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes:        []*Node{{Id: "a", Name: "app", Version: "2.0.0"}},
+		RootElements: []string{"a"},
+	}
+
+	result := nl1.Union(nl2)
+	require.Len(t, result.Nodes, 1)
+	require.Equal(t, "2.0.0", result.Nodes[0].Version, "set fields in the second list win")
+	require.Equal(t, "from one", result.Nodes[0].Comment, "unset fields preserve the first list")
+}
+
+// TestIntersectDisjoint checks that intersecting lists with no common nodes
+// produces an empty nodelist.
+func TestIntersectDisjoint(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes:        []*Node{{Id: "a"}},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes:        []*Node{{Id: "b"}},
+		RootElements: []string{"b"},
+	}
+
+	result := nl1.Intersect(nl2)
+	require.Empty(t, result.Nodes)
+	require.Empty(t, result.Edges)
+	require.Empty(t, result.RootElements)
+}
+
+// TestIntersectCleansEdges checks that edges pointing outside the
+// intersection are dropped and roots from either side are kept.
+func TestIntersectCleansEdges(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes: []*Node{{Id: "a"}, {Id: "b"}},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "a", To: []string{"b"}},
+		},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes: []*Node{{Id: "b"}, {Id: "c"}},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "b", To: []string{"c"}},
+		},
+		RootElements: []string{"b"},
+	}
+
+	result := nl1.Intersect(nl2)
+	require.Len(t, result.Nodes, 1)
+	require.Equal(t, "b", result.Nodes[0].Id)
+	require.Empty(t, result.Edges, "edges reaching outside the intersection are dropped")
+	require.Equal(t, []string{"b"}, result.RootElements,
+		"a node that is a root on either side stays a root")
+}
+
+// TestIntersectUpdatesNodes checks that common nodes carry the data of the
+// second list over the first.
+func TestIntersectUpdatesNodes(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes:        []*Node{{Id: "a", Name: "app", Version: "1.0.0", Comment: "from one"}},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes:        []*Node{{Id: "a", Name: "app", Version: "2.0.0"}},
+		RootElements: []string{"a"},
+	}
+
+	result := nl1.Intersect(nl2)
+	require.Len(t, result.Nodes, 1)
+	require.Equal(t, "2.0.0", result.Nodes[0].Version)
+	require.Equal(t, "from one", result.Nodes[0].Comment)
+}
+
+// TestGetNodesByPurlType checks the purl prefix matching itself (the root
+// recomputation of the resulting list is covered in
+// TestGetNodesByPurlTypeRoots).
+func TestGetNodesByPurlType(t *testing.T) {
+	purl := func(p string) map[int32]string {
+		return map[int32]string{int32(SoftwareIdentifierType_PURL): p}
+	}
+	nl := &NodeList{
+		Nodes: []*Node{
+			{Id: "npm1", Identifiers: purl("pkg:npm/express@4.0.0")},
+			{Id: "npm2", Identifiers: purl("pkg:/npm/slashed@1.0.0")},
+			{Id: "golang", Identifiers: purl("pkg:golang/github.com/protobom/protobom@0.5.0")},
+			{Id: "bare"},
+		},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "npm1", To: []string{"npm2"}},
+			{Type: Edge_dependsOn, From: "golang", To: []string{"npm1"}},
+		},
+		RootElements: []string{"golang"},
+	}
+
+	result := nl.GetNodesByPurlType("npm")
+	ids := make([]string, 0, len(result.Nodes))
+	for _, n := range result.Nodes {
+		ids = append(ids, n.Id)
+	}
+	require.Equal(t, []string{"npm1", "npm2"}, ids,
+		"both purl spellings match, other types and bare nodes do not")
+	require.Len(t, result.Edges, 1, "only edges between matching nodes survive")
+	require.True(t, result.Edges[0].Equal(
+		&Edge{Type: Edge_dependsOn, From: "npm1", To: []string{"npm2"}},
+	))
+
+	require.Empty(t, nl.GetNodesByPurlType("deb").Nodes)
+}
+
+// TestGetEdgesFrom checks listing the outgoing relationships of a node.
+func TestGetEdgesFrom(t *testing.T) {
+	deps := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"b"}}
+	contains := &Edge{Type: Edge_contains, From: "a", To: []string{"c"}}
+	other := &Edge{Type: Edge_dependsOn, From: "b", To: []string{"c"}}
+	nl := &NodeList{Edges: []*Edge{deps, contains, other}}
+
+	edges := nl.GetEdgesFrom("a")
+	require.Len(t, edges, 2)
+	require.Same(t, deps, edges[0])
+	require.Same(t, contains, edges[1])
+
+	require.Empty(t, nl.GetEdgesFrom("c"))
+	require.Empty(t, nl.GetEdgesFrom("not-here"))
+}
+
+// TestGetEdgesTo checks listing the relationships pointing to a node.
+func TestGetEdgesTo(t *testing.T) {
+	deps := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}}
+	contains := &Edge{Type: Edge_contains, From: "b", To: []string{"c"}}
+	nl := &NodeList{Edges: []*Edge{deps, contains}}
+
+	edges := nl.GetEdgesTo("c")
+	require.Len(t, edges, 2)
+	require.Same(t, deps, edges[0])
+	require.Same(t, contains, edges[1])
+
+	require.Len(t, nl.GetEdgesTo("b"), 1)
+	require.Empty(t, nl.GetEdgesTo("a"))
+	require.Empty(t, nl.GetEdgesTo("not-here"))
+}
+
+// TestUnrelateNodes checks removing a single relationship: other
+// destinations survive, emptied edges are dropped and everything else is
+// left alone.
+func TestUnrelateNodes(t *testing.T) {
+	build := func() *NodeList {
+		return &NodeList{
+			Nodes: []*Node{{Id: "a"}, {Id: "b"}, {Id: "c"}},
+			Edges: []*Edge{
+				{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}},
+				{Type: Edge_contains, From: "a", To: []string{"b"}},
+			},
+			RootElements: []string{"a"},
+		}
+	}
+
+	t.Run("other destinations survive", func(t *testing.T) {
+		nl := build()
+		nl.UnrelateNodes("a", "b", Edge_dependsOn)
+		require.Len(t, nl.Edges, 2)
+		require.True(t, nl.Edges[0].Equal(&Edge{Type: Edge_dependsOn, From: "a", To: []string{"c"}}))
+		require.True(t, nl.Edges[1].Equal(&Edge{Type: Edge_contains, From: "a", To: []string{"b"}}),
+			"other edge types are left alone")
+	})
+
+	t.Run("an emptied edge is dropped", func(t *testing.T) {
+		nl := build()
+		nl.UnrelateNodes("a", "b", Edge_contains)
+		require.Len(t, nl.Edges, 1)
+		require.Equal(t, Edge_dependsOn, nl.Edges[0].Type)
+	})
+
+	t.Run("an absent relationship is a no-op", func(t *testing.T) {
+		nl := build()
+		nl.UnrelateNodes("b", "a", Edge_dependsOn)
+		nl.UnrelateNodes("a", "not-here", Edge_dependsOn)
+		require.True(t, build().Equal(nl))
+	})
+}
+
+// TestRemoveEdgesFrom checks removing all relationships of one type
+// originating at a node.
+func TestRemoveEdgesFrom(t *testing.T) {
+	nl := &NodeList{
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "a", To: []string{"b"}},
+			{Type: Edge_dependsOn, From: "a", To: []string{"c"}},
+			{Type: Edge_contains, From: "a", To: []string{"b"}},
+			{Type: Edge_dependsOn, From: "b", To: []string{"c"}},
+		},
+	}
+
+	nl.RemoveEdgesFrom("a", Edge_dependsOn)
+	require.Len(t, nl.Edges, 2, "all matching edges go, including duplicates")
+	require.Equal(t, Edge_contains, nl.Edges[0].Type)
+	require.Equal(t, "b", nl.Edges[1].From)
+
+	nl.RemoveEdgesFrom("not-here", Edge_dependsOn)
+	require.Len(t, nl.Edges, 2, "an unknown source is a no-op")
 }

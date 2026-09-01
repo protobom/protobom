@@ -335,6 +335,66 @@ func (nl *NodeList) GetEdgeByType(fromElement string, t Edge_Type) *Edge {
 	return nil
 }
 
+// GetEdgesFrom returns the edges originating at the node with the given ID.
+// If the node has no outgoing relationships, the returned list is empty.
+func (nl *NodeList) GetEdgesFrom(id string) []*Edge {
+	ret := []*Edge{}
+	for _, e := range nl.Edges {
+		if e.From == id {
+			ret = append(ret, e)
+		}
+	}
+	return ret
+}
+
+// GetEdgesTo returns the edges pointing to the node with the given ID. If no
+// relationships point to the node, the returned list is empty.
+func (nl *NodeList) GetEdgesTo(id string) []*Edge {
+	ret := []*Edge{}
+	for _, e := range nl.Edges {
+		if e.PointsTo(id) {
+			ret = append(ret, e)
+		}
+	}
+	return ret
+}
+
+// UnrelateNodes removes the relationship of type t between the from node and
+// the to node. Other destinations of the matching edges are preserved; edges
+// left without destinations are removed from the list.
+func (nl *NodeList) UnrelateNodes(from, to string, t Edge_Type) {
+	newEdges := make([]*Edge, 0, len(nl.Edges))
+	for _, e := range nl.Edges {
+		if e.From == from && e.Type == t && e.PointsTo(to) {
+			newTos := make([]string, 0, len(e.To)-1)
+			for _, dest := range e.To {
+				if dest != to {
+					newTos = append(newTos, dest)
+				}
+			}
+			if len(newTos) == 0 {
+				continue
+			}
+			e.To = newTos
+		}
+		newEdges = append(newEdges, e)
+	}
+	nl.Edges = newEdges
+}
+
+// RemoveEdgesFrom removes all the edges of type t originating at the node
+// with the given ID.
+func (nl *NodeList) RemoveEdgesFrom(from string, t Edge_Type) {
+	newEdges := make([]*Edge, 0, len(nl.Edges))
+	for _, e := range nl.Edges {
+		if e.From == from && e.Type == t {
+			continue
+		}
+		newEdges = append(newEdges, e)
+	}
+	nl.Edges = newEdges
+}
+
 // copyEdgeList is a utility function that deep copies a list of edges
 func copyEdgeList(original []*Edge) []*Edge {
 	edgeCopy := make([]*Edge, 0, len(original))
@@ -1066,6 +1126,96 @@ func (nl *NodeList) NodeDescendants(id string, maxDepth int) *NodeList {
 	}
 	if len(ancestorEdge.To) > 0 {
 		nl2.Edges = append(nl2.Edges, ancestorEdge)
+	}
+	return &nl2
+}
+
+// NodeAncestors traverses the NodeList graph in the inverse direction of its
+// edges, starting at the node specified by id, and returns a new node list
+// with the elements pointing to it at a maximal distance of maxDepth levels.
+// If the specified id is not found, the NodeList will be empty.
+//
+// The traversal is structural, mirroring NodeDescendants: edges are walked
+// from destination to source whatever their type, so an edge stated with an
+// inverse type (such as contained_by) is not turned around. Traversing the
+// graph will stop at any related node that is a RootNode.
+//
+// In the resulting fragment the queried node is the sole root element and
+// the ancestors found relate to it through a single descendant edge, just as
+// NodeDescendants relates its results with an ancestor edge.
+func (nl *NodeList) NodeAncestors(id string, maxDepth int) *NodeList {
+	rootIdx := nl.indexRootElements()
+	nodeIdx := nl.indexNodes()
+	startNode := nodeIdx[id]
+	if startNode == nil {
+		return &NodeList{}
+	}
+
+	// Index the edges by their destinations to walk them backwards.
+	inboundIdx := map[string][]*Edge{}
+	for _, e := range nl.Edges {
+		for _, to := range e.To {
+			inboundIdx[to] = append(inboundIdx[to], e)
+		}
+	}
+
+	nl2 := NodeList{
+		Nodes:        []*Node{startNode},
+		Edges:        []*Edge{},
+		RootElements: []string{startNode.Id},
+	}
+
+	ancestors := nodeIndex{}
+
+	var loopNodes []*Node
+	newLoopNodes := []*Node{}
+
+	for i := 0; i <= maxDepth; i++ {
+		if i == 0 {
+			loopNodes = []*Node{startNode}
+		} else {
+			loopNodes = newLoopNodes
+		}
+		newLoopNodes = []*Node{}
+		for _, n := range loopNodes {
+			// If we've seen it, we're done
+			if _, ok := ancestors[n.Id]; ok {
+				continue
+			}
+
+			ancestors[n.Id] = n
+
+			// If nothing points to the node, we're done
+			if _, ok := inboundIdx[n.Id]; !ok {
+				continue
+			}
+
+			// If node is a root node, we're done
+			if _, ok := rootIdx[n.Id]; ok && n.Id != id {
+				continue
+			}
+
+			for _, e := range inboundIdx[n.Id] {
+				if _, ok := ancestors[e.From]; ok {
+					continue
+				}
+				if parent := nodeIdx[e.From]; parent != nil {
+					newLoopNodes = append(newLoopNodes, parent)
+				}
+			}
+		}
+	}
+
+	descendantEdge := &Edge{Type: Edge_descendant, From: id, To: []string{}}
+	for _, n := range ancestors {
+		if n.Id == id {
+			continue
+		}
+		nl2.Nodes = append(nl2.Nodes, n)
+		descendantEdge.To = append(descendantEdge.To, n.Id)
+	}
+	if len(descendantEdge.To) > 0 {
+		nl2.Edges = append(nl2.Edges, descendantEdge)
 	}
 	return &nl2
 }

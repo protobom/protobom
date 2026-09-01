@@ -102,12 +102,13 @@ func TestCleanEdges(t *testing.T) {
 
 func TestRemoveNodes(t *testing.T) {
 	for _, tc := range []struct {
+		name     string
 		sut      *NodeList
 		prep     func(*NodeList)
 		expected *NodeList
 	}{
 		{
-			// Two related edges. Remove the second
+			name: "two related edges, remove the second",
 			sut: &NodeList{
 				Nodes: []*Node{
 					{Id: "node1"}, {Id: "node2"},
@@ -132,9 +133,97 @@ func TestRemoveNodes(t *testing.T) {
 				RootElements: []string{"node1"},
 			},
 		},
+		{
+			name: "removing a root cleans the root elements",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}, {Id: "node2"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1", "node2"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"node1"})
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "node2"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node2"},
+			},
+		},
+		{
+			name: "removing one destination keeps the edge for the others",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: "node1"}, {Id: "node2"}, {Id: "node3"}},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "node1", To: []string{"node2", "node3"}},
+				},
+				RootElements: []string{"node1"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"node2"})
+			},
+			expected: &NodeList{
+				Nodes: []*Node{{Id: "node1"}, {Id: "node3"}},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "node1", To: []string{"node3"}},
+				},
+				RootElements: []string{"node1"},
+			},
+		},
+		{
+			name: "removing the edge source drops the edge",
+			sut: &NodeList{
+				Nodes: []*Node{{Id: "node1"}, {Id: "node2"}},
+				Edges: []*Edge{
+					{Type: Edge_dependsOn, From: "node1", To: []string{"node2"}},
+				},
+				RootElements: []string{"node1"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"node1"})
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "node2"}},
+				Edges:        []*Edge{},
+				RootElements: []string{},
+			},
+		},
+		{
+			name: "several nodes at once",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}, {Id: "node2"}, {Id: "node3"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"node2", "node3"})
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1"},
+			},
+		},
+		{
+			name: "an unknown id is a no-op",
+			sut: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1"},
+			},
+			prep: func(nl *NodeList) {
+				nl.RemoveNodes([]string{"not-here"})
+			},
+			expected: &NodeList{
+				Nodes:        []*Node{{Id: "node1"}},
+				Edges:        []*Edge{},
+				RootElements: []string{"node1"},
+			},
+		},
 	} {
-		tc.prep(tc.sut)
-		require.Equal(t, tc.expected, tc.sut)
+		t.Run(tc.name, func(t *testing.T) {
+			tc.prep(tc.sut)
+			require.True(t, tc.expected.Equal(tc.sut), "%+v", tc.sut)
+		})
 	}
 }
 
@@ -1664,4 +1753,161 @@ func TestAddRootNode(t *testing.T) {
 		require.Len(t, nl.Nodes, 1)
 		require.Len(t, nl.RootElements, 1)
 	})
+}
+
+// TestUnionMergesEdges checks that union merges the destinations of edges
+// sharing a source and type instead of duplicating the edge.
+func TestUnionMergesEdges(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes: []*Node{{Id: "a"}, {Id: "b"}},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "a", To: []string{"b"}},
+		},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes: []*Node{{Id: "a"}, {Id: "b"}, {Id: "c"}},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}},
+		},
+		RootElements: []string{"a"},
+	}
+
+	result := nl1.Union(nl2)
+	require.Len(t, result.Nodes, 3)
+	require.Len(t, result.Edges, 1, "equivalent edges must merge")
+	require.True(t, result.Edges[0].Equal(
+		&Edge{Type: Edge_dependsOn, From: "a", To: []string{"b", "c"}},
+	), result.Edges[0].flatString())
+}
+
+// TestUnionMergesRoots checks that the root elements of both sides are
+// combined without duplicates.
+func TestUnionMergesRoots(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes:        []*Node{{Id: "a"}},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes:        []*Node{{Id: "a"}, {Id: "b"}},
+		RootElements: []string{"a", "b"},
+	}
+
+	require.Equal(t, []string{"a", "b"}, nl1.Union(nl2).RootElements)
+}
+
+// TestUnionUpdatesNodes checks the merge semantics for nodes on both sides:
+// set fields in the second list win, unset ones preserve the first.
+func TestUnionUpdatesNodes(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes:        []*Node{{Id: "a", Name: "app", Version: "1.0.0", Comment: "from one"}},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes:        []*Node{{Id: "a", Name: "app", Version: "2.0.0"}},
+		RootElements: []string{"a"},
+	}
+
+	result := nl1.Union(nl2)
+	require.Len(t, result.Nodes, 1)
+	require.Equal(t, "2.0.0", result.Nodes[0].Version, "set fields in the second list win")
+	require.Equal(t, "from one", result.Nodes[0].Comment, "unset fields preserve the first list")
+}
+
+// TestIntersectDisjoint checks that intersecting lists with no common nodes
+// produces an empty nodelist.
+func TestIntersectDisjoint(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes:        []*Node{{Id: "a"}},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes:        []*Node{{Id: "b"}},
+		RootElements: []string{"b"},
+	}
+
+	result := nl1.Intersect(nl2)
+	require.Empty(t, result.Nodes)
+	require.Empty(t, result.Edges)
+	require.Empty(t, result.RootElements)
+}
+
+// TestIntersectCleansEdges checks that edges pointing outside the
+// intersection are dropped and roots from either side are kept.
+func TestIntersectCleansEdges(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes: []*Node{{Id: "a"}, {Id: "b"}},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "a", To: []string{"b"}},
+		},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes: []*Node{{Id: "b"}, {Id: "c"}},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "b", To: []string{"c"}},
+		},
+		RootElements: []string{"b"},
+	}
+
+	result := nl1.Intersect(nl2)
+	require.Len(t, result.Nodes, 1)
+	require.Equal(t, "b", result.Nodes[0].Id)
+	require.Empty(t, result.Edges, "edges reaching outside the intersection are dropped")
+	require.Equal(t, []string{"b"}, result.RootElements,
+		"a node that is a root on either side stays a root")
+}
+
+// TestIntersectUpdatesNodes checks that common nodes carry the data of the
+// second list over the first.
+func TestIntersectUpdatesNodes(t *testing.T) {
+	nl1 := &NodeList{
+		Nodes:        []*Node{{Id: "a", Name: "app", Version: "1.0.0", Comment: "from one"}},
+		RootElements: []string{"a"},
+	}
+	nl2 := &NodeList{
+		Nodes:        []*Node{{Id: "a", Name: "app", Version: "2.0.0"}},
+		RootElements: []string{"a"},
+	}
+
+	result := nl1.Intersect(nl2)
+	require.Len(t, result.Nodes, 1)
+	require.Equal(t, "2.0.0", result.Nodes[0].Version)
+	require.Equal(t, "from one", result.Nodes[0].Comment)
+}
+
+// TestGetNodesByPurlType checks the purl prefix matching itself (the root
+// recomputation of the resulting list is covered in
+// TestGetNodesByPurlTypeRoots).
+func TestGetNodesByPurlType(t *testing.T) {
+	purl := func(p string) map[int32]string {
+		return map[int32]string{int32(SoftwareIdentifierType_PURL): p}
+	}
+	nl := &NodeList{
+		Nodes: []*Node{
+			{Id: "npm1", Identifiers: purl("pkg:npm/express@4.0.0")},
+			{Id: "npm2", Identifiers: purl("pkg:/npm/slashed@1.0.0")},
+			{Id: "golang", Identifiers: purl("pkg:golang/github.com/protobom/protobom@0.5.0")},
+			{Id: "bare"},
+		},
+		Edges: []*Edge{
+			{Type: Edge_dependsOn, From: "npm1", To: []string{"npm2"}},
+			{Type: Edge_dependsOn, From: "golang", To: []string{"npm1"}},
+		},
+		RootElements: []string{"golang"},
+	}
+
+	result := nl.GetNodesByPurlType("npm")
+	ids := make([]string, 0, len(result.Nodes))
+	for _, n := range result.Nodes {
+		ids = append(ids, n.Id)
+	}
+	require.Equal(t, []string{"npm1", "npm2"}, ids,
+		"both purl spellings match, other types and bare nodes do not")
+	require.Len(t, result.Edges, 1, "only edges between matching nodes survive")
+	require.True(t, result.Edges[0].Equal(
+		&Edge{Type: Edge_dependsOn, From: "npm1", To: []string{"npm2"}},
+	))
+
+	require.Empty(t, nl.GetNodesByPurlType("deb").Nodes)
 }

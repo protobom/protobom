@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -858,4 +859,66 @@ func TestNodePurl(t *testing.T) {
 	require.Equal(t, PackageURL(""), file.Purl(), "files have no package URL")
 
 	require.Equal(t, PackageURL(""), (&Node{Type: Node_PACKAGE}).Purl())
+}
+
+// TestUpdateIsComplete checks Update against every field of the node: an
+// empty node updated from a full one must carry everything except the
+// identity fields (id and type), which Update never touches. A field added
+// to the proto that Update does not learn fails here.
+func TestUpdateIsComplete(t *testing.T) {
+	full := fullNode()
+	updated := &Node{}
+	updated.Update(full)
+
+	identity := map[protoreflect.Name]bool{"id": true, "type": true}
+	full.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, _ protoreflect.Value) bool {
+		if identity[fd.Name()] {
+			require.False(t, updated.ProtoReflect().Has(fd),
+				"Update must not touch the identity field %s", fd.Name())
+			return true
+		}
+		require.True(t, updated.ProtoReflect().Has(fd),
+			"Update does not carry %s", fd.Name())
+		return true
+	})
+
+	expected := fullNode()
+	expected.Id = ""
+	expected.Type = Node_PACKAGE
+	require.True(t, expected.Equal(updated), "the updated values do not match")
+}
+
+// TestUpdateSkipsEmptyFields checks the other half of the Update contract:
+// unset fields in the incoming node preserve the existing values.
+func TestUpdateSkipsEmptyFields(t *testing.T) {
+	full := fullNode()
+	full.Update(&Node{})
+	require.True(t, fullNode().Equal(full))
+}
+
+// TestAugmentIsComplete checks Augment against every field of the node: an
+// empty node augmented from a full one must carry everything except the
+// identity fields, and a full node augmented from anything must not change.
+func TestAugmentIsComplete(t *testing.T) {
+	full := fullNode()
+	augmented := &Node{}
+	augmented.Augment(full)
+
+	identity := map[protoreflect.Name]bool{"id": true, "type": true}
+	full.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, _ protoreflect.Value) bool {
+		if identity[fd.Name()] {
+			return true
+		}
+		require.True(t, augmented.ProtoReflect().Has(fd),
+			"Augment does not carry %s", fd.Name())
+		return true
+	})
+
+	set := fullNode()
+	other := fullNode()
+	other.Name = "a different name"
+	other.Version = "9.9.9"
+	other.Hashes = map[int32]string{int32(HashAlgorithm_SHA512): "fff"}
+	set.Augment(other)
+	require.True(t, fullNode().Equal(set), "Augment must not overwrite set fields")
 }

@@ -112,6 +112,16 @@ func (n *Node) Diff(n2 *Node, options ...DiffOption) *NodeDiff {
 	nd.Removed.SourceInfo = r
 	nd.DiffCount += c
 
+	a, r, c = diff(n.ContentType, n2.ContentType)
+	nd.Added.ContentType = a
+	nd.Removed.ContentType = r
+	nd.DiffCount += c
+
+	if n.FileKind != n2.FileKind {
+		nd.Added.FileKind = n2.FileKind
+		nd.DiffCount++
+	}
+
 	ap, rp, cp := diffSlice(n.PrimaryPurpose, n2.PrimaryPurpose)
 	nd.Added.PrimaryPurpose = ap
 	nd.Removed.PrimaryPurpose = rp

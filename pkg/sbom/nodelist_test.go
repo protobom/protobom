@@ -1,6 +1,7 @@
 package sbom
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -1590,4 +1591,77 @@ func TestGetNodesByPurlTypeRoots(t *testing.T) {
 			require.Equal(t, tc.expectedRoots, got.RootElements)
 		})
 	}
+}
+
+// TestGetEdgeByType checks the edge lookup that the set operations build on,
+// including its contract of returning the first matching edge.
+func TestGetEdgeByType(t *testing.T) {
+	first := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"b"}}
+	second := &Edge{Type: Edge_dependsOn, From: "a", To: []string{"c"}}
+	contains := &Edge{Type: Edge_contains, From: "a", To: []string{"d"}}
+	nl := &NodeList{Edges: []*Edge{first, second, contains}}
+
+	require.Same(t, first, nl.GetEdgeByType("a", Edge_dependsOn),
+		"the first matching edge is returned")
+	require.Same(t, contains, nl.GetEdgeByType("a", Edge_contains))
+	require.Nil(t, nl.GetEdgeByType("z", Edge_dependsOn))
+	require.Nil(t, nl.GetEdgeByType("a", Edge_testDependency))
+}
+
+// TestAddNode and TestAddEdge check the primitive append operations.
+func TestAddNode(t *testing.T) {
+	nl := &NodeList{}
+	nl.AddNode(&Node{Id: "a"})
+	nl.AddNode(&Node{Id: "b"})
+	require.Len(t, nl.Nodes, 2)
+	require.Empty(t, nl.RootElements, "adding a node does not make it a root")
+}
+
+func TestAddEdge(t *testing.T) {
+	nl := &NodeList{}
+	nl.AddEdge(&Edge{Type: Edge_dependsOn, From: "a", To: []string{"b"}})
+	nl.AddEdge(&Edge{Type: Edge_dependsOn, From: "a", To: []string{"c"}})
+	require.Len(t, nl.Edges, 2, "edges are appended, not merged (see MergeEdges)")
+}
+
+// TestAddRootNode checks adding top level nodes: registration as a root,
+// deduplication, and naming nodes that come without an ID.
+func TestAddRootNode(t *testing.T) {
+	t.Run("adds the node and registers the root", func(t *testing.T) {
+		nl := &NodeList{}
+		nl.AddRootNode(&Node{Id: "root-1", Name: "app"})
+		require.Len(t, nl.Nodes, 1)
+		require.Equal(t, []string{"root-1"}, nl.RootElements)
+	})
+
+	t.Run("an existing root is not duplicated", func(t *testing.T) {
+		nl := &NodeList{}
+		nl.AddRootNode(&Node{Id: "root-1", Name: "app"})
+		nl.AddRootNode(&Node{Id: "root-1", Name: "app"})
+		require.Len(t, nl.Nodes, 1)
+		require.Equal(t, []string{"root-1"}, nl.RootElements)
+	})
+
+	t.Run("an existing node is promoted without duplicating it", func(t *testing.T) {
+		nl := &NodeList{}
+		nl.AddNode(&Node{Id: "node-1", Name: "app"})
+		nl.AddRootNode(&Node{Id: "node-1", Name: "app"})
+		require.Len(t, nl.Nodes, 1)
+		require.Equal(t, []string{"node-1"}, nl.RootElements)
+	})
+
+	t.Run("a node without an ID is named after its name and version", func(t *testing.T) {
+		nl := &NodeList{}
+		node := &Node{Name: "app", Version: "1.0.0"}
+		nl.AddRootNode(node)
+		require.NotEmpty(t, node.Id)
+		require.True(t, strings.HasPrefix(node.Id, "protobom-auto-"), node.Id)
+		require.Equal(t, []string{node.Id}, nl.RootElements)
+
+		// The generated name is deterministic, so adding another nameless
+		// node describing the same software dedups against the first.
+		nl.AddRootNode(&Node{Name: "app", Version: "1.0.0"})
+		require.Len(t, nl.Nodes, 1)
+		require.Len(t, nl.RootElements, 1)
+	})
 }

@@ -56,7 +56,10 @@ func (p *Person) flatString() string {
 	if p.Phone != "" {
 		s += fmt.Sprintf("p(%s)", p.Phone)
 	}
-	if p.Contacts != nil {
+	// An empty contact list and no contact list are the same statement, so
+	// they must produce the same string: a copy of a person initializes the
+	// list and still has to be equal to its original.
+	if len(p.Contacts) > 0 {
 		s += "c("
 		for _, c := range p.Contacts {
 			s += c.flatString()

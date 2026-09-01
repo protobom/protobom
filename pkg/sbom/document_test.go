@@ -1,6 +1,13 @@
 package sbom_test
 
-import "github.com/protobom/protobom/pkg/sbom"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/protobom/pkg/sbom"
+)
 
 // Demonstrates how to create a new protobom document and add multiple root nodes representing different software applications.
 // Each root node has distinct properties such as ID, name, version, licenses, etc. These root nodes are then attached to the document.
@@ -34,6 +41,13 @@ func Example_roots() {
 	// Attach both roots to document
 	document.NodeList.AddRootNode(firstRoot)
 	document.NodeList.AddRootNode(secondRoot)
+
+	for _, root := range document.GetRootNodes() {
+		fmt.Println(root.Name)
+	}
+	// Output:
+	// My Software Name
+	// My Second Software Name
 }
 
 // Illustrates how to create a new protobom document and populate its metadata.
@@ -62,6 +76,13 @@ func Example_metadata() {
 			Vendor:  "ACME Corporation",
 		},
 	)
+
+	fmt.Printf(
+		"%s %s by %s\n",
+		document.Metadata.Name, document.Metadata.Version, document.Metadata.Authors[0].Name,
+	)
+	// Output:
+	// My software name v1.0.0 by John Doe
 }
 
 // Showcases how to create a new protobom document, add nodes representing software components,
@@ -105,4 +126,24 @@ func Example_nodes() {
 	document.NodeList.AddNode(firstNode)
 	document.NodeList.AddNode(secondSecond)
 	document.NodeList.AddEdge(edge)
+
+	fmt.Printf(
+		"%d nodes related by %d edge\n",
+		len(document.NodeList.Nodes), len(document.NodeList.Edges),
+	)
+	// Output:
+	// 2 nodes related by 1 edge
+}
+
+// TestDocumentGetRootNodes checks that the document surfaces the root nodes
+// of its nodelist.
+func TestDocumentGetRootNodes(t *testing.T) {
+	document := sbom.NewDocument()
+	root := &sbom.Node{Id: "root", Name: "the app"}
+	document.NodeList.AddRootNode(root)
+	document.NodeList.AddNode(&sbom.Node{Id: "dep", Name: "a dependency"})
+
+	roots := document.GetRootNodes()
+	require.Len(t, roots, 1)
+	require.True(t, root.Equal(roots[0]))
 }

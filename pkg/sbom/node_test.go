@@ -708,3 +708,154 @@ func TestMergeEdges(t *testing.T) {
 		})
 	}
 }
+
+// TestNodeEqual checks the node identity primitive: identical content is
+// equal, nil is not, and a change to any compared field breaks equality.
+func TestNodeEqual(t *testing.T) {
+	base := &Node{
+		Id:      "node-1",
+		Type:    Node_PACKAGE,
+		Name:    "test",
+		Version: "1.0.0",
+		Licenses: []string{
+			"Apache-2.0",
+		},
+		Hashes: map[int32]string{
+			int32(HashAlgorithm_SHA256): "d02b22ab7fc76fe2a17e768b180bf5048889dbcae3a6d7e4a889a916848e5d11",
+		},
+		Identifiers: map[int32]string{
+			int32(SoftwareIdentifierType_PURL): "pkg:generic/test@1.0.0",
+		},
+		Suppliers: []*Person{
+			{Name: "ACME Inc", IsOrg: true},
+		},
+	}
+
+	t.Run("equal to a copy of itself", func(t *testing.T) {
+		require.True(t, base.Equal(base.Copy()))
+		require.True(t, base.Copy().Equal(base))
+	})
+
+	t.Run("not equal to nil", func(t *testing.T) {
+		require.False(t, base.Equal(nil))
+	})
+
+	for name, prepare := range map[string]func(*Node){
+		"id":         func(n *Node) { n.Id = "changed" },
+		"type":       func(n *Node) { n.Type = Node_FILE },
+		"name":       func(n *Node) { n.Name = "changed" },
+		"version":    func(n *Node) { n.Version = "2.0.0" },
+		"license":    func(n *Node) { n.Licenses[0] = "MIT" },
+		"hash":       func(n *Node) { n.Hashes[int32(HashAlgorithm_SHA256)] = "changed" },
+		"identifier": func(n *Node) { n.Identifiers[int32(SoftwareIdentifierType_PURL)] = "pkg:generic/other@1.0.0" },
+		"supplier":   func(n *Node) { n.Suppliers[0].Name = "changed" },
+	} {
+		t.Run("not equal on changed "+name, func(t *testing.T) {
+			changed := base.Copy()
+			prepare(changed)
+			require.False(t, base.Equal(changed))
+			require.False(t, changed.Equal(base))
+		})
+	}
+}
+
+// TestNodeHashesMatch checks the hash comparison behind node matching: only
+// the algorithms both sides know are compared, all of them have to agree,
+// and at least one shared algorithm is required for a match.
+func TestNodeHashesMatch(t *testing.T) {
+	sha1 := int32(HashAlgorithm_SHA1)
+	sha256 := int32(HashAlgorithm_SHA256)
+	sha512 := int32(HashAlgorithm_SHA512)
+
+	for name, tc := range map[string]struct {
+		nodeHashes map[int32]string
+		testHashes map[int32]string
+		expected   bool
+	}{
+		"identical single algorithm": {
+			map[int32]string{sha256: "aaa"}, map[int32]string{sha256: "aaa"}, true,
+		},
+		"identical several algorithms": {
+			map[int32]string{sha1: "aaa", sha256: "bbb"},
+			map[int32]string{sha1: "aaa", sha256: "bbb"},
+			true,
+		},
+		"extra algorithms on the test side are ignored": {
+			map[int32]string{sha256: "aaa"},
+			map[int32]string{sha256: "aaa", sha512: "ccc"},
+			true,
+		},
+		"extra algorithms on the node are ignored": {
+			map[int32]string{sha256: "aaa", sha512: "ccc"},
+			map[int32]string{sha256: "aaa"},
+			true,
+		},
+		"a shared algorithm disagreeing breaks the match": {
+			map[int32]string{sha1: "aaa", sha256: "bbb"},
+			map[int32]string{sha1: "aaa", sha256: "changed"},
+			false,
+		},
+		"no shared algorithms is no match": {
+			map[int32]string{sha1: "aaa"}, map[int32]string{sha256: "bbb"}, false,
+		},
+		"empty node hashes is no match": {
+			map[int32]string{}, map[int32]string{sha256: "aaa"}, false,
+		},
+		"empty test hashes is no match": {
+			map[int32]string{sha256: "aaa"}, map[int32]string{}, false,
+		},
+		"both empty is no match": {
+			map[int32]string{}, map[int32]string{}, false,
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			node := &Node{Hashes: tc.nodeHashes}
+			require.Equal(t, tc.expected, node.HashesMatch(tc.testHashes))
+		})
+	}
+}
+
+// TestNodeChecksum checks the checksum backing NodeList.Equal and the
+// generated identifiers: stable for equal content, changed by any change.
+func TestNodeChecksum(t *testing.T) {
+	node := &Node{
+		Id:      "node-1",
+		Name:    "test",
+		Version: "1.0.0",
+		Hashes:  map[int32]string{int32(HashAlgorithm_SHA256): "aaa"},
+	}
+
+	sum := node.Checksum()
+	require.Len(t, sum, 64, "the checksum is a sha256 hex string")
+	require.Equal(t, sum, node.Copy().Checksum(), "equal content produces an equal checksum")
+
+	changed := node.Copy()
+	changed.Version = "2.0.0"
+	require.NotEqual(t, sum, changed.Checksum())
+}
+
+// TestNodePurl checks reading the node's package URL: only packages have
+// one, and only when the purl identifier is set.
+func TestNodePurl(t *testing.T) {
+	purl := "pkg:generic/test@1.0.0"
+
+	node := &Node{
+		Id:   "node-1",
+		Type: Node_PACKAGE,
+		Identifiers: map[int32]string{
+			int32(SoftwareIdentifierType_PURL): purl,
+		},
+	}
+	require.Equal(t, PackageURL(purl), node.Purl())
+
+	file := &Node{
+		Id:   "file-1",
+		Type: Node_FILE,
+		Identifiers: map[int32]string{
+			int32(SoftwareIdentifierType_PURL): purl,
+		},
+	}
+	require.Equal(t, PackageURL(""), file.Purl(), "files have no package URL")
+
+	require.Equal(t, PackageURL(""), (&Node{Type: Node_PACKAGE}).Purl())
+}

@@ -57,6 +57,51 @@ func TestRoundTripCDXRealDocuments(t *testing.T) {
 	}
 }
 
+// TestRoundTripCDXTools writes a document's creation tools and reads them
+// back. Protobom writes the legacy tools array, the only form its flat Tool
+// type maps onto, and reads that same form back (tools expressed as
+// components or services are not read; see docs/tool-representation.md).
+func TestRoundTripCDXTools(t *testing.T) {
+	for _, format := range []formats.Format{
+		formats.CDX14JSON,
+		formats.CDX15JSON,
+		formats.CDX16JSON,
+		formats.CDX17JSON,
+	} {
+		t.Run(string(format), func(t *testing.T) {
+			original := &sbom.Document{
+				Metadata: &sbom.Metadata{
+					Id: "urn:uuid:11111111-2222-3333-4444-555555555555",
+					Tools: []*sbom.Tool{
+						{Vendor: "Anchore", Name: "syft", Version: "0.96.0"},
+						{Name: "unversioned-tool"},
+					},
+				},
+				NodeList: &sbom.NodeList{
+					Nodes: []*sbom.Node{
+						{Id: "root", Type: sbom.Node_PACKAGE, Name: "a package"},
+					},
+					Edges:        []*sbom.Edge{},
+					RootElements: []string{"root"},
+				},
+			}
+
+			var buf bytes.Buffer
+			require.NoError(t, writer.New().WriteStreamWithOptions(
+				original, &buf, &writer.Options{
+					Format:        format,
+					RenderOptions: &native.RenderOptions{Indent: 2},
+				},
+			))
+
+			reread, err := reader.New().ParseStream(bytes.NewReader(buf.Bytes()))
+			require.NoError(t, err)
+
+			require.Equal(t, original.Metadata.Tools, reread.Metadata.Tools)
+		})
+	}
+}
+
 // maxDiffItems caps how many entries of each kind a diff description lists.
 const maxDiffItems = 10
 

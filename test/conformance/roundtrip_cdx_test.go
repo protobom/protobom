@@ -224,6 +224,52 @@ func TestRoundTripCDXSupplier(t *testing.T) {
 	}
 }
 
+// TestRoundTripCDXDocumentName pins where the names go: the root node keeps
+// its own name through the cycle, and the document name is dropped, as
+// CycloneDX has no field for it.
+// TODO(degradation): a future mod could preserve the document name, for
+// example as a namespaced metadata property.
+func TestRoundTripCDXDocumentName(t *testing.T) {
+	for _, format := range []formats.Format{
+		formats.CDX14JSON,
+		formats.CDX15JSON,
+		formats.CDX16JSON,
+		formats.CDX17JSON,
+	} {
+		t.Run(string(format), func(t *testing.T) {
+			original := &sbom.Document{
+				Metadata: &sbom.Metadata{
+					Id:   "urn:uuid:11111111-2222-3333-4444-555555555555",
+					Name: "acme-product-sbom",
+				},
+				NodeList: &sbom.NodeList{
+					Nodes: []*sbom.Node{
+						{Id: "root", Type: sbom.Node_PACKAGE, Name: "acme-app", Version: "1.0.0"},
+					},
+					Edges:        []*sbom.Edge{},
+					RootElements: []string{"root"},
+				},
+			}
+
+			var buf bytes.Buffer
+			require.NoError(t, writer.New().WriteStreamWithOptions(
+				original, &buf, &writer.Options{
+					Format:        format,
+					RenderOptions: &native.RenderOptions{Indent: 2},
+				},
+			))
+
+			reread, err := reader.New().ParseStream(bytes.NewReader(buf.Bytes()))
+			require.NoError(t, err)
+
+			root := reread.NodeList.GetNodeByID("root")
+			require.NotNil(t, root)
+			require.Equal(t, "acme-app", root.Name, "the root node must keep its own name")
+			require.Empty(t, reread.Metadata.Name, "the document name has no CycloneDX field")
+		})
+	}
+}
+
 // maxDiffItems caps how many entries of each kind a diff description lists.
 const maxDiffItems = 10
 

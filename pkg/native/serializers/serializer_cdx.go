@@ -189,9 +189,10 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 	}
 	doc.Dependencies = &deps
 
-	if !headless && bom.Metadata != nil && bom.GetMetadata().GetName() != "" {
-		doc.Metadata.Component.Name = bom.GetMetadata().GetName()
-	}
+	// TODO(degradation): the protobom document name has no equivalent field
+	// in CycloneDX and is not written. A future mod could preserve it, for
+	// example as a namespaced metadata property; it must not overwrite the
+	// root component's name, which names the software, not the document.
 
 	return doc, nil
 }

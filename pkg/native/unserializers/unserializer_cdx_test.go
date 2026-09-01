@@ -150,7 +150,6 @@ func TestComponentScopeToEdge(t *testing.T) {
 		"unknown":  {cdx.Scope("not-a-scope"), sbom.Edge_UNKNOWN, false},
 	} {
 		t.Run(name, func(t *testing.T) {
-			cc := 0
 			nl, err := cdxu.componentToNodeList(&cdx.Component{
 				BOMRef: "parent",
 				Type:   cdx.ComponentTypeApplication,
@@ -163,7 +162,7 @@ func TestComponentScopeToEdge(t *testing.T) {
 						Scope:  tc.scope,
 					},
 				},
-			}, &cc)
+			}, map[string]int{})
 			require.NoError(t, err)
 
 			// The structural relationship is always captured:
@@ -220,58 +219,180 @@ func TestUnserializeComponentScope(t *testing.T) {
 	}
 }
 
+// TestDeterministicIds checks the identifiers generated for components that
+// have no bom-ref: they are derived from the node's content, so they do not
+// depend on where the component sits in the document, and identical
+// components are told apart by their occurrence number in read order.
 func TestDeterministicIds(t *testing.T) {
 	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
-	for _, tc := range []struct {
-		name     string
-		sut      *cdx.Component
-		expected []string
-		len      int
-		mustErr  bool
-	}{
-		{
-			name: "3 components",
-			sut: &cdx.Component{
-				Type: "application",
-				Components: &[]cdx.Component{
-					{Type: "library"},
-					{Type: "library"},
-				},
-			},
-			expected: []string{"protobom-auto--000000001", "protobom-auto--000000002", "protobom-auto--000000003"},
-			len:      3,
-			mustErr:  false,
-		},
-		{
-			name: "3 components plus one with id",
-			sut: &cdx.Component{
-				Type: "application",
-				Components: &[]cdx.Component{
-					{BOMRef: "i-got-id", Type: "library"},
-					{Type: "library"},
-				},
-			},
-			expected: []string{"protobom-auto--000000001", "i-got-id", "protobom-auto--000000003"},
-			len:      3,
-			mustErr:  false,
-		},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			cc := 0
-			nodelist, err := cdxu.componentToNodeList(tc.sut, &cc)
-			if tc.mustErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			names := []string{}
-			require.Len(t, nodelist.Nodes, tc.len)
-			for i := range nodelist.Nodes {
-				names = append(names, nodelist.Nodes[i].Id)
-			}
-			require.Equal(t, tc.expected, names)
-		})
+
+	parse := func(t *testing.T, sut *cdx.Component) []string {
+		t.Helper()
+		nodelist, err := cdxu.componentToNodeList(sut, map[string]int{})
+		require.NoError(t, err)
+		ids := make([]string, 0, len(nodelist.Nodes))
+		for i := range nodelist.Nodes {
+			ids = append(ids, nodelist.Nodes[i].Id)
+		}
+		return ids
 	}
+
+	t.Run("identical twins get occurrence suffixes", func(t *testing.T) {
+		ids := parse(t, &cdx.Component{
+			Type: "application",
+			Components: &[]cdx.Component{
+				{Type: "library"},
+				{Type: "library"},
+			},
+		})
+		require.Len(t, ids, 3)
+		for _, id := range ids {
+			require.True(t, strings.HasPrefix(id, "protobom-auto--"), id)
+		}
+		// The parent's content differs from the children's, the twins
+		// share a checksum and are numbered apart:
+		require.NotEqual(t, ids[0], ids[1])
+		require.Equal(t, ids[1]+"-2", ids[2])
+	})
+
+	t.Run("explicit refs are preserved", func(t *testing.T) {
+		ids := parse(t, &cdx.Component{
+			Type: "application",
+			Components: &[]cdx.Component{
+				{BOMRef: "i-got-id", Type: "library"},
+				{Type: "library"},
+			},
+		})
+		require.Len(t, ids, 3)
+		require.Equal(t, "i-got-id", ids[1])
+		require.True(t, strings.HasPrefix(ids[2], "protobom-auto--"), ids[2])
+	})
+
+	t.Run("ids do not depend on position", func(t *testing.T) {
+		library := cdx.Component{Type: "library", Name: "a-library"}
+		alone := parse(t, &cdx.Component{
+			Type:       "application",
+			Components: &[]cdx.Component{library},
+		})
+		crowded := parse(t, &cdx.Component{
+			Type: "application",
+			Components: &[]cdx.Component{
+				{BOMRef: "first", Type: "library", Name: "another"},
+				library,
+			},
+		})
+		require.Equal(t, alone[1], crowded[2])
+	})
+}
+
+// TestUnserializeAuthors checks the reading of the document authors. A
+// CycloneDX author is an organizational contact, so name, email and phone
+// are all it can state.
+func TestUnserializeAuthors(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(`{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"authors": [
+				{"name": "Jane Doe", "email": "jane@example.com", "phone": "555-1234"},
+				{"name": "The Example Team"}
+			]
+		}
+	}`), nil, nil)
+	require.NoError(t, err)
+	require.Equal(t, []*sbom.Person{
+		{Name: "Jane Doe", Email: "jane@example.com", Phone: "555-1234"},
+		{Name: "The Example Team"},
+	}, doc.Metadata.Authors)
+}
+
+// TestUnserializeSupplier checks the reading of a component supplier. The
+// CycloneDX supplier is an organizational entity, so the person read back is
+// marked as an organization; its URL and contacts are carried over.
+func TestUnserializeSupplier(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(`{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"component": {
+				"bom-ref": "root",
+				"type": "application",
+				"name": "an app",
+				"supplier": {
+					"name": "Acme Inc",
+					"url": ["https://acme.example", "https://acme.example/second"],
+					"contact": [
+						{"name": "Jane Doe", "email": "jane@acme.example", "phone": "555-1234"}
+					]
+				}
+			}
+		}
+	}`), nil, nil)
+	require.NoError(t, err)
+
+	root := doc.NodeList.GetNodeByID("root")
+	require.NotNil(t, root)
+	require.Equal(t, []*sbom.Person{
+		{
+			Name:  "Acme Inc",
+			IsOrg: true,
+			Url:   "https://acme.example",
+			Contacts: []*sbom.Person{
+				{Name: "Jane Doe", Email: "jane@acme.example", Phone: "555-1234"},
+			},
+		},
+	}, root.Suppliers)
+}
+
+// TestUnserializeTools checks the reading of the document creation tools.
+// Only the legacy tools array maps onto protobom's flat Tool; tools expressed
+// as components or services are deliberately not read (see
+// docs/tool-representation.md).
+func TestUnserializeTools(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+
+	t.Run("legacy tools array", func(t *testing.T) {
+		doc, err := cdxu.Unserialize(strings.NewReader(`{
+			"bomFormat": "CycloneDX",
+			"specVersion": "1.5",
+			"version": 1,
+			"metadata": {
+				"tools": [
+					{"vendor": "Anchore", "name": "syft", "version": "0.96.0"},
+					{"name": "unversioned-tool"}
+				]
+			}
+		}`), nil, nil)
+		require.NoError(t, err)
+		require.Equal(t, []*sbom.Tool{
+			{Vendor: "Anchore", Name: "syft", Version: "0.96.0"},
+			{Name: "unversioned-tool"},
+		}, doc.Metadata.Tools)
+	})
+
+	t.Run("tool components and services are not read", func(t *testing.T) {
+		doc, err := cdxu.Unserialize(strings.NewReader(`{
+			"bomFormat": "CycloneDX",
+			"specVersion": "1.5",
+			"version": 1,
+			"metadata": {
+				"tools": {
+					"components": [
+						{"type": "application", "name": "syft", "version": "1.2.0"}
+					],
+					"services": [
+						{"name": "a-scanning-service"}
+					]
+				}
+			}
+		}`), nil, nil)
+		require.NoError(t, err)
+		require.Empty(t, doc.Metadata.Tools)
+	})
 }
 
 func TestLicenseChoicesNilLicense(t *testing.T) {

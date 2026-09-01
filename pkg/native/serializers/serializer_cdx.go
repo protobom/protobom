@@ -189,9 +189,10 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 	}
 	doc.Dependencies = &deps
 
-	if !headless && bom.Metadata != nil && bom.GetMetadata().GetName() != "" {
-		doc.Metadata.Component.Name = bom.GetMetadata().GetName()
-	}
+	// TODO(degradation): the protobom document name has no equivalent field
+	// in CycloneDX and is not written. A future mod could preserve it, for
+	// example as a namespaced metadata property; it must not overwrite the
+	// root component's name, which names the software, not the document.
 
 	return doc, nil
 }
@@ -236,6 +237,13 @@ func buildDependencies(nl *sbom.NodeList, components map[string]*cdx.Component) 
 		// Scope-carrying relationships surface as the scope attribute of
 		// their components, they are not part of the dependency graph.
 		if _, ok := edgeTypeToScope(e.Type); ok {
+			continue
+		}
+		// Containment is structural data: it is already expressed through
+		// the component nesting, so it does not belong in the dependency
+		// graph. Writing it there would claim the parent depends on
+		// everything it contains.
+		if e.Type == sbom.Edge_contains {
 			continue
 		}
 		if _, ok := components[e.From]; !ok {
@@ -346,8 +354,8 @@ func buildMetadata(doc *sbom.Document) (*cdx.Metadata, error) {
 			var lfc cdx.Lifecycle
 			var err error
 			if dt.Type == nil {
-				lfc.Name = *dt.Name
-				lfc.Description = *dt.Description
+				lfc.Name = dt.GetName()
+				lfc.Description = dt.GetDescription()
 			} else {
 				lfc.Phase, err = sbomTypeToPhase(dt)
 				if err != nil {
@@ -364,6 +372,7 @@ func buildMetadata(doc *sbom.Document) (*cdx.Metadata, error) {
 		var tools []cdx.Tool //nolint:staticcheck
 		for _, bomtool := range doc.GetMetadata().GetTools() {
 			tools = append(tools, cdx.Tool{ //nolint:staticcheck // Tool is needed for older cdx versions
+				Vendor:  bomtool.Vendor,
 				Name:    bomtool.Name,
 				Version: bomtool.Version,
 			})
@@ -402,7 +411,7 @@ func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
 		return cdx.LifecyclePhase(strings.ToLower(*dt.Name)), nil
 	}
 	// TODO(option): Dont err but assign to type OTHER
-	return "", fmt.Errorf("unknown document type %s", *dt.Name)
+	return "", fmt.Errorf("unknown document type %s", dt.GetName())
 }
 
 // clearAutoRefs
@@ -448,14 +457,18 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		// cdx.Component only allows single Type so we are using the first
 	}
 
-	if len(n.Licenses) > 0 {
-		var licenseChoices []cdx.LicenseChoice
-		var licenses cdx.Licenses
-		for _, l := range n.Licenses {
-			licenseChoices = append(licenseChoices, protobomLicenseToCdx(l))
-		}
-
-		licenses = licenseChoices
+	licenseChoices := []cdx.LicenseChoice{}
+	for _, l := range n.Licenses {
+		licenseChoices = append(licenseChoices, protobomLicenseToCdx(l))
+	}
+	// From 1.6 on, CycloneDX can state the concluded license apart from the
+	// declared ones through the license acknowledgement.
+	// TODO(degradation): below 1.6 the concluded license is not written.
+	if n.LicenseConcluded != "" && s.supportsLicenseAcknowledgment() {
+		licenseChoices = append(licenseChoices, protobomConcludedLicenseToCdx(n.LicenseConcluded))
+	}
+	if len(licenseChoices) > 0 {
+		licenses := cdx.Licenses(licenseChoices)
 		c.Licenses = &licenses
 	}
 
@@ -511,16 +524,26 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				if c.CPE == "" {
 					c.CPE = n.Identifiers[idType]
 				}
+			case int32(sbom.SoftwareIdentifierType_GITOID):
+				// OmniBOR identifiers are gitoids. The field is a 1.6
+				// addition, the encoder drops it for older versions.
+				c.OmniborID = &[]string{n.Identifiers[idType]}
 			}
 		}
 	}
 
 	if n.Suppliers != nil && len(n.GetSuppliers()) > 0 {
 		// TODO(degradation): CDX type Component only supports one Supplier while protobom supports multiple
+		// TODO(degradation): The supplier's own email and phone have no
+		// place on a CycloneDX organizational entity, and a person
+		// supplier is written as an organization.
 
 		nodesupplier := n.GetSuppliers()[0]
 		oe := cdx.OrganizationalEntity{
 			Name: nodesupplier.GetName(),
+		}
+		if nodesupplier.GetUrl() != "" {
+			oe.URL = &[]string{nodesupplier.GetUrl()}
 		}
 		if nodesupplier.Contacts != nil {
 			var contacts []cdx.OrganizationalContact
@@ -535,6 +558,22 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 			oe.Contact = &contacts
 		}
 		c.Supplier = &oe
+	}
+
+	if len(n.Originators) > 0 {
+		// The originators map to the component authors, a 1.6 addition the
+		// encoder drops for older versions.
+		// TODO(degradation): an originator's URL and org flag cannot be
+		// stated on a CycloneDX contact.
+		var authors []cdx.OrganizationalContact
+		for _, o := range n.Originators {
+			authors = append(authors, cdx.OrganizationalContact{
+				Name:  o.Name,
+				Email: o.Email,
+				Phone: o.Phone,
+			})
+		}
+		c.Authors = &authors
 	}
 
 	c.Copyright = n.GetCopyright()
@@ -681,6 +720,28 @@ func protobomLicenseToCdx(license string) cdx.LicenseChoice {
 		return cdx.LicenseChoice{Expression: license}
 	}
 	return cdx.LicenseChoice{License: &cdx.License{ID: license}}
+}
+
+// protobomConcludedLicenseToCdx renders the concluded license as a CycloneDX
+// license choice marked with the concluded acknowledgement, which CycloneDX
+// states inside the license object for a bare license and on the choice for
+// an expression.
+func protobomConcludedLicenseToCdx(license string) cdx.LicenseChoice {
+	choice := protobomLicenseToCdx(license)
+	if choice.License != nil {
+		choice.License.Acknowledgement = cdx.LicenseAcknowledgementConcluded
+	} else {
+		ack := cdx.LicenseAcknowledgementConcluded
+		choice.Acknowledgement = &ack
+	}
+	return choice
+}
+
+// supportsLicenseAcknowledgment reports whether the CycloneDX version being
+// written can mark a license with an acknowledgement (1.6 and later).
+func (s *CDX) supportsLicenseAcknowledgment() bool {
+	version, err := cdxformats.ParseVersion(s.version)
+	return err == nil && version >= cdx.SpecVersion1_6
 }
 
 // isSPDXLicenseExpression reports whether a license string is a compound SPDX

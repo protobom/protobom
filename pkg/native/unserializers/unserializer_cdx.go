@@ -56,7 +56,9 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		NodeList: &sbom.NodeList{},
 	}
 
-	cc := 0
+	// Occurrences of each content checksum among the components read so far
+	// that have no bom-ref, to tell identical ones apart (see componentToNode).
+	autoIDs := map[string]int{}
 
 	if bom.Metadata != nil {
 		if bom.Metadata.Lifecycles != nil {
@@ -76,7 +78,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 			}
 		}
 		if bom.Metadata.Component != nil {
-			nl, err := u.componentToNodeList(bom.Metadata.Component, &cc)
+			nl, err := u.componentToNodeList(bom.Metadata.Component, autoIDs)
 			if err != nil {
 				return nil, fmt.Errorf("converting main bom component to node: %w", err)
 			}
@@ -91,6 +93,31 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				logrus.Warnf("unable to parse time %q: %v", bom.Metadata.Timestamp, err)
 			} else {
 				md.Date = timestamppb.New(t)
+			}
+		}
+		if bom.Metadata.Authors != nil {
+			for _, author := range *bom.Metadata.Authors {
+				md.Authors = append(md.Authors, &sbom.Person{
+					Name:  author.Name,
+					Email: author.Email,
+					Phone: author.Phone,
+				})
+			}
+		}
+		if bom.Metadata.Tools != nil && bom.Metadata.Tools.Tools != nil {
+			// Only the legacy tools array maps onto protobom's flat Tool.
+			// A tool expressed as a component carries full component data
+			// and possibly a dependency tree that a flat Tool cannot hold,
+			// so those are left unread until protobom can model them as
+			// part of the graph (see docs/tool-representation.md), and
+			// services are out of protobom's scope.
+			// TODO(degradation): tool components and services are dropped.
+			for _, tool := range *bom.Metadata.Tools.Tools {
+				md.Tools = append(md.Tools, &sbom.Tool{
+					Name:    tool.Name,
+					Version: tool.Version,
+					Vendor:  tool.Vendor,
+				})
 			}
 		}
 	}
@@ -114,7 +141,7 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		seen := make(map[string]struct{})
 		for i := range *bom.Components {
 			component := &(*bom.Components)[i]
-			nl, err := u.componentToNodeList(component, &cc)
+			nl, err := u.componentToNodeList(component, autoIDs)
 			if err != nil {
 				return nil, fmt.Errorf("converting component to node: %w", err)
 			}
@@ -171,8 +198,8 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 
 // componentToNodes takes a CycloneDX component and computes its graph fragment,
 // returning a nodelist
-func (u *CDX) componentToNodeList(component *cdx.Component, cc *int) (*sbom.NodeList, error) {
-	node, err := u.componentToNode(component, cc)
+func (u *CDX) componentToNodeList(component *cdx.Component, autoIDs map[string]int) (*sbom.NodeList, error) {
+	node, err := u.componentToNode(component, autoIDs)
 	if err != nil {
 		return nil, fmt.Errorf("converting cdx component to node: %w", err)
 	}
@@ -186,7 +213,7 @@ func (u *CDX) componentToNodeList(component *cdx.Component, cc *int) (*sbom.Node
 	if component.Components != nil {
 		for i := range *component.Components {
 			subComponent := &(*component.Components)[i]
-			subList, err := u.componentToNodeList(subComponent, cc)
+			subList, err := u.componentToNodeList(subComponent, autoIDs)
 			if err != nil {
 				return nil, fmt.Errorf("converting subcomponent to nodelist: %w", err)
 			}
@@ -235,8 +262,7 @@ func (u *CDX) scopeToEdgeType(scope cdx.Scope) (sbom.Edge_Type, bool) {
 	}
 }
 
-func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { //nolint:unparam
-	(*cc)++
+func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.Node, error) { //nolint:unparam
 	node := &sbom.Node{
 		Id:      c.BOMRef,
 		Type:    sbom.Node_PACKAGE,
@@ -250,11 +276,35 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 		Hashes:             map[int32]string{},
 		Description:        c.Description,
 		Attribution:        []string{},
-		Suppliers:          []*sbom.Person{}, // TODO
+		Suppliers:          []*sbom.Person{},
 		Originators:        []*sbom.Person{}, // TODO
 		ExternalReferences: []*sbom.ExternalReference{},
 		Identifiers:        map[int32]string{},
 		FileTypes:          []string{},
+	}
+
+	// The CycloneDX supplier is an organizational entity, so the person
+	// read back is always marked as an organization.
+	if c.Supplier != nil {
+		supplier := &sbom.Person{
+			Name:  c.Supplier.Name,
+			IsOrg: true,
+		}
+		if c.Supplier.URL != nil && len(*c.Supplier.URL) > 0 {
+			// TODO(degradation): protobom holds a single URL per person,
+			// any additional entity URLs are dropped.
+			supplier.Url = (*c.Supplier.URL)[0]
+		}
+		if c.Supplier.Contact != nil {
+			for _, contact := range *c.Supplier.Contact {
+				supplier.Contacts = append(supplier.Contacts, &sbom.Person{
+					Name:  contact.Name,
+					Email: contact.Email,
+					Phone: contact.Phone,
+				})
+			}
+		}
+		node.Suppliers = []*sbom.Person{supplier}
 	}
 
 	node.PrimaryPurpose = []sbom.Purpose{u.componentTypeToPurpose(c.Type)}
@@ -278,6 +328,23 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 
 	if c.PackageURL != "" {
 		node.Identifiers[int32(sbom.SoftwareIdentifierType_PURL)] = c.PackageURL
+	}
+
+	if c.OmniborID != nil && len(*c.OmniborID) > 0 {
+		// OmniBOR identifiers are gitoids.
+		// TODO(degradation): protobom holds one gitoid per node, any
+		// additional OmniBOR identifiers are dropped.
+		node.Identifiers[int32(sbom.SoftwareIdentifierType_GITOID)] = (*c.OmniborID)[0]
+	}
+
+	if c.Authors != nil {
+		for _, author := range *c.Authors {
+			node.Originators = append(node.Originators, &sbom.Person{
+				Name:  author.Name,
+				Email: author.Email,
+				Phone: author.Phone,
+			})
+		}
 	}
 
 	if c.Hashes != nil {
@@ -307,9 +374,17 @@ func (u *CDX) componentToNode(c *cdx.Component, cc *int) (*sbom.Node, error) { /
 		node.Properties = ps
 	}
 
-	// Generate a new ID if none is set
+	// Generate a new ID if none is set. The identifier is derived from the
+	// node's content so it does not depend on where the component sits in
+	// the document and survives reserialization. Identical components are
+	// told apart by their occurrence number in read order.
 	if node.Id == "" {
-		node.Id = sbom.NewNodeIdentifier("auto", fmt.Sprintf("%09d", *cc))
+		sum := node.Checksum()[:16]
+		autoIDs[sum]++
+		if n := autoIDs[sum]; n > 1 {
+			sum = fmt.Sprintf("%s-%d", sum, n)
+		}
+		node.Id = sbom.NewNodeIdentifier(sbom.NodeIdentifierPrefixAuto, sum)
 	}
 
 	return node, nil
@@ -377,25 +452,47 @@ func (u *CDX) unserializeExternalReferences(cdxReferences *[]cdx.ExternalReferen
 	return ret
 }
 
-// licenseChoicesToLicenseList returns a flat list of license strings combining
-// expressions and IDs in one. This function should be part of a license package.
+// isConcludedLicense returns true when a license choice carries the
+// concluded acknowledgement, which CycloneDX states inside the license
+// object for a bare license and on the choice for an expression.
+func isConcludedLicense(lc *cdx.LicenseChoice) bool {
+	if lc.Acknowledgement != nil && *lc.Acknowledgement == cdx.LicenseAcknowledgementConcluded {
+		return true
+	}
+	return lc.License != nil && lc.License.Acknowledgement == cdx.LicenseAcknowledgementConcluded
+}
+
+// licenseChoiceString returns the string form of a license choice, or an
+// empty string when the choice states no license.
+func licenseChoiceString(lc *cdx.LicenseChoice) string {
+	// TODO(license): This should handle licenses without an ID and
+	// create custom licenses or another solution that captures the
+	// full custom license text.
+	if lc.Expression != "" {
+		return lc.Expression
+	}
+	if lc.License != nil {
+		return lc.License.ID
+	}
+	return ""
+}
+
+// licenseChoicesToLicenseList returns a flat list of the declared license
+// strings, combining expressions and IDs in one. Licenses marked with the
+// concluded acknowledgement belong to the concluded license instead and are
+// left out. This function should be part of a license package.
 func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 	list := []string{}
 	if lcs == nil {
 		return list
 	}
-	for _, lc := range *lcs {
-		// TODO(license): This should handle licenses without an ID and
-		// create custom licenses or another solution that captures the
-		// full custom license text.
-		if lc.Expression == "" && (lc.License == nil || lc.License.ID == "") {
+	for i := range *lcs {
+		lc := &(*lcs)[i]
+		if isConcludedLicense(lc) {
 			continue
 		}
-
-		if lc.Expression != "" {
-			list = append(list, lc.Expression)
-		} else {
-			list = append(list, lc.License.ID)
+		if s := licenseChoiceString(lc); s != "" {
+			list = append(list, s)
 		}
 	}
 
@@ -403,30 +500,32 @@ func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 }
 
 // licenseChoicesToLicenseString takes the component license data and computes
-// a license expression with its license entries. It will return the license or
-// expression verbatim if its just a single entry.
+// the concluded license expression: the licenses marked with the concluded
+// acknowledgement or, when there are none, the joined declared entries. It
+// will return the license or expression verbatim if its just a single entry.
 // This function is temporary and probably should be part of a more complete
 // license package.
 func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 	if lcs == nil {
 		return ""
 	}
-	var parts []string
-	for _, lc := range *lcs {
-		// TODO(license): This should handle licenses without an ID and
-		// create custom licenses or another solution that captures the
-		// full custom license text.
-		if lc.Expression == "" && (lc.License == nil || lc.License.ID == "") {
+	var parts, concluded []string
+	for i := range *lcs {
+		lc := &(*lcs)[i]
+		s := licenseChoiceString(lc)
+		if s == "" {
 			continue
 		}
-
-		if lc.Expression != "" {
-			parts = append(parts, lc.Expression)
+		if isConcludedLicense(lc) {
+			concluded = append(concluded, s)
 		} else {
-			parts = append(parts, lc.License.ID)
+			parts = append(parts, s)
 		}
 	}
 
+	if len(concluded) > 0 {
+		parts = concluded
+	}
 	if len(parts) == 1 {
 		return parts[0]
 	}

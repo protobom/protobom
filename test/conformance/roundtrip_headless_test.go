@@ -89,15 +89,12 @@ func headlessOptions(format formats.Format) *writer.Options {
 // document is serialized to a "headless" CycloneDX BOM (no metadata.component)
 // and parsed back, then the result is compared to the original via
 // NodeList.Equal.
-//
-// CycloneDX 1.7 is omitted because the cyclonedx-go library cannot decode
-// it (the protobom serializer patches the specVersion on output, but the
-// decoder still rejects 1.7 on read).
 func TestCycloneDXHeadlessRoundtrip(t *testing.T) {
 	for _, format := range []formats.Format{
 		formats.CDX14JSON,
 		formats.CDX15JSON,
 		formats.CDX16JSON,
+		formats.CDX17JSON,
 	} {
 		t.Run(string(format), func(t *testing.T) {
 			original := newMultirootDoc()

@@ -95,6 +95,15 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				md.Date = timestamppb.New(t)
 			}
 		}
+		if bom.Metadata.Authors != nil {
+			for _, author := range *bom.Metadata.Authors {
+				md.Authors = append(md.Authors, &sbom.Person{
+					Name:  author.Name,
+					Email: author.Email,
+					Phone: author.Phone,
+				})
+			}
+		}
 		if bom.Metadata.Tools != nil && bom.Metadata.Tools.Tools != nil {
 			// Only the legacy tools array maps onto protobom's flat Tool.
 			// A tool expressed as a component carries full component data

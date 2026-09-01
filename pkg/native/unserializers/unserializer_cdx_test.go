@@ -285,6 +285,29 @@ func TestDeterministicIds(t *testing.T) {
 	})
 }
 
+// TestUnserializeAuthors checks the reading of the document authors. A
+// CycloneDX author is an organizational contact, so name, email and phone
+// are all it can state.
+func TestUnserializeAuthors(t *testing.T) {
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(`{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"authors": [
+				{"name": "Jane Doe", "email": "jane@example.com", "phone": "555-1234"},
+				{"name": "The Example Team"}
+			]
+		}
+	}`), nil, nil)
+	require.NoError(t, err)
+	require.Equal(t, []*sbom.Person{
+		{Name: "Jane Doe", Email: "jane@example.com", Phone: "555-1234"},
+		{Name: "The Example Team"},
+	}, doc.Metadata.Authors)
+}
+
 // TestUnserializeTools checks the reading of the document creation tools.
 // Only the legacy tools array maps onto protobom's flat Tool; tools expressed
 // as components or services are deliberately not read (see

@@ -102,6 +102,56 @@ func TestRoundTripCDXTools(t *testing.T) {
 	}
 }
 
+// TestRoundTripCDXAuthors writes a document's authors and reads them back.
+// A CycloneDX author is an organizational contact holding only name, email
+// and phone, so those fields survive; a person's URL, org flag and contacts
+// have nowhere to go and are dropped on write.
+func TestRoundTripCDXAuthors(t *testing.T) {
+	for _, format := range []formats.Format{
+		formats.CDX14JSON,
+		formats.CDX15JSON,
+		formats.CDX16JSON,
+		formats.CDX17JSON,
+	} {
+		t.Run(string(format), func(t *testing.T) {
+			original := &sbom.Document{
+				Metadata: &sbom.Metadata{
+					Id: "urn:uuid:11111111-2222-3333-4444-555555555555",
+					Authors: []*sbom.Person{
+						{Name: "Jane Doe", Email: "jane@example.com", Phone: "555-1234"},
+						{Name: "Acme Inc", IsOrg: true, Email: "sbom@acme.example", Url: "https://acme.example"},
+					},
+				},
+				NodeList: &sbom.NodeList{
+					Nodes: []*sbom.Node{
+						{Id: "root", Type: sbom.Node_PACKAGE, Name: "a package"},
+					},
+					Edges:        []*sbom.Edge{},
+					RootElements: []string{"root"},
+				},
+			}
+
+			var buf bytes.Buffer
+			require.NoError(t, writer.New().WriteStreamWithOptions(
+				original, &buf, &writer.Options{
+					Format:        format,
+					RenderOptions: &native.RenderOptions{Indent: 2},
+				},
+			))
+
+			reread, err := reader.New().ParseStream(bytes.NewReader(buf.Bytes()))
+			require.NoError(t, err)
+
+			require.Equal(t, []*sbom.Person{
+				{Name: "Jane Doe", Email: "jane@example.com", Phone: "555-1234"},
+				// TODO(degradation): the URL and the org flag cannot be
+				// stated on a CycloneDX author contact.
+				{Name: "Acme Inc", Email: "sbom@acme.example"},
+			}, reread.Metadata.Authors)
+		})
+	}
+}
+
 // maxDiffItems caps how many entries of each kind a diff description lists.
 const maxDiffItems = 10
 

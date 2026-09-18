@@ -217,6 +217,8 @@ func (nl *NodeList) AddNode(n *Node) {
 // Add combines the nodes and edges from NodeList (nl2) into the current NodeList (nl).
 // It modifies current NodeList (nl) by adding new roots, nodes and edges or updating existing ones.
 // It is the equivalent to the Union of both NodeLists, but it modifies the current NodeList (nl) in place.
+// A node present on both sides, by id, is augmented with nl2's (see Node.Augment);
+// use Absorb to merge such nodes entry by entry instead.
 func (nl *NodeList) Add(nl2 *NodeList) {
 	existingNodes := nl.indexNodes()
 	for i := range nl2.Nodes {
@@ -228,6 +230,35 @@ func (nl *NodeList) Add(nl2 *NodeList) {
 	}
 
 	// Merge the edges into the existing edge set
+	nl.MergeEdges(nl2.Edges)
+
+	rootElements := nl.indexRootElements()
+	for _, id := range nl2.RootElements {
+		if _, ok := rootElements[id]; !ok {
+			nl.RootElements = append(nl.RootElements, id)
+		}
+	}
+
+	nl.cleanEdges()
+}
+
+// Absorb combines the nodes and edges from nl2 into nl, in place, like Add,
+// but a node present on both sides, by id, absorbs nl2's (see Node.Absorb):
+// its collections are merged entry by entry rather than kept as they are.
+// New nodes, edges and root elements are added as Add adds them.
+func (nl *NodeList) Absorb(nl2 *NodeList) {
+	if nl2 == nil {
+		return
+	}
+	existingNodes := nl.indexNodes()
+	for i := range nl2.Nodes {
+		if existing, ok := existingNodes[nl2.Nodes[i].Id]; ok {
+			existing.Absorb(nl2.Nodes[i])
+		} else {
+			nl.Nodes = append(nl.Nodes, nl2.Nodes[i])
+		}
+	}
+
 	nl.MergeEdges(nl2.Edges)
 
 	rootElements := nl.indexRootElements()

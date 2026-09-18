@@ -419,6 +419,18 @@ func (n *Node) HashesMatch(th map[int32]string) bool {
 	return atLeastOneMatch
 }
 
+// HashesConflict reports whether n and n2 state different values for a hash
+// algorithm they both carry. Two nodes whose hashes conflict cannot be the
+// same artifact, whatever else they have in common.
+func (n *Node) HashesConflict(n2 *Node) bool {
+	for algo, v := range n.GetHashes() {
+		if v2, ok := n2.GetHashes()[algo]; ok && v != "" && v2 != "" && v != v2 {
+			return true
+		}
+	}
+	return false
+}
+
 // AddHash adds a new hash with the specified algorithm (algo) to the node.
 // If the node already has a hash with the same algorithm, it is silently replaced.
 // The provided value must not be an empty string

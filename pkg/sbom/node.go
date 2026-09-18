@@ -117,8 +117,13 @@ func (n *Node) Update(n2 *Node) {
 	}
 }
 
-// Augment updates fields in n with data from n2 which is not already defined
-// (not empty string, not 0 length string, not nill pointer).
+// Augment fills the fields of n that are not set with the values n2 has for
+// them. A scalar field is filled when it is empty. A collection (hashes,
+// identifiers, licenses, external references, properties, suppliers,
+// originators, purposes) is copied over only when n has none of its kind
+// at all: a node with one license keeps exactly that license, whatever n2
+// adds. Nothing n already states is changed. Use Absorb to merge the
+// collections entry by entry instead.
 func (n *Node) Augment(n2 *Node) {
 	if n.Name == "" && n2.Name != "" {
 		n.Name = n2.Name
@@ -206,6 +211,53 @@ func augmentIfUnset[T comparable](field *T, other T) {
 	var unset T
 	if *field == unset && other != unset {
 		*field = other
+	}
+}
+
+// Absorb completes n with what n2 knows, without overriding anything n
+// states. Scalar fields n lacks are filled as Augment does, and then the
+// collections are merged entry by entry: every hash algorithm, identifier
+// type, license, external reference and property n2 has that n does not
+// is added to n's own, keeping n's entries first. Augment, by contrast,
+// copies a collection only when n has none at all. Absorb is what merging
+// two descriptions of the same component calls for, since each may know
+// something the other does not.
+func (n *Node) Absorb(n2 *Node) {
+	n.Augment(n2)
+	for algo, v := range n2.GetHashes() {
+		if _, ok := n.GetHashes()[algo]; !ok && v != "" {
+			if n.Hashes == nil {
+				n.Hashes = map[int32]string{}
+			}
+			n.Hashes[algo] = v
+		}
+	}
+	for t, v := range n2.GetIdentifiers() {
+		if _, ok := n.GetIdentifiers()[t]; !ok && v != "" {
+			if n.Identifiers == nil {
+				n.Identifiers = map[int32]string{}
+			}
+			n.Identifiers[t] = v
+		}
+	}
+	for _, l := range n2.GetLicenses() {
+		if !slices.Contains(n.GetLicenses(), l) {
+			n.Licenses = append(n.Licenses, l)
+		}
+	}
+	for _, ref := range n2.GetExternalReferences() {
+		if !slices.ContainsFunc(n.GetExternalReferences(), func(r *ExternalReference) bool {
+			return r.GetType() == ref.GetType() && r.GetUrl() == ref.GetUrl()
+		}) {
+			n.ExternalReferences = append(n.ExternalReferences, ref)
+		}
+	}
+	for _, p := range n2.GetProperties() {
+		if !slices.ContainsFunc(n.GetProperties(), func(q *Property) bool {
+			return q.GetName() == p.GetName() && q.GetData() == p.GetData()
+		}) {
+			n.Properties = append(n.Properties, p)
+		}
 	}
 }
 

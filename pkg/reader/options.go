@@ -61,6 +61,10 @@ func (o *Options) GetFormatOptions(key interface{}) interface{} {
 	return nil
 }
 
+// SetFormatOptions stores the options for an unserializer. The key is either a
+// string, naming the driver type as %T prints it (for example
+// "*unserializers.SPDX3") or a format (for example string(formats.SPDX3JSON)), or
+// the driver itself, whose type is then used. See WithFormatOptions.
 func (o *Options) SetFormatOptions(key, opts interface{}) {
 	if o.formatOptions == nil {
 		o.formatOptions = map[string]interface{}{}
@@ -74,6 +78,23 @@ func (o *Options) SetFormatOptions(key, opts interface{}) {
 
 type ReaderOption func(*Reader)
 
+// WithFormatOptions sets the options handed to the unserializer of a format.
+//
+// The key names the unserializer the options are for, in one of two ways:
+//
+//   - The Go type of the unserializer driver as fmt's %T prints it, for example
+//     "*unserializers.SPDX3" or "*unserializers.CDX". It applies to every format that
+//     driver reads.
+//   - The format itself, for example string(formats.SPDX3JSON), which is
+//     "text/spdx+json;version=3.0.1". It applies to that format only.
+//
+// When options are set under both keys, those keyed by the format win, as
+// the more specific of the two. The options passed to a single call are
+// looked up before the reader's own, so a call's options under either key
+// win over the reader's. Options under a key that matches no unserializer
+// are ignored. None of the built-in unserializers take options today; a
+// custom one decides itself what to do with options of a type it does not
+// expect.
 func WithFormatOptions(driverKey string, opts interface{}) ReaderOption {
 	return func(r *Reader) {
 		r.Options.SetFormatOptions(driverKey, opts)

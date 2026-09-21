@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 
@@ -22,6 +23,13 @@ import (
 
 var _ native.Serializer = &SPDX23{}
 
+// SPDX23 serializes protobom documents to SPDX 2.3 in JSON encoding.
+//
+// The document namespace is taken from the protobom document identifier, so
+// a document read from SPDX 2 and written again keeps its namespace. SPDX 2.3
+// asks for a new namespace for every modified version of a document, so
+// callers that change a document they read should reset its Metadata.Id (or
+// set a new one) before writing it.
 type SPDX23 struct{}
 
 type SPDX23Options struct {
@@ -84,10 +92,21 @@ func (s *SPDX23) Render(doc any, wr io.Writer, o *native.RenderOptions, _ any) e
 	return nil
 }
 
+// spdxDocumentFragments are the fragments a protobom document identifier may
+// carry and still be used as an SPDX namespace. "SPDXRef-DOCUMENT" is the SPDX
+// identifier of every SPDX 2 document, and "DOCUMENT" is how the SPDX 2
+// unserializers write it into the protobom identifier, since the SPDX library
+// they use drops the "SPDXRef-" prefix.
+var spdxDocumentFragments = []string{"SPDXRef-" + protospdx.DOCUMENT, protospdx.DOCUMENT}
+
 // spdxNamespaceFromProtobomID parses the protobom identifier and returns a string
 // suitable to use as an SPDX namespace. In SPDX, the namespace is what uniquely
 // identifies the document's elements on the Internet. The document SPDX identifier
-// is always set to "SPDXRef-DOCUMENT".
+// is always set to "SPDXRef-DOCUMENT", so an identifier ending in that fragment,
+// or in the "DOCUMENT" fragment the SPDX 2 unserializers produce, keeps its
+// namespace across a read and write cycle. A caller that modifies the document
+// in between should reset the identifier, since SPDX 2.3 wants a new namespace
+// for each modified version of a document.
 //
 // For more info see
 // https://spdx.github.io/spdx-spec/v2.3/document-creation-information/#63-spdx-identifier-field
@@ -107,7 +126,7 @@ func spdxNamespaceFromProtobomID(opts SPDX23Options, protoId string) (spdxId str
 	// namespace. Only full URIs can be used as namespaces triming any
 	// fragment at the end.
 	u, err := url.Parse(protoId)
-	if err != nil || u.Scheme == "" || (u.Fragment != "" && u.Fragment != "SPDXRef-DOCUMENT") {
+	if err != nil || u.Scheme == "" || (u.Fragment != "" && !slices.Contains(spdxDocumentFragments, u.Fragment)) {
 		// If the document identifier is not full URI, generate a
 		// deterministic URN
 		//nolint:nilerr
@@ -119,8 +138,10 @@ func spdxNamespaceFromProtobomID(opts SPDX23Options, protoId string) (spdxId str
 	}
 
 	// At this point we've verified the protobom document ID is a URI and its
-	// fragment is blank or SPDXRef-DOCUMENT, we can use it as the SPDX namespace
-	return strings.Replace(protoId, "#SPDXRef-DOCUMENT", "", 1), nil
+	// fragment is blank or names the SPDX document, so what precedes the
+	// fragment is the SPDX namespace.
+	namespace, _, _ := strings.Cut(protoId, "#")
+	return namespace, nil
 }
 
 // Serialize takes a protobom and returns an SPDX 2.3 struct

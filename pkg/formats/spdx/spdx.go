@@ -23,6 +23,11 @@ const (
 	ExtRefTypeCPE22  = "cpe22Type"
 	ExtRefTypeCPE23  = "cpe23Type"
 	ExtRefTypeGitoid = "gitoid"
+
+	// ProtobomName is how protobom names itself, as a tool and as an agent,
+	// in the SPDX documents it writes and recognizes itself by when reading
+	// them back.
+	ProtobomName = "protobom"
 )
 
 // ParseActorString parses an SPDX "actor string", it is a specially formatted
@@ -52,3 +57,13 @@ func ParseActorString(s string) (actorType, actorName, actorEmail string) {
 
 	return actorType, actorName, actorEmail
 }
+
+// The IRIs of the licensing individuals SPDX 3.0.1 predefines for NONE and
+// NOASSERTION, as the specification's model and JSON-LD context name them.
+// The model also declares an alias for each under the Licensing namespace
+// (.../terms/Licensing/None and .../terms/Licensing/NoAssertion), but
+// validators that do not follow owl:sameAs only recognize these.
+const (
+	SPDX3NoneLicenseIRI        = "https://spdx.org/rdf/3.0.1/terms/ExpandedLicensing/NoneLicense"
+	SPDX3NoAssertionLicenseIRI = "https://spdx.org/rdf/3.0.1/terms/ExpandedLicensing/NoAssertionLicense"
+)

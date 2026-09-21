@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/carabiner-dev/spdx3/profiles/core"
+	"github.com/carabiner-dev/spdx3/profiles/expandedlicensing"
 	"github.com/carabiner-dev/spdx3/profiles/simplelicensing"
 	spdx3types "github.com/carabiner-dev/spdx3/types"
 
@@ -47,7 +48,7 @@ func (rd *spdx3Reader) licenses() {
 				continue
 			}
 			if declared {
-				node.Licenses = append(node.Licenses, splitConjunction(expression)...)
+				node.Licenses = append(node.Licenses, protospdx.SplitLicenses(expression, protospdx.OperatorAND)...)
 				continue
 			}
 			// TODO(degradation): protobom concludes a single licence, so an
@@ -74,35 +75,44 @@ func (rd *spdx3Reader) licenses() {
 // own decision, as Security was.
 //
 // A NOASSERTION says the document declines to state a licence, so it is not
-// read as one, which is what the SPDX 2 reader does with it too.
+// read as one, which is what the SPDX 2 reader does with it too. NONE and
+// NOASSERTION are read both as expressions and as the individuals the
+// specification predefines for them, which documents reference by IRI.
 func licenseFromSPDX3(node spdx3types.Node) (string, bool) {
+	if node == nil {
+		return "", false
+	}
+	// The individuals are never written out, so a reference to one is left
+	// unresolved and carries its IRI as a bare reference.
+	id := node.GetSPDXID()
+	if ref, ok := node.(spdx3types.NodeRef); ok {
+		id = ref.ID
+	}
+	switch id {
+	case protospdx.SPDX3NoneLicenseIRI, expandedlicensing.NoneLicenseIRI, spdx3NoneLicenseCompact:
+		return protospdx.NONE, true
+	case protospdx.SPDX3NoAssertionLicenseIRI, expandedlicensing.NoAssertionLicenseIRI, spdx3NoAssertionLicenseCompact:
+		return "", false
+	}
+
 	expression, ok := node.(*simplelicensing.LicenseExpression)
 	if !ok {
 		return "", false
 	}
-	if expression.LicenseExpression == "" || expression.LicenseExpression == protospdx.NOASSERTION {
+	license := strings.TrimSpace(expression.LicenseExpression)
+	if license == "" || strings.EqualFold(license, protospdx.NOASSERTION) {
 		return "", false
+	}
+	if strings.EqualFold(license, protospdx.NONE) {
+		return protospdx.NONE, true
 	}
 	return expression.LicenseExpression, true
 }
 
-// splitConjunction takes apart an expression that is nothing but licences
-// joined by AND, which is how the writer states protobom's list of declared
-// licences as the single expression SPDX 3 wants.
-//
-// It splits only when there is nothing else in the expression: a bracket or
-// an OR means the licences relate to each other in a way a flat list cannot
-// hold, and a piece of such an expression is not a licence. So
-// "MIT AND Apache-2.0" comes apart and "(BSD-3-Clause AND GPL-3.0-or-later)"
-// does not.
-func splitConjunction(expression string) []string {
-	if strings.ContainsAny(expression, "()") || strings.Contains(expression, " OR ") {
-		return []string{expression}
-	}
-
-	licenses := strings.Split(expression, " AND ")
-	for i := range licenses {
-		licenses[i] = strings.TrimSpace(licenses[i])
-	}
-	return licenses
-}
+// The compact names of the licensing individuals. The JSON-LD context
+// declares the relationship's "to" property with "@type": "@vocab", so a
+// document may name them relative to the vocabulary instead of by IRI.
+const (
+	spdx3NoneLicenseCompact        = "expandedlicensing_NoneLicense"
+	spdx3NoAssertionLicenseCompact = "expandedlicensing_NoAssertionLicense"
+)

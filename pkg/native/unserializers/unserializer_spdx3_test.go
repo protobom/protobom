@@ -10,8 +10,10 @@ import (
 	"time"
 
 	"github.com/carabiner-dev/spdx3/profiles/core"
+	"github.com/carabiner-dev/spdx3/profiles/expandedlicensing"
 	"github.com/stretchr/testify/require"
 
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -578,7 +580,8 @@ func TestSPDX3UnserializeCreators(t *testing.T) {
 				"https://example.com/doc#jane",
 				"https://example.com/doc#acme",
 				"https://example.com/doc#scanner",
-				"https://spdx.org/rdf/3.0.1/terms/Core/SpdxOrganization"
+				"https://spdx.org/rdf/3.0.1/terms/Core/SpdxOrganization",
+				"https://example.com/doc#protobom"
 			],
 			"createdUsing": [
 				"https://example.com/doc#tool-1",
@@ -602,6 +605,10 @@ func TestSPDX3UnserializeCreators(t *testing.T) {
 			"creationInfo": "_:creationinfo", "name": "a scanner"
 		},
 		{
+			"type": "SoftwareAgent", "spdxId": "https://example.com/doc#protobom",
+			"creationInfo": "_:creationinfo", "name": "protobom"
+		},
+		{
 			"type": "Tool", "spdxId": "https://example.com/doc#tool-1",
 			"creationInfo": "_:creationinfo", "name": "protobom-v1.2.3"
 		},
@@ -618,7 +625,8 @@ func TestSPDX3UnserializeCreators(t *testing.T) {
 	// The three SPDX 3 agent classes become one protobom person each,
 	// telling themselves apart by their flags. The predefined
 	// SpdxOrganization is not an author: it is how a document says it will
-	// not name one.
+	// not name one. Neither is the protobom agent the writer credits when
+	// the protobom names no author.
 	require.Equal(t, []*sbom.Person{
 		{Name: "Jane", Email: "jane@example.com", Url: "https://jane.example.com"},
 		{Name: "Acme", IsOrg: true},
@@ -772,6 +780,14 @@ func TestSPDX3UnserializeLicenses(t *testing.T) {
 			[]string{"(MIT AND BSD-3-Clause) OR Apache-2.0"},
 		},
 
+		// The writer brackets declared licences that are expressions
+		// themselves, and the brackets come off again when it is taken
+		// apart.
+		"bracketed declared licences joined with AND": {
+			"hasDeclaredLicense", "(GPL-2.0-or-later OR LGPL-3.0-or-later) AND MIT", "",
+			[]string{"GPL-2.0-or-later OR LGPL-3.0-or-later", "MIT"},
+		},
+
 		// An exception belongs to the licence it applies to.
 		"a licence with an exception": {
 			"hasDeclaredLicense", "GPL-2.0-only WITH Classpath-exception-2.0 AND MIT", "",
@@ -787,6 +803,10 @@ func TestSPDX3UnserializeLicenses(t *testing.T) {
 		// NONE is an assertion: there is no licence, which is not the same
 		// as declining to say.
 		"NONE": {"hasDeclaredLicense", "NONE", "", []string{"NONE"}},
+
+		// Neither is matched by case.
+		"a lower case NOASSERTION": {"hasDeclaredLicense", "noassertion", "", nil},
+		"a lower case NONE":        {"hasDeclaredLicense", "none", "", []string{"NONE"}},
 	} {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -799,6 +819,61 @@ func TestSPDX3UnserializeLicenses(t *testing.T) {
 			require.Len(t, doc.NodeList.Nodes, 1)
 			require.Empty(t, doc.NodeList.Edges)
 
+			pkg := doc.NodeList.Nodes[0]
+			require.Equal(t, tc.licenseConcluded, pkg.LicenseConcluded)
+			require.Equal(t, tc.licenses, pkg.Licenses)
+		})
+	}
+}
+
+// TestSPDX3UnserializeLicenseIndividuals covers the licensing individuals
+// the specification predefines for NONE and NOASSERTION, which documents
+// reference by IRI without writing them out.
+func TestSPDX3UnserializeLicenseIndividuals(t *testing.T) {
+	t.Parallel()
+
+	for name, tc := range map[string]struct {
+		relType          string
+		iri              string
+		licenseConcluded string
+		licenses         []string
+	}{
+		"declared NONE":              {"hasDeclaredLicense", protospdx.SPDX3NoneLicenseIRI, "", []string{"NONE"}},
+		"declared NONE alias":        {"hasDeclaredLicense", expandedlicensing.NoneLicenseIRI, "", []string{"NONE"}},
+		"concluded NONE":             {"hasConcludedLicense", protospdx.SPDX3NoneLicenseIRI, "NONE", nil},
+		"declared NOASSERTION":       {"hasDeclaredLicense", protospdx.SPDX3NoAssertionLicenseIRI, "", nil},
+		"concluded NOASSERTION":      {"hasConcludedLicense", expandedlicensing.NoAssertionLicenseIRI, "", nil},
+		"declared NOASSERTION alias": {"hasDeclaredLicense", expandedlicensing.NoAssertionLicenseIRI, "", nil},
+
+		// The JSON-LD context lets a document name them relative to the
+		// vocabulary.
+		"compact declared NONE":         {"hasDeclaredLicense", "expandedlicensing_NoneLicense", "", []string{"NONE"}},
+		"compact concluded NONE":        {"hasConcludedLicense", "expandedlicensing_NoneLicense", "NONE", nil},
+		"compact declared NOASSERTION":  {"hasDeclaredLicense", "expandedlicensing_NoAssertionLicense", "", nil},
+		"compact concluded NOASSERTION": {"hasConcludedLicense", "expandedlicensing_NoAssertionLicense", "", nil},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+				{
+					"type": "SpdxDocument", "spdxId": "https://example.com/doc",
+					"creationInfo": "_:creationinfo"
+				},
+				{
+					"type": "software_Package", "spdxId": "https://example.com/doc#pkg",
+					"creationInfo": "_:creationinfo", "name": "a package"
+				},
+				{
+					"type": "Relationship", "spdxId": "https://example.com/doc#r",
+					"creationInfo": "_:creationinfo",
+					"from": "https://example.com/doc#pkg",
+					"relationshipType": "`+tc.relType+`",
+					"to": ["`+tc.iri+`"]
+				}`)), nil, nil)
+			require.NoError(t, err)
+
+			require.Len(t, doc.NodeList.Nodes, 1)
+			require.Empty(t, doc.NodeList.Edges)
 			pkg := doc.NodeList.Nodes[0]
 			require.Equal(t, tc.licenseConcluded, pkg.LicenseConcluded)
 			require.Equal(t, tc.licenses, pkg.Licenses)

@@ -10,6 +10,7 @@ import (
 	"github.com/carabiner-dev/spdx3/profiles/core"
 	spdx3types "github.com/carabiner-dev/spdx3/types"
 
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -38,6 +39,15 @@ func agentFromSPDX3(node spdx3types.Node) (*sbom.Person, bool) {
 	default:
 		return nil, false
 	}
+}
+
+// isProtobomAgent says whether an agent is the one protobom's writer credits
+// when a document names no author. Like SpdxOrganization, it stands for an
+// author the protobom did not state, so it is not read as one; the writer
+// credits it again when the document is written back out.
+func isProtobomAgent(person *sbom.Person) bool {
+	return person.IsSoftwareAgent && person.Name == protospdx.ProtobomName &&
+		person.Email == "" && person.Url == ""
 }
 
 // withIdentifiers takes the ways of reaching an agent out of the external

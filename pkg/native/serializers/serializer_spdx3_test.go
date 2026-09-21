@@ -7,6 +7,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"runtime/debug"
+	"strings"
 	"testing"
 	"time"
 
@@ -16,6 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -360,5 +363,404 @@ func TestSPDX3EdgeMappingIsExhaustive(t *testing.T) {
 				"edge type %q maps to lifecycle scope %q, which is not a member "+
 					"of the SPDX 3 vocabulary", name, mapping.scope)
 		}
+	}
+}
+
+// serializeWith serializes and renders a document with the given options,
+// returning the rendered bytes.
+func serializeWith(t *testing.T, bom *sbom.Document, opts SPDX3Options) []byte {
+	t.Helper()
+	doc, err := (&SPDX3{}).Serialize(bom, &native.SerializeOptions{}, opts)
+	require.NoError(t, err)
+	buf := &bytes.Buffer{}
+	require.NoError(t, (&SPDX3{}).Render(doc, buf, &native.RenderOptions{}, nil))
+	return buf.Bytes()
+}
+
+// licenseTargets returns what the relationships of a type point at, as
+// license expressions where they point at one and IRIs where they do not.
+func licenseTargets(t *testing.T, rendered map[string]any, relType string) []string {
+	t.Helper()
+	elements := byType(t, rendered)
+	expressions := map[string]string{}
+	for _, license := range elements["simplelicensing_LicenseExpression"] {
+		expressions[fmt.Sprint(license["spdxId"])] = fmt.Sprint(license["simplelicensing_licenseExpression"])
+	}
+	targets := []string{}
+	for _, rel := range elements["Relationship"] {
+		if rel["relationshipType"] != relType {
+			continue
+		}
+		for _, to := range asSlice(t, rel["to"]) {
+			id := fmt.Sprint(to)
+			if expression, ok := expressions[id]; ok {
+				id = expression
+			}
+			targets = append(targets, id)
+		}
+	}
+	return targets
+}
+
+func TestSPDX3DeclaredLicenses(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		licenses []string
+		expected []string
+	}{
+		{"none", nil, []string{}},
+		{"one", []string{"MIT"}, []string{"MIT"}},
+		{"several are all declared", []string{"MIT", "Apache-2.0"}, []string{"MIT AND Apache-2.0"}},
+		{
+			"a compound entry is bracketed",
+			[]string{"GPL-2.0-or-later OR LGPL-3.0-or-later", "MIT"},
+			[]string{"(GPL-2.0-or-later OR LGPL-3.0-or-later) AND MIT"},
+		},
+		{"a single compound entry is kept", []string{"MIT OR Apache-2.0"}, []string{"MIT OR Apache-2.0"}},
+		{"NONE is the predefined individual", []string{"NONE"}, []string{protospdx.SPDX3NoneLicenseIRI}},
+		{"NOASSERTION is the predefined individual", []string{"NOASSERTION"}, []string{protospdx.SPDX3NoAssertionLicenseIRI}},
+		{"NONE in lower case", []string{"none"}, []string{protospdx.SPDX3NoneLicenseIRI}},
+		{"NOASSERTION in mixed case", []string{"NoAssertion"}, []string{protospdx.SPDX3NoAssertionLicenseIRI}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			bom := testDocument()
+			bom.NodeList.Nodes[0].LicenseConcluded = ""
+			bom.NodeList.Nodes[0].Licenses = tc.licenses
+
+			_, rendered := serialize(t, bom)
+			require.Equal(t, tc.expected, licenseTargets(t, rendered, "hasDeclaredLicense"))
+		})
+	}
+}
+
+// Every node under the same license shares one license element, and NONE and
+// NOASSERTION are the individuals the specification predefines, which are
+// referenced rather than written out.
+func TestSPDX3LicenseElementsAreShared(t *testing.T) {
+	bom := testDocument()
+	bom.NodeList.Nodes = []*sbom.Node{
+		{Id: "a", Type: sbom.Node_PACKAGE, Name: "a", LicenseConcluded: "MIT", Licenses: []string{"MIT"}},
+		{Id: "b", Type: sbom.Node_PACKAGE, Name: "b", LicenseConcluded: "MIT", Licenses: []string{"Apache-2.0"}},
+		{Id: "c", Type: sbom.Node_FILE, Name: "c", LicenseConcluded: "NOASSERTION", Licenses: []string{"NONE"}},
+		{Id: "d", Type: sbom.Node_FILE, Name: "d", LicenseConcluded: "NONE", Licenses: []string{"NOASSERTION"}},
+	}
+	bom.NodeList.RootElements = []string{"a"}
+	bom.NodeList.Edges = nil
+
+	_, rendered := serialize(t, bom)
+
+	licenses := byType(t, rendered)["simplelicensing_LicenseExpression"]
+	expressions := make([]string, 0, len(licenses))
+	for _, license := range licenses {
+		expressions = append(expressions, fmt.Sprint(license["simplelicensing_licenseExpression"]))
+		require.Nil(t, license["simplelicensing_licenseListVersion"], "no version unless asked for")
+	}
+	require.Equal(t, []string{"MIT", "Apache-2.0"}, expressions)
+
+	require.Equal(t, []string{
+		"MIT", "MIT", protospdx.SPDX3NoAssertionLicenseIRI, protospdx.SPDX3NoneLicenseIRI,
+	}, licenseTargets(t, rendered, "hasConcludedLicense"))
+	require.Equal(t, []string{
+		"MIT", "Apache-2.0", protospdx.SPDX3NoneLicenseIRI, protospdx.SPDX3NoAssertionLicenseIRI,
+	}, licenseTargets(t, rendered, "hasDeclaredLicense"))
+}
+
+func TestSPDX3LicenseListVersion(t *testing.T) {
+	for _, tc := range []struct {
+		version, expected string
+	}{
+		{"3.27.0", "3.27.0"},
+		{"3.27", "3.27.0"},
+		{" 3.20 ", "3.20.0"},
+		{"3.27.0-rc.1", "3.27.0-rc.1"},
+	} {
+		t.Run(tc.version, func(t *testing.T) {
+			opts := DefaultSPDX3Options
+			opts.LicenseListVersion = tc.version
+
+			rendered := map[string]any{}
+			require.NoError(t, json.Unmarshal(serializeWith(t, testDocument(), opts), &rendered))
+
+			licenses := byType(t, rendered)["simplelicensing_LicenseExpression"]
+			require.NotEmpty(t, licenses)
+			for _, license := range licenses {
+				require.Equal(t, tc.expected, license["simplelicensing_licenseListVersion"])
+			}
+		})
+	}
+}
+
+func TestSPDX3InvalidLicenseListVersion(t *testing.T) {
+	for _, version := range []string{"3", "v3.27", "3.27.0.1", "03.27", "latest", "3.x"} {
+		opts := DefaultSPDX3Options
+		opts.LicenseListVersion = version
+		_, err := (&SPDX3{}).Serialize(testDocument(), &native.SerializeOptions{}, opts)
+		require.Error(t, err, version)
+	}
+}
+
+// Writing the same document twice gives the same bytes, however the maps
+// the hashes and identifiers are held in happen to be ordered.
+func TestSPDX3OutputIsDeterministic(t *testing.T) {
+	bom := testDocument()
+	for _, node := range bom.NodeList.Nodes {
+		node.Hashes = map[int32]string{
+			int32(sbom.HashAlgorithm_SHA1):     "aa",
+			int32(sbom.HashAlgorithm_SHA256):   "bb",
+			int32(sbom.HashAlgorithm_SHA512):   "cc",
+			int32(sbom.HashAlgorithm_MD5):      "dd",
+			int32(sbom.HashAlgorithm_SHA384):   "ee",
+			int32(sbom.HashAlgorithm_BLAKE3):   "ff",
+			int32(sbom.HashAlgorithm_SHA3_256): "11",
+		}
+		node.Identifiers = map[int32]string{
+			int32(sbom.SoftwareIdentifierType_PURL):   "pkg:generic/a@1",
+			int32(sbom.SoftwareIdentifierType_CPE22):  "cpe:/a:example:a:1",
+			int32(sbom.SoftwareIdentifierType_CPE23):  "cpe:2.3:a:example:a:1:*:*:*:*:*:*:*",
+			int32(sbom.SoftwareIdentifierType_GITOID): "gitoid:blob:sha1:abc",
+		}
+	}
+
+	first := serializeWith(t, bom, DefaultSPDX3Options)
+	for range 20 {
+		require.Equal(t, string(first), string(serializeWith(t, bom, DefaultSPDX3Options)))
+	}
+
+	// And in the order of their keys.
+	_, rendered := serialize(t, bom)
+	pkg := byType(t, rendered)["software_Package"][0]
+	algorithms := []string{}
+	for _, hash := range asSlice(t, pkg["verifiedUsing"]) {
+		if algo, ok := asMap(t, hash)["algorithm"].(string); ok && asMap(t, hash)["type"] == "Hash" {
+			algorithms = append(algorithms, algo)
+		}
+	}
+	require.Equal(t, []string{"md5", "sha1", "sha256", "sha384", "sha512", "sha3_256", "blake3"}, algorithms)
+}
+
+func TestSPDX3CreationInfo(t *testing.T) {
+	self := protobomToolName()
+
+	for _, tc := range []struct {
+		name      string
+		authors   []*sbom.Person
+		tools     []*sbom.Tool
+		createdBy []string // "class:name"
+		toolNames []string
+	}{
+		{
+			name:      "no authors credits protobom",
+			createdBy: []string{"SoftwareAgent:protobom"},
+			toolNames: []string{self},
+		},
+		{
+			name:      "authors are credited instead",
+			authors:   []*sbom.Person{{Name: "Alice"}, {Name: "Acme", IsOrg: true}},
+			createdBy: []string{"Person:Alice", "Organization:Acme"},
+			toolNames: []string{self},
+		},
+		{
+			name: "protobom read from an earlier document is not repeated",
+			tools: []*sbom.Tool{
+				{Name: "protobom", Version: "v0.6.1"},
+				{Name: "protobom-v0.5.0"},
+				{Name: "protobom-devel"},
+				{Name: "scanner", Version: "1.0"},
+				{Name: "protobom-storage", Version: "1.0"},
+			},
+			createdBy: []string{"SoftwareAgent:protobom"},
+			toolNames: []string{self, "scanner-1.0", "protobom-storage-1.0"},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			bom := testDocument()
+			bom.Metadata.Authors = tc.authors
+			bom.Metadata.Tools = tc.tools
+
+			_, rendered := serialize(t, bom)
+			elements := byType(t, rendered)
+
+			names := map[string]string{}
+			for class, nodes := range elements {
+				for _, node := range nodes {
+					names[fmt.Sprint(node["spdxId"])] = fmt.Sprintf("%s:%v", class, node["name"])
+				}
+			}
+
+			creation := elements["CreationInfo"][0]
+			creators := asSlice(t, creation["createdBy"])
+			createdBy := make([]string, 0, len(creators))
+			for _, id := range creators {
+				require.NotEqual(t, core.SpdxOrganizationIRI, id, "the SPDX project did not create the document")
+				createdBy = append(createdBy, names[fmt.Sprint(id)])
+			}
+			require.Equal(t, tc.createdBy, createdBy)
+
+			used := asSlice(t, creation["createdUsing"])
+			tools := make([]string, 0, len(used))
+			for _, id := range used {
+				tools = append(tools, strings.TrimPrefix(names[fmt.Sprint(id)], "Tool:"))
+			}
+			require.Equal(t, tc.toolNames, tools)
+		})
+	}
+}
+
+func TestProtobomVersionFromBuildInfo(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		name     string
+		info     *debug.BuildInfo
+		expected string
+	}{
+		{"no build info", nil, "devel"},
+		{
+			"protobom is the main module",
+			&debug.BuildInfo{Main: debug.Module{Path: protobomModule, Version: "v0.7.0"}},
+			"v0.7.0",
+		},
+		{
+			"protobom built from a checkout",
+			&debug.BuildInfo{Main: debug.Module{Path: protobomModule, Version: "(devel)"}},
+			"devel",
+		},
+		{
+			"protobom is a dependency",
+			&debug.BuildInfo{
+				Main: debug.Module{Path: "sigs.k8s.io/bom", Version: "v0.8.0"},
+				Deps: []*debug.Module{
+					{Path: "github.com/spdx/tools-golang", Version: "v0.5.7"},
+					{Path: protobomModule, Version: "v0.6.1"},
+				},
+			},
+			"v0.6.1",
+		},
+		{
+			"protobom is replaced by another version",
+			&debug.BuildInfo{
+				Main: debug.Module{Path: "sigs.k8s.io/bom"},
+				Deps: []*debug.Module{{
+					Path: protobomModule, Version: "v0.6.1",
+					Replace: &debug.Module{Path: "github.com/fork/protobom", Version: "v0.6.2"},
+				}},
+			},
+			"v0.6.2",
+		},
+		{
+			"protobom is replaced by a directory",
+			&debug.BuildInfo{
+				Main: debug.Module{Path: "sigs.k8s.io/bom"},
+				Deps: []*debug.Module{{
+					Path: protobomModule, Version: "v0.6.1",
+					Replace: &debug.Module{Path: "../protobom"},
+				}},
+			},
+			"devel",
+		},
+		{
+			"protobom is not linked",
+			&debug.BuildInfo{Main: debug.Module{Path: "example.com/tool", Version: "v1.0.0"}},
+			"devel",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			require.Equal(t, tc.expected, protobomVersionFromBuildInfo(tc.info))
+		})
+	}
+}
+
+func TestIsProtobomTool(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		name, version string
+		expected      bool
+	}{
+		{"protobom", "v0.6.1", true},
+		{"protobom", "", true},
+		{"protobom-v0.6.1", "", true},
+		{"protobom-0.6.1", "", true},
+		{"protobom-devel", "", true},
+		{"protobom-(devel)", "", true},
+		{"protobom-storage", "", false},
+		{"protobom-validator", "", false},
+		{"protobom-v0.6.1", "1.0", false},
+		{"protobom-", "", false},
+		{"scanner", "1.0", false},
+	} {
+		t.Run(tc.name+"@"+tc.version, func(t *testing.T) {
+			t.Parallel()
+			require.Equal(t, tc.expected, isProtobomTool(tc.name, tc.version))
+		})
+	}
+}
+
+// A reference with no URL points nowhere, so it is not written.
+func TestSPDX3SkipsEmptyExternalReferences(t *testing.T) {
+	bom := testDocument()
+	bom.NodeList.Nodes[0].ExternalReferences = []*sbom.ExternalReference{
+		{Url: "", Type: sbom.ExternalReference_VCS},
+		nil,
+		{Url: "https://example.com/vcs", Type: sbom.ExternalReference_VCS},
+	}
+
+	_, rendered := serialize(t, bom)
+	refs := asSlice(t, byType(t, rendered)["software_Package"][0]["externalRef"])
+	require.Len(t, refs, 1)
+	require.Equal(t, []any{"https://example.com/vcs"}, asMap(t, refs[0])["locator"])
+
+	bom.NodeList.Nodes[0].ExternalReferences = []*sbom.ExternalReference{{Url: ""}}
+	_, rendered = serialize(t, bom)
+	require.Nil(t, byType(t, rendered)["software_Package"][0]["externalRef"])
+}
+
+// SPDX 3 replaced the SPDX 2 file types with a purpose and a media type.
+func TestSPDX3FileTypes(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		fileTypes   []string
+		purposes    []sbom.Purpose
+		contentType string
+		primary     any
+		additional  any
+		mediaType   any
+	}{
+		{name: "none"},
+		{name: "source", fileTypes: []string{"SOURCE"}, primary: "source"},
+		{
+			name: "several purposes", fileTypes: []string{"ARCHIVE", "DOCUMENTATION"},
+			primary: "archive", additional: []any{"documentation"},
+		},
+		{
+			name: "the node's own purposes come first", fileTypes: []string{"SOURCE", "APPLICATION"},
+			purposes: []sbom.Purpose{sbom.Purpose_APPLICATION}, primary: "application", additional: []any{"source"},
+		},
+		{name: "binary is a media type", fileTypes: []string{"BINARY"}, mediaType: "application/octet-stream"},
+		{name: "text is a media type", fileTypes: []string{"TEXT", "OTHER"}, primary: "other", mediaType: "text/plain"},
+		{
+			name: "the node's own media type wins", fileTypes: []string{"BINARY"},
+			contentType: "application/x-executable", mediaType: "application/x-executable",
+		},
+		{
+			name: "a node media type that is not one is skipped", fileTypes: []string{"BINARY"},
+			contentType: "executable", mediaType: "application/octet-stream",
+		},
+		{name: "a malformed media type is not written", contentType: "application/x/y"},
+		{name: "lower case", fileTypes: []string{"source"}, primary: "source"},
+		{name: "not carried over", fileTypes: []string{"IMAGE", "AUDIO", "VIDEO", "SPDX"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			bom := testDocument()
+			file := bom.NodeList.Nodes[1]
+			file.FileTypes = tc.fileTypes
+			file.PrimaryPurpose = tc.purposes
+			file.ContentType = tc.contentType
+
+			_, rendered := serialize(t, bom)
+			written := byType(t, rendered)["software_File"][0]
+			require.Equal(t, tc.primary, written["software_primaryPurpose"])
+			require.Equal(t, tc.additional, written["software_additionalPurpose"])
+			require.Equal(t, tc.mediaType, written["contentType"])
+		})
 	}
 }

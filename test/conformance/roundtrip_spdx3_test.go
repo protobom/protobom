@@ -5,6 +5,8 @@ package conformance
 
 import (
 	"bytes"
+	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,7 +14,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/protobom/protobom/pkg/formats"
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/native"
+	"github.com/protobom/protobom/pkg/native/serializers"
 	"github.com/protobom/protobom/pkg/reader"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/protobom/protobom/pkg/writer"
@@ -560,13 +564,23 @@ func TestRoundTripSPDX3Licenses(t *testing.T) {
 		"concluded only": {
 			"GPL-3.0-or-later", nil, nil,
 		},
-		// TODO(degradation): a declared licence that is itself an expression
-		// is joined with the others and cannot be taken apart again, because
-		// a piece of a bracketed expression is not a licence.
+		// A declared licence that is itself an expression is bracketed when
+		// it is joined with the others, so it keeps its meaning and comes
+		// back as one entry. Brackets it was given are not kept.
 		"a declared licence that is an expression": {
 			"",
+			[]string{"MIT OR Apache-2.0", "BSD-3-Clause"},
+			[]string{"MIT OR Apache-2.0", "BSD-3-Clause"},
+		},
+		"a declared licence that is a bracketed expression": {
+			"",
 			[]string{"(MIT OR Apache-2.0)", "BSD-3-Clause"},
-			[]string{"(MIT OR Apache-2.0) AND BSD-3-Clause"},
+			[]string{"MIT OR Apache-2.0", "BSD-3-Clause"},
+		},
+		// NONE is written as the individual SPDX 3 predefines for it, and
+		// read back as itself.
+		"no licence asserted": {
+			"NONE", []string{"NONE"}, []string{"NONE"},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
@@ -630,4 +644,147 @@ func TestRoundTripSPDX3LicensesLeaveNoGraph(t *testing.T) {
 		{Type: sbom.Edge_contains, From: pkg.Id, To: []string{file.Id}},
 	}, got.NodeList.Edges)
 	require.Equal(t, []string{pkg.Id}, got.NodeList.RootElements)
+}
+
+// TestRoundTripSPDX3CreationInfoIsStable reads back what the writer wrote and
+// writes it again, several times over. The writer credits protobom as a tool
+// and, when the protobom names no author, as the agent that created the
+// document; reading those back must not turn them into more tools and
+// authors on every cycle, and the document must come out the same each time.
+func TestRoundTripSPDX3CreationInfoIsStable(t *testing.T) {
+	const ns = "https://example.com/spdxdocs/cycle"
+
+	for name, authors := range map[string][]*sbom.Person{
+		"no authors": nil,
+		"an author":  {{Name: "Alice"}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			doc := &sbom.Document{
+				Metadata: &sbom.Metadata{
+					Id:      ns,
+					Date:    timestamppb.New(mustTime(t, "2026-08-01T10:00:00Z")),
+					Authors: authors,
+					Tools:   []*sbom.Tool{{Name: "scanner", Version: "1.0"}},
+				},
+				NodeList: &sbom.NodeList{
+					Nodes: []*sbom.Node{{
+						Id: ns + "#pkg", Type: sbom.Node_PACKAGE, Name: "a package",
+						Licenses:    []string{"MIT OR Apache-2.0", "BSD-3-Clause"},
+						Identifiers: map[int32]string{}, Hashes: map[int32]string{},
+					}},
+					Edges:        []*sbom.Edge{},
+					RootElements: []string{ns + "#pkg"},
+				},
+			}
+
+			var previous []byte
+			for range 3 {
+				var out bytes.Buffer
+				require.NoError(t, writer.New().WriteStreamWithOptions(
+					doc, &out, &writer.Options{Format: formats.SPDX3JSON},
+				))
+				if previous != nil {
+					require.Equal(t, string(previous), out.String())
+				}
+				previous = out.Bytes()
+
+				var err error
+				doc, err = reader.New().ParseStreamWithOptions(
+					bytes.NewReader(out.Bytes()),
+					&reader.Options{
+						Format:             formats.SPDX3JSON,
+						UnserializeOptions: &native.UnserializeOptions{},
+					},
+				)
+				require.NoError(t, err)
+
+				// protobom itself is read back as a tool once, and not as an
+				// author.
+				require.Len(t, doc.Metadata.Tools, 2)
+				require.True(t, strings.HasPrefix(doc.Metadata.Tools[0].Name, "protobom"))
+				require.Equal(t, "scanner", doc.Metadata.Tools[1].Name)
+				require.Len(t, doc.Metadata.Authors, len(authors))
+				require.Equal(t,
+					[]string{"MIT OR Apache-2.0", "BSD-3-Clause"},
+					doc.NodeList.GetNodeByID(ns+"#pkg").Licenses,
+				)
+			}
+		})
+	}
+}
+
+// TestConvertSPDX3ToSPDX23Licenses reads an SPDX 3 document declaring a
+// compound license and writes it as SPDX 2.3. The reader takes the AND
+// expression apart into the licenses it joins, one of which is a choice of
+// licenses itself, so the SPDX 2.3 writer has to bracket it when it joins
+// them again to keep its meaning.
+func TestConvertSPDX3ToSPDX23Licenses(t *testing.T) {
+	const ns = "https://example.com/spdxdocs/convert"
+	const expression = "(MIT OR Apache-2.0) AND BSD-3-Clause"
+
+	var spdx3Doc bytes.Buffer
+	require.NoError(t, writer.New().WriteStreamWithOptions(&sbom.Document{
+		Metadata: &sbom.Metadata{Id: ns, Date: timestamppb.New(mustTime(t, "2026-08-01T10:00:00Z"))},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{{
+				Id: ns + "#pkg", Type: sbom.Node_PACKAGE, Name: "a package",
+				Licenses: []string{expression},
+			}},
+			RootElements: []string{ns + "#pkg"},
+		},
+	}, &spdx3Doc, &writer.Options{Format: formats.SPDX3JSON}))
+
+	doc, err := reader.New().ParseStreamWithOptions(
+		bytes.NewReader(spdx3Doc.Bytes()),
+		&reader.Options{Format: formats.SPDX3JSON, UnserializeOptions: &native.UnserializeOptions{}},
+	)
+	require.NoError(t, err)
+	require.Equal(t, []string{"MIT OR Apache-2.0", "BSD-3-Clause"}, doc.NodeList.GetNodeByID(ns+"#pkg").Licenses)
+
+	for name, tc := range map[string]struct {
+		operator string
+		expected string
+	}{
+		// Joined with AND, as SPDX 3 reads a list of licenses, the
+		// expression is the one the SPDX 3 document declared.
+		"AND": {protospdx.OperatorAND, expression},
+		// TODO: the SPDX 2.3 writer joins with OR by default, which reads
+		// the list differently than SPDX 3 does. The bracket still keeps
+		// the choice together.
+		"default OR": {"", "(MIT OR Apache-2.0) OR BSD-3-Clause"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			opts := &writer.Options{Format: formats.SPDX23JSON}
+			if tc.operator != "" {
+				spdxOpts := serializers.DefaultSPDX23Options
+				spdxOpts.LicenseExpressionOperator = tc.operator
+				opts.SetFormatOptions(&serializers.SPDX23{}, spdxOpts)
+			}
+
+			var out bytes.Buffer
+			require.NoError(t, writer.New().WriteStreamWithOptions(doc, &out, opts))
+
+			var spdx23 struct {
+				CreationInfo struct {
+					Creators []string `json:"creators"`
+				} `json:"creationInfo"`
+				Packages []struct {
+					LicenseDeclared string `json:"licenseDeclared"`
+				} `json:"packages"`
+			}
+			require.NoError(t, json.Unmarshal(out.Bytes(), &spdx23))
+			require.Len(t, spdx23.Packages, 1)
+			require.Equal(t, tc.expected, spdx23.Packages[0].LicenseDeclared)
+
+			// protobom credited itself in the SPDX 3 document, and is
+			// credited once in the SPDX 2.3 one.
+			tools := 0
+			for _, creator := range spdx23.CreationInfo.Creators {
+				if strings.HasPrefix(creator, "Tool: protobom") {
+					tools++
+				}
+			}
+			require.Equal(t, 1, tools, spdx23.CreationInfo.Creators)
+		})
+	}
 }

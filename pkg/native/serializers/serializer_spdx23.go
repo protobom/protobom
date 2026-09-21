@@ -13,7 +13,6 @@ import (
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
 	"github.com/spdx/tools-golang/spdx/v2/v2_3"
-	"sigs.k8s.io/release-utils/version"
 
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/mod"
@@ -43,14 +42,16 @@ type SPDX23Options struct {
 	FailOnMultipleLicenses bool
 
 	// LicenseExpressionOperator is the logical operator used to form an SPDX
-	// license expression whe a protobom node has more than one license
+	// license expression when a protobom node has more than one license,
+	// "AND" or "OR". Licenses that are compound expressions themselves are
+	// wrapped in parentheses so each keeps its meaning.
 	LicenseExpressionOperator string
 }
 
 // Validate returns an error if the SPDX options are invalid
 func (o *SPDX23Options) Validate() error {
-	if o.LicenseExpressionOperator != "OR" && o.LicenseExpressionOperator != "AND" {
-		return fmt.Errorf("invalid LicenseExpressionOperator, must be 'OR' or 'AND'")
+	if o.LicenseExpressionOperator != protospdx.OperatorOR && o.LicenseExpressionOperator != protospdx.OperatorAND {
+		return fmt.Errorf("invalid LicenseExpressionOperator, must be '%s' or '%s'", protospdx.OperatorOR, protospdx.OperatorAND)
 	}
 	return nil
 }
@@ -59,7 +60,7 @@ var DefaultSPDX23Options = SPDX23Options{
 	FailOnInvalidDocIdFragment: false,
 	FailOnMultipleLicenses:     false,
 	GenerateDocumentID:         true,
-	LicenseExpressionOperator:  "OR",
+	LicenseExpressionOperator:  protospdx.OperatorOR,
 }
 
 const spdxOther = "OTHER"
@@ -160,10 +161,12 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 		CreationInfo: &spdx.CreationInfo{
 			LicenseListVersion: "3.20", // https://spdx.org/licenses/
 			Creators: []spdx.Creator{
-				// Register protobom as one of the document creation tools
+				// Register protobom as one of the document creation tools,
+				// with the version of the protobom module rather than that
+				// of the program embedding it.
 				{
-					Creator:     fmt.Sprintf("protobom-%s", version.GetVersionInfo().GitVersion),
-					CreatorType: "Tool",
+					Creator:     protobomToolName(),
+					CreatorType: protospdx.Tool,
 				},
 			},
 
@@ -174,6 +177,12 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 	}
 
 	for _, t := range bom.Metadata.Tools {
+		// The document already credits protobom above, so an entry for it
+		// read from an earlier document, of any version, is not repeated.
+		if isProtobomTool(t.Name, t.Version) {
+			continue
+		}
+
 		// TODO(degradation): SPDX is prescriptive on how this field is structured
 		// it is a tool identifier word separated from the version with a dash.
 		// We should transform the field value
@@ -325,6 +334,13 @@ func (s *SPDX23) buildPackages(
 			continue
 		}
 
+		// Licenses that are compound expressions themselves are bracketed
+		// so the joined expression keeps the meaning of each.
+		declared, err := protospdx.JoinLicenses(node.Licenses, spdxopts.LicenseExpressionOperator)
+		if err != nil {
+			return nil, fmt.Errorf("node %q: joining declared licenses: %w", node.Id, err)
+		}
+
 		p := spdx.Package{
 			IsUnpackaged:          false,
 			PackageName:           node.Name,
@@ -338,7 +354,7 @@ func (s *SPDX23) buildPackages(
 			PackageHomePage:             node.UrlHome,
 			PackageSourceInfo:           node.SourceInfo,
 			PackageLicenseConcluded:     node.LicenseConcluded,
-			PackageLicenseDeclared:      strings.Join(node.Licenses, fmt.Sprintf(" %s ", spdxopts.LicenseExpressionOperator)),
+			PackageLicenseDeclared:      declared,
 			PackageLicenseInfoFromFiles: []string{},
 			PackageLicenseComments:      node.LicenseComments,
 			PackageCopyrightText:        strings.TrimSpace(node.Copyright),

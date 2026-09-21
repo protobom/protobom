@@ -4,9 +4,13 @@
 package serializers
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"io"
+	"maps"
+	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -16,8 +20,8 @@ import (
 	"github.com/carabiner-dev/spdx3/profiles/simplelicensing"
 	"github.com/carabiner-dev/spdx3/profiles/software"
 	spdx3types "github.com/carabiner-dev/spdx3/types"
-	"sigs.k8s.io/release-utils/version"
 
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -33,6 +37,11 @@ const (
 )
 
 // SPDX3 serializes protobom documents to SPDX 3.0.1.
+//
+// A node's list of declared licenses is written as a single expression
+// joining them with AND, which is how the SPDX 3 reader takes it apart
+// again. Entries that are compound expressions themselves are wrapped in
+// parentheses so each keeps its meaning.
 type SPDX3 struct{}
 
 func NewSPDX3() *SPDX3 {
@@ -54,11 +63,23 @@ type SPDX3Options struct {
 	// so we chose to not enable this by default. Turn it on for a consumer
 	// that reads the collection rather than the graph.
 	ListCollectionElements bool
+
+	// LicenseListVersion is the version of the SPDX License List the
+	// license expressions refer to, in the major.minor.patch form SPDX 3
+	// asks for (for example "3.27.0"). When set, it is written on every
+	// license expression. Protobom does not carry the version, so it is
+	// empty by default and left out of the document.
+	//
+	// The License List itself is versioned major.minor, as in "3.27", so
+	// such a version is completed to "3.27.0". Serialize returns an error
+	// for any version that is neither that nor a semantic version.
+	LicenseListVersion string
 }
 
 var DefaultSPDX3Options = SPDX3Options{
 	GenerateDocumentID:     true,
 	ListCollectionElements: false,
+	LicenseListVersion:     "",
 }
 
 // Render writes the SPDX 3 document. The indent of the render options is not
@@ -92,6 +113,13 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 		}
 	}
 
+	var err error
+
+	opts.LicenseListVersion, err = normalizeLicenseListVersion(opts.LicenseListVersion)
+	if err != nil {
+		return nil, fmt.Errorf("validating SPDX 3 options: %w", err)
+	}
+
 	namespace, err := spdxNamespaceFromProtobomID(SPDX23Options{
 		GenerateDocumentID: opts.GenerateDocumentID,
 	}, bom.Metadata.Id)
@@ -100,7 +128,13 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 	}
 
 	env := spdx3.NewEnvelope()
-	t := &spdx3Translator{namespace: namespace, env: env, nodeList: bom.NodeList}
+	t := &spdx3Translator{
+		namespace: namespace,
+		env:       env,
+		nodeList:  bom.NodeList,
+		opts:      opts,
+		licenses:  map[string]spdx3types.Node{},
+	}
 
 	// The agents and tools the document credits, which its creation
 	// information points at.
@@ -113,7 +147,9 @@ func (s *SPDX3) Serialize(bom *sbom.Document, _ *native.SerializeOptions, rawopt
 			return nil, fmt.Errorf("converting node %q: %w", node.Id, err)
 		}
 		env.Graph.AddNode(element)
-		t.licenses(node, element)
+		if err := t.nodeLicenses(node, element); err != nil {
+			return nil, fmt.Errorf("converting node %q: %w", node.Id, err)
+		}
 	}
 
 	// The relationships between them.
@@ -172,7 +208,12 @@ type spdx3Translator struct {
 	namespace string
 	env       *spdx3.Envelope
 	nodeList  *sbom.NodeList
+	opts      SPDX3Options
 	counter   int
+
+	// licenses holds the license element written for each distinct
+	// expression, so nodes under the same license share one.
+	licenses map[string]spdx3types.Node
 }
 
 // elementID returns an identifier for an element. SPDX3 identifies elements
@@ -209,15 +250,20 @@ func (t *spdx3Translator) creationInfo(md *sbom.Metadata) *core.CreationInfo {
 		creation.CreatedBy = append(creation.CreatedBy, t.agent(author))
 	}
 
-	// Record protobom itself, as the SPDX 2.3 serializer does.
-	self := core.NewTool(
-		t.newID("tool"),
-		fmt.Sprintf("protobom-%s", version.GetVersionInfo().GitVersion),
-	)
+	// Record protobom itself, as the SPDX 2.3 serializer does, with the
+	// version of the protobom module rather than that of the program
+	// embedding it.
+	self := core.NewTool(t.newID("tool"), protobomToolName())
 	t.env.Graph.AddNode(self)
 	creation.CreatedUsing = append(creation.CreatedUsing, self)
 
 	for _, tool := range md.Tools {
+		// The document already credits protobom above, so an entry for it
+		// read from an earlier document is not repeated. Without this, every
+		// read and write cycle would add another.
+		if isProtobomTool(tool.Name, tool.Version) {
+			continue
+		}
 		name := tool.Name
 		if tool.Version != "" {
 			name = fmt.Sprintf("%s-%s", tool.Name, tool.Version)
@@ -228,10 +274,15 @@ func (t *spdx3Translator) creationInfo(md *sbom.Metadata) *core.CreationInfo {
 		creation.CreatedUsing = append(creation.CreatedUsing, element)
 	}
 
-	// An SPDX 3 document states who created it, so credit protobom when the
-	// protobom names nobody.
+	// An SPDX 3 document must state who created it, so credit protobom, as
+	// the software agent that wrote the document, when the protobom names
+	// nobody. The predefined SpdxOrganization is not used: it stands for the
+	// SPDX project, which did not create the document.
 	if len(creation.CreatedBy) == 0 {
-		creation.CreatedBy = append(creation.CreatedBy, spdx3types.NodeRef{ID: core.SpdxOrganizationIRI})
+		creation.CreatedBy = append(creation.CreatedBy, t.agent(&sbom.Person{
+			Name:            protospdx.ProtobomName,
+			IsSoftwareAgent: true,
+		}))
 	}
 
 	return creation
@@ -302,6 +353,10 @@ func (t *spdx3Translator) pkg(n *sbom.Node) *software.Package {
 	p.PackageUrl = string(n.Purl())
 	p.PrimaryPurpose, p.AdditionalPurpose = purposesToSPDX3(n.PrimaryPurpose)
 
+	// TODO(degradation): SPDX 3 has no package file name. It says the same
+	// with a File element related to the package by hasDistributionArtifact,
+	// which would add a node to the graph that the protobom does not have.
+
 	// The verification code is derived from the package's files rather than
 	// carried in the protobom, so it is computed as the document is written.
 	if code := packageVerificationCode(t.nodeList, n); code != "" {
@@ -327,12 +382,50 @@ func (t *spdx3Translator) file(n *sbom.Node) *software.File {
 
 	f.CopyrightText = n.Copyright
 	f.AttributionText = n.Attribution
-	f.PrimaryPurpose, f.AdditionalPurpose = purposesToSPDX3(n.PrimaryPurpose)
 
-	// TODO(degradation): a node's SPDX 2 file types have no home in SPDX 3,
-	// whose fileKind only tells a file from a directory.
+	// SPDX 3 replaced the SPDX 2 file types with the file's purpose and its
+	// media type, so each file type is carried into whichever of the two
+	// says the same thing. What the node states itself comes first.
+	purposes, contentType := fileTypesToSPDX3(n.FileTypes)
+	f.PrimaryPurpose, f.AdditionalPurpose = purposesToSPDX3(n.PrimaryPurpose, purposes...)
+	// A media type is written only when it is shaped as one, type/subtype,
+	// as SPDX 3 requires.
+	f.ContentType = contentType
+	if mediaTypePattern.MatchString(n.ContentType) {
+		f.ContentType = n.ContentType
+	}
 
 	return f
+}
+
+// mediaTypePattern is the shape SPDX 3 requires of a media type.
+var mediaTypePattern = regexp.MustCompile(`^[^/]+/[^/]+$`)
+
+// licenseListVersionPattern is the semantic version SPDX 3 requires of a
+// License List version, and shortVersionPattern the major.minor version the
+// License List is published under.
+var (
+	licenseListVersionPattern = regexp.MustCompile(
+		`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)` +
+			`(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?` +
+			`(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`,
+	)
+	shortVersionPattern = regexp.MustCompile(`^(0|[1-9]\d*)\.(0|[1-9]\d*)$`)
+)
+
+// normalizeLicenseListVersion returns a License List version in the form SPDX
+// 3 requires, completing a major.minor version with a zero patch level, and
+// an error if it cannot.
+func normalizeLicenseListVersion(version string) (string, error) {
+	version = strings.TrimSpace(version)
+	switch {
+	case version == "", licenseListVersionPattern.MatchString(version):
+		return version, nil
+	case shortVersionPattern.MatchString(version):
+		return version + ".0", nil
+	default:
+		return "", fmt.Errorf("invalid license list version %q, must be major.minor.patch", version)
+	}
 }
 
 // artifact fills in what every software element carries, whatever its kind.
@@ -361,16 +454,18 @@ func (t *spdx3Translator) artifact(n *sbom.Node, a *core.Artifact) {
 		a.OriginatedBy = append(a.OriginatedBy, t.agent(originator))
 	}
 
-	for algo, value := range n.Hashes {
+	// The hashes and identifiers are maps, so they are written in the order
+	// of their keys to keep the output the same from one run to the next.
+	for _, algo := range slices.Sorted(maps.Keys(n.Hashes)) {
 		name := sbom.HashAlgorithm(algo).ToSPDX3()
 		if name == "" {
 			// TODO(degradation): the algorithm has no SPDX 3 name.
 			continue
 		}
-		a.VerifiedUsing = append(a.VerifiedUsing, core.NewHash(core.HashAlgorithm(name), value))
+		a.VerifiedUsing = append(a.VerifiedUsing, core.NewHash(core.HashAlgorithm(name), n.Hashes[algo]))
 	}
 
-	for idType, value := range n.Identifiers {
+	for _, idType := range slices.Sorted(maps.Keys(n.Identifiers)) {
 		name := identifierTypeToSPDX3(sbom.SoftwareIdentifierType(idType))
 		if name == "" {
 			continue
@@ -378,11 +473,16 @@ func (t *spdx3Translator) artifact(n *sbom.Node, a *core.Artifact) {
 		a.ExternalIdentifier = append(a.ExternalIdentifier, core.ExternalIdentifier{
 			Type:                   spdx3ExternalIdentifier,
 			ExternalIdentifierType: name,
-			Identifier:             value,
+			Identifier:             n.Identifiers[idType],
 		})
 	}
 
 	for _, ref := range n.ExternalReferences {
+		// A reference without a URL points nowhere, and an empty locator
+		// is not one.
+		if ref == nil || ref.Url == "" {
+			continue
+		}
 		a.ExternalRef = append(a.ExternalRef, core.ExternalRef{
 			Type:            spdx3ExternalRef,
 			ExternalRefType: core.ExternalRefType(externalRefTypeToSPDX3(ref)),
@@ -395,35 +495,63 @@ func (t *spdx3Translator) artifact(n *sbom.Node, a *core.Artifact) {
 	// an extension, which protobom has no way to describe.
 }
 
-// licenses states what a node is licensed under, which SPDX 3 says with a
-// relationship to a license rather than with a field.
-func (t *spdx3Translator) licenses(n *sbom.Node, element core.ElementDescendant) {
+// nodeLicenses states what a node is licensed under, which SPDX 3 says with
+// a relationship to a license rather than with a field.
+func (t *spdx3Translator) nodeLicenses(n *sbom.Node, element core.ElementDescendant) error {
 	add := func(expression string, relType core.RelationshipType) {
-		if expression == "" {
-			return
+		if license := t.license(expression); license != nil {
+			t.env.Graph.Relate(t.newID("relationship"), element, relType, license)
 		}
-		license := &simplelicensing.LicenseExpression{
-			AnyLicenseInfo: simplelicensing.AnyLicenseInfo{Element: core.Element{Node: core.Node{
-				PreNode: base.PreNode{
-					SPDXID: t.newID("license"),
-					Type:   spdx3LicenseExpression,
-				},
-			}}},
-			LicenseExpression: expression,
-		}
-		t.env.Graph.AddNode(license)
-		t.env.Graph.Relate(t.newID("relationship"), element, relType, license)
 	}
 
 	add(n.LicenseConcluded, core.RelationshipTypeHasConcludedLicense)
 
-	// TODO(degradation): protobom carries a list of declared licenses, which
-	// SPDX 3 states as one expression; they are joined with AND.
-	if len(n.Licenses) > 0 {
-		add(strings.Join(n.Licenses, " AND "), core.RelationshipTypeHasDeclaredLicense)
+	// Protobom carries a list of declared licenses, which SPDX 3 states as
+	// one expression. The list is read as licenses that all apply, so they
+	// are joined with AND, and compound entries are bracketed to keep their
+	// meaning.
+	declared, err := protospdx.JoinLicenses(n.Licenses, protospdx.OperatorAND)
+	if err != nil {
+		return fmt.Errorf("joining declared licenses: %w", err)
 	}
+	add(declared, core.RelationshipTypeHasDeclaredLicense)
 
 	// TODO(degradation): a node's license comments have nowhere to go.
+	return nil
+}
+
+// license returns the license element stating an expression. The elements
+// are shared: each distinct expression is written once, however many nodes
+// it licenses. NONE and NOASSERTION are the individuals the specification
+// predefines for them, which documents reference without writing out.
+func (t *spdx3Translator) license(expression string) spdx3types.Node {
+	expression = strings.TrimSpace(expression)
+	switch {
+	case expression == "":
+		return nil
+	case strings.EqualFold(expression, protospdx.NONE):
+		return spdx3types.NodeRef{ID: protospdx.SPDX3NoneLicenseIRI}
+	case strings.EqualFold(expression, protospdx.NOASSERTION):
+		return spdx3types.NodeRef{ID: protospdx.SPDX3NoAssertionLicenseIRI}
+	}
+
+	if license, ok := t.licenses[expression]; ok {
+		return spdx3types.NodeRef{ID: license.GetSPDXID()}
+	}
+
+	license := &simplelicensing.LicenseExpression{
+		AnyLicenseInfo: simplelicensing.AnyLicenseInfo{Element: core.Element{Node: core.Node{
+			PreNode: base.PreNode{
+				SPDXID: t.newID("license"),
+				Type:   spdx3LicenseExpression,
+			},
+		}}},
+		LicenseExpression:  expression,
+		LicenseListVersion: t.opts.LicenseListVersion,
+	}
+	t.env.Graph.AddNode(license)
+	t.licenses[expression] = license
+	return license
 }
 
 // edge converts a protobom edge to the relationship, or relationships, that
@@ -591,11 +719,18 @@ func identifierTypeToSPDX3(t sbom.SoftwareIdentifierType) core.ExternalIdentifie
 }
 
 // purposesToSPDX3 splits protobom's purposes into the one SPDX 3 calls
-// primary and the rest, which it calls additional.
-func purposesToSPDX3(purposes []sbom.Purpose) (primary software.SoftwarePurpose, additional []software.SoftwarePurpose) {
+// primary and the rest, which it calls additional. Any extra purposes, such
+// as those a file's types imply, follow protobom's own, and a purpose is
+// named once however many times it is stated.
+func purposesToSPDX3(purposes []sbom.Purpose, extra ...software.SoftwarePurpose) (primary software.SoftwarePurpose, additional []software.SoftwarePurpose) {
 	names := []software.SoftwarePurpose{}
 	for _, p := range purposes {
-		if name := purposeToSPDX3(p); name != "" {
+		if name := purposeToSPDX3(p); name != "" && !slices.Contains(names, name) {
+			names = append(names, name)
+		}
+	}
+	for _, name := range extra {
+		if name != "" && !slices.Contains(names, name) {
 			names = append(names, name)
 		}
 	}
@@ -603,6 +738,34 @@ func purposesToSPDX3(purposes []sbom.Purpose) (primary software.SoftwarePurpose,
 		return "", nil
 	}
 	return names[0], names[1:]
+}
+
+// fileTypesToSPDX3 carries SPDX 2 file types into the purposes and the media
+// type SPDX 3 replaced them with, following the specification's migration
+// guide. The purposes are returned in the order the types are listed.
+//
+// TODO(degradation): AUDIO, IMAGE and VIDEO name a family of media types
+// rather than one, and SPDX a choice of two, so they are not carried over.
+func fileTypesToSPDX3(fileTypes []string) (purposes []software.SoftwarePurpose, contentType string) {
+	for _, fileType := range fileTypes {
+		switch strings.ToUpper(strings.TrimSpace(fileType)) {
+		case "ARCHIVE":
+			purposes = append(purposes, software.SoftwarePurposeArchive)
+		case "SOURCE":
+			purposes = append(purposes, software.SoftwarePurposeSource)
+		case "APPLICATION":
+			purposes = append(purposes, software.SoftwarePurposeApplication)
+		case "DOCUMENTATION":
+			purposes = append(purposes, software.SoftwarePurposeDocumentation)
+		case spdxOther:
+			purposes = append(purposes, software.SoftwarePurposeOther)
+		case "BINARY":
+			contentType = cmp.Or(contentType, "application/octet-stream")
+		case "TEXT":
+			contentType = cmp.Or(contentType, "text/plain")
+		}
+	}
+	return purposes, contentType
 }
 
 func purposeToSPDX3(p sbom.Purpose) software.SoftwarePurpose {

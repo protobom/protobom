@@ -585,3 +585,75 @@ func TestBuildPackages(t *testing.T) {
 		})
 	}
 }
+
+// Declared licenses that are compound expressions themselves are bracketed
+// when joined, so each keeps its meaning.
+func TestSPDX23DeclaredLicenses(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		licenses []string
+		operator string
+		expected string
+	}{
+		{"none", nil, protospdx.OperatorOR, ""},
+		{"one", []string{"MIT"}, protospdx.OperatorOR, "MIT"},
+		{"a single compound entry is kept", []string{"MIT OR Apache-2.0"}, protospdx.OperatorAND, "MIT OR Apache-2.0"},
+		{"simple entries", []string{"MIT", "Apache-2.0"}, protospdx.OperatorOR, "MIT OR Apache-2.0"},
+		{
+			"a compound entry is bracketed",
+			[]string{"MIT OR Apache-2.0", "BSD-3-Clause"},
+			protospdx.OperatorAND,
+			"(MIT OR Apache-2.0) AND BSD-3-Clause",
+		},
+		{
+			"a compound entry is bracketed with the default operator",
+			[]string{"MIT AND Apache-2.0", "BSD-3-Clause"},
+			protospdx.OperatorOR,
+			"(MIT AND Apache-2.0) OR BSD-3-Clause",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			opts := DefaultSPDX23Options
+			opts.LicenseExpressionOperator = tc.operator
+			doc, err := NewSPDX23().Serialize(&sbom.Document{
+				Metadata: &sbom.Metadata{Id: "https://example.com/doc"},
+				NodeList: &sbom.NodeList{Nodes: []*sbom.Node{{
+					Id: "pkg", Type: sbom.Node_PACKAGE, Name: "pkg", Licenses: tc.licenses,
+				}}},
+			}, &native.SerializeOptions{}, opts)
+			require.NoError(t, err)
+			spdxDoc, ok := doc.(*spdx.Document)
+			require.True(t, ok)
+			require.Len(t, spdxDoc.Packages, 1)
+			require.Equal(t, tc.expected, spdxDoc.Packages[0].PackageLicenseDeclared)
+		})
+	}
+}
+
+// The document credits protobom once, with the version of the protobom
+// module, however many protobom entries of earlier documents it carries.
+func TestSPDX23CreatorTools(t *testing.T) {
+	doc, err := NewSPDX23().Serialize(&sbom.Document{
+		Metadata: &sbom.Metadata{
+			Id: "https://example.com/doc",
+			Tools: []*sbom.Tool{
+				{Name: "protobom", Version: "v0.6.1"},
+				{Name: "protobom-devel"},
+				{Name: "scanner", Version: "1.0"},
+				{Name: "protobom-storage", Version: "1.0"},
+			},
+		},
+		NodeList: &sbom.NodeList{},
+	}, &native.SerializeOptions{}, nil)
+	require.NoError(t, err)
+	spdxDoc, ok := doc.(*spdx.Document)
+	require.True(t, ok)
+
+	tools := []string{}
+	for _, creator := range spdxDoc.CreationInfo.Creators {
+		if creator.CreatorType == protospdx.Tool {
+			tools = append(tools, creator.Creator)
+		}
+	}
+	require.Equal(t, []string{protobomToolName(), "scanner-1.0", "protobom-storage-1.0"}, tools)
+}

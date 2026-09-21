@@ -90,9 +90,11 @@ func (u *SPDX3) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interfa
 // the rest.
 func (rd *spdx3Reader) creators(metadata *sbom.Metadata, ci *core.CreationInfo) {
 	for _, node := range ci.CreatedBy {
-		if author, ok := agentFromSPDX3(node); ok {
-			metadata.Authors = append(metadata.Authors, author)
+		author, ok := agentFromSPDX3(node)
+		if !ok || isProtobomAgent(author) {
+			continue
 		}
+		metadata.Authors = append(metadata.Authors, author)
 	}
 	for _, node := range ci.CreatedUsing {
 		if tool, ok := toolFromSPDX3(node); ok {

@@ -118,7 +118,7 @@ func (w *Writer) WriteStreamWithOptions(bom *sbom.Document, wr io.Writer, o *Opt
 		return fmt.Errorf("getting serializer: %w", err)
 	}
 
-	fo := w.formatOptions(o, serializer)
+	fo := w.formatOptions(o, format, serializer)
 	nativeDoc, err := serializer.Serialize(bom, w.serializeOptions(o), fo)
 	if err != nil {
 		return fmt.Errorf("serializing SBOM to native format: %w", err)
@@ -167,14 +167,20 @@ func (w *Writer) renderOptions(o *Options) *native.RenderOptions {
 
 // formatOptions resolves the driver-specific options for a call: the
 // argument's when it has any for the driver, otherwise the writer's own.
-func (w *Writer) formatOptions(o *Options, driver native.Serializer) interface{} {
-	if o != nil {
-		if fo := o.GetFormatOptions(driver); fo != nil {
+// Within each, options keyed by the format win over those keyed by the
+// serializer's type, as the format is the more specific of the two: one
+// driver type can handle several formats.
+func (w *Writer) formatOptions(o *Options, format formats.Format, driver native.Serializer) interface{} {
+	for _, opts := range []*Options{o, w.Options} {
+		if opts == nil {
+			continue
+		}
+		if fo := opts.GetFormatOptions(string(format)); fo != nil {
 			return fo
 		}
-	}
-	if w.Options != nil {
-		return w.Options.GetFormatOptions(driver)
+		if fo := opts.GetFormatOptions(driver); fo != nil {
+			return fo
+		}
 	}
 	return nil
 }

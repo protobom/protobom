@@ -174,3 +174,60 @@ func TestWriteStreamWithOptionsResolvesArgumentThenWriter(t *testing.T) {
 		require.Equal(t, "argument", fo)
 	})
 }
+
+// Format options can be keyed by the serializer's type or by the format it
+// is registered for, and the format wins when both are set.
+func TestWriteStreamFormatOptionKeys(t *testing.T) {
+	format := formats.Format("format-option-keys-test")
+	fake := &nativefakes.FakeSerializer{}
+	fake.SerializeReturns(struct{}{}, nil)
+	RegisterSerializer(format, fake)
+	defer UnregisterSerializer(format)
+	driverKey := fmt.Sprintf("%T", fake)
+
+	for _, tc := range []struct {
+		name     string
+		writer   map[string]any
+		argument map[string]any
+		expected any
+	}{
+		{name: "no options", expected: nil},
+		{name: "keyed by driver type", writer: map[string]any{driverKey: "type"}, expected: "type"},
+		{name: "keyed by format", writer: map[string]any{string(format): "format"}, expected: "format"},
+		{
+			name:     "format wins over driver type",
+			writer:   map[string]any{string(format): "format", driverKey: "type"},
+			expected: "format",
+		},
+		{
+			name:     "argument keyed by format wins over writer keyed by type",
+			writer:   map[string]any{driverKey: "writer"},
+			argument: map[string]any{string(format): "argument"},
+			expected: "argument",
+		},
+		{
+			name:     "argument keyed by type wins over writer keyed by format",
+			writer:   map[string]any{string(format): "writer"},
+			argument: map[string]any{driverKey: "argument"},
+			expected: "argument",
+		},
+		{name: "other format is ignored", writer: map[string]any{"other-format": "other"}, expected: nil},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			opts := make([]WriterOption, 0, len(tc.writer))
+			for k, v := range tc.writer {
+				opts = append(opts, WithFormatOptions(k, v))
+			}
+			w := New(opts...)
+			o := &Options{Format: format}
+			for k, v := range tc.argument {
+				o.SetFormatOptions(k, v)
+			}
+			require.NoError(t, w.WriteStreamWithOptions(sbom.NewDocument(), &bytes.Buffer{}, o))
+			_, _, fo := fake.SerializeArgsForCall(fake.SerializeCallCount() - 1)
+			_, _, _, rfo := fake.RenderArgsForCall(fake.RenderCallCount() - 1)
+			require.Equal(t, tc.expected, fo)
+			require.Equal(t, tc.expected, rfo)
+		})
+	}
+}

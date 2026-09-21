@@ -196,7 +196,7 @@ func (r *Reader) ParseStreamWithOptions(f io.ReadSeeker, o *Options) (*sbom.Docu
 	tee := io.TeeReader(f, multiwriter)
 
 	// Call the format unserializer
-	doc, err := unserializer.Unserialize(tee, uo, r.formatOptions(o, unserializer))
+	doc, err := unserializer.Unserialize(tee, uo, r.formatOptions(o, format, unserializer))
 	if err != nil {
 		return nil, fmt.Errorf("unserializing %s: %w", format, err)
 	}
@@ -240,14 +240,20 @@ func (r *Reader) unserializeOptions(o *Options) *native.UnserializeOptions {
 
 // formatOptions resolves the driver-specific options for a call: the
 // argument's when it has any for the driver, otherwise the reader's own.
-func (r *Reader) formatOptions(o *Options, driver native.Unserializer) interface{} {
-	if o != nil {
-		if fo := o.GetFormatOptions(driver); fo != nil {
+// Within each, options keyed by the format win over those keyed by the
+// unserializer's type, as the format is the more specific of the two: one
+// driver type can handle several formats.
+func (r *Reader) formatOptions(o *Options, format formats.Format, driver native.Unserializer) interface{} {
+	for _, opts := range []*Options{o, r.Options} {
+		if opts == nil {
+			continue
+		}
+		if fo := opts.GetFormatOptions(string(format)); fo != nil {
 			return fo
 		}
-	}
-	if r.Options != nil {
-		return r.Options.GetFormatOptions(driver)
+		if fo := opts.GetFormatOptions(driver); fo != nil {
+			return fo
+		}
 	}
 	return nil
 }

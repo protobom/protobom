@@ -200,3 +200,59 @@ func TestParseWithOptionsResolvesArgumentThenReader(t *testing.T) {
 		require.Equal(t, "file://"+path, *doc.Metadata.SourceData.Uri)
 	})
 }
+
+// Format options can be keyed by the unserializer's type or by the format it
+// is registered for, and the format wins when both are set.
+func TestParseFormatOptionKeys(t *testing.T) {
+	format := formats.Format("format-option-keys-test")
+	fake := &nativefakes.FakeUnserializer{}
+	fake.UnserializeReturns(sbom.NewDocument(), nil)
+	RegisterUnserializer(format, fake)
+	defer UnregisterUnserializer(format)
+	driverKey := fmt.Sprintf("%T", fake)
+
+	for _, tc := range []struct {
+		name     string
+		reader   map[string]any
+		argument map[string]any
+		expected any
+	}{
+		{name: "no options", expected: nil},
+		{name: "keyed by driver type", reader: map[string]any{driverKey: "type"}, expected: "type"},
+		{name: "keyed by format", reader: map[string]any{string(format): "format"}, expected: "format"},
+		{
+			name:     "format wins over driver type",
+			reader:   map[string]any{string(format): "format", driverKey: "type"},
+			expected: "format",
+		},
+		{
+			name:     "argument keyed by format wins over reader keyed by type",
+			reader:   map[string]any{driverKey: "reader"},
+			argument: map[string]any{string(format): "argument"},
+			expected: "argument",
+		},
+		{
+			name:     "argument keyed by type wins over reader keyed by format",
+			reader:   map[string]any{string(format): "reader"},
+			argument: map[string]any{driverKey: "argument"},
+			expected: "argument",
+		},
+		{name: "other format is ignored", reader: map[string]any{"other-format": "other"}, expected: nil},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			opts := make([]ReaderOption, 0, len(tc.reader))
+			for k, v := range tc.reader {
+				opts = append(opts, WithFormatOptions(k, v))
+			}
+			r := New(opts...)
+			o := &Options{Format: format}
+			for k, v := range tc.argument {
+				o.SetFormatOptions(k, v)
+			}
+			_, err := r.ParseStreamWithOptions(strings.NewReader("{}"), o)
+			require.NoError(t, err)
+			_, _, fo := fake.UnserializeArgsForCall(fake.UnserializeCallCount() - 1)
+			require.Equal(t, tc.expected, fo)
+		})
+	}
+}

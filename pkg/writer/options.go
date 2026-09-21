@@ -30,6 +30,23 @@ func WithSerializeOptions(so *native.SerializeOptions) WriterOption {
 	}
 }
 
+// WithFormatOptions sets the options handed to the serializer of a format.
+//
+// The key names the serializer the options are for, in one of two ways:
+//
+//   - The Go type of the serializer driver as fmt's %T prints it, for example
+//     "*serializers.SPDX3" or "*serializers.CDX". It applies to every format that
+//     driver writes.
+//   - The format itself, for example string(formats.SPDX3JSON), which is
+//     "text/spdx+json;version=3.0.1". It applies to that format only.
+//
+// When options are set under both keys, those keyed by the format win, as
+// the more specific of the two. The options passed to a single call are
+// looked up before the writer's own, so a call's options under either key
+// win over the writer's. The options must be of the type the driver expects,
+// such as serializers.SPDX3Options for the SPDX 3 serializer; options under
+// a key that matches no serializer are ignored, and options of another type
+// make the built-in serializers return an error.
 func WithFormatOptions(driverKey string, opts interface{}) WriterOption {
 	return func(w *Writer) {
 		w.Options.SetFormatOptions(driverKey, opts)
@@ -135,6 +152,10 @@ func (o *Options) GetFormatOptions(key interface{}) interface{} {
 	return nil
 }
 
+// SetFormatOptions stores the options for a serializer. The key is either a
+// string, naming the driver type as %T prints it (for example
+// "*serializers.SPDX3") or a format (for example string(formats.SPDX3JSON)), or
+// the driver itself, whose type is then used. See WithFormatOptions.
 func (o *Options) SetFormatOptions(key, opts interface{}) {
 	if o.formatOptions == nil {
 		o.formatOptions = map[string]interface{}{}

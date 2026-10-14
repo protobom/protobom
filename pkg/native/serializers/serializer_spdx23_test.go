@@ -707,3 +707,76 @@ func TestSPDX23CreatorTools(t *testing.T) {
 	}
 	require.Equal(t, []string{protobomToolName(), "scanner-1.0", "protobom-storage-1.0"}, tools)
 }
+
+func TestSerializeHashOrderIsDeterministic(t *testing.T) {
+	bom := &sbom.Document{
+		Metadata: &sbom.Metadata{
+			Id:   "test-doc",
+			Name: "test-doc",
+			Date: timestamppb.New(time.Unix(0, 0)),
+			Tools: []*sbom.Tool{
+				{Name: "protobom-test"},
+			},
+		},
+		NodeList: &sbom.NodeList{
+			RootElements: []string{"pkg-1"},
+			Nodes: []*sbom.Node{
+				{
+					Id:   "pkg-1",
+					Type: sbom.Node_PACKAGE,
+					Name: "pkg-1",
+					Hashes: map[int32]string{
+						int32(sbom.HashAlgorithm_SHA1):   "5891b5b522d5df086d0ff0b110fbd9d21bb4fc71",
+						int32(sbom.HashAlgorithm_SHA256): "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+						int32(sbom.HashAlgorithm_SHA512): "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043",
+						int32(sbom.HashAlgorithm_MD5):    "5d41402abc4b2a76b9719d911017c592",
+					},
+					Identifiers: map[int32]string{
+						int32(sbom.SoftwareIdentifierType_PURL):  "pkg:generic/pkg-1@1.0.0",
+						int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:test:pkg-1:1.0.0:*:*:*:*:*:*:*",
+						int32(sbom.SoftwareIdentifierType_CPE22): "cpe:/a:test:pkg-1:1.0.0",
+					},
+				},
+				{
+					Id:   "file-1",
+					Type: sbom.Node_FILE,
+					Name: "file-1",
+					Hashes: map[int32]string{
+						int32(sbom.HashAlgorithm_SHA1):   "5891b5b522d5df086d0ff0b110fbd9d21bb4fc71",
+						int32(sbom.HashAlgorithm_SHA256): "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+						int32(sbom.HashAlgorithm_SHA512): "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043",
+					},
+				},
+			},
+			Edges: []*sbom.Edge{
+				{Type: sbom.Edge_contains, From: "pkg-1", To: []string{"file-1"}},
+			},
+		},
+	}
+
+	for _, tc := range []struct {
+		name string
+		s    native.Serializer
+	}{
+		{"spdx23", NewSPDX23()},
+		{"cdx", NewCDX("1.5", "json")},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var first string
+			for i := 0; i < 20; i++ {
+				doc, err := tc.s.Serialize(bom, &native.SerializeOptions{}, nil)
+				require.NoError(t, err)
+
+				var buf strings.Builder
+				require.NoError(t, tc.s.Render(doc, &buf, &native.RenderOptions{Indent: 2}, nil))
+
+				if i == 0 {
+					first = buf.String()
+					require.NotEmpty(t, first)
+					continue
+				}
+				require.Equal(t, first, buf.String(), "render %d differs from the first", i)
+			}
+		})
+	}
+}

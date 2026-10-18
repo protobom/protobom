@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -473,7 +475,9 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	if len(n.Hashes) > 0 {
-		for algo, hash := range n.Hashes {
+		for _, algo := range slices.Sorted(maps.Keys(n.Hashes)) {
+			hash := n.Hashes[algo]
+
 			cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(algo))
 			if err != nil {
 				// TODO(degradation): Algorithm not supported in CDX
@@ -494,7 +498,9 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				Type:    s.protobomExtRefTypeToCdxType(er.Type),
 			}
 			hashList := []cdx.Hash{}
-			for protoAlgo, val := range er.Hashes {
+			for _, protoAlgo := range slices.Sorted(maps.Keys(er.Hashes)) {
+				val := er.Hashes[protoAlgo]
+
 				cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(protoAlgo))
 				if err != nil {
 					// TODO(degradation): Hash not supported
@@ -513,7 +519,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	if n.Identifiers != nil {
-		for idType := range n.Identifiers {
+		for _, idType := range slices.Sorted(maps.Keys(n.Identifiers)) {
 			switch idType {
 			case int32(sbom.SoftwareIdentifierType_PURL):
 				c.PackageURL = n.Identifiers[idType]

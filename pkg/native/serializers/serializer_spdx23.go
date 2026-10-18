@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/url"
 	"slices"
 	"strings"
@@ -319,7 +320,9 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 			f.FileCopyrightText = protospdx.NONE
 		}
 
-		for algo, hash := range node.Hashes {
+		for _, algo := range slices.Sorted(maps.Keys(node.Hashes)) {
+			hash := node.Hashes[algo]
+
 			if _, ok := sbom.HashAlgorithm_name[algo]; ok {
 				spdxAlgo := sbom.HashAlgorithm(algo).ToSPDX()
 				if spdxAlgo == "" {
@@ -457,7 +460,9 @@ func (s *SPDX23) buildPackages(
 			p.PackageDownloadLocation = protospdx.NOASSERTION
 		}
 
-		for algo, hash := range node.Hashes {
+		for _, algo := range slices.Sorted(maps.Keys(node.Hashes)) {
+			hash := node.Hashes[algo]
+
 			if _, ok := sbom.HashAlgorithm_name[algo]; ok {
 				spdxAlgo := sbom.HashAlgorithm(algo).ToSPDX()
 				if spdxAlgo == "" {
@@ -487,7 +492,7 @@ func (s *SPDX23) buildPackages(
 			})
 		}
 
-		for i := range node.Identifiers {
+		for _, i := range slices.Sorted(maps.Keys(node.Identifiers)) {
 			p.PackageExternalReferences = append(p.PackageExternalReferences, &v2_3.PackageExternalReference{
 				Category: sbom.SoftwareIdentifierType(i).ToSPDX2Category(),
 				RefType:  sbom.SoftwareIdentifierType(i).ToSPDX2Type(),

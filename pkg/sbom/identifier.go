@@ -16,10 +16,14 @@ func SoftwareIdentifierTypeFromString(queryString string) SoftwareIdentifierType
 
 	queryString = strings.TrimSpace(strings.ToLower(queryString))
 	switch queryString {
+	case "purl":
+		return SoftwareIdentifierType_PURL
 	case "cpe22", "cpe2.2":
 		return SoftwareIdentifierType_CPE22
 	case "cpe23", "cpe2.3":
 		return SoftwareIdentifierType_CPE23
+	case "gitoid":
+		return SoftwareIdentifierType_GITOID
 	default:
 		return SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE
 	}

@@ -12,13 +12,8 @@ import (
 type FakeSerializer struct {
 	RenderStub        func(interface{}, io.Writer, *native.RenderOptions, interface{}) error
 	renderMutex       sync.RWMutex
-	renderArgsForCall []struct {
-		arg1 interface{}
-		arg2 io.Writer
-		arg3 *native.RenderOptions
-		arg4 interface{}
-	}
-	renderReturns struct {
+	renderArgsForCall []FakeSerializerRenderArgs
+	renderReturns     struct {
 		result1 error
 	}
 	renderReturnsOnCall map[int]struct {
@@ -26,12 +21,8 @@ type FakeSerializer struct {
 	}
 	SerializeStub        func(*sbom.Document, *native.SerializeOptions, interface{}) (interface{}, error)
 	serializeMutex       sync.RWMutex
-	serializeArgsForCall []struct {
-		arg1 *sbom.Document
-		arg2 *native.SerializeOptions
-		arg3 interface{}
-	}
-	serializeReturns struct {
+	serializeArgsForCall []FakeSerializerSerializeArgs
+	serializeReturns     struct {
 		result1 interface{}
 		result2 error
 	}
@@ -40,18 +31,29 @@ type FakeSerializer struct {
 		result2 error
 	}
 	invocations      map[string][][]interface{}
+	callOrder        []string
 	invocationsMutex sync.RWMutex
+}
+
+// FakeSerializerRenderArgs holds the arguments of one call to Render.
+type FakeSerializerRenderArgs struct {
+	Arg1 interface{}
+	Arg2 io.Writer
+	Arg3 *native.RenderOptions
+	Arg4 interface{}
+}
+
+// FakeSerializerSerializeArgs holds the arguments of one call to Serialize.
+type FakeSerializerSerializeArgs struct {
+	Arg1 *sbom.Document
+	Arg2 *native.SerializeOptions
+	Arg3 interface{}
 }
 
 func (fake *FakeSerializer) Render(arg1 interface{}, arg2 io.Writer, arg3 *native.RenderOptions, arg4 interface{}) error {
 	fake.renderMutex.Lock()
 	ret, specificReturn := fake.renderReturnsOnCall[len(fake.renderArgsForCall)]
-	fake.renderArgsForCall = append(fake.renderArgsForCall, struct {
-		arg1 interface{}
-		arg2 io.Writer
-		arg3 *native.RenderOptions
-		arg4 interface{}
-	}{arg1, arg2, arg3, arg4})
+	fake.renderArgsForCall = append(fake.renderArgsForCall, FakeSerializerRenderArgs{arg1, arg2, arg3, arg4})
 	stub := fake.RenderStub
 	fakeReturns := fake.renderReturns
 	fake.recordInvocation("Render", []interface{}{arg1, arg2, arg3, arg4})
@@ -81,7 +83,15 @@ func (fake *FakeSerializer) RenderArgsForCall(i int) (interface{}, io.Writer, *n
 	fake.renderMutex.RLock()
 	defer fake.renderMutex.RUnlock()
 	argsForCall := fake.renderArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3, argsForCall.Arg4
+}
+
+func (fake *FakeSerializer) RenderArgs() []FakeSerializerRenderArgs {
+	fake.renderMutex.RLock()
+	defer fake.renderMutex.RUnlock()
+	args := make([]FakeSerializerRenderArgs, len(fake.renderArgsForCall))
+	copy(args, fake.renderArgsForCall)
+	return args
 }
 
 func (fake *FakeSerializer) RenderReturns(result1 error) {
@@ -110,11 +120,7 @@ func (fake *FakeSerializer) RenderReturnsOnCall(i int, result1 error) {
 func (fake *FakeSerializer) Serialize(arg1 *sbom.Document, arg2 *native.SerializeOptions, arg3 interface{}) (interface{}, error) {
 	fake.serializeMutex.Lock()
 	ret, specificReturn := fake.serializeReturnsOnCall[len(fake.serializeArgsForCall)]
-	fake.serializeArgsForCall = append(fake.serializeArgsForCall, struct {
-		arg1 *sbom.Document
-		arg2 *native.SerializeOptions
-		arg3 interface{}
-	}{arg1, arg2, arg3})
+	fake.serializeArgsForCall = append(fake.serializeArgsForCall, FakeSerializerSerializeArgs{arg1, arg2, arg3})
 	stub := fake.SerializeStub
 	fakeReturns := fake.serializeReturns
 	fake.recordInvocation("Serialize", []interface{}{arg1, arg2, arg3})
@@ -144,7 +150,15 @@ func (fake *FakeSerializer) SerializeArgsForCall(i int) (*sbom.Document, *native
 	fake.serializeMutex.RLock()
 	defer fake.serializeMutex.RUnlock()
 	argsForCall := fake.serializeArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeSerializer) SerializeArgs() []FakeSerializerSerializeArgs {
+	fake.serializeMutex.RLock()
+	defer fake.serializeMutex.RUnlock()
+	args := make([]FakeSerializerSerializeArgs, len(fake.serializeArgsForCall))
+	copy(args, fake.serializeArgsForCall)
+	return args
 }
 
 func (fake *FakeSerializer) SerializeReturns(result1 interface{}, result2 error) {
@@ -183,9 +197,18 @@ func (fake *FakeSerializer) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
+func (fake *FakeSerializer) CallOrder() []string {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	order := make([]string, len(fake.callOrder))
+	copy(order, fake.callOrder)
+	return order
+}
+
 func (fake *FakeSerializer) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
+	fake.callOrder = append(fake.callOrder, key)
 	if fake.invocations == nil {
 		fake.invocations = map[string][][]interface{}{}
 	}

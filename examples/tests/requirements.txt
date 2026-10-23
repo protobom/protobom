@@ -1,2 +1,2 @@
-GitPython==3.1.62
+GitPython==3.2.1
 requests==2.33.0

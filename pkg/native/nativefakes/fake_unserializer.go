@@ -12,12 +12,8 @@ import (
 type FakeUnserializer struct {
 	UnserializeStub        func(io.Reader, *native.UnserializeOptions, interface{}) (*sbom.Document, error)
 	unserializeMutex       sync.RWMutex
-	unserializeArgsForCall []struct {
-		arg1 io.Reader
-		arg2 *native.UnserializeOptions
-		arg3 interface{}
-	}
-	unserializeReturns struct {
+	unserializeArgsForCall []FakeUnserializerUnserializeArgs
+	unserializeReturns     struct {
 		result1 *sbom.Document
 		result2 error
 	}
@@ -26,17 +22,21 @@ type FakeUnserializer struct {
 		result2 error
 	}
 	invocations      map[string][][]interface{}
+	callOrder        []string
 	invocationsMutex sync.RWMutex
+}
+
+// FakeUnserializerUnserializeArgs holds the arguments of one call to Unserialize.
+type FakeUnserializerUnserializeArgs struct {
+	Arg1 io.Reader
+	Arg2 *native.UnserializeOptions
+	Arg3 interface{}
 }
 
 func (fake *FakeUnserializer) Unserialize(arg1 io.Reader, arg2 *native.UnserializeOptions, arg3 interface{}) (*sbom.Document, error) {
 	fake.unserializeMutex.Lock()
 	ret, specificReturn := fake.unserializeReturnsOnCall[len(fake.unserializeArgsForCall)]
-	fake.unserializeArgsForCall = append(fake.unserializeArgsForCall, struct {
-		arg1 io.Reader
-		arg2 *native.UnserializeOptions
-		arg3 interface{}
-	}{arg1, arg2, arg3})
+	fake.unserializeArgsForCall = append(fake.unserializeArgsForCall, FakeUnserializerUnserializeArgs{arg1, arg2, arg3})
 	stub := fake.UnserializeStub
 	fakeReturns := fake.unserializeReturns
 	fake.recordInvocation("Unserialize", []interface{}{arg1, arg2, arg3})
@@ -66,7 +66,15 @@ func (fake *FakeUnserializer) UnserializeArgsForCall(i int) (io.Reader, *native.
 	fake.unserializeMutex.RLock()
 	defer fake.unserializeMutex.RUnlock()
 	argsForCall := fake.unserializeArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeUnserializer) UnserializeArgs() []FakeUnserializerUnserializeArgs {
+	fake.unserializeMutex.RLock()
+	defer fake.unserializeMutex.RUnlock()
+	args := make([]FakeUnserializerUnserializeArgs, len(fake.unserializeArgsForCall))
+	copy(args, fake.unserializeArgsForCall)
+	return args
 }
 
 func (fake *FakeUnserializer) UnserializeReturns(result1 *sbom.Document, result2 error) {
@@ -105,9 +113,18 @@ func (fake *FakeUnserializer) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
+func (fake *FakeUnserializer) CallOrder() []string {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	order := make([]string, len(fake.callOrder))
+	copy(order, fake.callOrder)
+	return order
+}
+
 func (fake *FakeUnserializer) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
+	fake.callOrder = append(fake.callOrder, key)
 	if fake.invocations == nil {
 		fake.invocations = map[string][][]interface{}{}
 	}

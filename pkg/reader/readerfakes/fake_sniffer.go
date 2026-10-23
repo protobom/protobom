@@ -12,10 +12,8 @@ import (
 type FakeSniffer struct {
 	SniffFileStub        func(string) (formats.Format, error)
 	sniffFileMutex       sync.RWMutex
-	sniffFileArgsForCall []struct {
-		arg1 string
-	}
-	sniffFileReturns struct {
+	sniffFileArgsForCall []FakeSnifferSniffFileArgs
+	sniffFileReturns     struct {
 		result1 formats.Format
 		result2 error
 	}
@@ -25,10 +23,8 @@ type FakeSniffer struct {
 	}
 	SniffReaderStub        func(io.ReadSeeker) (formats.Format, error)
 	sniffReaderMutex       sync.RWMutex
-	sniffReaderArgsForCall []struct {
-		arg1 io.ReadSeeker
-	}
-	sniffReaderReturns struct {
+	sniffReaderArgsForCall []FakeSnifferSniffReaderArgs
+	sniffReaderReturns     struct {
 		result1 formats.Format
 		result2 error
 	}
@@ -37,15 +33,24 @@ type FakeSniffer struct {
 		result2 error
 	}
 	invocations      map[string][][]interface{}
+	callOrder        []string
 	invocationsMutex sync.RWMutex
+}
+
+// FakeSnifferSniffFileArgs holds the arguments of one call to SniffFile.
+type FakeSnifferSniffFileArgs struct {
+	Arg1 string
+}
+
+// FakeSnifferSniffReaderArgs holds the arguments of one call to SniffReader.
+type FakeSnifferSniffReaderArgs struct {
+	Arg1 io.ReadSeeker
 }
 
 func (fake *FakeSniffer) SniffFile(arg1 string) (formats.Format, error) {
 	fake.sniffFileMutex.Lock()
 	ret, specificReturn := fake.sniffFileReturnsOnCall[len(fake.sniffFileArgsForCall)]
-	fake.sniffFileArgsForCall = append(fake.sniffFileArgsForCall, struct {
-		arg1 string
-	}{arg1})
+	fake.sniffFileArgsForCall = append(fake.sniffFileArgsForCall, FakeSnifferSniffFileArgs{arg1})
 	stub := fake.SniffFileStub
 	fakeReturns := fake.sniffFileReturns
 	fake.recordInvocation("SniffFile", []interface{}{arg1})
@@ -75,7 +80,15 @@ func (fake *FakeSniffer) SniffFileArgsForCall(i int) string {
 	fake.sniffFileMutex.RLock()
 	defer fake.sniffFileMutex.RUnlock()
 	argsForCall := fake.sniffFileArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.Arg1
+}
+
+func (fake *FakeSniffer) SniffFileArgs() []FakeSnifferSniffFileArgs {
+	fake.sniffFileMutex.RLock()
+	defer fake.sniffFileMutex.RUnlock()
+	args := make([]FakeSnifferSniffFileArgs, len(fake.sniffFileArgsForCall))
+	copy(args, fake.sniffFileArgsForCall)
+	return args
 }
 
 func (fake *FakeSniffer) SniffFileReturns(result1 formats.Format, result2 error) {
@@ -107,9 +120,7 @@ func (fake *FakeSniffer) SniffFileReturnsOnCall(i int, result1 formats.Format, r
 func (fake *FakeSniffer) SniffReader(arg1 io.ReadSeeker) (formats.Format, error) {
 	fake.sniffReaderMutex.Lock()
 	ret, specificReturn := fake.sniffReaderReturnsOnCall[len(fake.sniffReaderArgsForCall)]
-	fake.sniffReaderArgsForCall = append(fake.sniffReaderArgsForCall, struct {
-		arg1 io.ReadSeeker
-	}{arg1})
+	fake.sniffReaderArgsForCall = append(fake.sniffReaderArgsForCall, FakeSnifferSniffReaderArgs{arg1})
 	stub := fake.SniffReaderStub
 	fakeReturns := fake.sniffReaderReturns
 	fake.recordInvocation("SniffReader", []interface{}{arg1})
@@ -139,7 +150,15 @@ func (fake *FakeSniffer) SniffReaderArgsForCall(i int) io.ReadSeeker {
 	fake.sniffReaderMutex.RLock()
 	defer fake.sniffReaderMutex.RUnlock()
 	argsForCall := fake.sniffReaderArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.Arg1
+}
+
+func (fake *FakeSniffer) SniffReaderArgs() []FakeSnifferSniffReaderArgs {
+	fake.sniffReaderMutex.RLock()
+	defer fake.sniffReaderMutex.RUnlock()
+	args := make([]FakeSnifferSniffReaderArgs, len(fake.sniffReaderArgsForCall))
+	copy(args, fake.sniffReaderArgsForCall)
+	return args
 }
 
 func (fake *FakeSniffer) SniffReaderReturns(result1 formats.Format, result2 error) {
@@ -178,9 +197,18 @@ func (fake *FakeSniffer) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
+func (fake *FakeSniffer) CallOrder() []string {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	order := make([]string, len(fake.callOrder))
+	copy(order, fake.callOrder)
+	return order
+}
+
 func (fake *FakeSniffer) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
+	fake.callOrder = append(fake.callOrder, key)
 	if fake.invocations == nil {
 		fake.invocations = map[string][][]interface{}{}
 	}

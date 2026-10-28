@@ -30,12 +30,20 @@ the golang library.
 | SPDX | 2.2 | tag-value | supported | supported |
 | SPDX | 2.3 | JSON | supported | supported |
 | SPDX | 2.3 | tag-value | supported | supported |
-| SPDX | 3.0 | JSON | planned | planned |
-| SPDX | 3.1 | JSON | planned | planned |
+| SPDX | 3.0.1 | JSON-LD | supported | supported |
+| CycloneDX | 1.2 | JSON | supported¹ | supported |
+| CycloneDX | 1.3 | JSON | supported | supported |
 | CycloneDX | 1.4 | JSON | supported | supported |
 | CycloneDX | 1.5 | JSON | supported | supported |
 | CycloneDX | 1.6 | JSON | supported | supported |
 | CycloneDX | 1.7 | JSON | supported | supported |
+
+¹ The format sniffer autodetects CycloneDX 1.3 and later. To read a CycloneDX
+1.2 document, pass the format explicitly through the reader options.
+
+The format identifiers for all of the above are defined as constants in the
+[`formats`](pkg/formats/formats.go) package (for example `formats.SPDX3JSON` or
+`formats.CDX17JSON`).
 
 Other read and write implementations can potentially be written in
 other [languages supported by protobuf](https://protobuf.dev/getting-started/)
@@ -83,7 +91,7 @@ func main() {
 
 Developers can use the `protobom` library to generate SBOM documents based on the content of a separate SBOM document, as shown by the [sbom-convert](https://github.com/protobom/sbom-convert) project.
 
-However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The protobom v0.2.0 release includes six registered serializer formats for Writer.New(): SPDX23JSON, CDX12JSON, CDX13JSON, CDX14JSON, CDX15JSON, and CDX16JSON.
+However, the `protobom` intermediate representation could also be used to create a new SBOM document.  Developers could create a new `protobom` document and use the Go programming language to populate the fields needed in the SBOM document.  The developer would then create a new Writer to define where the SBOM should be written, and to which format the SBOM should be written passing in the programmatically-defined SBOM structure.  The writer returned by `writer.New()` can render the document in any of the formats listed in the [support table](#supported-versions-and-formats) above.
 
 ```golang
 package main

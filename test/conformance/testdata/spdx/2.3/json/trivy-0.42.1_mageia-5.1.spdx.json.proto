@@ -4,774 +4,774 @@ lhttp://aquasecurity.github.io/trivy/container_image/mageia:5.1-1195e55f-6de0-4b
 mageia:5.1"°∏£™*
 trivy-0.42.12
 aquasecurityJÓ
-text/spdx+json;version=2.3D@fbc13d79cdb93181db8a0ed34d771ee954b84652ce36c9ba2a5ee16b3924a063ÖÄba865816a95fc08b349a1fd24465586d889018f1736acf689d5435dcad49442ddc7082bdc468b3897f1c8d1742e68be84abdc4ab3435fd666b3709ae5b0ff1b8,(c1ab5fcf08d6b3014a4f10382ef2c2bf86db60ceÈÒ"Pfile://test/conformance/testdata/spdx/2.3/json/trivy-0.42.1_mageia-5.1.spdx.jsonı˙
-â
-Package-2caaa458314d9a49basesystem-minimal"1:2-21.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj*built package from: basesystem 1:2-21.mga5í*PkgID: basesystem-minimal@2-21.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+text/spdx+json;version=2.3D@fbc13d79cdb93181db8a0ed34d771ee954b84652ce36c9ba2a5ee16b3924a063ÖÄba865816a95fc08b349a1fd24465586d889018f1736acf689d5435dcad49442ddc7082bdc468b3897f1c8d1742e68be84abdc4ab3435fd666b3709ae5b0ff1b8,(c1ab5fcf08d6b3014a4f10382ef2c2bf86db60ceÈÒ"Pfile://test/conformance/testdata/spdx/2.3/json/trivy-0.42.1_mageia-5.1.spdx.json´Ú
+É
+Package-2caaa458314d9a49basesystem-minimal"1:2-21.mga5BGPL-3.0-onlyJGPL-3.0-onlyj*built package from: basesystem 1:2-21.mga5í*PkgID: basesystem-minimal@2-21.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚=9pkg:none/basesystem-minimal@2-21.mga5?arch=x86_64&epoch=1Í$ bbeb49e48167f6dcc70a5e523a307681Ú
-Ì
-Package-28c91b9946006b98bash"4.3-48.2.1.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: bash 4.3-48.2.1.mga5í"PkgID: bash@4.3-48.2.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Á
+Package-28c91b9946006b98bash"4.3-48.2.1.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: bash 4.3-48.2.1.mga5í"PkgID: bash@4.3-48.2.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/bash@4.3-48.2.1.mga5?arch=x86_64Í$ cc6115a93bb47bdc67f3392c7ef57684Ú
-Â
-Package-f6f385ad0d354791bzip2"1.0.6-7.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej(built package from: bzip2 1.0.6-7.1.mga5í"PkgID: bzip2@1.0.6-7.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ﬂ
+Package-f6f385ad0d354791bzip2"1.0.6-7.1.mga5BBSD-3-ClauseJBSD-3-Clausej(built package from: bzip2 1.0.6-7.1.mga5í"PkgID: bzip2@1.0.6-7.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/bzip2@1.0.6-7.1.mga5?arch=x86_64Í$ f693a07ebe429e68d6f5ffb3f6697a6fÚ
-Ò
-Package-ea3709426e050a24	chkconfig"1.3.63-1.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj+built package from: chkconfig 1.3.63-1.mga5í%PkgID: chkconfig@1.3.63-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-ea3709426e050a24	chkconfig"1.3.63-1.mga5BGPL-3.0-onlyJGPL-3.0-onlyj+built package from: chkconfig 1.3.63-1.mga5í%PkgID: chkconfig@1.3.63-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/chkconfig@1.3.63-1.mga5?arch=x86_64Í$ 81675f352c85f010012e74cc320cb5ffÚ
-Ö
+ˇ
 Package-45a6d93274aea7b3common-licenses"
-1.1-6.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj.built package from: common-licenses 1.1-6.mga5í(PkgID: common-licenses@1.1-6.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+1.1-6.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj.built package from: common-licenses 1.1-6.mga5í(PkgID: common-licenses@1.1-6.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/common-licenses@1.1-6.mga5?arch=noarchÍ$ 4598c4ec5d508349b2d3888fefeb2204Ú
-Ò
-Package-6bd58534b58ac6ae	coreutils"8.23-6.mga5:NONEBGPL-3.0-or-laterJGPL-3.0-or-laterj)built package from: coreutils 8.23-6.mga5í#PkgID: coreutils@8.23-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-6bd58534b58ac6ae	coreutils"8.23-6.mga5BGPL-3.0-or-laterJGPL-3.0-or-laterj)built package from: coreutils 8.23-6.mga5í#PkgID: coreutils@8.23-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚.*pkg:none/coreutils@8.23-6.mga5?arch=x86_64Í$ 4aa73a09b699d4559a5356679e7be75fÚ
-È
-Package-e42d2bec8541d5cbcpio"2.11-11.1.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj'built package from: cpio 2.11-11.1.mga5í!PkgID: cpio@2.11-11.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+„
+Package-e42d2bec8541d5cbcpio"2.11-11.1.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj'built package from: cpio 2.11-11.1.mga5í!PkgID: cpio@2.11-11.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚,(pkg:none/cpio@2.11-11.1.mga5?arch=x86_64Í$ 2ccb55c0ce6706b152b0853c692357ddÚ
-ˆ
-Package-d83f36c31ed6452cracklib-dicts"2.9.2-2.2.mga5:NONEBLGPLv2JLGPLv2j+built package from: cracklib 2.9.2-2.2.mga5í+PkgID: cracklib-dicts@2.9.2-2.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+
+Package-d83f36c31ed6452cracklib-dicts"2.9.2-2.2.mga5BLGPLv2JLGPLv2j+built package from: cracklib 2.9.2-2.2.mga5í+PkgID: cracklib-dicts@2.9.2-2.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/cracklib-dicts@2.9.2-2.2.mga5?arch=x86_64Í$ 67282191edb6b53ae16e13188259ca13Ú
-ı
-Package-3204a1dc1e54cf94cronie"1.4.12-2.mga5:NONEBMIT AND BSD-3-ClauseJMIT AND BSD-3-Clausej(built package from: cronie 1.4.12-2.mga5í"PkgID: cronie@1.4.12-2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ô
+Package-3204a1dc1e54cf94cronie"1.4.12-2.mga5BMIT AND BSD-3-ClauseJMIT AND BSD-3-Clausej(built package from: cronie 1.4.12-2.mga5í"PkgID: cronie@1.4.12-2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/cronie@1.4.12-2.mga5?arch=x86_64Í$ b6bcd8195ed433443698efaeee6f899dÚ
-Ò
-Package-fbf591e51acca932crontabs"1.10-20.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: crontabs 1.10-20.mga5í#PkgID: crontabs@1.10-20.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-fbf591e51acca932crontabs"1.10-20.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: crontabs 1.10-20.mga5í#PkgID: crontabs@1.10-20.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚.*pkg:none/crontabs@1.10-20.mga5?arch=noarchÍ$ 458876f99cab23e9fbc4d3a1a1811e08Ú
-Ì
-Package-115d4b6814f1ac47curl"1:7.40.0-3.14.mga5:NONEBBSD-likeJBSD-likej+built package from: curl 1:7.40.0-3.14.mga5í#PkgID: curl@7.40.0-3.14.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Á
+Package-115d4b6814f1ac47curl"1:7.40.0-3.14.mga5BBSD-likeJBSD-likej+built package from: curl 1:7.40.0-3.14.mga5í#PkgID: curl@7.40.0-3.14.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/curl@7.40.0-3.14.mga5?arch=x86_64&epoch=1Í$ 18c5e35c5de47a7b287e9e6d6f21ae89Ú
-Ó
-Package-811f1e8fcdd52fb5dash-static"0.5.7-6.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej%built package from: dash 0.5.7-6.mga5í&PkgID: dash-static@0.5.7-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ë
+Package-811f1e8fcdd52fb5dash-static"0.5.7-6.mga5BBSD-3-ClauseJBSD-3-Clausej%built package from: dash 0.5.7-6.mga5í&PkgID: dash-static@0.5.7-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/dash-static@0.5.7-6.mga5?arch=x86_64Í$ 2d937aeab6b48995a5d701205eb4ac0aÚ
-˚
-Package-73dbd221498871f2dbus"1.8.22-1.1.mga5:NONEBGPL-2.0-or-later OR AFLJGPL-2.0-or-later OR AFLj(built package from: dbus 1.8.22-1.1.mga5í"PkgID: dbus@1.8.22-1.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ı
+Package-73dbd221498871f2dbus"1.8.22-1.1.mga5BGPL-2.0-or-later OR AFLJGPL-2.0-or-later OR AFLj(built package from: dbus 1.8.22-1.1.mga5í"PkgID: dbus@1.8.22-1.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/dbus@1.8.22-1.1.mga5?arch=x86_64Í$ ba239305ec3fd683c0816f3db269bc71Ú
-Ì
+Á
 Package-7c3f8abee57d290f	diffutils"
-3.3-4.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: diffutils 3.3-4.mga5í"PkgID: diffutils@3.3-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+3.3-4.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: diffutils 3.3-4.mga5í"PkgID: diffutils@3.3-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/diffutils@3.3-4.mga5?arch=x86_64Í$ bfc59900ee6bfba923e31806360b3dd9Ú
-É
-Package-b339ea213bf27458dmsetup"1.02.90-6.mga5:NONEBGPL-2.0-only AND LGPL2.1JGPL-2.0-only AND LGPL2.1j(built package from: lvm2 2.02.111-6.mga5í$PkgID: dmsetup@1.02.90-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˝
+Package-b339ea213bf27458dmsetup"1.02.90-6.mga5BGPL-2.0-only AND LGPL2.1JGPL-2.0-only AND LGPL2.1j(built package from: lvm2 2.02.111-6.mga5í$PkgID: dmsetup@1.02.90-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/dmsetup@1.02.90-6.mga5?arch=x86_64Í$ 084af08bd175d06bf5aa85645d9a3476Ú
-ı
-Package-af6e609e14026dd3	e2fsprogs"1.42.12-5.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj,built package from: e2fsprogs 1.42.12-5.mga5í&PkgID: e2fsprogs@1.42.12-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ô
+Package-af6e609e14026dd3	e2fsprogs"1.42.12-5.mga5BGPL-3.0-onlyJGPL-3.0-onlyj,built package from: e2fsprogs 1.42.12-5.mga5í&PkgID: e2fsprogs@1.42.12-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/e2fsprogs@1.42.12-5.mga5?arch=x86_64Í$ 8bda1f212a5bc7d11dd2716bf176ec75Ú
-ﬁ
-Package-cc8b9000539347eetcskel"1.63-32.mga5:NONEB	UnlicenseJ	Unlicensej(built package from: etcskel 1.63-32.mga5í"PkgID: etcskel@1.63-32.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ÿ
+Package-cc8b9000539347eetcskel"1.63-32.mga5B	UnlicenseJ	Unlicensej(built package from: etcskel 1.63-32.mga5í"PkgID: etcskel@1.63-32.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/etcskel@1.63-32.mga5?arch=noarchÍ$ 672edc27b58a591f615c0c478183aabdÚ
-Ì
-Package-4cd9c4eba08b19c0ethtool"1:3.15-3.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj)built package from: ethtool 1:3.15-3.mga5í!PkgID: ethtool@3.15-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Á
+Package-4cd9c4eba08b19c0ethtool"1:3.15-3.mga5BGPL-3.0-onlyJGPL-3.0-onlyj)built package from: ethtool 1:3.15-3.mga5í!PkgID: ethtool@3.15-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/ethtool@3.15-3.mga5?arch=x86_64&epoch=1Í$ 48e4e1e1a72b3b819453c95a3d53b1cdÚ
-·
-Package-c03961d8d155182cfile"5.19-10.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej'built package from: file 5.19-10.1.mga5í!PkgID: file@5.19-10.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+€
+Package-c03961d8d155182cfile"5.19-10.1.mga5BBSD-3-ClauseJBSD-3-Clausej'built package from: file 5.19-10.1.mga5í!PkgID: file@5.19-10.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚,(pkg:none/file@5.19-10.1.mga5?arch=x86_64Í$ 9bdb4773d9c93256f1dce21c5113257eÚ
-˜
+Ò
 Package-ca8c16d013a14fd2
-filesystem"2.1.9-25.1.mga5:NONEB	UnlicenseJ	Unlicensej.built package from: filesystem 2.1.9-25.1.mga5í(PkgID: filesystem@2.1.9-25.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+filesystem"2.1.9-25.1.mga5B	UnlicenseJ	Unlicensej.built package from: filesystem 2.1.9-25.1.mga5í(PkgID: filesystem@2.1.9-25.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/filesystem@2.1.9-25.1.mga5?arch=x86_64Í$ 037e67bf19fd519618d9b4da349b9828Ú
-Ò
-Package-2f8c3e36a3504564	findutils"4.5.14-3.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj+built package from: findutils 4.5.14-3.mga5í%PkgID: findutils@4.5.14-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-2f8c3e36a3504564	findutils"4.5.14-3.mga5BGPL-3.0-onlyJGPL-3.0-onlyj+built package from: findutils 4.5.14-3.mga5í%PkgID: findutils@4.5.14-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/findutils@4.5.14-3.mga5?arch=x86_64Í$ 17cb5c4919b9bc7020ba3a36901aed47Ú
-·
-Package-2e7cfe22bc3765f7gawk"4.1.1-4.mga5:NONEBGPL-3.0-or-laterJGPL-3.0-or-laterj%built package from: gawk 4.1.1-4.mga5íPkgID: gawk@4.1.1-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+€
+Package-2e7cfe22bc3765f7gawk"4.1.1-4.mga5BGPL-3.0-or-laterJGPL-3.0-or-laterj%built package from: gawk 4.1.1-4.mga5íPkgID: gawk@4.1.1-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚*&pkg:none/gawk@4.1.1-4.mga5?arch=x86_64Í$ 54882c2ff46801cbddada92c36197eeaÚ
-Û
+Ì
 Package-f56fc08044351f87
-genhdlist2"7.00-3.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: rpmtools 7.00-3.mga5í$PkgID: genhdlist2@7.00-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+genhdlist2"7.00-3.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: rpmtools 7.00-3.mga5í$PkgID: genhdlist2@7.00-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/genhdlist2@7.00-3.mga5?arch=x86_64Í$ cf9fad3a641a696575fd12fe6e5dc255Ú
-ò
-Package-9db8bf695be13726gettext-base"0.19.4-1.mga5:NONEBGPL-3.0-or-later AND LGPLv2+JGPL-3.0-or-later AND LGPLv2+j)built package from: gettext 0.19.4-1.mga5í(PkgID: gettext-base@0.19.4-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+í
+Package-9db8bf695be13726gettext-base"0.19.4-1.mga5BGPL-3.0-or-later AND LGPLv2+JGPL-3.0-or-later AND LGPLv2+j)built package from: gettext 0.19.4-1.mga5í(PkgID: gettext-base@0.19.4-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/gettext-base@0.19.4-1.mga5?arch=x86_64Í$ ae27a7a3be74358a9e47e854e2e23b59Ú
-Î
-Package-55a41b127f9fac57glibc"6:2.20-27.mga5:NONEBLGPL-3.0-onlyJLGPL-3.0-onlyj(built package from: glibc 6:2.20-27.mga5í PkgID: glibc@2.20-27.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Â
+Package-55a41b127f9fac57glibc"6:2.20-27.mga5BLGPL-3.0-onlyJLGPL-3.0-onlyj(built package from: glibc 6:2.20-27.mga5í PkgID: glibc@2.20-27.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/glibc@2.20-27.mga5?arch=x86_64&epoch=6Í$ 4d9d6f0c5ab35b058400ea0f9349bb03Ú
-á
+Å
 Package-139387a6198f55a9
-gpg-pubkey"80420f66-4d4fe123:NONEBpubkeyJpubkeyí$PkgID: gpg-pubkey@80420f66-4d4fe123.íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2‚3/pkg:none/gpg-pubkey@80420f66-4d4fe123?arch=NoneÚ
-›
-Package-14f6e642e5a4663egrep"2.20-4.1.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj&built package from: grep 2.20-4.1.mga5í PkgID: grep@2.20-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+gpg-pubkey"80420f66-4d4fe123BpubkeyJpubkeyí$PkgID: gpg-pubkey@80420f66-4d4fe123.íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2‚3/pkg:none/gpg-pubkey@80420f66-4d4fe123?arch=NoneÚ
+◊
+Package-14f6e642e5a4663egrep"2.20-4.1.mga5BGPL-3.0-onlyJGPL-3.0-onlyj&built package from: grep 2.20-4.1.mga5í PkgID: grep@2.20-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚+'pkg:none/grep@2.20-4.1.mga5?arch=x86_64Í$ 3d8a932a0a60cf0a3f98072b43660531Ú
-Ÿ
+”
 Package-6a74f1b147c46580gzip"
-1.6-7.mga5:NONEBGPL-3.0-or-laterJGPL-3.0-or-laterj#built package from: gzip 1.6-7.mga5íPkgID: gzip@1.6-7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+1.6-7.mga5BGPL-3.0-or-laterJGPL-3.0-or-laterj#built package from: gzip 1.6-7.mga5íPkgID: gzip@1.6-7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚($pkg:none/gzip@1.6-7.mga5?arch=x86_64Í$ 8fb650d17a186a80bdf00ba3e5337f61Ú
-Ì
-Package-49900480856794d7hostname"3.15-5.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: hostname 3.15-5.mga5í"PkgID: hostname@3.15-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Á
+Package-49900480856794d7hostname"3.15-5.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: hostname 3.15-5.mga5í"PkgID: hostname@3.15-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/hostname@3.15-5.mga5?arch=x86_64Í$ 97adfa673a14195d6f8e425dd2a712f3Ú
-Ï
+Ê
 Package-9e0916904b20aaec
-icu53-data"1:53.1-12.9.mga5:NONEBMITJMITj(built package from: icu 1:53.1-12.9.mga5í'PkgID: icu53-data@53.1-12.9.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+icu53-data"1:53.1-12.9.mga5BMITJMITj(built package from: icu 1:53.1-12.9.mga5í'PkgID: icu53-data@53.1-12.9.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/icu53-data@53.1-12.9.mga5?arch=noarch&epoch=1Í$ 07178d6a15a9eb20f618e748d6a18871Ú
-Ì
-Package-17aa994ad4469243ifmetric"0.3-15.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: ifmetric 0.3-15.mga5í"PkgID: ifmetric@0.3-15.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Á
+Package-17aa994ad4469243ifmetric"0.3-15.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj(built package from: ifmetric 0.3-15.mga5í"PkgID: ifmetric@0.3-15.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/ifmetric@0.3-15.mga5?arch=x86_64Í$ e6b0c36d816df84dcfd1fa46b6892146Ú
-‰
-Package-59c5c58e05ac147ifplugd"0.28-18.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj(built package from: ifplugd 0.28-18.mga5í"PkgID: ifplugd@0.28-18.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ﬁ
+Package-59c5c58e05ac147ifplugd"0.28-18.mga5BGPL-3.0-onlyJGPL-3.0-onlyj(built package from: ifplugd 0.28-18.mga5í"PkgID: ifplugd@0.28-18.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/ifplugd@0.28-18.mga5?arch=x86_64Í$ 3133c64118d642ccfaf776abbcbc7ddcÚ
-Ï
+Ê
 Package-b0847bf50ff2901cinfo-install"
-5.2-7.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj&built package from: texinfo 5.2-7.mga5í%PkgID: info-install@5.2-7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+5.2-7.mga5BGPL-3.0-onlyJGPL-3.0-onlyj&built package from: texinfo 5.2-7.mga5í%PkgID: info-install@5.2-7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/info-install@5.2-7.mga5?arch=x86_64Í$ 8ca1ab3f99070ed6c4024be5ecfc4023Ú
-ü
-Package-b4fd8938b32ae66dinitscripts"9.55-13.mga5:NONEB!GPL-2.0-only AND GPL-2.0-or-laterJ!GPL-2.0-only AND GPL-2.0-or-laterj,built package from: initscripts 9.55-13.mga5í&PkgID: initscripts@9.55-13.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ô
+Package-b4fd8938b32ae66dinitscripts"9.55-13.mga5B!GPL-2.0-only AND GPL-2.0-or-laterJ!GPL-2.0-only AND GPL-2.0-or-laterj,built package from: initscripts 9.55-13.mga5í&PkgID: initscripts@9.55-13.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/initscripts@9.55-13.mga5?arch=x86_64Í$ 74e782fd747ee7abea33436ff097a0c3Ú
-Ò
-Package-117ae0fc7a1c1529iproute2"4.4.0-1.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: iproute2 4.4.0-1.mga5í#PkgID: iproute2@4.4.0-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-117ae0fc7a1c1529iproute2"4.4.0-1.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: iproute2 4.4.0-1.mga5í#PkgID: iproute2@4.4.0-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚.*pkg:none/iproute2@4.4.0-1.mga5?arch=x86_64Í$ 5043785bb9cfbe130c6b771a7d9b4432Ú
-Ò
-Package-8db1d957c7a27a6ciputils"20140620-3.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej+built package from: iputils 20140620-3.mga5í%PkgID: iputils@20140620-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-8db1d957c7a27a6ciputils"20140620-3.mga5BBSD-3-ClauseJBSD-3-Clausej+built package from: iputils 20140620-3.mga5í%PkgID: iputils@20140620-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/iputils@20140620-3.mga5?arch=x86_64Í$ f1438844542d79e140f682a8675b532cÚ
-”
-Package-39fe407679d82akbd"2.0.2-3.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj$built package from: kbd 2.0.2-3.mga5íPkgID: kbd@2.0.2-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Õ
+Package-39fe407679d82akbd"2.0.2-3.mga5BGPL-3.0-onlyJGPL-3.0-onlyj$built package from: kbd 2.0.2-3.mga5íPkgID: kbd@2.0.2-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚)%pkg:none/kbd@2.0.2-3.mga5?arch=x86_64Í$ b57a0149530ceb3c3f8018571caf47adÚ
-’
-Package-7c5f7ab0758fb3d4kmod"	18-4.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj"built package from: kmod 18-4.mga5íPkgID: kmod@18-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+œ
+Package-7c5f7ab0758fb3d4kmod"	18-4.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj"built package from: kmod 18-4.mga5íPkgID: kmod@18-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚'#pkg:none/kmod@18-4.mga5?arch=x86_64Í$ 63fd5086bb005b4392aeb849ad9a0737Ú
-”
-Package-66a7e323eafd1ec5krb5"1.12.5-1.3.mga5:NONEBMITJMITj(built package from: krb5 1.12.5-1.3.mga5í"PkgID: krb5@1.12.5-1.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Õ
+Package-66a7e323eafd1ec5krb5"1.12.5-1.3.mga5BMITJMITj(built package from: krb5 1.12.5-1.3.mga5í"PkgID: krb5@1.12.5-1.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/krb5@1.12.5-1.3.mga5?arch=x86_64Í$ 7f48f688ddfa39ae6474aba00ccb0833Ú
-Ò
+Î
 Package-39c9adef7a7da533less"
-458-5.mga5:NONEBGPL-3.0-or-later OR BSD-likeJGPL-3.0-or-later OR BSD-likej#built package from: less 458-5.mga5íPkgID: less@458-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+458-5.mga5BGPL-3.0-or-later OR BSD-likeJGPL-3.0-or-later OR BSD-likej#built package from: less 458-5.mga5íPkgID: less@458-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚($pkg:none/less@458-5.mga5?arch=x86_64Í$ 4b184aba6243dc5f8ddccc7ca42e50d1Ú
-â
-Package-a0bd80f569a79fb3	lib64acl1"2.2.52-5.mga5:NONEBGPL-2.0-or-later AND LGPLv2JGPL-2.0-or-later AND LGPLv2j%built package from: acl 2.2.52-5.mga5í%PkgID: lib64acl1@2.2.52-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+É
+Package-a0bd80f569a79fb3	lib64acl1"2.2.52-5.mga5BGPL-2.0-or-later AND LGPLv2JGPL-2.0-or-later AND LGPLv2j%built package from: acl 2.2.52-5.mga5í%PkgID: lib64acl1@2.2.52-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/lib64acl1@2.2.52-5.mga5?arch=x86_64Í$ 1f41172c6d058acb28fe1fac2d6e3786Ú
-Ö
-Package-6a219ead4b6ae76clib64archive13"3.2.2-1.4.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej-built package from: libarchive 3.2.2-1.4.mga5í+PkgID: lib64archive13@3.2.2-1.4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ˇ
+Package-6a219ead4b6ae76clib64archive13"3.2.2-1.4.mga5BBSD-3-ClauseJBSD-3-Clausej-built package from: libarchive 3.2.2-1.4.mga5í+PkgID: lib64archive13@3.2.2-1.4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/lib64archive13@3.2.2-1.4.mga5?arch=x86_64Í$ bfde272485d71d7fadd338f22c1e87beÚ
-Á
+·
 Package-d94b14eac3c36676
-lib64attr1"2.4.47-5.mga5:NONEBLGPLv2.1JLGPLv2.1j&built package from: attr 2.4.47-5.mga5í&PkgID: lib64attr1@2.4.47-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64attr1"2.4.47-5.mga5BLGPLv2.1JLGPLv2.1j&built package from: attr 2.4.47-5.mga5í&PkgID: lib64attr1@2.4.47-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64attr1@2.4.47-5.mga5?arch=x86_64Í$ 7400fbb0d2085897d0eeec6b05dc419fÚ
-Â
-Package-f7d98e78552b98e5lib64audit1"2.4.4-1.mga5:NONEBLGPLv2+JLGPLv2+j&built package from: audit 2.4.4-1.mga5í&PkgID: lib64audit1@2.4.4-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ﬂ
+Package-f7d98e78552b98e5lib64audit1"2.4.4-1.mga5BLGPLv2+JLGPLv2+j&built package from: audit 2.4.4-1.mga5í&PkgID: lib64audit1@2.4.4-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64audit1@2.4.4-1.mga5?arch=x86_64Í$ 05dfa25b53a093d32f3b4c620afb5d63Ú
-ˆ
-Package-96c11e18022d137blib64blkid1"2.25.2-3.5.mga5:NONEBLGPLv2+JLGPLv2+j.built package from: util-linux 2.25.2-3.5.mga5í)PkgID: lib64blkid1@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+
+Package-96c11e18022d137blib64blkid1"2.25.2-3.5.mga5BLGPLv2+JLGPLv2+j.built package from: util-linux 2.25.2-3.5.mga5í)PkgID: lib64blkid1@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64blkid1@2.25.2-3.5.mga5?arch=x86_64Í$ 09c2f22176824a5f7f21e7d91865b83cÚ
-˙
-Package-33b76a96142994delib64bzip2_1"1.0.6-7.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej(built package from: bzip2 1.0.6-7.1.mga5í)PkgID: lib64bzip2_1@1.0.6-7.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ù
+Package-33b76a96142994delib64bzip2_1"1.0.6-7.1.mga5BBSD-3-ClauseJBSD-3-Clausej(built package from: bzip2 1.0.6-7.1.mga5í)PkgID: lib64bzip2_1@1.0.6-7.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64bzip2_1@1.0.6-7.1.mga5?arch=x86_64Í$ 25525ad2dae646b3c7ecfb9b56631991Ú
-Ï
-Package-d39c492cd88ee824lib64cap-ng0"0.7.4-5.mga5:NONEBLGPLv2+JLGPLv2+j*built package from: libcap-ng 0.7.4-5.mga5í'PkgID: lib64cap-ng0@0.7.4-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ê
+Package-d39c492cd88ee824lib64cap-ng0"0.7.4-5.mga5BLGPLv2+JLGPLv2+j*built package from: libcap-ng 0.7.4-5.mga5í'PkgID: lib64cap-ng0@0.7.4-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚2.pkg:none/lib64cap-ng0@0.7.4-5.mga5?arch=x86_64Í$ 375768d29c083b7fc24d1b313e09da0eÚ
-‡
-Package-d8fb31796aa53d10	lib64cap2"2.24-3.mga5:NONEB	BSD-GPLv2J	BSD-GPLv2j&built package from: libcap 2.24-3.mga5í#PkgID: lib64cap2@2.24-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+⁄
+Package-d8fb31796aa53d10	lib64cap2"2.24-3.mga5B	BSD-GPLv2J	BSD-GPLv2j&built package from: libcap 2.24-3.mga5í#PkgID: lib64cap2@2.24-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚.*pkg:none/lib64cap2@2.24-3.mga5?arch=x86_64Í$ 3c11706a4efc3c0214537d9f06783d14Ú
-Ó
-Package-644c349c04c7b747lib64crack2"2.9.2-2.2.mga5:NONEBLGPLv2JLGPLv2j+built package from: cracklib 2.9.2-2.2.mga5í(PkgID: lib64crack2@2.9.2-2.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ë
+Package-644c349c04c7b747lib64crack2"2.9.2-2.2.mga5BLGPLv2JLGPLv2j+built package from: cracklib 2.9.2-2.2.mga5í(PkgID: lib64crack2@2.9.2-2.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/lib64crack2@2.9.2-2.2.mga5?arch=x86_64Í$ 6df93c87e38e5b667b0d49efbe453830Ú
-É
-Package-951739652545bbeblib64cryptsetup4"1.6.6-4.mga5:NONEBGPL-2.0-onlyJGPL-2.0-onlyj+built package from: cryptsetup 1.6.6-4.mga5í+PkgID: lib64cryptsetup4@1.6.6-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˝
+Package-951739652545bbeblib64cryptsetup4"1.6.6-4.mga5BGPL-2.0-onlyJGPL-2.0-onlyj+built package from: cryptsetup 1.6.6-4.mga5í+PkgID: lib64cryptsetup4@1.6.6-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/lib64cryptsetup4@1.6.6-4.mga5?arch=x86_64Í$ 4bfa9fae755a71bab43491a70c7f89d7Ú
-ˇ
+˘
 Package-2b23118e3020f2af
-lib64curl4"1:7.40.0-3.14.mga5:NONEBBSD-likeJBSD-likej+built package from: curl 1:7.40.0-3.14.mga5í)PkgID: lib64curl4@7.40.0-3.14.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64curl4"1:7.40.0-3.14.mga5BBSD-likeJBSD-likej+built package from: curl 1:7.40.0-3.14.mga5í)PkgID: lib64curl4@7.40.0-3.14.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚<8pkg:none/lib64curl4@7.40.0-3.14.mga5?arch=x86_64&epoch=1Í$ 314b9ff8c700315622ad228775844fa5Ú
-Ë
-Package-dc512bc45c792921lib64daemon0"0.14-8.mga5:NONEBLGPLv2+JLGPLv2+j)built package from: libdaemon 0.14-8.mga5í&PkgID: lib64daemon0@0.14-8.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+‚
+Package-dc512bc45c792921lib64daemon0"0.14-8.mga5BLGPLv2+JLGPLv2+j)built package from: libdaemon 0.14-8.mga5í&PkgID: lib64daemon0@0.14-8.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64daemon0@0.14-8.mga5?arch=x86_64Í$ 7ce58b901eeaf22b75056fb34e7af20cÚ
-˜
+Ò
 Package-57dc7d6b206e67e4
-lib64db5.3"5.3.28-4.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej(built package from: db53 5.3.28-4.1.mga5í(PkgID: lib64db5.3@5.3.28-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64db5.3"5.3.28-4.1.mga5BBSD-3-ClauseJBSD-3-Clausej(built package from: db53 5.3.28-4.1.mga5í(PkgID: lib64db5.3@5.3.28-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/lib64db5.3@5.3.28-4.1.mga5?arch=x86_64Í$ 319a0e776f741798470c1d064acfe4d8Ú
-ˇ
-Package-613cfa1eb8ecbdalib64dbnss5.3"5.3.28-4.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej(built package from: db53 5.3.28-4.1.mga5í+PkgID: lib64dbnss5.3@5.3.28-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˘
+Package-613cfa1eb8ecbdalib64dbnss5.3"5.3.28-4.1.mga5BBSD-3-ClauseJBSD-3-Clausej(built package from: db53 5.3.28-4.1.mga5í+PkgID: lib64dbnss5.3@5.3.28-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/lib64dbnss5.3@5.3.28-4.1.mga5?arch=x86_64Í$ f610dec2e48697011e6da807c9043af8Ú
-ì
-Package-ed285659a34c594clib64dbus1_3"1.8.22-1.1.mga5:NONEBGPL-2.0-or-later OR AFLJGPL-2.0-or-later OR AFLj(built package from: dbus 1.8.22-1.1.mga5í*PkgID: lib64dbus1_3@1.8.22-1.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ç
+Package-ed285659a34c594clib64dbus1_3"1.8.22-1.1.mga5BGPL-2.0-or-later OR AFLJGPL-2.0-or-later OR AFLj(built package from: dbus 1.8.22-1.1.mga5í*PkgID: lib64dbus1_3@1.8.22-1.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚51pkg:none/lib64dbus1_3@1.8.22-1.1.mga5?arch=x86_64Í$ 2ac7b17197acec470f636d2bf60b3d6bÚ
-∂
-Package-15f157dee8d75e62lib64devmapper-event1.02"1.02.90-6.mga5:NONEBGPL-2.0-only AND LGPL2.1JGPL-2.0-only AND LGPL2.1j(built package from: lvm2 2.02.111-6.mga5í5PkgID: lib64devmapper-event1.02@1.02.90-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+∞
+Package-15f157dee8d75e62lib64devmapper-event1.02"1.02.90-6.mga5BGPL-2.0-only AND LGPL2.1JGPL-2.0-only AND LGPL2.1j(built package from: lvm2 2.02.111-6.mga5í5PkgID: lib64devmapper-event1.02@1.02.90-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚@<pkg:none/lib64devmapper-event1.02@1.02.90-6.mga5?arch=x86_64Í$ 648a6e799c59991474e4d9f702067870Ú
-§
-Package-9193d3fa64ce6d47lib64devmapper1.02"1.02.90-6.mga5:NONEBGPL-2.0-only AND LGPL2.1JGPL-2.0-only AND LGPL2.1j(built package from: lvm2 2.02.111-6.mga5í/PkgID: lib64devmapper1.02@1.02.90-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+û
+Package-9193d3fa64ce6d47lib64devmapper1.02"1.02.90-6.mga5BGPL-2.0-only AND LGPL2.1JGPL-2.0-only AND LGPL2.1j(built package from: lvm2 2.02.111-6.mga5í/PkgID: lib64devmapper1.02@1.02.90-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/lib64devmapper1.02@1.02.90-6.mga5?arch=x86_64Í$ 25786440b33a605effe3f5ab3c0198aaÚ
-É
-Package-80eb6e6080c53f71lib64elfutils1"0.169-1.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: elfutils 0.169-1.mga5í)PkgID: lib64elfutils1@0.169-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˝
+Package-80eb6e6080c53f71lib64elfutils1"0.169-1.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: elfutils 0.169-1.mga5í)PkgID: lib64elfutils1@0.169-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64elfutils1@0.169-1.mga5?arch=x86_64Í$ 028821ddba1f38b39aeaf7504cbb4545Ú
-Â
-Package-19a9f0f380c28815lib64expat1"2.1.0-9.5.mga5:NONEBMITJMITj(built package from: expat 2.1.0-9.5.mga5í(PkgID: lib64expat1@2.1.0-9.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ﬂ
+Package-19a9f0f380c28815lib64expat1"2.1.0-9.5.mga5BMITJMITj(built package from: expat 2.1.0-9.5.mga5í(PkgID: lib64expat1@2.1.0-9.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/lib64expat1@2.1.0-9.5.mga5?arch=x86_64Í$ eed3cae5ae26c148d87aafff6cbe2e29Ú
-˛
-Package-c4b5e4b2cdfb5502lib64ext2fs2"1.42.12-5.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj,built package from: e2fsprogs 1.42.12-5.mga5í)PkgID: lib64ext2fs2@1.42.12-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+¯
+Package-c4b5e4b2cdfb5502lib64ext2fs2"1.42.12-5.mga5BGPL-3.0-onlyJGPL-3.0-onlyj,built package from: e2fsprogs 1.42.12-5.mga5í)PkgID: lib64ext2fs2@1.42.12-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64ext2fs2@1.42.12-5.mga5?arch=x86_64Í$ 9483b9215f464df1cf7cfda4302056b3Ú
-Í
-Package-9e3db132ba595cce	lib64ffi6"3.1-4.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej'built package from: libffi 3.1-4.1.mga5í$PkgID: lib64ffi6@3.1-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+‰
+Package-9e3db132ba595cce	lib64ffi6"3.1-4.1.mga5BBSD-3-ClauseJBSD-3-Clausej'built package from: libffi 3.1-4.1.mga5í$PkgID: lib64ffi6@3.1-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/lib64ffi6@3.1-4.1.mga5?arch=x86_64Í$ 038c24e4f5324827e9422f6fe5594ab0Ú
-˜
-Package-3827013b59e87288lib64gcrypt11"1.5.4-5.4.mga5:NONEBLGPLv2+JLGPLv2+j,built package from: libgcrypt 1.5.4-5.4.mga5í*PkgID: lib64gcrypt11@1.5.4-5.4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ò
+Package-3827013b59e87288lib64gcrypt11"1.5.4-5.4.mga5BLGPLv2+JLGPLv2+j,built package from: libgcrypt 1.5.4-5.4.mga5í*PkgID: lib64gcrypt11@1.5.4-5.4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚51pkg:none/lib64gcrypt11@1.5.4-5.4.mga5?arch=x86_64Í$ 88cc6c61c7927e8b07bfc8cc34b9081fÚ
-Á
+·
 Package-937cdff4f2c298ee
-lib64gdbm4"1.11-4.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj$built package from: gdbm 1.11-4.mga5í$PkgID: lib64gdbm4@1.11-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64gdbm4"1.11-4.mga5BGPL-3.0-onlyJGPL-3.0-onlyj$built package from: gdbm 1.11-4.mga5í$PkgID: lib64gdbm4@1.11-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/lib64gdbm4@1.11-4.mga5?arch=x86_64Í$ 39e25f569df0e4e5d1d289d2d0256af4Ú
-˚
-Package-609791fe076ecd5lib64glib2.0_0"2.42.1-2.1.mga5:NONEBLGPLv2+JLGPLv2+j+built package from: glib2.0 2.42.1-2.1.mga5í,PkgID: lib64glib2.0_0@2.42.1-2.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ı
+Package-609791fe076ecd5lib64glib2.0_0"2.42.1-2.1.mga5BLGPLv2+JLGPLv2+j+built package from: glib2.0 2.42.1-2.1.mga5í,PkgID: lib64glib2.0_0@2.42.1-2.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚73pkg:none/lib64glib2.0_0@2.42.1-2.1.mga5?arch=x86_64Í$ 1887dec3338a563b06dcee4a005599d3Ú
-Ó
+Ë
 Package-b4087f364d7f30f1
-lib64gmp10"6.0.0a-3.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj%built package from: gmp 6.0.0a-3.mga5í&PkgID: lib64gmp10@6.0.0a-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64gmp10"6.0.0a-3.mga5BGPL-3.0-onlyJGPL-3.0-onlyj%built package from: gmp 6.0.0a-3.mga5í&PkgID: lib64gmp10@6.0.0a-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64gmp10@6.0.0a-3.mga5?arch=x86_64Í$ efcc4e05f0bfced8a4ae32527b0b9f8fÚ
-¯
-Package-ef11f829baeb5246lib64gnutls28"3.2.21-1.4.mga5:NONEBLGPLv2+JLGPLv2+j*built package from: gnutls 3.2.21-1.4.mga5í+PkgID: lib64gnutls28@3.2.21-1.4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ú
+Package-ef11f829baeb5246lib64gnutls28"3.2.21-1.4.mga5BLGPLv2+JLGPLv2+j*built package from: gnutls 3.2.21-1.4.mga5í+PkgID: lib64gnutls28@3.2.21-1.4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/lib64gnutls28@3.2.21-1.4.mga5?arch=x86_64Í$ c9f3042a22851c99a95fea8f070b3992Ú
-Ù
-Package-eed65f208ecd3f26lib64gpg-error0"1.13-3.mga5:NONEBLGPLv2+JLGPLv2+j,built package from: libgpg-error 1.13-3.mga5í)PkgID: lib64gpg-error0@1.13-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ó
+Package-eed65f208ecd3f26lib64gpg-error0"1.13-3.mga5BLGPLv2+JLGPLv2+j,built package from: libgpg-error 1.13-3.mga5í)PkgID: lib64gpg-error0@1.13-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64gpg-error0@1.13-3.mga5?arch=x86_64Í$ 423642987aa8d4fd5d19120806713d3fÚ
-ç
-Package-d97516d6fa973bbblib64hogweed2"1:2.7.1-6.2.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj.built package from: nettle2.7 1:2.7.1-6.2.mga5í*PkgID: lib64hogweed2@2.7.1-6.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+á
+Package-d97516d6fa973bbblib64hogweed2"1:2.7.1-6.2.mga5BGPL-3.0-onlyJGPL-3.0-onlyj.built package from: nettle2.7 1:2.7.1-6.2.mga5í*PkgID: lib64hogweed2@2.7.1-6.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚=9pkg:none/lib64hogweed2@2.7.1-6.2.mga5?arch=x86_64&epoch=1Í$ c64a1b4bbedc50036bfb1ccea3f062fdÚ
-Ï
+Ê
 Package-1031058378306ed6
-lib64icu53"1:53.1-12.9.mga5:NONEBMITJMITj(built package from: icu 1:53.1-12.9.mga5í'PkgID: lib64icu53@53.1-12.9.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64icu53"1:53.1-12.9.mga5BMITJMITj(built package from: icu 1:53.1-12.9.mga5í'PkgID: lib64icu53@53.1-12.9.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/lib64icu53@53.1-12.9.mga5?arch=x86_64&epoch=1Í$ 15ad560071c8476880fd9530ba6af552Ú
-Ê
+‡
 Package-aa73cb37d616309
-lib64idn11"1.33-1.1.mga5:NONEBLGPLv2+JLGPLv2+j(built package from: libidn 1.33-1.1.mga5í&PkgID: lib64idn11@1.33-1.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64idn11"1.33-1.1.mga5BLGPLv2+JLGPLv2+j(built package from: libidn 1.33-1.1.mga5í&PkgID: lib64idn11@1.33-1.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64idn11@1.33-1.1.mga5?arch=x86_64Í$ 06b1392f3b9ad9308a9cfcc505ef550aÚ
-Ù
+Ó
 Package-27e6052ef2b5df99
-lib64intl8"0.19.4-1.mga5:NONEBLGPL-3.0-onlyJLGPL-3.0-onlyj)built package from: gettext 0.19.4-1.mga5í&PkgID: lib64intl8@0.19.4-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64intl8"0.19.4-1.mga5BLGPL-3.0-onlyJLGPL-3.0-onlyj)built package from: gettext 0.19.4-1.mga5í&PkgID: lib64intl8@0.19.4-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64intl8@0.19.4-1.mga5?arch=x86_64Í$ 87e6a12d3c20195f8ebd7666eebef7f6Ú
-’
+œ
 Package-c01cf6023611bdec
-lib64kmod2"	18-4.mga5:NONEBLGPLv2+JLGPLv2+j"built package from: kmod 18-4.mga5í"PkgID: lib64kmod2@18-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64kmod2"	18-4.mga5BLGPLv2+JLGPLv2+j"built package from: kmod 18-4.mga5í"PkgID: lib64kmod2@18-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/lib64kmod2@18-4.mga5?arch=x86_64Í$ 898367c7ff11a4ee0de0752b2b53982bÚ
-Â
+ﬂ
 Package-32f71871b3c57968
-lib64krb53"1.12.5-1.3.mga5:NONEBMITJMITj(built package from: krb5 1.12.5-1.3.mga5í(PkgID: lib64krb53@1.12.5-1.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64krb53"1.12.5-1.3.mga5BMITJMITj(built package from: krb5 1.12.5-1.3.mga5í(PkgID: lib64krb53@1.12.5-1.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/lib64krb53@1.12.5-1.3.mga5?arch=x86_64Í$ a67368cd785aac9cc42ca8a505d55f85Ú
-˜
-Package-3c23ec2d3ab3bf98lib64ldap2.4_2"2.4.45-1.mga5:NONEBArtisticJArtisticj*built package from: openldap 2.4.45-1.mga5í*PkgID: lib64ldap2.4_2@2.4.45-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ò
+Package-3c23ec2d3ab3bf98lib64ldap2.4_2"2.4.45-1.mga5BArtisticJArtisticj*built package from: openldap 2.4.45-1.mga5í*PkgID: lib64ldap2.4_2@2.4.45-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚51pkg:none/lib64ldap2.4_2@2.4.45-1.mga5?arch=x86_64Í$ 1cba3426024d3c20c9271131d6335f6eÚ
-´
-Package-4b063f0e3e9ceb1elib64lockdev1"1.0.4-0.120111007git.10.mga5:NONEBLGPLv2JLGPLv2j8built package from: lockdev 1.0.4-0.120111007git.10.mga5í8PkgID: lib64lockdev1@1.0.4-0.120111007git.10.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+•
+Package-4b063f0e3e9ceb1elib64lockdev1"1.0.4-0.120111007git.10.mga5BLGPLv2JLGPLv2j8built package from: lockdev 1.0.4-0.120111007git.10.mga5í8PkgID: lib64lockdev1@1.0.4-0.120111007git.10.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚C?pkg:none/lib64lockdev1@1.0.4-0.120111007git.10.mga5?arch=x86_64Í$ e69c4a5067c007e52198ff554c87e8f0Ú
-€
-Package-5c186a317438bde8lib64lua5.2"5.2.3-6.mga5:NONEBMITJMITj$built package from: lua 5.2.3-6.mga5í&PkgID: lib64lua5.2@5.2.3-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+’
+Package-5c186a317438bde8lib64lua5.2"5.2.3-6.mga5BMITJMITj$built package from: lua 5.2.3-6.mga5í&PkgID: lib64lua5.2@5.2.3-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64lua5.2@5.2.3-6.mga5?arch=x86_64Í$ 56f07ebef74f1b6433adf2731f2e71f1Ú
-‚
+‹
 Package-bdd8423a2f2d1b3
-lib64lzma5"5.2.0-1.mga5:NONEB	UnlicenseJ	Unlicensej#built package from: xz 5.2.0-1.mga5í%PkgID: lib64lzma5@5.2.0-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64lzma5"5.2.0-1.mga5B	UnlicenseJ	Unlicensej#built package from: xz 5.2.0-1.mga5í%PkgID: lib64lzma5@5.2.0-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/lib64lzma5@5.2.0-1.mga5?arch=x86_64Í$ 4257ef118f0a03d713636c50eb7b4782Ú
-Ï
-Package-45ecbf04a69736aflib64lzo2_2"2.09-1.mga5:NONEBGPL-2.0-onlyJGPL-2.0-onlyj&built package from: liblzo 2.09-1.mga5í%PkgID: lib64lzo2_2@2.09-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ê
+Package-45ecbf04a69736aflib64lzo2_2"2.09-1.mga5BGPL-2.0-onlyJGPL-2.0-onlyj&built package from: liblzo 2.09-1.mga5í%PkgID: lib64lzo2_2@2.09-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/lib64lzo2_2@2.09-1.mga5?arch=x86_64Í$ 549755ca5d49014fcf452e59d1b2b673Ú
-ˆ
-Package-9997832ae2364076lib64magic1"5.19-10.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej'built package from: file 5.19-10.1.mga5í(PkgID: lib64magic1@5.19-10.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+
+Package-9997832ae2364076lib64magic1"5.19-10.1.mga5BBSD-3-ClauseJBSD-3-Clausej'built package from: file 5.19-10.1.mga5í(PkgID: lib64magic1@5.19-10.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/lib64magic1@5.19-10.1.mga5?arch=x86_64Í$ c4a55fae9d96701e7958c369aff7abb4Ú
-ï
-Package-e1406268f62570e1lib64microhttpd10"0.9.37-4.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj/built package from: libmicrohttpd 0.9.37-4.mga5í-PkgID: lib64microhttpd10@0.9.37-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+è
+Package-e1406268f62570e1lib64microhttpd10"0.9.37-4.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj/built package from: libmicrohttpd 0.9.37-4.mga5í-PkgID: lib64microhttpd10@0.9.37-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚84pkg:none/lib64microhttpd10@0.9.37-4.mga5?arch=x86_64Í$ 749f435793af2c901672d075762856deÚ
-ä
-Package-efe0d2a6bd601d92lib64mount1"2.25.2-3.5.mga5:NONEBLGPL-2.0-or-laterJLGPL-2.0-or-laterj.built package from: util-linux 2.25.2-3.5.mga5í)PkgID: lib64mount1@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ñ
+Package-efe0d2a6bd601d92lib64mount1"2.25.2-3.5.mga5BLGPL-2.0-or-laterJLGPL-2.0-or-laterj.built package from: util-linux 2.25.2-3.5.mga5í)PkgID: lib64mount1@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64mount1@2.25.2-3.5.mga5?arch=x86_64Í$ cf0e47ee88a2e094fdd2274ee148acb1Ú
-È
-Package-961d50647546894elib64ncurses5"5.9-21.1.mga5:NONEBMITJMITj)built package from: ncurses 5.9-21.1.mga5í)PkgID: lib64ncurses5@5.9-21.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+„
+Package-961d50647546894elib64ncurses5"5.9-21.1.mga5BMITJMITj)built package from: ncurses 5.9-21.1.mga5í)PkgID: lib64ncurses5@5.9-21.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64ncurses5@5.9-21.1.mga5?arch=x86_64Í$ 5f64b7f7167b8cf9890a049ff1daf21fÚ
-Ï
-Package-1c84c0669ae215b3lib64ncursesw5"5.9-21.1.mga5:NONEBMITJMITj)built package from: ncurses 5.9-21.1.mga5í*PkgID: lib64ncursesw5@5.9-21.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ê
+Package-1c84c0669ae215b3lib64ncursesw5"5.9-21.1.mga5BMITJMITj)built package from: ncurses 5.9-21.1.mga5í*PkgID: lib64ncursesw5@5.9-21.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚51pkg:none/lib64ncursesw5@5.9-21.1.mga5?arch=x86_64Í$ c4d199e417073ffecc0445cf78868a2aÚ
-ä
-Package-829c71ad2f6cb542lib64nettle4"1:2.7.1-6.2.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj.built package from: nettle2.7 1:2.7.1-6.2.mga5í)PkgID: lib64nettle4@2.7.1-6.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ñ
+Package-829c71ad2f6cb542lib64nettle4"1:2.7.1-6.2.mga5BGPL-3.0-onlyJGPL-3.0-onlyj.built package from: nettle2.7 1:2.7.1-6.2.mga5í)PkgID: lib64nettle4@2.7.1-6.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚<8pkg:none/lib64nettle4@2.7.1-6.2.mga5?arch=x86_64&epoch=1Í$ 65cc2c74821b3d1f4cada87b2578e690Ú
-ß
+°
 Package-d9e32b4e8549a05b
-lib64nspr4"2:4.18-1.mga5:NONEB&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+J&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+j&built package from: nspr 2:4.18-1.mga5í$PkgID: lib64nspr4@4.18-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64nspr4"2:4.18-1.mga5B&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+J&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+j&built package from: nspr 2:4.18-1.mga5í$PkgID: lib64nspr4@4.18-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚73pkg:none/lib64nspr4@4.18-1.mga5?arch=x86_64&epoch=2Í$ d8c41e319531b4447ada9be73444cf2bÚ
-≥
-Package-300517e06f18c73d	lib64nss3"2:3.28.6-1.3.mga5:NONEB&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+J&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+j)built package from: nss 2:3.28.6-1.3.mga5í'PkgID: lib64nss3@3.28.6-1.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+≠
+Package-300517e06f18c73d	lib64nss3"2:3.28.6-1.3.mga5B&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+J&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+j)built package from: nss 2:3.28.6-1.3.mga5í'PkgID: lib64nss3@3.28.6-1.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/lib64nss3@3.28.6-1.3.mga5?arch=x86_64&epoch=2Í$ 972504bc9a3ca559be8fabb9293718f4Ú
-ó
-Package-ddab168f441d3bc0lib64openssl-engines1.0.0"1.0.2o-1.mga5:NONEBBSD-likeJBSD-likej)built package from: openssl 1.0.2o-1.mga5í5PkgID: lib64openssl-engines1.0.0@1.0.2o-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ë
+Package-ddab168f441d3bc0lib64openssl-engines1.0.0"1.0.2o-1.mga5BBSD-likeJBSD-likej)built package from: openssl 1.0.2o-1.mga5í5PkgID: lib64openssl-engines1.0.0@1.0.2o-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚@<pkg:none/lib64openssl-engines1.0.0@1.0.2o-1.mga5?arch=x86_64Í$ 4783544d4eac658a29abde96ed74f83cÚ
-ˇ
-Package-32fbae199491d260lib64openssl1.0.0"1.0.2o-1.mga5:NONEBBSD-likeJBSD-likej)built package from: openssl 1.0.2o-1.mga5í-PkgID: lib64openssl1.0.0@1.0.2o-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˘
+Package-32fbae199491d260lib64openssl1.0.0"1.0.2o-1.mga5BBSD-likeJBSD-likej)built package from: openssl 1.0.2o-1.mga5í-PkgID: lib64openssl1.0.0@1.0.2o-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚84pkg:none/lib64openssl1.0.0@1.0.2o-1.mga5?arch=x86_64Í$ a444d0ded0ef6f77a3dfbe8d69619339Ú
-ˇ
-Package-98c710933f99cb9dlib64p11-kit0"0.20.6-6.mga5:NONEBApache-LicenseJApache-Licensej)built package from: p11-kit 0.20.6-6.mga5í)PkgID: lib64p11-kit0@0.20.6-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˘
+Package-98c710933f99cb9dlib64p11-kit0"0.20.6-6.mga5BApache-LicenseJApache-Licensej)built package from: p11-kit 0.20.6-6.mga5í)PkgID: lib64p11-kit0@0.20.6-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64p11-kit0@0.20.6-6.mga5?arch=x86_64Í$ 27ae2c25d3d195f5215e2da09f6e6e5bÚ
-ù
-Package-8f08980cf0e59b35	lib64pam0"1.1.8-10.1.mga5:NONEB!BSD-3-Clause AND GPL-2.0-or-laterJ!BSD-3-Clause AND GPL-2.0-or-laterj'built package from: pam 1.1.8-10.1.mga5í'PkgID: lib64pam0@1.1.8-10.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ó
+Package-8f08980cf0e59b35	lib64pam0"1.1.8-10.1.mga5B!BSD-3-Clause AND GPL-2.0-or-laterJ!BSD-3-Clause AND GPL-2.0-or-laterj'built package from: pam 1.1.8-10.1.mga5í'PkgID: lib64pam0@1.1.8-10.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚2.pkg:none/lib64pam0@1.1.8-10.1.mga5?arch=x86_64Í$ c3a67f14e69dc84cc405b111d03bea0aÚ
-Û
-Package-c7222df9a6a2cc30lib64pam_userpass1"1.0.2-10.mga5:NONEj.built package from: pam_userpass 1.0.2-10.mga5í.PkgID: lib64pam_userpass1@1.0.2-10.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ì
+Package-c7222df9a6a2cc30lib64pam_userpass1"1.0.2-10.mga5j.built package from: pam_userpass 1.0.2-10.mga5í.PkgID: lib64pam_userpass1@1.0.2-10.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚95pkg:none/lib64pam_userpass1@1.0.2-10.mga5?arch=x86_64Í$ c507fde7c3110722051f33fa63e1f5d7Ú
-·
+€
 Package-4d0997ad1ec476d1
-lib64pcre1"8.41-1.mga5:NONEB	BSD-StyleJ	BSD-Stylej$built package from: pcre 8.41-1.mga5í$PkgID: lib64pcre1@8.41-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64pcre1"8.41-1.mga5B	BSD-StyleJ	BSD-Stylej$built package from: pcre 8.41-1.mga5í$PkgID: lib64pcre1@8.41-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/lib64pcre1@8.41-1.mga5?arch=x86_64Í$ 6e775c5008a21ab27681b75461450e7dÚ
-·
+€
 Package-81b64ba586913455
-lib64popt0"1:1.16-7.mga5:NONEBMITJMITj&built package from: popt 1:1.16-7.mga5í$PkgID: lib64popt0@1.16-7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64popt0"1:1.16-7.mga5BMITJMITj&built package from: popt 1:1.16-7.mga5í$PkgID: lib64popt0@1.16-7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚73pkg:none/lib64popt0@1.16-7.mga5?arch=x86_64&epoch=1Í$ f711fdfe3bff6f4bd396f9e6e0941403Ú
-Ï
-Package-ba64e846054dd112lib64procps3"3.3.9-5.mga5:NONEBLGPLv2+JLGPLv2+j*built package from: procps-ng 3.3.9-5.mga5í'PkgID: lib64procps3@3.3.9-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ê
+Package-ba64e846054dd112lib64procps3"3.3.9-5.mga5BLGPLv2+JLGPLv2+j*built package from: procps-ng 3.3.9-5.mga5í'PkgID: lib64procps3@3.3.9-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚2.pkg:none/lib64procps3@3.3.9-5.mga5?arch=x86_64Í$ c0f2ebd617191bb9382ac62c6097f779Ú
-‰
+ﬁ
 Package-d1e66a08946a107a
-lib64pth20"2.0.7-13.mga5:NONEBLGPLv2+JLGPLv2+j%built package from: pth 2.0.7-13.mga5í&PkgID: lib64pth20@2.0.7-13.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64pth20"2.0.7-13.mga5BLGPLv2+JLGPLv2+j%built package from: pth 2.0.7-13.mga5í&PkgID: lib64pth20@2.0.7-13.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64pth20@2.0.7-13.mga5?arch=x86_64Í$ db17b8bb24134582abc9c04ed7b6d9b4Ú
-Û
+Ì
 Package-30e335f489c17fbclib64readline6"
-6.3-6.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj'built package from: readline 6.3-6.mga5í'PkgID: lib64readline6@6.3-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+6.3-6.mga5BGPL-3.0-onlyJGPL-3.0-onlyj'built package from: readline 6.3-6.mga5í'PkgID: lib64readline6@6.3-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚2.pkg:none/lib64readline6@6.3-6.mga5?arch=x86_64Í$ a00552cac9993f4fbd6cac59ddf210a9Ú
-è
-Package-17b68444615682ca	lib64rpm3"1:4.12.0.2-1.7.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj+built package from: rpm 1:4.12.0.2-1.7.mga5í)PkgID: lib64rpm3@4.12.0.2-1.7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+â
+Package-17b68444615682ca	lib64rpm3"1:4.12.0.2-1.7.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj+built package from: rpm 1:4.12.0.2-1.7.mga5í)PkgID: lib64rpm3@4.12.0.2-1.7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚<8pkg:none/lib64rpm3@4.12.0.2-1.7.mga5?arch=x86_64&epoch=1Í$ 7ab5d9f8dd9c8100ef7e8bb287a6e6c4Ú
-û
-Package-2b1384df9c802270lib64rpmbuild3"1:4.12.0.2-1.7.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj+built package from: rpm 1:4.12.0.2-1.7.mga5í.PkgID: lib64rpmbuild3@4.12.0.2-1.7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ò
+Package-2b1384df9c802270lib64rpmbuild3"1:4.12.0.2-1.7.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj+built package from: rpm 1:4.12.0.2-1.7.mga5í.PkgID: lib64rpmbuild3@4.12.0.2-1.7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚A=pkg:none/lib64rpmbuild3@4.12.0.2-1.7.mga5?arch=x86_64&epoch=1Í$ 5ad58c73059e050555ee957c28b2d76fÚ
-˘
-Package-31d103573e0643e4lib64sasl2_3"2.1.26-10.mga5:NONEB	BSD-styleJ	BSD-stylej-built package from: cyrus-sasl 2.1.26-10.mga5í)PkgID: lib64sasl2_3@2.1.26-10.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Û
+Package-31d103573e0643e4lib64sasl2_3"2.1.26-10.mga5B	BSD-styleJ	BSD-stylej-built package from: cyrus-sasl 2.1.26-10.mga5í)PkgID: lib64sasl2_3@2.1.26-10.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64sasl2_3@2.1.26-10.mga5?arch=x86_64Í$ 0ee6349e3e85122ac7ea52854f591755Ú
-Ï
+Ê
 Package-41635ee0fdd4f14blib64selinux1"
-2.3-4.mga5:NONEB	UnlicenseJ	Unlicensej)built package from: libselinux 2.3-4.mga5í&PkgID: lib64selinux1@2.3-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+2.3-4.mga5B	UnlicenseJ	Unlicensej)built package from: libselinux 2.3-4.mga5í&PkgID: lib64selinux1@2.3-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64selinux1@2.3-4.mga5?arch=x86_64Í$ d8ae48bae1ca23553830b1303a236d2aÚ
-˛
-Package-c4018961ebfb5047lib64sigsegv2"2.10-5.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj*built package from: libsigsegv 2.10-5.mga5í'PkgID: lib64sigsegv2@2.10-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+¯
+Package-c4018961ebfb5047lib64sigsegv2"2.10-5.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj*built package from: libsigsegv 2.10-5.mga5í'PkgID: lib64sigsegv2@2.10-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚2.pkg:none/lib64sigsegv2@2.10-5.mga5?arch=x86_64Í$ 29a8885bd5bddfa308a17b6d6408b113Ú
-ñ
-Package-32133b5c0603c752lib64smartcols1"2.25.2-3.5.mga5:NONEBLGPL-2.0-or-laterJLGPL-2.0-or-laterj.built package from: util-linux 2.25.2-3.5.mga5í-PkgID: lib64smartcols1@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ê
+Package-32133b5c0603c752lib64smartcols1"2.25.2-3.5.mga5BLGPL-2.0-or-laterJLGPL-2.0-or-laterj.built package from: util-linux 2.25.2-3.5.mga5í-PkgID: lib64smartcols1@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚84pkg:none/lib64smartcols1@2.25.2-3.5.mga5?arch=x86_64Í$ aff70d573a092128311e49073258f2f7Ú
-Ä
-Package-e0b4a0f839b0c208lib64sqlite3_0"3.10.2-1.2.mga5:NONEB	UnlicenseJ	Unlicensej+built package from: sqlite3 3.10.2-1.2.mga5í,PkgID: lib64sqlite3_0@3.10.2-1.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˙
+Package-e0b4a0f839b0c208lib64sqlite3_0"3.10.2-1.2.mga5B	UnlicenseJ	Unlicensej+built package from: sqlite3 3.10.2-1.2.mga5í,PkgID: lib64sqlite3_0@3.10.2-1.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚73pkg:none/lib64sqlite3_0@3.10.2-1.2.mga5?arch=x86_64Í$ 46eb831c930bc30ede570f79516d6995Ú
-˘
-Package-5b5d4b77c89a589dlib64ssh2_1"1.4.3-6.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej*built package from: libssh2 1.4.3-6.1.mga5í(PkgID: lib64ssh2_1@1.4.3-6.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Û
+Package-5b5d4b77c89a589dlib64ssh2_1"1.4.3-6.1.mga5BBSD-3-ClauseJBSD-3-Clausej*built package from: libssh2 1.4.3-6.1.mga5í(PkgID: lib64ssh2_1@1.4.3-6.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/lib64ssh2_1@1.4.3-6.1.mga5?arch=x86_64Í$ a35b4ffbfde1661e63b488ef93944584Ú
-É
-Package-2a67fced6874bcb9lib64systemd0"217-11.2.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í)PkgID: lib64systemd0@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˝
+Package-2a67fced6874bcb9lib64systemd0"217-11.2.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í)PkgID: lib64systemd0@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/lib64systemd0@217-11.2.mga5?arch=x86_64Í$ 564ea0bc1ad5357f65580a34de6f4529Ú
-Î
-Package-3b15fb00141cd392lib64tasn1_6"4.2-4.2.mga5:NONEBLGPLv2+JLGPLv2+j)built package from: libtasn1 4.2-4.2.mga5í'PkgID: lib64tasn1_6@4.2-4.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Â
+Package-3b15fb00141cd392lib64tasn1_6"4.2-4.2.mga5BLGPLv2+JLGPLv2+j)built package from: libtasn1 4.2-4.2.mga5í'PkgID: lib64tasn1_6@4.2-4.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚2.pkg:none/lib64tasn1_6@4.2-4.2.mga5?arch=x86_64Í$ 1edd7d77e0dcebe01b16cea852c76507Ú
-Ü
+Ä
 Package-32dd837c5e309fb	lib64tcb0"
-1.1-5.mga5:NONEB BSD-3-Clause OR GPL-3.0-or-laterJ BSD-3-Clause OR GPL-3.0-or-laterj"built package from: tcb 1.1-5.mga5í"PkgID: lib64tcb0@1.1-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+1.1-5.mga5B BSD-3-Clause OR GPL-3.0-or-laterJ BSD-3-Clause OR GPL-3.0-or-laterj"built package from: tcb 1.1-5.mga5í"PkgID: lib64tcb0@1.1-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚-)pkg:none/lib64tcb0@1.1-5.mga5?arch=x86_64Í$ b11d8309374ea88714dd6ec5e3e806d9Ú
-˙
+Ù
 Package-fbefff66a72e45e7
-lib64udev1"217-11.2.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í&PkgID: lib64udev1@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64udev1"217-11.2.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í&PkgID: lib64udev1@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64udev1@217-11.2.mga5?arch=x86_64Í$ fb5320d25085423c127976d6de4a2f19Ú
-Ë
+‚
 Package-aaf84a918ce99dac
-lib64user1"0.60-5.3.mga5:NONEBLGPLv2+JLGPLv2+j)built package from: libuser 0.60-5.3.mga5í&PkgID: lib64user1@0.60-5.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64user1"0.60-5.3.mga5BLGPLv2+JLGPLv2+j)built package from: libuser 0.60-5.3.mga5í&PkgID: lib64user1@0.60-5.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64user1@0.60-5.3.mga5?arch=x86_64Í$ c78cf6a20bd78269acc2b6d9a9443d8cÚ
-˝
+˜
 Package-33216a4106d1993f
-lib64uuid1"2.25.2-3.5.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej.built package from: util-linux 2.25.2-3.5.mga5í(PkgID: lib64uuid1@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64uuid1"2.25.2-3.5.mga5BBSD-3-ClauseJBSD-3-Clausej.built package from: util-linux 2.25.2-3.5.mga5í(PkgID: lib64uuid1@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/lib64uuid1@2.25.2-3.5.mga5?arch=x86_64Í$ ab59a47bc1c573b0a120f470df443ee1Ú
-‡
-Package-1cc268515c72802dlib64verto1"0.2.6-3.mga5:NONEBMITJMITj)built package from: libverto 0.2.6-3.mga5í&PkgID: lib64verto1@0.2.6-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+⁄
+Package-1cc268515c72802dlib64verto1"0.2.6-3.mga5BMITJMITj)built package from: libverto 0.2.6-3.mga5í&PkgID: lib64verto1@0.2.6-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64verto1@0.2.6-3.mga5?arch=x86_64Í$ 1fafebc0b66c0297361042c327a92213Ú
-ﬂ
-Package-755b5726a02c667blib64xml2_2"2.9.7-1.mga5:NONEBMITJMITj(built package from: libxml2 2.9.7-1.mga5í&PkgID: lib64xml2_2@2.9.7-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ÿ
+Package-755b5726a02c667blib64xml2_2"2.9.7-1.mga5BMITJMITj(built package from: libxml2 2.9.7-1.mga5í&PkgID: lib64xml2_2@2.9.7-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/lib64xml2_2@2.9.7-1.mga5?arch=x86_64Í$ 8b39c7ff94b1ddd4ed1cb5441cf5a4d0Ú
-Û
+Ì
 Package-610efd027cb7a2d5
-lib64zlib1"1.2.8-7.1.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej'built package from: zlib 1.2.8-7.1.mga5í'PkgID: lib64zlib1@1.2.8-7.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+lib64zlib1"1.2.8-7.1.mga5BBSD-3-ClauseJBSD-3-Clausej'built package from: zlib 1.2.8-7.1.mga5í'PkgID: lib64zlib1@1.2.8-7.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚2.pkg:none/lib64zlib1@1.2.8-7.1.mga5?arch=x86_64Í$ 1e8bbfd82f39924dbf31ed4d507f33d8Ú
-Ò
-Package-cca36a867075e273libgcc1"4.9.2-4.1.mga5:NONEBGPL-3.0-or-laterJGPL-3.0-or-laterj&built package from: gcc 4.9.2-4.1.mga5í$PkgID: libgcc1@4.9.2-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-cca36a867075e273libgcc1"4.9.2-4.1.mga5BGPL-3.0-or-laterJGPL-3.0-or-laterj&built package from: gcc 4.9.2-4.1.mga5í$PkgID: libgcc1@4.9.2-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/libgcc1@4.9.2-4.1.mga5?arch=x86_64Í$ 58f556c4546cde4f4a54e26756cd3839Ú
-Ä
-Package-846597cafdd91b1elibgpg-error-common"1.13-3.mga5:NONEBLGPLv2+JLGPLv2+j,built package from: libgpg-error 1.13-3.mga5í-PkgID: libgpg-error-common@1.13-3.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˙
+Package-846597cafdd91b1elibgpg-error-common"1.13-3.mga5BLGPLv2+JLGPLv2+j,built package from: libgpg-error 1.13-3.mga5í-PkgID: libgpg-error-common@1.13-3.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚84pkg:none/libgpg-error-common@1.13-3.mga5?arch=noarchÍ$ 68ff35377d6a7ad3a74b238032bb5f55Ú
-˛
+¯
 Package-ac1bf4d469024ebd
-libstdc++6"4.9.2-4.1.mga5:NONEBGPL-3.0-or-laterJGPL-3.0-or-laterj&built package from: gcc 4.9.2-4.1.mga5í'PkgID: libstdc++6@4.9.2-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+libstdc++6"4.9.2-4.1.mga5BGPL-3.0-or-laterJGPL-3.0-or-laterj&built package from: gcc 4.9.2-4.1.mga5í'PkgID: libstdc++6@4.9.2-4.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/libstdc%2B%2B6@4.9.2-4.1.mga5?arch=x86_64Í$ 637a3a89277ba636cb788cdbeb39e52fÚ
-ﬂ
-Package-5715f37f1f192ff4libuser"0.60-5.3.mga5:NONEBLGPLv2+JLGPLv2+j)built package from: libuser 0.60-5.3.mga5í#PkgID: libuser@0.60-5.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ÿ
+Package-5715f37f1f192ff4libuser"0.60-5.3.mga5BLGPLv2+JLGPLv2+j)built package from: libuser 0.60-5.3.mga5í#PkgID: libuser@0.60-5.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚.*pkg:none/libuser@0.60-5.3.mga5?arch=x86_64Í$ 9d6fdf659ac7981e25f69acbd2870f49Ú
-Î
-Package-50aa65430c5e77cflibutempter"1.1.6-3.mga5:NONEBLGPLv2+JLGPLv2+j,built package from: libutempter 1.1.6-3.mga5í&PkgID: libutempter@1.1.6-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Â
+Package-50aa65430c5e77cflibutempter"1.1.6-3.mga5BLGPLv2+JLGPLv2+j,built package from: libutempter 1.1.6-3.mga5í&PkgID: libutempter@1.1.6-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚1-pkg:none/libutempter@1.1.6-3.mga5?arch=x86_64Í$ 20fa5a0ebd352111adadeb9e23959fedÚ
-·
-Package-3a6e97222b3b2390locales"2.20-4.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj'built package from: locales 2.20-4.mga5í!PkgID: locales@2.20-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+€
+Package-3a6e97222b3b2390locales"2.20-4.mga5BGPL-3.0-onlyJGPL-3.0-onlyj'built package from: locales 2.20-4.mga5í!PkgID: locales@2.20-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚,(pkg:none/locales@2.20-4.mga5?arch=x86_64Í$ 1160aadcddd8c34b26e0eaa550f1587fÚ
-Í
+‰
 Package-e3e28712bc6bbc4c
-locales-en"2.20-4.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj'built package from: locales 2.20-4.mga5í$PkgID: locales-en@2.20-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+locales-en"2.20-4.mga5BGPL-3.0-onlyJGPL-3.0-onlyj'built package from: locales 2.20-4.mga5í$PkgID: locales-en@2.20-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/locales-en@2.20-4.mga5?arch=x86_64Í$ 443f5718a3e101d62e015d4ef8d60b23Ú
-ô
-Package-16a6242d83d89836lockdev"1.0.4-0.120111007git.10.mga5:NONEBLGPLv2JLGPLv2j8built package from: lockdev 1.0.4-0.120111007git.10.mga5í2PkgID: lockdev@1.0.4-0.120111007git.10.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ì
+Package-16a6242d83d89836lockdev"1.0.4-0.120111007git.10.mga5BLGPLv2JLGPLv2j8built package from: lockdev 1.0.4-0.120111007git.10.mga5í2PkgID: lockdev@1.0.4-0.120111007git.10.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚=9pkg:none/lockdev@1.0.4-0.120111007git.10.mga5?arch=x86_64Í$ 23714a98998d9d0211b4ef5049057912Ú
-Ì
-Package-6a5d953eb74de698	logrotate"3.8.7-4.mga5:NONEBGPL-2.0-onlyJGPL-2.0-onlyj*built package from: logrotate 3.8.7-4.mga5í$PkgID: logrotate@3.8.7-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Á
+Package-6a5d953eb74de698	logrotate"3.8.7-4.mga5BGPL-2.0-onlyJGPL-2.0-onlyj*built package from: logrotate 3.8.7-4.mga5í$PkgID: logrotate@3.8.7-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/logrotate@3.8.7-4.mga5?arch=x86_64Í$ 3ced4e582e201129485027a61db8cbc4Ú
-Ò
-Package-425670bfefde6d92lsb-release"2.0-46.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj+built package from: lsb-release 2.0-46.mga5í%PkgID: lsb-release@2.0-46.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-425670bfefde6d92lsb-release"2.0-46.mga5BGPL-3.0-onlyJGPL-3.0-onlyj+built package from: lsb-release 2.0-46.mga5í%PkgID: lsb-release@2.0-46.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/lsb-release@2.0-46.mga5?arch=x86_64Í$ 39f7af94b65120c16b20532909d8571cÚ
-ë
+ã
 Package-77cd9f69cc8525e7mageia-release-Default"
-5-2.2.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj-built package from: mageia-release 5-2.2.mga5í/PkgID: mageia-release-Default@5-2.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+5-2.2.mga5BGPL-3.0-onlyJGPL-3.0-onlyj-built package from: mageia-release 5-2.2.mga5í/PkgID: mageia-release-Default@5-2.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/mageia-release-Default@5-2.2.mga5?arch=x86_64Í$ f5e16a38d4c709c6e5280e8f722f79deÚ
-é
+à
 Package-a7d47701cdf596cfmageia-release-common"
-5-2.2.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj-built package from: mageia-release 5-2.2.mga5í.PkgID: mageia-release-common@5-2.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+5-2.2.mga5BGPL-3.0-onlyJGPL-3.0-onlyj-built package from: mageia-release 5-2.2.mga5í.PkgID: mageia-release-common@5-2.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚95pkg:none/mageia-release-common@5-2.2.mga5?arch=x86_64Í$ 47c6e1fb3e1d8768b76e05b2ac09a696Ú
-í
+å
 ContainerImage-1de6f444b7a71fe9
-mageia:5.1:NONEíSchemaVersion: 2íPImageID: sha256:edd3db0debe23b2eb4fbbac2d23b8eae4b0a63ebc79c4839275322b0c27ac467íZRepoDigest: mageia@sha256:d769f2b2c933287db3e266a60188f44fabf3559c04d3011668f83a5dab9eb26díODiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2íRepoTag: mageia:5íRepoTag: mageia:5.1‚òìpkg:oci/mageia@sha256:d769f2b2c933287db3e266a60188f44fabf3559c04d3011668f83a5dab9eb26d?repository_url=index.docker.io%2Flibrary%2Fmageia&arch=amd64Ú
-È
-Package-1c3081c3f8e0dfc1makedev"4.4-19.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj'built package from: makedev 4.4-19.mga5í!PkgID: makedev@4.4-19.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+mageia:5.1íSchemaVersion: 2íPImageID: sha256:edd3db0debe23b2eb4fbbac2d23b8eae4b0a63ebc79c4839275322b0c27ac467íZRepoDigest: mageia@sha256:d769f2b2c933287db3e266a60188f44fabf3559c04d3011668f83a5dab9eb26díODiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2íRepoTag: mageia:5íRepoTag: mageia:5.1‚òìpkg:oci/mageia@sha256:d769f2b2c933287db3e266a60188f44fabf3559c04d3011668f83a5dab9eb26d?repository_url=index.docker.io%2Flibrary%2Fmageia&arch=amd64Ú
+„
+Package-1c3081c3f8e0dfc1makedev"4.4-19.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj'built package from: makedev 4.4-19.mga5í!PkgID: makedev@4.4-19.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚,(pkg:none/makedev@4.4-19.mga5?arch=noarchÍ$ ad8acdd608199608e6f091cab94f5c2eÚ
-ı
-Package-bb548cad73508d66	meta-task"1:5-28.2.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj+built package from: meta-task 1:5-28.2.mga5í#PkgID: meta-task@5-28.2.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ô
+Package-bb548cad73508d66	meta-task"1:5-28.2.mga5BGPL-3.0-onlyJGPL-3.0-onlyj+built package from: meta-task 1:5-28.2.mga5í#PkgID: meta-task@5-28.2.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/meta-task@5-28.2.mga5?arch=noarch&epoch=1Í$ 74a9c152b084c475a70f692f142ad2aeÚ
-â
-Package-d876e99a8edcc342multiarch-utils"1.0.13-5.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj1built package from: multiarch-utils 1.0.13-5.mga5í+PkgID: multiarch-utils@1.0.13-5.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+É
+Package-d876e99a8edcc342multiarch-utils"1.0.13-5.mga5BGPL-3.0-onlyJGPL-3.0-onlyj1built package from: multiarch-utils 1.0.13-5.mga5í+PkgID: multiarch-utils@1.0.13-5.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/multiarch-utils@1.0.13-5.mga5?arch=noarchÍ$ f7ed8e76f57013fbaca07c2c17e5997cÚ
-◊
-Package-8d1f45506ddb4621ncurses"5.9-21.1.mga5:NONEBMITJMITj)built package from: ncurses 5.9-21.1.mga5í#PkgID: ncurses@5.9-21.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+—
+Package-8d1f45506ddb4621ncurses"5.9-21.1.mga5BMITJMITj)built package from: ncurses 5.9-21.1.mga5í#PkgID: ncurses@5.9-21.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚.*pkg:none/ncurses@5.9-21.1.mga5?arch=x86_64Í$ d13470c629ea4d7ee6219656542d858fÚ
-•
-Package-2acd564fa54b840e	net-tools"2.0-0.20140707git.6.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj6built package from: net-tools 2.0-0.20140707git.6.mga5í0PkgID: net-tools@2.0-0.20140707git.6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ü
+Package-2acd564fa54b840e	net-tools"2.0-0.20140707git.6.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj6built package from: net-tools 2.0-0.20140707git.6.mga5í0PkgID: net-tools@2.0-0.20140707git.6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚;7pkg:none/net-tools@2.0-0.20140707git.6.mga5?arch=x86_64Í$ e127f0b8077fc7a50655d60445157f22Ú
-2
- OperatingSystem-f446e46e887702dfnone:NONEÚ
-°
-Package-a54f0009fea13fb8nss"2:3.28.6-1.3.mga5:NONEB&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+J&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+j)built package from: nss 2:3.28.6-1.3.mga5í!PkgID: nss@3.28.6-1.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+,
+ OperatingSystem-f446e46e887702dfnoneÚ
+õ
+Package-a54f0009fea13fb8nss"2:3.28.6-1.3.mga5B&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+J&MPLv1.1 OR GPL-2.0-or-later OR LGPLv2+j)built package from: nss 2:3.28.6-1.3.mga5í!PkgID: nss@3.28.6-1.3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/nss@3.28.6-1.3.mga5?arch=x86_64&epoch=2Í$ 5b6a65273c03172dec3fa1f3de1f29dfÚ
-Ü
-Package-fbd679423e965dfdnss-myhostname"217-11.2.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í*PkgID: nss-myhostname@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ä
+Package-fbd679423e965dfdnss-myhostname"217-11.2.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í*PkgID: nss-myhostname@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚51pkg:none/nss-myhostname@217-11.2.mga5?arch=x86_64Í$ 96deede36ad3ba2d0f808716ab38965cÚ
-Å
+˚
 Package-3c4f1c8376d3bf5dnss_tcb"
-1.1-5.mga5:NONEB BSD-3-Clause OR GPL-3.0-or-laterJ BSD-3-Clause OR GPL-3.0-or-laterj"built package from: tcb 1.1-5.mga5í PkgID: nss_tcb@1.1-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+1.1-5.mga5B BSD-3-Clause OR GPL-3.0-or-laterJ BSD-3-Clause OR GPL-3.0-or-laterj"built package from: tcb 1.1-5.mga5í PkgID: nss_tcb@1.1-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚+'pkg:none/nss_tcb@1.1-5.mga5?arch=x86_64Í$ ea9dbf3f21ee9672c02035a44af5d96cÚ
-Â
-Package-82aba9ca7d3756ffopenldap"2.4.45-1.mga5:NONEBArtisticJArtisticj*built package from: openldap 2.4.45-1.mga5í$PkgID: openldap@2.4.45-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ﬂ
+Package-82aba9ca7d3756ffopenldap"2.4.45-1.mga5BArtisticJArtisticj*built package from: openldap 2.4.45-1.mga5í$PkgID: openldap@2.4.45-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/openldap@2.4.45-1.mga5?arch=x86_64Í$ 98490260ba9192aec8ccc5552b25cf94Ú
-Ì
-Package-b1a5877b82387d87p11-kit"0.20.6-6.mga5:NONEBApache-LicenseJApache-Licensej)built package from: p11-kit 0.20.6-6.mga5í#PkgID: p11-kit@0.20.6-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Á
+Package-b1a5877b82387d87p11-kit"0.20.6-6.mga5BApache-LicenseJApache-Licensej)built package from: p11-kit 0.20.6-6.mga5í#PkgID: p11-kit@0.20.6-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚.*pkg:none/p11-kit@0.20.6-6.mga5?arch=x86_64Í$ 1f5da9f06979c036c6e43e478e6e25c1Ú
-ã
-Package-ed42c04803d94fe6pam"1.1.8-10.1.mga5:NONEB!BSD-3-Clause AND GPL-2.0-or-laterJ!BSD-3-Clause AND GPL-2.0-or-laterj'built package from: pam 1.1.8-10.1.mga5í!PkgID: pam@1.1.8-10.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ö
+Package-ed42c04803d94fe6pam"1.1.8-10.1.mga5B!BSD-3-Clause AND GPL-2.0-or-laterJ!BSD-3-Clause AND GPL-2.0-or-laterj'built package from: pam 1.1.8-10.1.mga5í!PkgID: pam@1.1.8-10.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚,(pkg:none/pam@1.1.8-10.1.mga5?arch=x86_64Í$ 217bef47cfa9ec85239f91a7f2ae1423Ú
-Å
+˚
 Package-488d9409766b8ee3pam_tcb"
-1.1-5.mga5:NONEB BSD-3-Clause OR GPL-3.0-or-laterJ BSD-3-Clause OR GPL-3.0-or-laterj"built package from: tcb 1.1-5.mga5í PkgID: pam_tcb@1.1-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+1.1-5.mga5B BSD-3-Clause OR GPL-3.0-or-laterJ BSD-3-Clause OR GPL-3.0-or-laterj"built package from: tcb 1.1-5.mga5í PkgID: pam_tcb@1.1-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚+'pkg:none/pam_tcb@1.1-5.mga5?arch=x86_64Í$ 32598476f6d2fa93447241be1e7a7185Ú
-›
-Package-7034b55867166327passwd"0.79-4.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej&built package from: passwd 0.79-4.mga5í PkgID: passwd@0.79-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+◊
+Package-7034b55867166327passwd"0.79-4.mga5BBSD-3-ClauseJBSD-3-Clausej&built package from: passwd 0.79-4.mga5í PkgID: passwd@0.79-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚+'pkg:none/passwd@0.79-4.mga5?arch=x86_64Í$ 83714bfb2faeb4498cc2ba4554f02a3eÚ
-ë
-Package-51d8a76a8a489a06perl"2:5.20.1-8.8.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj*built package from: perl 2:5.20.1-8.8.mga5í"PkgID: perl@5.20.1-8.8.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ã
+Package-51d8a76a8a489a06perl"2:5.20.1-8.8.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj*built package from: perl 2:5.20.1-8.8.mga5í"PkgID: perl@5.20.1-8.8.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚51pkg:none/perl@5.20.1-8.8.mga5?arch=x86_64&epoch=2Í$ af8ed4ee5c1efe7031a3d13a18accc33Ú
-°
-Package-e281adcb341ddfbfperl-Config-IniFiles"2.830.0-3.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj7built package from: perl-Config-IniFiles 2.830.0-3.mga5í1PkgID: perl-Config-IniFiles@2.830.0-3.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+õ
+Package-e281adcb341ddfbfperl-Config-IniFiles"2.830.0-3.mga5BGPL-3.0-onlyJGPL-3.0-onlyj7built package from: perl-Config-IniFiles 2.830.0-3.mga5í1PkgID: perl-Config-IniFiles@2.830.0-3.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚<8pkg:none/perl-Config-IniFiles@2.830.0-3.mga5?arch=noarchÍ$ 17561c5ebc296741af15916bb2d89390Ú
-Ö
-Package-de278471eaa8b6c1perl-File-Sync"0.110.0-11.mga5:NONEBArtisticJArtisticj2built package from: perl-File-Sync 0.110.0-11.mga5í,PkgID: perl-File-Sync@0.110.0-11.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ˇ
+Package-de278471eaa8b6c1perl-File-Sync"0.110.0-11.mga5BArtisticJArtisticj2built package from: perl-File-Sync 0.110.0-11.mga5í,PkgID: perl-File-Sync@0.110.0-11.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚73pkg:none/perl-File-Sync@0.110.0-11.mga5?arch=x86_64Í$ c360f288b710f9637e9dc9561beab08cÚ
-±
-Package-3312fc7301b108b4perl-Filesys-Df"0.920.0-13.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj3built package from: perl-Filesys-Df 0.920.0-13.mga5í-PkgID: perl-Filesys-Df@0.920.0-13.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+´
+Package-3312fc7301b108b4perl-Filesys-Df"0.920.0-13.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj3built package from: perl-Filesys-Df 0.920.0-13.mga5í-PkgID: perl-Filesys-Df@0.920.0-13.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚84pkg:none/perl-Filesys-Df@0.920.0-13.mga5?arch=x86_64Í$ 8abcf512b5d697d193d1d151e240c9c5Ú
-¡
-Package-83ea42caecf37219perl-List-MoreUtils"0.330.0-12.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj7built package from: perl-List-MoreUtils 0.330.0-12.mga5í1PkgID: perl-List-MoreUtils@0.330.0-12.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ª
+Package-83ea42caecf37219perl-List-MoreUtils"0.330.0-12.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj7built package from: perl-List-MoreUtils 0.330.0-12.mga5í1PkgID: perl-List-MoreUtils@0.330.0-12.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚<8pkg:none/perl-List-MoreUtils@0.330.0-12.mga5?arch=x86_64Í$ eeb671ca0521e9e83289779a593c3d99Ú
-Ω
-Package-c5eaa8553b794e07perl-Locale-gettext"1.50.0-15.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj6built package from: perl-Locale-gettext 1.50.0-15.mga5í0PkgID: perl-Locale-gettext@1.50.0-15.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+∑
+Package-c5eaa8553b794e07perl-Locale-gettext"1.50.0-15.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj6built package from: perl-Locale-gettext 1.50.0-15.mga5í0PkgID: perl-Locale-gettext@1.50.0-15.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚;7pkg:none/perl-Locale-gettext@1.50.0-15.mga5?arch=x86_64Í$ 4072f4d14bca21abb799346568416c42Ú
-ë
-Package-12552bf83cab2106perl-MDK-Common"1.2.31-1.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj1built package from: perl-MDK-Common 1.2.31-1.mga5í+PkgID: perl-MDK-Common@1.2.31-1.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ã
+Package-12552bf83cab2106perl-MDK-Common"1.2.31-1.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj1built package from: perl-MDK-Common 1.2.31-1.mga5í+PkgID: perl-MDK-Common@1.2.31-1.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/perl-MDK-Common@1.2.31-1.mga5?arch=noarchÍ$ 96c996214b95a2a0f938125b44f438f4Ú
-ô
-Package-86387ab5d83124b5perl-MDV-Distribconf"4.02-12.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj5built package from: perl-MDV-Distribconf 4.02-12.mga5í/PkgID: perl-MDV-Distribconf@4.02-12.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ì
+Package-86387ab5d83124b5perl-MDV-Distribconf"4.02-12.mga5BGPL-3.0-onlyJGPL-3.0-onlyj5built package from: perl-MDV-Distribconf 4.02-12.mga5í/PkgID: perl-MDV-Distribconf@4.02-12.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/perl-MDV-Distribconf@4.02-12.mga5?arch=noarchÍ$ 345094968c1d7b9df6ecc0d487711d58Ú
-ô
-Package-fa5d95bb3f441a05perl-MDV-Packdrakeng"1.13-16.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj5built package from: perl-MDV-Packdrakeng 1.13-16.mga5í/PkgID: perl-MDV-Packdrakeng@1.13-16.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ì
+Package-fa5d95bb3f441a05perl-MDV-Packdrakeng"1.13-16.mga5BGPL-3.0-onlyJGPL-3.0-onlyj5built package from: perl-MDV-Packdrakeng 1.13-16.mga5í/PkgID: perl-MDV-Packdrakeng@1.13-16.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/perl-MDV-Packdrakeng@1.13-16.mga5?arch=noarchÍ$ 90944342fabb895c411ec165159f43e4Ú
-π
-Package-63b38509329905e6perl-Time-ZoneInfo"0.300.0-6.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj5built package from: perl-Time-ZoneInfo 0.300.0-6.mga5í/PkgID: perl-Time-ZoneInfo@0.300.0-6.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+≥
+Package-63b38509329905e6perl-Time-ZoneInfo"0.300.0-6.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj5built package from: perl-Time-ZoneInfo 0.300.0-6.mga5í/PkgID: perl-Time-ZoneInfo@0.300.0-6.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/perl-Time-ZoneInfo@0.300.0-6.mga5?arch=noarchÍ$ 78c7c6119a6cf192db27e9ab73d23d77Ú
-â
-Package-8ce7ced63dc263ef	perl-URPM"5.06.3-1.mga5:NONEBGPL-3.0-only OR ArtisticJGPL-3.0-only OR Artisticj+built package from: perl-URPM 5.06.3-1.mga5í%PkgID: perl-URPM@5.06.3-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+É
+Package-8ce7ced63dc263ef	perl-URPM"5.06.3-1.mga5BGPL-3.0-only OR ArtisticJGPL-3.0-only OR Artisticj+built package from: perl-URPM 5.06.3-1.mga5í%PkgID: perl-URPM@5.06.3-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚0,pkg:none/perl-URPM@5.06.3-1.mga5?arch=x86_64Í$ 001eeeab428f95a84846665918e3aeacÚ
-π
-Package-c3fe224f04dba4b8perl-XML-LibXML"2.12.100-1.2.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj5built package from: perl-XML-LibXML 2.12.100-1.2.mga5í/PkgID: perl-XML-LibXML@2.12.100-1.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+≥
+Package-c3fe224f04dba4b8perl-XML-LibXML"2.12.100-1.2.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj5built package from: perl-XML-LibXML 2.12.100-1.2.mga5í/PkgID: perl-XML-LibXML@2.12.100-1.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/perl-XML-LibXML@2.12.100-1.2.mga5?arch=x86_64Í$ 718db56e5d4aaaae2ce47e4f7e3f8dd9Ú
-£
-Package-8cfcc6bc16c2f0e0perl-XML-NamespaceSupport"1.110.0-7.mga5:NONEBMPLJMPLj<built package from: perl-XML-NamespaceSupport 1.110.0-7.mga5í6PkgID: perl-XML-NamespaceSupport@1.110.0-7.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ù
+Package-8cfcc6bc16c2f0e0perl-XML-NamespaceSupport"1.110.0-7.mga5BMPLJMPLj<built package from: perl-XML-NamespaceSupport 1.110.0-7.mga5í6PkgID: perl-XML-NamespaceSupport@1.110.0-7.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚A=pkg:none/perl-XML-NamespaceSupport@1.110.0-7.mga5?arch=noarchÍ$ f93452deb3fb9ceebe7697b3c0045980Ú
-°
-Package-d192b552e1031716perl-XML-SAX"0.990.0-7.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj/built package from: perl-XML-SAX 0.990.0-7.mga5í)PkgID: perl-XML-SAX@0.990.0-7.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+õ
+Package-d192b552e1031716perl-XML-SAX"0.990.0-7.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj/built package from: perl-XML-SAX 0.990.0-7.mga5í)PkgID: perl-XML-SAX@0.990.0-7.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/perl-XML-SAX@0.990.0-7.mga5?arch=noarchÍ$ 9a942ce46de5a6c211690bd4fdf235e0Ú
-±
-Package-8ddfd5146b0ef28bperl-XML-SAX-Base"1.80.0-5.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj3built package from: perl-XML-SAX-Base 1.80.0-5.mga5í-PkgID: perl-XML-SAX-Base@1.80.0-5.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+´
+Package-8ddfd5146b0ef28bperl-XML-SAX-Base"1.80.0-5.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj3built package from: perl-XML-SAX-Base 1.80.0-5.mga5í-PkgID: perl-XML-SAX-Base@1.80.0-5.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚84pkg:none/perl-XML-SAX-Base@1.80.0-5.mga5?arch=noarchÍ$ 5b2c38c42a013929d90aaaabd5e65abbÚ
-†
-Package-e13799a66944a9e8	perl-base"2:5.20.1-8.8.mga5:NONEBGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj*built package from: perl 2:5.20.1-8.8.mga5í'PkgID: perl-base@5.20.1-8.8.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ö
+Package-e13799a66944a9e8	perl-base"2:5.20.1-8.8.mga5BGPL-3.0-or-later OR ArtisticJGPL-3.0-or-later OR Artisticj*built package from: perl 2:5.20.1-8.8.mga5í'PkgID: perl-base@5.20.1-8.8.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/perl-base@5.20.1-8.8.mga5?arch=x86_64&epoch=2Í$ 95e299faab4e0bd453fc30d99fd3eac2Ú
-ﬁ
-Package-f88e022c21858395	popt-data"1:1.16-7.mga5:NONEBMITJMITj&built package from: popt 1:1.16-7.mga5í#PkgID: popt-data@1.16-7.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ÿ
+Package-f88e022c21858395	popt-data"1:1.16-7.mga5BMITJMITj&built package from: popt 1:1.16-7.mga5í#PkgID: popt-data@1.16-7.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/popt-data@1.16-7.mga5?arch=noarch&epoch=1Í$ 77efc5d7fd1d6679fdc13e3bb2f89c19Ú
-ç
-Package-e25de2bb99a26991	procps-ng"3.3.9-5.mga5:NONEBGPL-2.0-or-later AND LGPLv2+JGPL-2.0-or-later AND LGPLv2+j*built package from: procps-ng 3.3.9-5.mga5í$PkgID: procps-ng@3.3.9-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+á
+Package-e25de2bb99a26991	procps-ng"3.3.9-5.mga5BGPL-2.0-or-later AND LGPLv2+JGPL-2.0-or-later AND LGPLv2+j*built package from: procps-ng 3.3.9-5.mga5í$PkgID: procps-ng@3.3.9-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/procps-ng@3.3.9-5.mga5?arch=x86_64Í$ 11818525bcc380d5720857d69aae4a33Ú
-È
-Package-3ad615f00a79c8abpsmisc"22.21-5.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj'built package from: psmisc 22.21-5.mga5í!PkgID: psmisc@22.21-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+„
+Package-3ad615f00a79c8abpsmisc"22.21-5.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj'built package from: psmisc 22.21-5.mga5í!PkgID: psmisc@22.21-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚,(pkg:none/psmisc@22.21-5.mga5?arch=x86_64Í$ a21c51d27fbaa513589860b8d49211efÚ
-ı
+Ô
 Package-346992bcc75d03ab
-resolvconf"1.75-3.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj*built package from: resolvconf 1.75-3.mga5í$PkgID: resolvconf@1.75-3.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+resolvconf"1.75-3.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj*built package from: resolvconf 1.75-3.mga5í$PkgID: resolvconf@1.75-3.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/resolvconf@1.75-3.mga5?arch=noarchÍ$ 6f0acc87ab40cb271c5090626c2dc6efÚ
-⁄
-Package-dfca24a157ae62e5rmt"0.4b44-7.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej&built package from: dump 0.4b44-7.mga5íPkgID: rmt@0.4b44-7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+‘
+Package-dfca24a157ae62e5rmt"0.4b44-7.mga5BBSD-3-ClauseJBSD-3-Clausej&built package from: dump 0.4b44-7.mga5íPkgID: rmt@0.4b44-7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚*&pkg:none/rmt@0.4b44-7.mga5?arch=x86_64Í$ f8d90ff7fbf1c5d3b44d897fc4943c63Ú
-ë
-Package-f4f38d01106bf6a6	rootcerts"1:20180104.00-1.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj2built package from: rootcerts 1:20180104.00-1.mga5í*PkgID: rootcerts@20180104.00-1.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ã
+Package-f4f38d01106bf6a6	rootcerts"1:20180104.00-1.mga5BGPL-3.0-onlyJGPL-3.0-onlyj2built package from: rootcerts 1:20180104.00-1.mga5í*PkgID: rootcerts@20180104.00-1.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚=9pkg:none/rootcerts@20180104.00-1.mga5?arch=noarch&epoch=1Í$ 81c579b0a75d44b824cf1a58094e24d9Ú
-Á
-Package-7e7d3302a3199498	rootfiles"11.0-12.mga5:NONEB	UnlicenseJ	Unlicensej*built package from: rootfiles 11.0-12.mga5í$PkgID: rootfiles@11.0-12.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+·
+Package-7e7d3302a3199498	rootfiles"11.0-12.mga5B	UnlicenseJ	Unlicensej*built package from: rootfiles 11.0-12.mga5í$PkgID: rootfiles@11.0-12.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚/+pkg:none/rootfiles@11.0-12.mga5?arch=noarchÍ$ 83909a1f43dc560c5de488ff58e10748Ú
-˝
-Package-4f056431d677ea84rpm"1:4.12.0.2-1.7.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj+built package from: rpm 1:4.12.0.2-1.7.mga5í#PkgID: rpm@4.12.0.2-1.7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˜
+Package-4f056431d677ea84rpm"1:4.12.0.2-1.7.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj+built package from: rpm 1:4.12.0.2-1.7.mga5í#PkgID: rpm@4.12.0.2-1.7.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/rpm@4.12.0.2-1.7.mga5?arch=x86_64&epoch=1Í$ d5e850aa16215a99eaa4d351230190f2Ú
-˘
+Û
 Package-27488a977eb804ea
-rpm-helper"0.24.17-1.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj-built package from: rpm-helper 0.24.17-1.mga5í'PkgID: rpm-helper@0.24.17-1.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+rpm-helper"0.24.17-1.mga5BGPL-3.0-onlyJGPL-3.0-onlyj-built package from: rpm-helper 0.24.17-1.mga5í'PkgID: rpm-helper@0.24.17-1.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚2.pkg:none/rpm-helper@0.24.17-1.mga5?arch=noarchÍ$ a3ebcffaab7c63dd556ed53e46cb5bb8Ú
-â
+É
 Package-1c278eb9fe3ed56brpm-mageia-setup"
-2.7-1.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj/built package from: rpm-mageia-setup 2.7-1.mga5í)PkgID: rpm-mageia-setup@2.7-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+2.7-1.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj/built package from: rpm-mageia-setup 2.7-1.mga5í)PkgID: rpm-mageia-setup@2.7-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/rpm-mageia-setup@2.7-1.mga5?arch=x86_64Í$ 4a84fc746035ad880a60e63d93bb21c8Ú
-˘
-Package-2c68cd92e243b985	run-parts"1:4.4-4.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj*built package from: run-parts 1:4.4-4.mga5í"PkgID: run-parts@4.4-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Û
+Package-2c68cd92e243b985	run-parts"1:4.4-4.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj*built package from: run-parts 1:4.4-4.mga5í"PkgID: run-parts@4.4-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚51pkg:none/run-parts@4.4-4.mga5?arch=x86_64&epoch=1Í$ cbd823a85723d9d858cd0f2574c1f3e9Ú
-–
+ 
 Package-fc7d7d42f903281sash"
-3.8-3.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj#built package from: sash 3.8-3.mga5íPkgID: sash@3.8-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+3.8-3.mga5BGPL-3.0-onlyJGPL-3.0-onlyj#built package from: sash 3.8-3.mga5íPkgID: sash@3.8-3.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚($pkg:none/sash@3.8-3.mga5?arch=x86_64Í$ 95081d1c7880fe15ff328b92d56722cfÚ
-’
-Package-8f5f4099203b31d0sed"4.2.2-6.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj$built package from: sed 4.2.2-6.mga5íPkgID: sed@4.2.2-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+œ
+Package-8f5f4099203b31d0sed"4.2.2-6.mga5BGPL-3.0-onlyJGPL-3.0-onlyj$built package from: sed 4.2.2-6.mga5íPkgID: sed@4.2.2-6.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚)%pkg:none/sed@4.2.2-6.mga5?arch=x86_64Í$ 8abcb0a9d5c0a23f23f7b9066bb343b2Ú
-€
-Package-99910abfe3c308bfsetup"2.7.21-5.mga5:NONEB	UnlicenseJ	Unlicensej'built package from: setup 2.7.21-5.mga5í!PkgID: setup@2.7.21-5.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+’
+Package-99910abfe3c308bfsetup"2.7.21-5.mga5B	UnlicenseJ	Unlicensej'built package from: setup 2.7.21-5.mga5í!PkgID: setup@2.7.21-5.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚,(pkg:none/setup@2.7.21-5.mga5?arch=noarchÍ$ 58d99db8525fe06fe53bb8801f8e9e36Ú
-ç
-Package-c46e6bd1fc43bc4eshadow-utils"2:4.2.1-6.2.mga5:NONEBBSD-3-ClauseJBSD-3-Clausej1built package from: shadow-utils 2:4.2.1-6.2.mga5í)PkgID: shadow-utils@4.2.1-6.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+á
+Package-c46e6bd1fc43bc4eshadow-utils"2:4.2.1-6.2.mga5BBSD-3-ClauseJBSD-3-Clausej1built package from: shadow-utils 2:4.2.1-6.2.mga5í)PkgID: shadow-utils@4.2.1-6.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚<8pkg:none/shadow-utils@4.2.1-6.2.mga5?arch=x86_64&epoch=2Í$ add639150b6f555fd844194ea1907802Ú
-Ò
-Package-71370f415c62a35fsystemd"217-11.2.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í#PkgID: systemd@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Î
+Package-71370f415c62a35fsystemd"217-11.2.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í#PkgID: systemd@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚.*pkg:none/systemd@217-11.2.mga5?arch=x86_64Í$ c0f6cf680ea9576829a3783f83bd86aaÚ
-É
-Package-84d23659289036dasystemd-units"217-11.2.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í)PkgID: systemd-units@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+˝
+Package-84d23659289036dasystemd-units"217-11.2.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj)built package from: systemd 217-11.2.mga5í)PkgID: systemd-units@217-11.2.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚40pkg:none/systemd-units@217-11.2.mga5?arch=x86_64Í$ 2dab6ce77c6374bf7efd5e04ab433af4Ú
-Ÿ
-Package-67a5aaabb26ad962tar"1.28-3.1.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj%built package from: tar 1.28-3.1.mga5íPkgID: tar@1.28-3.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+”
+Package-67a5aaabb26ad962tar"1.28-3.1.mga5BGPL-3.0-onlyJGPL-3.0-onlyj%built package from: tar 1.28-3.1.mga5íPkgID: tar@1.28-3.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚*&pkg:none/tar@1.28-3.1.mga5?arch=x86_64Í$ ce0d31bf0cb2e4622c305fa812217b68Ú
-ı
+Ô
 Package-38684dbe7bc8de21tcb"
-1.1-5.mga5:NONEB BSD-3-Clause OR GPL-3.0-or-laterJ BSD-3-Clause OR GPL-3.0-or-laterj"built package from: tcb 1.1-5.mga5íPkgID: tcb@1.1-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+1.1-5.mga5B BSD-3-Clause OR GPL-3.0-or-laterJ BSD-3-Clause OR GPL-3.0-or-laterj"built package from: tcb 1.1-5.mga5íPkgID: tcb@1.1-5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚'#pkg:none/tcb@1.1-5.mga5?arch=x86_64Í$ 505a0798891686e2a2ea5e569a24ad40Ú
-›
-Package-8c6d8e15251dd650time"1.7-43.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj$built package from: time 1.7-43.mga5íPkgID: time@1.7-43.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+◊
+Package-8c6d8e15251dd650time"1.7-43.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj$built package from: time 1.7-43.mga5íPkgID: time@1.7-43.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚)%pkg:none/time@1.7-43.mga5?arch=x86_64Í$ abd4a99fb834d1e5ae6d1ac43a0fbb32Ú
-ı
-Package-126a2ca1999fb90atimezone"6:2016i-4.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj+built package from: timezone 6:2016i-4.mga5í#PkgID: timezone@2016i-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+Ô
+Package-126a2ca1999fb90atimezone"6:2016i-4.mga5BGPL-3.0-onlyJGPL-3.0-onlyj+built package from: timezone 6:2016i-4.mga5í#PkgID: timezone@2016i-4.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚62pkg:none/timezone@2016i-4.mga5?arch=x86_64&epoch=6Í$ 5ff112e814016e0fbf1c567a060d5d24Ú
-ô
-Package-e9f9e7957543dd38update-alternatives"1.9.0-15.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj5built package from: update-alternatives 1.9.0-15.mga5í/PkgID: update-alternatives@1.9.0-15.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ì
+Package-e9f9e7957543dd38update-alternatives"1.9.0-15.mga5BGPL-3.0-onlyJGPL-3.0-onlyj5built package from: update-alternatives 1.9.0-15.mga5í/PkgID: update-alternatives@1.9.0-15.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚:6pkg:none/update-alternatives@1.9.0-15.mga5?arch=noarchÍ$ 7f2d92fcace582033ed3810abcff00a6Ú
-È
-Package-305da96d53467c63urpmi"8.06.1-1.mga5:NONEBGPL-2.0-or-laterJGPL-2.0-or-laterj'built package from: urpmi 8.06.1-1.mga5í!PkgID: urpmi@8.06.1-1.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+„
+Package-305da96d53467c63urpmi"8.06.1-1.mga5BGPL-2.0-or-laterJGPL-2.0-or-laterj'built package from: urpmi 8.06.1-1.mga5í!PkgID: urpmi@8.06.1-1.mga5.noarchíTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚,(pkg:none/urpmi@8.06.1-1.mga5?arch=noarchÍ$ 5da06ca0e9a561486d3b1138d6a69720Ú
-…
+√
 Package-8c9ddf6ac32a9ffa
-util-linux"2.25.2-3.5.mga5:NONEBrGPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later AND LGPLv2+ AND BSD-3-Clause WITH advertising AND UnlicenseJrGPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later AND LGPLv2+ AND BSD-3-Clause WITH advertising AND Unlicensej.built package from: util-linux 2.25.2-3.5.mga5í(PkgID: util-linux@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+util-linux"2.25.2-3.5.mga5BrGPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later AND LGPLv2+ AND BSD-3-Clause WITH advertising AND UnlicenseJrGPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later AND LGPLv2+ AND BSD-3-Clause WITH advertising AND Unlicensej.built package from: util-linux 2.25.2-3.5.mga5í(PkgID: util-linux@2.25.2-3.5.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚3/pkg:none/util-linux@2.25.2-3.5.mga5?arch=x86_64Í$ c1f66e2efa0b0178b26d4e2b290e94f2Ú
-˚
-Package-9e8af64b56086be5vim-minimal"7.4.430-7.1.mga5:NONEBCharitywareJCharitywarej(built package from: vim 7.4.430-7.1.mga5í*PkgID: vim-minimal@7.4.430-7.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+ı
+Package-9e8af64b56086be5vim-minimal"7.4.430-7.1.mga5BCharitywareJCharitywarej(built package from: vim 7.4.430-7.1.mga5í*PkgID: vim-minimal@7.4.430-7.1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚51pkg:none/vim-minimal@7.4.430-7.1.mga5?arch=x86_64Í$ 47a6269f33c8dfba20c38318440e9759Ú
-›
-Package-d972beb6537df156which"2.20-11.mga5:NONEBGPL-3.0-onlyJGPL-3.0-onlyj&built package from: which 2.20-11.mga5í PkgID: which@2.20-11.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+◊
+Package-d972beb6537df156which"2.20-11.mga5BGPL-3.0-onlyJGPL-3.0-onlyj&built package from: which 2.20-11.mga5í PkgID: which@2.20-11.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚+'pkg:none/which@2.20-11.mga5?arch=x86_64Í$ 7c6cee680cb0abd26fda91ddc0bc7c31Ú
-À
-Package-5ba8e086dc135ed6xz"5.2.0-1.mga5:NONEB	UnlicenseJ	Unlicensej#built package from: xz 5.2.0-1.mga5íPkgID: xz@5.2.0-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
+≈
+Package-5ba8e086dc135ed6xz"5.2.0-1.mga5B	UnlicenseJ	Unlicensej#built package from: xz 5.2.0-1.mga5íPkgID: xz@5.2.0-1.mga5.x86_64íTLayerDiffID: sha256:a471e448fabe6175b3c5080e94b4dc1c6441f5d8cd632e4bcf158bedb7c6f3b2ö
 
 Mageia.Org‚($pkg:none/xz@5.2.0-1.mga5?arch=x86_64Í$ 0f12e1a0fa911c8447da787c7854bc3fÚEContainerImage-1de6f444b7a71fe9 OperatingSystem-f446e46e887702df> OperatingSystem-f446e46e887702dfPackage-2caaa458314d9a49> OperatingSystem-f446e46e887702dfPackage-28c91b9946006b98> OperatingSystem-f446e46e887702dfPackage-f6f385ad0d354791> OperatingSystem-f446e46e887702dfPackage-ea3709426e050a24> OperatingSystem-f446e46e887702dfPackage-45a6d93274aea7b3> OperatingSystem-f446e46e887702dfPackage-6bd58534b58ac6ae> OperatingSystem-f446e46e887702dfPackage-e42d2bec8541d5cb= OperatingSystem-f446e46e887702dfPackage-d83f36c31ed6452> OperatingSystem-f446e46e887702dfPackage-3204a1dc1e54cf94> OperatingSystem-f446e46e887702dfPackage-fbf591e51acca932> OperatingSystem-f446e46e887702dfPackage-115d4b6814f1ac47> OperatingSystem-f446e46e887702dfPackage-811f1e8fcdd52fb5> OperatingSystem-f446e46e887702dfPackage-73dbd221498871f2> OperatingSystem-f446e46e887702dfPackage-7c3f8abee57d290f> OperatingSystem-f446e46e887702dfPackage-b339ea213bf27458> OperatingSystem-f446e46e887702dfPackage-af6e609e14026dd3= OperatingSystem-f446e46e887702dfPackage-cc8b9000539347e> OperatingSystem-f446e46e887702dfPackage-4cd9c4eba08b19c0> OperatingSystem-f446e46e887702dfPackage-c03961d8d155182c> OperatingSystem-f446e46e887702dfPackage-ca8c16d013a14fd2> OperatingSystem-f446e46e887702dfPackage-2f8c3e36a3504564> OperatingSystem-f446e46e887702dfPackage-2e7cfe22bc3765f7> OperatingSystem-f446e46e887702dfPackage-f56fc08044351f87> OperatingSystem-f446e46e887702dfPackage-9db8bf695be13726> OperatingSystem-f446e46e887702dfPackage-55a41b127f9fac57> OperatingSystem-f446e46e887702dfPackage-139387a6198f55a9> OperatingSystem-f446e46e887702dfPackage-14f6e642e5a4663e> OperatingSystem-f446e46e887702dfPackage-6a74f1b147c46580> OperatingSystem-f446e46e887702dfPackage-49900480856794d7> OperatingSystem-f446e46e887702dfPackage-9e0916904b20aaec> OperatingSystem-f446e46e887702dfPackage-17aa994ad4469243= OperatingSystem-f446e46e887702dfPackage-59c5c58e05ac147> OperatingSystem-f446e46e887702dfPackage-b0847bf50ff2901c> OperatingSystem-f446e46e887702dfPackage-b4fd8938b32ae66d> OperatingSystem-f446e46e887702dfPackage-117ae0fc7a1c1529> OperatingSystem-f446e46e887702dfPackage-8db1d957c7a27a6c< OperatingSystem-f446e46e887702dfPackage-39fe407679d82a> OperatingSystem-f446e46e887702dfPackage-7c5f7ab0758fb3d4> OperatingSystem-f446e46e887702dfPackage-66a7e323eafd1ec5> OperatingSystem-f446e46e887702dfPackage-39c9adef7a7da533> OperatingSystem-f446e46e887702dfPackage-a0bd80f569a79fb3> OperatingSystem-f446e46e887702dfPackage-6a219ead4b6ae76c> OperatingSystem-f446e46e887702dfPackage-d94b14eac3c36676> OperatingSystem-f446e46e887702dfPackage-f7d98e78552b98e5> OperatingSystem-f446e46e887702dfPackage-96c11e18022d137b> OperatingSystem-f446e46e887702dfPackage-33b76a96142994de> OperatingSystem-f446e46e887702dfPackage-d39c492cd88ee824> OperatingSystem-f446e46e887702dfPackage-d8fb31796aa53d10> OperatingSystem-f446e46e887702dfPackage-644c349c04c7b747> OperatingSystem-f446e46e887702dfPackage-951739652545bbeb> OperatingSystem-f446e46e887702dfPackage-2b23118e3020f2af> OperatingSystem-f446e46e887702dfPackage-dc512bc45c792921> OperatingSystem-f446e46e887702dfPackage-57dc7d6b206e67e4= OperatingSystem-f446e46e887702dfPackage-613cfa1eb8ecbda> OperatingSystem-f446e46e887702dfPackage-ed285659a34c594c> OperatingSystem-f446e46e887702dfPackage-15f157dee8d75e62> OperatingSystem-f446e46e887702dfPackage-9193d3fa64ce6d47> OperatingSystem-f446e46e887702dfPackage-80eb6e6080c53f71> OperatingSystem-f446e46e887702dfPackage-19a9f0f380c28815> OperatingSystem-f446e46e887702dfPackage-c4b5e4b2cdfb5502> OperatingSystem-f446e46e887702dfPackage-9e3db132ba595cce> OperatingSystem-f446e46e887702dfPackage-3827013b59e87288> OperatingSystem-f446e46e887702dfPackage-937cdff4f2c298ee= OperatingSystem-f446e46e887702dfPackage-609791fe076ecd5> OperatingSystem-f446e46e887702dfPackage-b4087f364d7f30f1> OperatingSystem-f446e46e887702dfPackage-ef11f829baeb5246> OperatingSystem-f446e46e887702dfPackage-eed65f208ecd3f26> OperatingSystem-f446e46e887702dfPackage-d97516d6fa973bbb> OperatingSystem-f446e46e887702dfPackage-1031058378306ed6= OperatingSystem-f446e46e887702dfPackage-aa73cb37d616309> OperatingSystem-f446e46e887702dfPackage-27e6052ef2b5df99> OperatingSystem-f446e46e887702dfPackage-c01cf6023611bdec> OperatingSystem-f446e46e887702dfPackage-32f71871b3c57968> OperatingSystem-f446e46e887702dfPackage-3c23ec2d3ab3bf98> OperatingSystem-f446e46e887702dfPackage-4b063f0e3e9ceb1e> OperatingSystem-f446e46e887702dfPackage-5c186a317438bde8= OperatingSystem-f446e46e887702dfPackage-bdd8423a2f2d1b3> OperatingSystem-f446e46e887702dfPackage-45ecbf04a69736af> OperatingSystem-f446e46e887702dfPackage-9997832ae2364076> OperatingSystem-f446e46e887702dfPackage-e1406268f62570e1> OperatingSystem-f446e46e887702dfPackage-efe0d2a6bd601d92> OperatingSystem-f446e46e887702dfPackage-961d50647546894e> OperatingSystem-f446e46e887702dfPackage-1c84c0669ae215b3> OperatingSystem-f446e46e887702dfPackage-829c71ad2f6cb542> OperatingSystem-f446e46e887702dfPackage-d9e32b4e8549a05b> OperatingSystem-f446e46e887702dfPackage-300517e06f18c73d> OperatingSystem-f446e46e887702dfPackage-ddab168f441d3bc0> OperatingSystem-f446e46e887702dfPackage-32fbae199491d260> OperatingSystem-f446e46e887702dfPackage-98c710933f99cb9d> OperatingSystem-f446e46e887702dfPackage-8f08980cf0e59b35> OperatingSystem-f446e46e887702dfPackage-c7222df9a6a2cc30> OperatingSystem-f446e46e887702dfPackage-4d0997ad1ec476d1> OperatingSystem-f446e46e887702dfPackage-81b64ba586913455> OperatingSystem-f446e46e887702dfPackage-ba64e846054dd112> OperatingSystem-f446e46e887702dfPackage-d1e66a08946a107a> OperatingSystem-f446e46e887702dfPackage-30e335f489c17fbc> OperatingSystem-f446e46e887702dfPackage-17b68444615682ca> OperatingSystem-f446e46e887702dfPackage-2b1384df9c802270> OperatingSystem-f446e46e887702dfPackage-31d103573e0643e4> OperatingSystem-f446e46e887702dfPackage-41635ee0fdd4f14b> OperatingSystem-f446e46e887702dfPackage-c4018961ebfb5047> OperatingSystem-f446e46e887702dfPackage-32133b5c0603c752> OperatingSystem-f446e46e887702dfPackage-e0b4a0f839b0c208> OperatingSystem-f446e46e887702dfPackage-5b5d4b77c89a589d> OperatingSystem-f446e46e887702dfPackage-2a67fced6874bcb9> OperatingSystem-f446e46e887702dfPackage-3b15fb00141cd392= OperatingSystem-f446e46e887702dfPackage-32dd837c5e309fb> OperatingSystem-f446e46e887702dfPackage-fbefff66a72e45e7> OperatingSystem-f446e46e887702dfPackage-aaf84a918ce99dac> OperatingSystem-f446e46e887702dfPackage-33216a4106d1993f> OperatingSystem-f446e46e887702dfPackage-1cc268515c72802d> OperatingSystem-f446e46e887702dfPackage-755b5726a02c667b> OperatingSystem-f446e46e887702dfPackage-610efd027cb7a2d5> OperatingSystem-f446e46e887702dfPackage-cca36a867075e273> OperatingSystem-f446e46e887702dfPackage-846597cafdd91b1e> OperatingSystem-f446e46e887702dfPackage-ac1bf4d469024ebd> OperatingSystem-f446e46e887702dfPackage-5715f37f1f192ff4> OperatingSystem-f446e46e887702dfPackage-50aa65430c5e77cf> OperatingSystem-f446e46e887702dfPackage-3a6e97222b3b2390> OperatingSystem-f446e46e887702dfPackage-e3e28712bc6bbc4c> OperatingSystem-f446e46e887702dfPackage-16a6242d83d89836> OperatingSystem-f446e46e887702dfPackage-6a5d953eb74de698> OperatingSystem-f446e46e887702dfPackage-425670bfefde6d92> OperatingSystem-f446e46e887702dfPackage-77cd9f69cc8525e7> OperatingSystem-f446e46e887702dfPackage-a7d47701cdf596cf> OperatingSystem-f446e46e887702dfPackage-1c3081c3f8e0dfc1> OperatingSystem-f446e46e887702dfPackage-bb548cad73508d66> OperatingSystem-f446e46e887702dfPackage-d876e99a8edcc342> OperatingSystem-f446e46e887702dfPackage-8d1f45506ddb4621> OperatingSystem-f446e46e887702dfPackage-2acd564fa54b840e> OperatingSystem-f446e46e887702dfPackage-a54f0009fea13fb8> OperatingSystem-f446e46e887702dfPackage-fbd679423e965dfd> OperatingSystem-f446e46e887702dfPackage-3c4f1c8376d3bf5d> OperatingSystem-f446e46e887702dfPackage-82aba9ca7d3756ff> OperatingSystem-f446e46e887702dfPackage-b1a5877b82387d87> OperatingSystem-f446e46e887702dfPackage-ed42c04803d94fe6> OperatingSystem-f446e46e887702dfPackage-488d9409766b8ee3> OperatingSystem-f446e46e887702dfPackage-7034b55867166327> OperatingSystem-f446e46e887702dfPackage-51d8a76a8a489a06> OperatingSystem-f446e46e887702dfPackage-e281adcb341ddfbf> OperatingSystem-f446e46e887702dfPackage-de278471eaa8b6c1> OperatingSystem-f446e46e887702dfPackage-3312fc7301b108b4> OperatingSystem-f446e46e887702dfPackage-83ea42caecf37219> OperatingSystem-f446e46e887702dfPackage-c5eaa8553b794e07> OperatingSystem-f446e46e887702dfPackage-12552bf83cab2106> OperatingSystem-f446e46e887702dfPackage-86387ab5d83124b5> OperatingSystem-f446e46e887702dfPackage-fa5d95bb3f441a05> OperatingSystem-f446e46e887702dfPackage-63b38509329905e6> OperatingSystem-f446e46e887702dfPackage-8ce7ced63dc263ef> OperatingSystem-f446e46e887702dfPackage-c3fe224f04dba4b8> OperatingSystem-f446e46e887702dfPackage-8cfcc6bc16c2f0e0> OperatingSystem-f446e46e887702dfPackage-d192b552e1031716> OperatingSystem-f446e46e887702dfPackage-8ddfd5146b0ef28b> OperatingSystem-f446e46e887702dfPackage-e13799a66944a9e8> OperatingSystem-f446e46e887702dfPackage-f88e022c21858395> OperatingSystem-f446e46e887702dfPackage-e25de2bb99a26991> OperatingSystem-f446e46e887702dfPackage-3ad615f00a79c8ab> OperatingSystem-f446e46e887702dfPackage-346992bcc75d03ab> OperatingSystem-f446e46e887702dfPackage-dfca24a157ae62e5> OperatingSystem-f446e46e887702dfPackage-f4f38d01106bf6a6> OperatingSystem-f446e46e887702dfPackage-7e7d3302a3199498> OperatingSystem-f446e46e887702dfPackage-4f056431d677ea84> OperatingSystem-f446e46e887702dfPackage-27488a977eb804ea> OperatingSystem-f446e46e887702dfPackage-1c278eb9fe3ed56b> OperatingSystem-f446e46e887702dfPackage-2c68cd92e243b985= OperatingSystem-f446e46e887702dfPackage-fc7d7d42f903281> OperatingSystem-f446e46e887702dfPackage-8f5f4099203b31d0> OperatingSystem-f446e46e887702dfPackage-99910abfe3c308bf> OperatingSystem-f446e46e887702dfPackage-c46e6bd1fc43bc4e> OperatingSystem-f446e46e887702dfPackage-71370f415c62a35f> OperatingSystem-f446e46e887702dfPackage-84d23659289036da> OperatingSystem-f446e46e887702dfPackage-67a5aaabb26ad962> OperatingSystem-f446e46e887702dfPackage-38684dbe7bc8de21> OperatingSystem-f446e46e887702dfPackage-8c6d8e15251dd650> OperatingSystem-f446e46e887702dfPackage-126a2ca1999fb90a> OperatingSystem-f446e46e887702dfPackage-e9f9e7957543dd38> OperatingSystem-f446e46e887702dfPackage-305da96d53467c63> OperatingSystem-f446e46e887702dfPackage-8c9ddf6ac32a9ffa> OperatingSystem-f446e46e887702dfPackage-9e8af64b56086be5> OperatingSystem-f446e46e887702dfPackage-d972beb6537df156> OperatingSystem-f446e46e887702dfPackage-5ba8e086dc135ed6ContainerImage-1de6f444b7a71fe9

@@ -112,6 +112,17 @@ func (u *SPDX23) unserializeDocument(spdxDoc *spdx23.Document, opts *native.Unse
 	return bom, nil
 }
 
+// spdx2URL returns the URL stated in an SPDX 2 location field. The NOASSERTION
+// and NONE values the specification allows in place of a URL are not data
+// and are read as an empty URL. The serializer restores NOASSERTION where the
+// specification requires a value.
+func spdx2URL(value string) string {
+	if value == protospdx.NOASSERTION || value == protospdx.NONE {
+		return ""
+	}
+	return value
+}
+
 // packageToNode assigns the data from an SPDX package into a new Node
 func (u *SPDX23) packageToNode(opts *native.UnserializeOptions, p *spdx23.Package) *sbom.Node {
 	n := &sbom.Node{
@@ -120,8 +131,8 @@ func (u *SPDX23) packageToNode(opts *native.UnserializeOptions, p *spdx23.Packag
 		Name:            p.PackageName,
 		Version:         p.PackageVersion,
 		FileName:        p.PackageFileName,
-		UrlHome:         p.PackageHomePage,
-		UrlDownload:     p.PackageDownloadLocation,
+		UrlHome:         spdx2URL(p.PackageHomePage),
+		UrlDownload:     spdx2URL(p.PackageDownloadLocation),
 		LicenseComments: p.PackageLicenseComments,
 		Copyright:       p.PackageCopyrightText,
 		SourceInfo:      p.PackageSourceInfo,

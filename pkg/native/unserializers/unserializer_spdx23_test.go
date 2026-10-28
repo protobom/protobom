@@ -10,6 +10,7 @@ import (
 	spdx23 "github.com/spdx/tools-golang/spdx/v2/v2_3"
 	"github.com/stretchr/testify/require"
 
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -271,6 +272,32 @@ func TestAnnotationsMod(t *testing.T) {
 				require.Equal(t, tc.expected[i].Name, node.Properties[i].Name)
 				require.Equal(t, tc.expected[i].Data, node.Properties[i].Data)
 			}
+		})
+	}
+}
+
+func TestPackageToNodeURLs(t *testing.T) {
+	sut := NewSPDX23()
+	for _, tc := range []struct {
+		name         string
+		home, dl     string
+		wantHome     string
+		wantDownload string
+	}{
+		{"urls", "https://example.com/", "git+https://example.com/repo@abc123", "https://example.com/", "git+https://example.com/repo@abc123"},
+		{"noassertion", protospdx.NOASSERTION, protospdx.NOASSERTION, "", ""},
+		{"none", protospdx.NONE, protospdx.NONE, "", ""},
+		{"empty", "", "", "", ""},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			n := sut.packageToNode(&native.UnserializeOptions{}, &spdx23.Package{
+				PackageSPDXIdentifier:   "SPDXRef-pkg",
+				PackageName:             "pkg",
+				PackageHomePage:         tc.home,
+				PackageDownloadLocation: tc.dl,
+			})
+			require.Equal(t, tc.wantHome, n.UrlHome)
+			require.Equal(t, tc.wantDownload, n.UrlDownload)
 		})
 	}
 }

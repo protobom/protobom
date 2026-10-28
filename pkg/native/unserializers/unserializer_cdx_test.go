@@ -428,3 +428,40 @@ func TestLicenseChoicesNilLicense(t *testing.T) {
 		})
 	}
 }
+
+func TestUnserializeURLReferences(t *testing.T) {
+	data := `{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"component": {
+				"bom-ref": "root", "type": "application", "name": "root",
+				"externalReferences": [
+					{"type": "website", "url": "https://example.com/"},
+					{"type": "distribution", "url": "https://example.com/pkg.tgz", "comment": "primary"},
+					{"type": "distribution", "url": "https://mirror.example.com/pkg.tgz"},
+					{"type": "vcs", "url": "https://example.com/repo"}
+				]
+			}
+		}
+	}`
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(data), nil, nil)
+	require.NoError(t, err)
+	root := doc.NodeList.GetNodeByID("root")
+	require.NotNil(t, root)
+
+	require.Equal(t, "https://example.com/", root.UrlHome)
+	require.Equal(t, "https://example.com/pkg.tgz", root.UrlDownload)
+
+	// The plain website reference is folded into the node field. The first
+	// distribution reference stays as it carries a comment, the second one
+	// and the vcs reference are untouched.
+	require.Len(t, root.ExternalReferences, 3)
+	require.Equal(t, sbom.ExternalReference_DOWNLOAD, root.ExternalReferences[0].Type)
+	require.Equal(t, "primary", root.ExternalReferences[0].Comment)
+	require.Equal(t, sbom.ExternalReference_DOWNLOAD, root.ExternalReferences[1].Type)
+	require.Equal(t, "https://mirror.example.com/pkg.tgz", root.ExternalReferences[1].Url)
+	require.Equal(t, sbom.ExternalReference_VCS, root.ExternalReferences[2].Type)
+}

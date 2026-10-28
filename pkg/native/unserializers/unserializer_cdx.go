@@ -3,6 +3,7 @@ package unserializers
 import (
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 	"time"
 
@@ -264,12 +265,10 @@ func (u *CDX) scopeToEdgeType(scope cdx.Scope) (sbom.Edge_Type, bool) {
 
 func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.Node, error) { //nolint:unparam
 	node := &sbom.Node{
-		Id:      c.BOMRef,
-		Type:    sbom.Node_PACKAGE,
-		Name:    c.Name,
-		Version: c.Version,
-		// UrlHome:     "", // Perhaps it would make sense to use the supplier URL here
-		UrlDownload:        "",
+		Id:                 c.BOMRef,
+		Type:               sbom.Node_PACKAGE,
+		Name:               c.Name,
+		Version:            c.Version,
 		Licenses:           u.licenseChoicesToLicenseList(c.Licenses),
 		LicenseConcluded:   u.licenseChoicesToLicenseString(c.Licenses),
 		Copyright:          c.Copyright,
@@ -316,6 +315,12 @@ func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.N
 	}
 
 	node.ExternalReferences = u.unserializeExternalReferences(c.ExternalReferences)
+
+	// The first website and distribution references are the component's
+	// home and download URLs. The reference itself is only kept when it
+	// carries data beyond the URL, which the node fields cannot hold.
+	node.UrlHome, node.ExternalReferences = extractURLReference(node.ExternalReferences, sbom.ExternalReference_WEBSITE)
+	node.UrlDownload, node.ExternalReferences = extractURLReference(node.ExternalReferences, sbom.ExternalReference_DOWNLOAD)
 
 	// Named external references:
 	if c.CPE != "" {
@@ -450,6 +455,24 @@ func (u *CDX) unserializeExternalReferences(cdxReferences *[]cdx.ExternalReferen
 		ret = append(ret, nref)
 	}
 	return ret
+}
+
+// extractURLReference returns the URL of the first external reference of
+// type t and the reference list without it. The reference stays in the list
+// when it has a comment or hashes, as those would otherwise be lost.
+func extractURLReference(
+	refs []*sbom.ExternalReference, t sbom.ExternalReference_ExternalReferenceType,
+) (string, []*sbom.ExternalReference) {
+	for i, er := range refs {
+		if er.Type != t || er.Url == "" {
+			continue
+		}
+		if er.Comment == "" && len(er.Hashes) == 0 {
+			refs = slices.Delete(refs, i, i+1)
+		}
+		return er.Url, refs
+	}
+	return "", refs
 }
 
 // isConcludedLicense returns true when a license choice carries the

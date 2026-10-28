@@ -365,6 +365,13 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 		sbom.ExternalReference_VULNERABILITY_DISCLOSURE_REPORT: true,
 	}
 
+	// A plain website or distribution reference is read back into the
+	// node's home and download URL fields rather than as a reference.
+	urlFieldRefs := map[sbom.ExternalReference_ExternalReferenceType]func(*sbom.Node) string{
+		sbom.ExternalReference_WEBSITE:  func(n *sbom.Node) string { return n.UrlHome },
+		sbom.ExternalReference_DOWNLOAD: func(n *sbom.Node) string { return n.UrlDownload },
+	}
+
 	t.Run("external reference types", func(t *testing.T) {
 		for value, name := range sbom.ExternalReference_ExternalReferenceType_name {
 			refType := sbom.ExternalReference_ExternalReferenceType(value)
@@ -377,6 +384,11 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 				}))
 				node := got.NodeList.GetNodeByID("root")
 				require.NotNil(t, node)
+				if field, ok := urlFieldRefs[refType]; ok {
+					require.Empty(t, node.ExternalReferences)
+					require.Equal(t, "https://example.com/x", field(node))
+					return
+				}
 				require.Len(t, node.ExternalReferences, 1)
 				want := refType
 				if unnamedRefs[refType] {
@@ -385,6 +397,19 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 				require.Equal(t, want, node.ExternalReferences[0].Type)
 			})
 		}
+	})
+
+	t.Run("url fields", func(t *testing.T) {
+		got := cdxRoundTrip(t, cdxOneNodeDoc(&sbom.Node{
+			Id: "root", Type: sbom.Node_PACKAGE, Name: "n",
+			UrlHome:     "https://example.com/",
+			UrlDownload: "git+https://example.com/repo@abc123",
+		}))
+		node := got.NodeList.GetNodeByID("root")
+		require.NotNil(t, node)
+		require.Equal(t, "https://example.com/", node.UrlHome)
+		require.Equal(t, "git+https://example.com/repo@abc123", node.UrlDownload)
+		require.Empty(t, node.ExternalReferences)
 	})
 
 	// Identifier types with no CycloneDX component field are dropped on

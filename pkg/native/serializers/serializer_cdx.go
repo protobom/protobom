@@ -512,6 +512,14 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		}
 	}
 
+	// The home and download URLs have no field of their own on a CycloneDX
+	// component, they are stated as external references of type website and
+	// distribution. A reference is only added when the node does not already
+	// carry it, which is the case for data read from CycloneDX where the
+	// unserializer keeps the reference when it holds more than the URL.
+	s.addURLReference(c, n.UrlHome, sbom.ExternalReference_WEBSITE)
+	s.addURLReference(c, n.UrlDownload, sbom.ExternalReference_DOWNLOAD)
+
 	if n.Identifiers != nil {
 		for idType := range n.Identifiers {
 			switch idType {
@@ -588,6 +596,25 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	c.Properties = &properties
 
 	return c
+}
+
+// addURLReference appends an external reference of the given type pointing to
+// url, unless url is empty or the component already references it with the
+// same type.
+func (s *CDX) addURLReference(c *cdx.Component, url string, t sbom.ExternalReference_ExternalReferenceType) {
+	if url == "" {
+		return
+	}
+	cdxType := s.protobomExtRefTypeToCdxType(t)
+	for _, er := range *c.ExternalReferences {
+		if er.Type == cdxType && er.URL == url {
+			return
+		}
+	}
+	*c.ExternalReferences = append(*c.ExternalReferences, cdx.ExternalReference{
+		URL:  url,
+		Type: cdxType,
+	})
 }
 
 // Render calls the official CDX serializer to render the BOM into a specific version

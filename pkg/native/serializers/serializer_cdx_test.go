@@ -293,3 +293,41 @@ func TestPurposeToComponentType(t *testing.T) {
 		require.Equal(t, cdxType, res)
 	}
 }
+
+func TestNodeURLsToComponent(t *testing.T) {
+	sut := NewCDX("1.5", "json")
+
+	t.Run("urls become references", func(t *testing.T) {
+		c := sut.nodeToComponent(&sbom.Node{
+			Id:          "pkg",
+			UrlHome:     "https://example.com/",
+			UrlDownload: "git+https://example.com/repo@abc123",
+		})
+		require.Equal(t, []cdx.ExternalReference{
+			{URL: "https://example.com/", Type: cdx.ERTypeWebsite},
+			{URL: "git+https://example.com/repo@abc123", Type: cdx.ERTypeDistribution},
+		}, *c.ExternalReferences)
+	})
+
+	t.Run("existing references are not duplicated", func(t *testing.T) {
+		c := sut.nodeToComponent(&sbom.Node{
+			Id:          "pkg",
+			UrlDownload: "https://example.com/pkg.tgz",
+			ExternalReferences: []*sbom.ExternalReference{
+				{
+					Url:     "https://example.com/pkg.tgz",
+					Type:    sbom.ExternalReference_DOWNLOAD,
+					Comment: "mirror",
+				},
+			},
+		})
+		require.Len(t, *c.ExternalReferences, 1)
+		require.Equal(t, cdx.ERTypeDistribution, (*c.ExternalReferences)[0].Type)
+		require.Equal(t, "mirror", (*c.ExternalReferences)[0].Comment)
+	})
+
+	t.Run("empty urls add nothing", func(t *testing.T) {
+		c := sut.nodeToComponent(&sbom.Node{Id: "pkg"})
+		require.Empty(t, *c.ExternalReferences)
+	})
+}

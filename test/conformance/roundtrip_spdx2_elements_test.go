@@ -98,3 +98,35 @@ func TestRoundTripSPDX2File(t *testing.T) {
 		})
 	}
 }
+
+// TestRoundTripSPDX2Actors pins that the people and organizations a document
+// credits keep their emails through every SPDX 2 encoding, which states an
+// actor as "name (email)".
+func TestRoundTripSPDX2Actors(t *testing.T) {
+	authors := []*sbom.Person{
+		{Name: "Jane Doe", Email: "jane@example.com"},
+		{Name: "Acme", IsOrg: true, Email: "acme@example.com"},
+		{Name: "Nameless Org", IsOrg: true},
+	}
+	pkg := &sbom.Node{
+		Id: "pkg", Type: sbom.Node_PACKAGE, Name: "pkg",
+		Suppliers:   []*sbom.Person{{Name: "Supplier Inc", IsOrg: true, Email: "supply@example.com"}},
+		Originators: []*sbom.Person{{Name: "An Author", Email: "author@example.com"}},
+	}
+	original := &sbom.Document{
+		Metadata: &sbom.Metadata{Id: "https://example.com/spdxdocs/actors#DOCUMENT", Authors: authors},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{pkg}, Edges: []*sbom.Edge{}, RootElements: []string{"pkg"},
+		},
+	}
+	for _, format := range spdx2Formats {
+		t.Run(string(format), func(t *testing.T) {
+			got := spdx2RoundTrip(t, original, format)
+			require.Equal(t, authors, got.Metadata.Authors)
+			gotPkg := got.NodeList.GetNodeByID("pkg")
+			require.NotNil(t, gotPkg)
+			require.Equal(t, pkg.Suppliers, gotPkg.Suppliers)
+			require.Equal(t, pkg.Originators, gotPkg.Originators)
+		})
+	}
+}

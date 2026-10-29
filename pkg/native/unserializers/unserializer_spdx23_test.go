@@ -367,3 +367,35 @@ func TestSPDX23SpecialRelationshipTargets(t *testing.T) {
 	require.Equal(t, []string{"a"}, doc.NodeList.RootElements)
 	require.Equal(t, []*sbom.Edge{{Type: sbom.Edge_dependsOn, From: "a", To: []string{"b"}}}, doc.NodeList.Edges)
 }
+
+// Authors, suppliers and originators come back with their email split off
+// the "name (email)" string SPDX 2 states them with.
+func TestSPDX23ActorsWithEmails(t *testing.T) {
+	doc, err := NewSPDX23().Unserialize(strings.NewReader(`{
+		"spdxVersion": "SPDX-2.3", "dataLicense": "CC0-1.0", "SPDXID": "SPDXRef-DOCUMENT",
+		"name": "x", "documentNamespace": "https://example.com/x",
+		"creationInfo": {"created": "2020-01-01T00:00:00Z", "creators": [
+			"Person: Jane Doe (jane@example.com)", "Organization: Acme ()", "Organization: Example (Europe)", "Tool: test"
+		]},
+		"packages": [{
+			"name": "a", "SPDXID": "SPDXRef-a", "downloadLocation": "NOASSERTION",
+			"supplier": "Organization: Acme, Inc. (sales@acme.example)",
+			"originator": "Person: Bob Builder (bob@example.com)"
+		}, {
+			"name": "b", "SPDXID": "SPDXRef-b", "downloadLocation": "NOASSERTION",
+			"supplier": "NOASSERTION"
+		}]
+	}`), &native.UnserializeOptions{}, nil)
+	require.NoError(t, err)
+
+	require.Equal(t, []*sbom.Person{
+		{Name: "Jane Doe", Email: "jane@example.com"},
+		{Name: "Acme", IsOrg: true},
+		{Name: "Example (Europe)", IsOrg: true},
+	}, doc.Metadata.Authors)
+
+	a := doc.NodeList.GetNodeByID("a")
+	require.Equal(t, []*sbom.Person{{Name: "Acme, Inc.", Email: "sales@acme.example", IsOrg: true}}, a.Suppliers)
+	require.Equal(t, []*sbom.Person{{Name: "Bob Builder", Email: "bob@example.com"}}, a.Originators)
+	require.Empty(t, doc.NodeList.GetNodeByID("b").Suppliers)
+}

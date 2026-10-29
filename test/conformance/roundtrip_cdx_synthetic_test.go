@@ -223,6 +223,13 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 		"a license reference survives": {
 			"", []string{"LicenseRef-GPL"}, "LicenseRef-GPL", []string{"LicenseRef-GPL"},
 		},
+		// A bare license outside the SPDX License List cannot be a CycloneDX
+		// identifier. It is written as a name and comes back as the marked
+		// reference the reader mints from one.
+		// TODO(degradation): the original string is not restored.
+		"an unlisted bare license comes back as a reference": {
+			"", []string{"GPL"}, "LicenseRef-x-protobom-GPL", []string{"LicenseRef-x-protobom-GPL"},
+		},
 		// A reference minted from a CycloneDX license name is written back
 		// as the name and minted again on read.
 		"a reference minted from a name survives": {

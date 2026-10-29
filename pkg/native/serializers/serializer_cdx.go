@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
+	"github.com/protobom/protobom/pkg/licenselist"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -761,7 +762,12 @@ func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference
 //     through the Expression field, which takes any SPDX expression and so
 //     preserves the reference as is.
 //   - A compound SPDX expression is emitted through the Expression field too.
-//   - Anything else is a bare license identifier and keeps using License.ID.
+//   - A license in the SPDX License List goes to License.ID in its canonical
+//     spelling, since the field is case sensitive.
+//   - Any other bare license is not an identifier CycloneDX accepts and is
+//     written as a license name.
+//     TODO(degradation): the unserializer reads such a name back as a
+//     marked license reference rather than the original string.
 //
 // The unserializer reads each form back into the same license slice (see
 // licenseChoicesToLicenseList), which keeps the round trip.
@@ -772,7 +778,10 @@ func protobomLicenseToCdx(license string) cdx.LicenseChoice {
 	if cdxformats.IsLicenseRef(license) || isSPDXLicenseExpression(license) {
 		return cdx.LicenseChoice{Expression: license}
 	}
-	return cdx.LicenseChoice{License: &cdx.License{ID: license}}
+	if canonical, _, ok := licenselist.License(license); ok {
+		return cdx.LicenseChoice{License: &cdx.License{ID: canonical}}
+	}
+	return cdx.LicenseChoice{License: &cdx.License{Name: license}}
 }
 
 // protobomConcludedLicenseToCdx renders the concluded license as a CycloneDX

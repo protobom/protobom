@@ -125,6 +125,22 @@ func TestNodeLicensesToComponent(t *testing.T) {
 			licenses: []string{"MIT OR LicenseRef-x-protobom-GPL"},
 			expected: cdx.Licenses{{Expression: "MIT OR LicenseRef-x-protobom-GPL"}},
 		},
+		"listed identifier is written in its canonical spelling": {
+			licenses: []string{"mit"},
+			expected: cdx.Licenses{{License: &cdx.License{ID: "MIT"}}},
+		},
+		"deprecated identifier is still an identifier": {
+			licenses: []string{"GPL-2.0"},
+			expected: cdx.Licenses{{License: &cdx.License{ID: "GPL-2.0"}}},
+		},
+		"unlisted bare license is a name": {
+			licenses: []string{"GPL"},
+			expected: cdx.Licenses{{License: &cdx.License{Name: "GPL"}}},
+		},
+		"exception alone is not a license identifier": {
+			licenses: []string{"Classpath-exception-2.0"},
+			expected: cdx.Licenses{{License: &cdx.License{Name: "Classpath-exception-2.0"}}},
+		},
 	} {
 		node := &sbom.Node{Licenses: tc.licenses}
 		comp := sut.nodeToComponent(node)

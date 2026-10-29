@@ -74,12 +74,43 @@ func (u *SPDX3) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interfa
 		rd.creators(bom.Metadata, ci)
 	}
 
+	rd.documentTypes(bom.Metadata)
 	rd.elements(bom.NodeList)
 	rd.licenses()
 	rd.roots(bom.NodeList)
 	rd.relationships(bom.NodeList)
 
 	return bom, nil
+}
+
+// documentTypes reads what kinds of bill of materials the document carries.
+//
+// SPDX 3 states the kind on the Sbom element rather than on the document,
+// since it is a property of the bill and not of the file: the serializer
+// writes protobom's document types there. Every Sbom element in the graph
+// is read, and a kind stated more than once is read once.
+// TODO(degradation): SPDX 3 names the kind and nothing else, so a document
+// type comes back with neither name nor description.
+func (rd *spdx3Reader) documentTypes(metadata *sbom.Metadata) {
+	seen := map[sbom.DocumentType_SBOMType]struct{}{}
+	for _, element := range rd.env.Graph {
+		bill, ok := element.(*software.Sbom)
+		if !ok {
+			continue
+		}
+		for _, kind := range bill.SbomType {
+			t, known := documentTypeFromSPDX3(kind)
+			if !known {
+				// TODO(degradation): the kind has no protobom name.
+				continue
+			}
+			if _, already := seen[t]; already {
+				continue
+			}
+			seen[t] = struct{}{}
+			metadata.DocumentTypes = append(metadata.DocumentTypes, &sbom.DocumentType{Type: t.Enum()})
+		}
+	}
 }
 
 // creators reads who and what made the document.

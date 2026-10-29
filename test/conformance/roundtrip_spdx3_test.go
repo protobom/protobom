@@ -84,7 +84,13 @@ func TestRoundTripSPDX3Elements(t *testing.T) {
 	}
 
 	original := &sbom.Document{
-		Metadata: &sbom.Metadata{Id: ns, Name: "a round trip", Version: "1"},
+		Metadata: &sbom.Metadata{
+			Id: ns, Name: "a round trip", Version: "1",
+			DocumentTypes: []*sbom.DocumentType{
+				{Type: sbom.DocumentType_BUILD.Enum()},
+				{Type: sbom.DocumentType_ANALYZED.Enum()},
+			},
+		},
 		NodeList: &sbom.NodeList{
 			Nodes:        []*sbom.Node{pkg, file},
 			Edges:        []*sbom.Edge{},
@@ -108,6 +114,10 @@ func TestRoundTripSPDX3Elements(t *testing.T) {
 
 	require.Equal(t, ns, got.Metadata.Id)
 	require.Equal(t, "a round trip", got.Metadata.Name)
+
+	// The kinds of bill of materials travel on the Sbom element and come
+	// back in the order written.
+	require.Equal(t, original.Metadata.DocumentTypes, got.Metadata.DocumentTypes)
 
 	// The document says it is about the package, through the bill of
 	// materials the writer wraps it in.
@@ -182,6 +192,40 @@ func TestRoundTripSPDX3EveryVocabulary(t *testing.T) {
 		sbom.Purpose_PLATFORM:               true,
 		sbom.Purpose_MACHINE_LEARNING_MODEL: true,
 	}
+
+	// Document types SPDX 3 has no kind for: OTHER, and the two that come
+	// from CycloneDX. The writer leaves them out, so they cannot come back.
+	unnamedTypes := map[sbom.DocumentType_SBOMType]bool{
+		sbom.DocumentType_OTHER:       true,
+		sbom.DocumentType_DISCOVERY:   true,
+		sbom.DocumentType_DECOMISSION: true,
+	}
+
+	t.Run("document types", func(t *testing.T) {
+		for value, name := range sbom.DocumentType_SBOMType_name {
+			docType := sbom.DocumentType_SBOMType(value)
+			t.Run(name, func(t *testing.T) {
+				original := &sbom.Document{
+					Metadata: &sbom.Metadata{
+						Id:            vocabularyNS,
+						DocumentTypes: []*sbom.DocumentType{{Type: docType.Enum()}},
+					},
+					NodeList: &sbom.NodeList{Nodes: []*sbom.Node{}, Edges: []*sbom.Edge{}},
+				}
+				var out bytes.Buffer
+				require.NoError(t, writer.New().WriteStreamWithOptions(
+					original, &out, &writer.Options{Format: formats.SPDX3JSON},
+				))
+				got, err := reader.New().ParseStream(bytes.NewReader(out.Bytes()))
+				require.NoError(t, err)
+				if unnamedTypes[docType] {
+					require.Empty(t, got.Metadata.DocumentTypes)
+					return
+				}
+				require.Equal(t, original.Metadata.DocumentTypes, got.Metadata.DocumentTypes)
+			})
+		}
+	})
 
 	t.Run("purposes", func(t *testing.T) {
 		for value, name := range sbom.Purpose_name {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/carabiner-dev/spdx3/profiles/core"
 	"github.com/carabiner-dev/spdx3/profiles/expandedlicensing"
+	"github.com/carabiner-dev/spdx3/profiles/software"
 	"github.com/stretchr/testify/require"
 
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
@@ -918,4 +919,49 @@ func TestSPDX3LicensesOfElementsNotRead(t *testing.T) {
 	require.Len(t, doc.NodeList.Nodes, 1)
 	require.Empty(t, doc.NodeList.Nodes[0].Licenses)
 	require.Empty(t, doc.NodeList.Edges)
+}
+
+func TestSPDX3UnserializeDocumentTypes(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+		{
+			"type": "SpdxDocument",
+			"spdxId": "https://spdx.org/spdxdocs/protobom/test",
+			"creationInfo": "_:creationinfo",
+			"rootElement": ["https://spdx.org/spdxdocs/protobom/test#sbom"]
+		},
+		{
+			"type": "software_Sbom",
+			"spdxId": "https://spdx.org/spdxdocs/protobom/test#sbom",
+			"creationInfo": "_:creationinfo",
+			"software_sbomType": ["build", "runtime", "build", "not-a-kind"]
+		}`)), nil, nil)
+	require.NoError(t, err)
+
+	// The kinds are read in the order stated, once each, and a kind SPDX 3
+	// does not name is skipped rather than failing the document.
+	require.Len(t, doc.Metadata.DocumentTypes, 2)
+	require.Equal(t, sbom.DocumentType_BUILD, doc.Metadata.DocumentTypes[0].GetType())
+	require.Equal(t, sbom.DocumentType_RUNTIME, doc.Metadata.DocumentTypes[1].GetType())
+	require.Nil(t, doc.Metadata.DocumentTypes[0].Name)
+	require.Nil(t, doc.Metadata.DocumentTypes[0].Description)
+}
+
+func TestSPDX3DocumentTypeFromSPDX3(t *testing.T) {
+	t.Parallel()
+	for kind, expected := range map[software.SbomType]sbom.DocumentType_SBOMType{
+		software.SbomTypeAnalyzed: sbom.DocumentType_ANALYZED,
+		software.SbomTypeBuild:    sbom.DocumentType_BUILD,
+		software.SbomTypeDeployed: sbom.DocumentType_DEPLOYED,
+		software.SbomTypeDesign:   sbom.DocumentType_DESIGN,
+		software.SbomTypeRuntime:  sbom.DocumentType_RUNTIME,
+		software.SbomTypeSource:   sbom.DocumentType_SOURCE,
+	} {
+		got, ok := documentTypeFromSPDX3(kind)
+		require.True(t, ok, kind)
+		require.Equal(t, expected, got, kind)
+	}
+	_, ok := documentTypeFromSPDX3(software.SbomType("other"))
+	require.False(t, ok)
 }

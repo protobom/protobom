@@ -97,6 +97,26 @@ func identifierTypeFromSPDX3(t core.ExternalIdentifierType) sbom.SoftwareIdentif
 	}
 }
 
+// spdx3SbomTypes reverses the serializer's document type mapping. SPDX 3
+// names six kinds of bill of materials; protobom's OTHER, DISCOVERY and
+// DECOMISSION have no SPDX 3 name and are not written, so there is nothing
+// to read them back from.
+var spdx3SbomTypes = map[software.SbomType]sbom.DocumentType_SBOMType{
+	software.SbomTypeAnalyzed: sbom.DocumentType_ANALYZED,
+	software.SbomTypeBuild:    sbom.DocumentType_BUILD,
+	software.SbomTypeDeployed: sbom.DocumentType_DEPLOYED,
+	software.SbomTypeDesign:   sbom.DocumentType_DESIGN,
+	software.SbomTypeRuntime:  sbom.DocumentType_RUNTIME,
+	software.SbomTypeSource:   sbom.DocumentType_SOURCE,
+}
+
+// documentTypeFromSPDX3 returns the protobom document type an SPDX 3 kind of
+// bill of materials names, and whether it names one at all.
+func documentTypeFromSPDX3(t software.SbomType) (sbom.DocumentType_SBOMType, bool) {
+	known, ok := spdx3SbomTypes[t]
+	return known, ok
+}
+
 // fileKindFromSPDX3 says whether an element is a file or a directory, which
 // is all SPDX 3's fileKind distinguishes.
 func fileKindFromSPDX3(k software.FileKindType) sbom.Node_FileKind {

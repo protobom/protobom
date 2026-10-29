@@ -708,3 +708,26 @@ func TestSPDX23CreatorTools(t *testing.T) {
 	}
 	require.Equal(t, []string{protobomToolName(), "scanner-1.0", "protobom-storage-1.0"}, tools)
 }
+
+// The document is dated when the protobom says it was created, in UTC as
+// SPDX requires, and only dated now when the protobom says nothing.
+func TestSPDX23Created(t *testing.T) {
+	serialize := func(date *timestamppb.Timestamp) string {
+		doc, err := NewSPDX23().Serialize(&sbom.Document{
+			Metadata: &sbom.Metadata{Id: "https://example.com/doc", Date: date},
+			NodeList: &sbom.NodeList{},
+		}, &native.SerializeOptions{}, nil)
+		require.NoError(t, err)
+		spdxDoc, ok := doc.(*spdx.Document)
+		require.True(t, ok)
+		return spdxDoc.CreationInfo.Created
+	}
+
+	stated := time.Date(2020, 1, 2, 3, 4, 5, 0, time.FixedZone("CST", -6*3600))
+	require.Equal(t, "2020-01-02T09:04:05Z", serialize(timestamppb.New(stated)))
+
+	before := time.Now().UTC().Truncate(time.Second)
+	now, err := time.Parse(time.RFC3339, serialize(nil))
+	require.NoError(t, err)
+	require.False(t, now.Before(before), "an undated protobom is dated now")
+}

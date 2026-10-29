@@ -172,6 +172,14 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 		return nil, fmt.Errorf("serializing SPDX namespace: %w", err)
 	}
 
+	// The document is dated when the protobom says it was created, so a
+	// document read and written again keeps its date. One that says nothing
+	// is dated now.
+	created := time.Now()
+	if bom.Metadata.Date != nil {
+		created = bom.Metadata.Date.AsTime()
+	}
+
 	doc := &spdx.Document{
 		SPDXVersion:       spdx.Version,
 		DataLicense:       spdx.DataLicense,
@@ -192,8 +200,7 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 				},
 			},
 
-			// Interesting, should we keep the original date?
-			Created: time.Now().UTC().Format(time.RFC3339),
+			Created: created.UTC().Format(time.RFC3339),
 			// CreatorComment: bom.Metadata.... /// TODO(puerco): Missing in the proto
 		},
 	}

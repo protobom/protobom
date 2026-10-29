@@ -24,6 +24,8 @@ func SoftwareIdentifierTypeFromString(queryString string) SoftwareIdentifierType
 		return SoftwareIdentifierType_CPE23
 	case "gitoid":
 		return SoftwareIdentifierType_GITOID
+	case "swhid":
+		return SoftwareIdentifierType_SWHID
 	default:
 		return SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE
 	}

@@ -50,6 +50,7 @@ func TestSoftwareIdentifierTypeFromString(t *testing.T) {
 		{spdx.ExtRefTypeCPE22, SoftwareIdentifierType_CPE22},
 		{spdx.ExtRefTypeCPE23, SoftwareIdentifierType_CPE23},
 		{spdx.ExtRefTypeGitoid, SoftwareIdentifierType_GITOID},
+		{spdx.ExtRefTypeSwh, SoftwareIdentifierType_SWHID},
 
 		// Every type also resolves from its own name, whatever the case and
 		// surrounding space, including the name the enum itself prints.
@@ -65,9 +66,11 @@ func TestSoftwareIdentifierTypeFromString(t *testing.T) {
 		{"cpe23", SoftwareIdentifierType_CPE23},
 		{"CPE23", SoftwareIdentifierType_CPE23},
 		{"cpe2.3", SoftwareIdentifierType_CPE23},
+		{"swhid", SoftwareIdentifierType_SWHID},
+		{"SWHID", SoftwareIdentifierType_SWHID},
 
 		{"", SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE},
-		{"swh", SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE},
+		{"swid", SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE},
 		{"not-an-identifier", SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE},
 	} {
 		require.Equal(t, tc.expected, SoftwareIdentifierTypeFromString(tc.query), "resolving %q", tc.query)
@@ -80,6 +83,7 @@ func TestSoftwareIdentifierTypeFromStringRoundTrip(t *testing.T) {
 		SoftwareIdentifierType_CPE22,
 		SoftwareIdentifierType_CPE23,
 		SoftwareIdentifierType_GITOID,
+		SoftwareIdentifierType_SWHID,
 	} {
 		require.Equal(t, tc, SoftwareIdentifierTypeFromString(tc.String()), "round tripping %s", tc)
 	}

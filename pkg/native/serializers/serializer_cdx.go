@@ -752,14 +752,24 @@ func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference
 }
 
 // protobomLicenseToCdx renders a single protobom license string as a CycloneDX
-// license choice. A compound SPDX expression is emitted through the Expression
-// field; a bare license keeps using License.ID. CycloneDX only accepts a single
-// SPDX identifier in License.ID, so placing an expression there (e.g.
-// "Apache-2.0 OR MIT") produces an invalid document and defeats the round-trip:
-// the unserializer already reads an expression back into the same license slice
-// (see licenseChoicesToLicenseList).
+// license choice. CycloneDX only accepts a listed SPDX identifier in
+// License.ID, so the string is placed by what it is:
+//
+//   - A license reference protobom minted from a CycloneDX license name
+//     (see cdxformats.NamedLicenseRefPrefix) goes back to License.Name.
+//   - Any other license reference came from an SPDX document and is emitted
+//     through the Expression field, which takes any SPDX expression and so
+//     preserves the reference as is.
+//   - A compound SPDX expression is emitted through the Expression field too.
+//   - Anything else is a bare license identifier and keeps using License.ID.
+//
+// The unserializer reads each form back into the same license slice (see
+// licenseChoicesToLicenseList), which keeps the round trip.
 func protobomLicenseToCdx(license string) cdx.LicenseChoice {
-	if isSPDXLicenseExpression(license) {
+	if name, ok := cdxformats.LicenseNameFromRef(license); ok {
+		return cdx.LicenseChoice{License: &cdx.License{Name: name}}
+	}
+	if cdxformats.IsLicenseRef(license) || isSPDXLicenseExpression(license) {
 		return cdx.LicenseChoice{Expression: license}
 	}
 	return cdx.LicenseChoice{License: &cdx.License{ID: license}}

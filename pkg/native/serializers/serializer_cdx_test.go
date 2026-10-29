@@ -113,6 +113,18 @@ func TestNodeLicensesToComponent(t *testing.T) {
 				{Expression: "Apache-2.0 OR MIT"},
 			},
 		},
+		"reference minted from a name goes back to the name": {
+			licenses: []string{"LicenseRef-x-protobom-GPL"},
+			expected: cdx.Licenses{{License: &cdx.License{Name: "GPL"}}},
+		},
+		"reference from spdx is an expression": {
+			licenses: []string{"LicenseRef-GPL"},
+			expected: cdx.Licenses{{Expression: "LicenseRef-GPL"}},
+		},
+		"expression with a reference": {
+			licenses: []string{"MIT OR LicenseRef-x-protobom-GPL"},
+			expected: cdx.Licenses{{Expression: "MIT OR LicenseRef-x-protobom-GPL"}},
+		},
 	} {
 		node := &sbom.Node{Licenses: tc.licenses}
 		comp := sut.nodeToComponent(node)
@@ -449,6 +461,24 @@ func TestNodeConcludedLicenseToComponent(t *testing.T) {
 			[]string{"MIT"},
 			"Apache-2.0",
 			cdx.Licenses{{License: &cdx.License{ID: "MIT"}}},
+		},
+		"concluded reference minted from a name is written as an acknowledged name": {
+			"1.6",
+			[]string{"MIT"},
+			"LicenseRef-x-protobom-GPL",
+			cdx.Licenses{
+				{License: &cdx.License{ID: "MIT"}},
+				{License: &cdx.License{Name: "GPL", Acknowledgement: cdx.LicenseAcknowledgementConcluded}},
+			},
+		},
+		"concluded reference from spdx is written as an acknowledged expression": {
+			"1.6",
+			[]string{"MIT"},
+			"LicenseRef-GPL",
+			cdx.Licenses{
+				{License: &cdx.License{ID: "MIT"}},
+				{Expression: "LicenseRef-GPL", Acknowledgement: ptr(cdx.LicenseAcknowledgementConcluded)},
+			},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {

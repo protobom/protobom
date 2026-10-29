@@ -26,3 +26,29 @@ func TestDerivedConcludedLicense(t *testing.T) {
 		})
 	}
 }
+
+func TestLicenseNameFromRef(t *testing.T) {
+	for license, tc := range map[string]struct {
+		name string
+		ok   bool
+	}{
+		"LicenseRef-x-protobom-GPL":   {"GPL", true},
+		"LicenseRef-x-protobom-":      {"", false},
+		"LicenseRef-GPL":              {"", false},
+		"MIT":                         {"", false},
+		"LicenseRef-x-protobom-a.b-c": {"a.b-c", true},
+	} {
+		t.Run(license, func(t *testing.T) {
+			name, ok := LicenseNameFromRef(license)
+			require.Equal(t, tc.ok, ok)
+			require.Equal(t, tc.name, name)
+		})
+	}
+}
+
+func TestIsLicenseRef(t *testing.T) {
+	require.True(t, IsLicenseRef("LicenseRef-GPL"))
+	require.True(t, IsLicenseRef("LicenseRef-x-protobom-GPL"))
+	require.False(t, IsLicenseRef("MIT"))
+	require.False(t, IsLicenseRef("MIT OR LicenseRef-GPL"))
+}

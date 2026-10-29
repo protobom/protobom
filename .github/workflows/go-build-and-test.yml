@@ -53,6 +53,10 @@ jobs:
       run: |
         hack/verify-fakes.sh
 
+    - name: Verify the embedded SPDX License List
+      run: |
+        hack/verify-licenselist.sh
+
   test:
     needs: go-versions
     name: Go Tests (go ${{ matrix.go-version }}, ${{ matrix.os }})

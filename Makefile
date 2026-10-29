@@ -22,6 +22,10 @@ conformance-test: ## Run the conformance test suite
 fakes: ## Rebuild the fake implementations
 	go generate ./...
 
+.PHONY: licenselist
+licenselist: ## Regenerate the embedded SPDX License List from the release pinned in pkg/licenselist/VERSION
+	go run ./pkg/licenselist/generate pkg/licenselist
+
 .PHONY: buf-format
 buf-format: ## Check for breaking changes in protocol buffer definitions
 	buf format --write

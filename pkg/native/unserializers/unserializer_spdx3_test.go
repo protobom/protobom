@@ -153,7 +153,8 @@ func TestSPDX3UnserializeElements(t *testing.T) {
 			"validUntilTime": "2026-08-03T00:00:00Z",
 			"verifiedUsing": [
 				{"type": "Hash", "algorithm": "sha256", "hashValue": "abc123"},
-				{"type": "Hash", "algorithm": "adler32", "hashValue": "nope"}
+				{"type": "Hash", "algorithm": "adler32", "hashValue": "0bad"},
+				{"type": "Hash", "algorithm": "crystalsKyber", "hashValue": "nope"}
 			],
 			"externalIdentifier": [
 				{"type": "ExternalIdentifier", "externalIdentifierType": "cpe23", "identifier": "cpe:2.3:a:x"},
@@ -203,7 +204,11 @@ func TestSPDX3UnserializeElements(t *testing.T) {
 
 	// An algorithm or identifier type protobom has no name for is dropped,
 	// and does not displace the ones it does.
-	require.Equal(t, map[int32]string{int32(sbom.HashAlgorithm_SHA256): "abc123"}, pkg.Hashes)
+	// An algorithm protobom has no value for is dropped; every other is read.
+	require.Equal(t, map[int32]string{
+		int32(sbom.HashAlgorithm_SHA256):  "abc123",
+		int32(sbom.HashAlgorithm_ADLER32): "0bad",
+	}, pkg.Hashes)
 	require.Equal(t, map[int32]string{
 		int32(sbom.SoftwareIdentifierType_PURL):  "pkg:generic/a-package@1.2.3",
 		int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:x",

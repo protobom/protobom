@@ -783,8 +783,10 @@ func purposeToSPDX3(p sbom.Purpose) software.SoftwarePurpose {
 		return software.SoftwarePurposeContainer
 	case sbom.Purpose_DATA:
 		return software.SoftwarePurposeData
-	case sbom.Purpose_DEVICE, sbom.Purpose_DEVICE_DRIVER:
+	case sbom.Purpose_DEVICE:
 		return software.SoftwarePurposeDevice
+	case sbom.Purpose_DEVICE_DRIVER:
+		return software.SoftwarePurposeDeviceDriver
 	case sbom.Purpose_DOCUMENTATION:
 		return software.SoftwarePurposeDocumentation
 	case sbom.Purpose_EVIDENCE:
@@ -811,6 +813,8 @@ func purposeToSPDX3(p sbom.Purpose) software.SoftwarePurpose {
 		return software.SoftwarePurposeOperatingSystem
 	case sbom.Purpose_PATCH:
 		return software.SoftwarePurposePatch
+	case sbom.Purpose_PLATFORM:
+		return software.SoftwarePurposePlatform
 	case sbom.Purpose_REQUIREMENT:
 		return software.SoftwarePurposeRequirement
 	case sbom.Purpose_SOURCE:
@@ -819,7 +823,7 @@ func purposeToSPDX3(p sbom.Purpose) software.SoftwarePurpose {
 		return software.SoftwarePurposeSpecification
 	case sbom.Purpose_TEST:
 		return software.SoftwarePurposeTest
-	case sbom.Purpose_OTHER, sbom.Purpose_PLATFORM:
+	case sbom.Purpose_OTHER:
 		return software.SoftwarePurposeOther
 	default:
 		// TODO(degradation): the purpose has no SPDX 3 name.

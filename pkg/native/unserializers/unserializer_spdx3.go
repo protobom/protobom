@@ -390,23 +390,31 @@ func (rd *spdx3Reader) relationships(nl *sbom.NodeList) {
 
 	for _, element := range rd.env.Graph {
 		var relationship *core.Relationship
+		var mapping spdx3Edge
+		var ok bool
 		switch r := element.(type) {
 		case *core.Relationship:
 			relationship = r
+			mapping, ok = edgeFromSPDX3(r.RelationshipType)
 		case *core.LifecycleScopedRelationship:
-			// TODO(degradation): the period of an element's life the
-			// relationship holds during is dropped. Protobom says that with
-			// the relationship type itself, and the type it reads back as
-			// is the one that does not name a period.
+			// Protobom names the period an element's life a relationship
+			// holds during with the edge type itself, so the type and the
+			// scope are read together.
 			relationship = &r.Relationship
+			mapping, ok = edgeFromScopedSPDX3(r.RelationshipType, r.Scope)
 		default:
+			continue
+		}
+		if !ok {
+			// TODO(degradation): the relationship belongs to a profile protobom
+			// does not model, or says something it has no field for.
 			continue
 		}
 
 		// TODO(degradation): a relationship's completeness, start time and
 		// end time have nowhere to go.
 
-		edges = append(edges, rd.edges(relationship)...)
+		edges = append(edges, rd.edges(relationship, mapping)...)
 	}
 
 	// Merged rather than appended, so a document stating the same
@@ -415,20 +423,13 @@ func (rd *spdx3Reader) relationships(nl *sbom.NodeList) {
 	nl.MergeEdges(edges)
 }
 
-// edges returns the edges a relationship becomes.
+// edges returns the edges a relationship becomes under a mapping.
 //
 // A relationship SPDX 3 states one way and protobom the other is turned
 // around, and turning it around fans it out: SPDX 3 lets one relationship
 // name several targets, and each of them becomes the source of an edge of
 // its own. This mirrors what the serializer does in the other direction.
-func (rd *spdx3Reader) edges(relationship *core.Relationship) []*sbom.Edge {
-	mapping, ok := edgeFromSPDX3(relationship.RelationshipType)
-	if !ok {
-		// TODO(degradation): the relationship belongs to a profile protobom
-		// does not model, or says something it has no field for.
-		return nil
-	}
-
+func (rd *spdx3Reader) edges(relationship *core.Relationship, mapping spdx3Edge) []*sbom.Edge {
 	from := ""
 	if relationship.From != nil {
 		from = relationship.From.GetSPDXID()

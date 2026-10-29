@@ -131,10 +131,9 @@ func fileKindFromSPDX3(k software.FileKindType) sbom.Node_FileKind {
 }
 
 // spdx3Purposes reverses the serializer's purpose mapping. It is not an exact
-// inverse, because the forward mapping is not injective: protobom's device
-// driver and platform are written as SPDX 3's device and other, and both of
-// its model purposes as model. Read back, each SPDX 3 purpose becomes the
-// protobom purpose that names the same thing.
+// inverse, because the forward mapping is not injective: protobom's two model
+// purposes are both written as SPDX 3's model. Read back, each SPDX 3 purpose
+// becomes the protobom purpose that names the same thing.
 var spdx3Purposes = map[software.SoftwarePurpose]sbom.Purpose{
 	software.SoftwarePurposeApplication:     sbom.Purpose_APPLICATION,
 	software.SoftwarePurposeArchive:         sbom.Purpose_ARCHIVE,

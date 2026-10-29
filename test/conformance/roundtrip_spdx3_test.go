@@ -185,11 +185,9 @@ const vocabularyNS = "https://example.com/spdxdocs/vocabularies"
 // rather than in a document that quietly lost a field.
 func TestRoundTripSPDX3EveryVocabulary(t *testing.T) {
 	// Purposes protobom writes as an SPDX 3 purpose that names something
-	// else: SPDX 3 has deviceDriver and platform, but the writer sends them
-	// to device and other, and a machine learning model to model.
+	// else: SPDX 3 has one model purpose, so a machine learning model is
+	// written as model and comes back as the other model purpose.
 	lossy := map[sbom.Purpose]bool{
-		sbom.Purpose_DEVICE_DRIVER:          true,
-		sbom.Purpose_PLATFORM:               true,
 		sbom.Purpose_MACHINE_LEARNING_MODEL: true,
 	}
 
@@ -388,20 +386,9 @@ func TestRoundTripSPDX3EveryEdgeType(t *testing.T) {
 		sbom.Edge_prerequisiteFor: sbom.Edge_prerequisite,
 	}
 
-	// The relationship types protobom states with a lifecycle scope. SPDX 3
-	// writes the scope on the relationship, the reader drops it, and what is
-	// left is the type that names no period — or, for the tool ones,
-	// nothing at all, since protobom has no way to say a tool is used
-	// without saying when.
-	scoped := map[sbom.Edge_Type]sbom.Edge_Type{
-		sbom.Edge_buildDependency:   sbom.Edge_dependsOn,
-		sbom.Edge_devDependency:     sbom.Edge_dependsOn,
-		sbom.Edge_runtimeDependency: sbom.Edge_dependsOn,
-		sbom.Edge_testDependency:    sbom.Edge_dependsOn,
-		sbom.Edge_buildTool:         sbom.Edge_UNKNOWN,
-		sbom.Edge_devTool:           sbom.Edge_UNKNOWN,
-		sbom.Edge_testTool:          sbom.Edge_UNKNOWN,
-	}
+	// The seven types protobom states with the period in the type itself
+	// are written as a scoped dependsOn or usesTool and read back through
+	// the scope, so they survive like every other type.
 
 	for value, name := range sbom.Edge_Type_name {
 		edgeType := sbom.Edge_Type(value)
@@ -441,9 +428,6 @@ func TestRoundTripSPDX3EveryEdgeType(t *testing.T) {
 			want, wantFrom, wantTo := edgeType, from, to
 			if collapsed, ok := collapses[edgeType]; ok {
 				want, wantFrom, wantTo = collapsed, to, from
-			}
-			if unscoped, ok := scoped[edgeType]; ok {
-				want, wantFrom, wantTo = unscoped, to, from
 			}
 
 			if want == sbom.Edge_UNKNOWN {

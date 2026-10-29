@@ -72,12 +72,39 @@ var spdx3RelationshipTypes = map[core.RelationshipType]spdx3Edge{
 	// the closest SPDX 3 has, so it is read back as what it was.
 	core.RelationshipTypeModifiedBy: {edgeType: sbom.Edge_fileModified},
 
-	// TODO(degradation): usesTool has no entry. Protobom says a tool is used
-	// with buildTool, devTool or testTool, each naming the period it is used
-	// in, and SPDX 3 states that period as the relationship's scope, which
-	// is dropped on the way in. Without it there is no protobom edge type to
-	// choose, so a usesTool relationship is dropped along with its scope.
-	// Seven of the 414 relationships in the SPDX examples corpus are one.
+	// usesTool has no entry of its own: protobom says a tool is used with
+	// buildTool, devTool or testTool, each naming the period it is used in,
+	// and SPDX 3 states that period as the scope of a lifecycle scoped
+	// relationship. The pairs are read through spdx3ScopedRelationshipTypes;
+	// a usesTool without a scope protobom can name is dropped.
+}
+
+// scopedRelationship is a relationship type together with the period of an
+// element's life it holds during.
+type scopedRelationship struct {
+	relType core.RelationshipType
+	scope   core.LifecycleScopeType
+}
+
+// spdx3ScopedRelationshipTypes reads the pairs SPDX 3 states with a lifecycle
+// scoped relationship back into the protobom edge types that name the period
+// themselves. It is the reverse of the scoped entries of the serializer's
+// edgeTypeToSPDX3: protobom says "b is a build dependency of a" where SPDX 3
+// says "a depends on b, during build", so each comes back turned around,
+// like the other "... of" types.
+//
+// Protobom has no edge type for a dependency or a tool during the design
+// phase, or during an unnamed one, so those scopes are not here: a
+// dependsOn under them is read as a plain dependsOn and a usesTool is
+// dropped.
+var spdx3ScopedRelationshipTypes = map[scopedRelationship]spdx3Edge{
+	{core.RelationshipTypeDependsOn, core.LifecycleScopeTypeBuild}:       {edgeType: sbom.Edge_buildDependency, invert: true},
+	{core.RelationshipTypeDependsOn, core.LifecycleScopeTypeDevelopment}: {edgeType: sbom.Edge_devDependency, invert: true},
+	{core.RelationshipTypeDependsOn, core.LifecycleScopeTypeRuntime}:     {edgeType: sbom.Edge_runtimeDependency, invert: true},
+	{core.RelationshipTypeDependsOn, core.LifecycleScopeTypeTest}:        {edgeType: sbom.Edge_testDependency, invert: true},
+	{core.RelationshipTypeUsesTool, core.LifecycleScopeTypeBuild}:        {edgeType: sbom.Edge_buildTool, invert: true},
+	{core.RelationshipTypeUsesTool, core.LifecycleScopeTypeDevelopment}:  {edgeType: sbom.Edge_devTool, invert: true},
+	{core.RelationshipTypeUsesTool, core.LifecycleScopeTypeTest}:         {edgeType: sbom.Edge_testTool, invert: true},
 }
 
 // edgeFromSPDX3 returns what a relationship type says in protobom's terms,
@@ -85,4 +112,15 @@ var spdx3RelationshipTypes = map[core.RelationshipType]spdx3Edge{
 func edgeFromSPDX3(t core.RelationshipType) (spdx3Edge, bool) {
 	edge, ok := spdx3RelationshipTypes[t]
 	return edge, ok
+}
+
+// edgeFromScopedSPDX3 returns what a relationship type holding during a
+// period of an element's life says in protobom's terms. A pair protobom has
+// no edge type for is read as the relationship type alone.
+// TODO(degradation): the scope is then dropped.
+func edgeFromScopedSPDX3(t core.RelationshipType, scope core.LifecycleScopeType) (spdx3Edge, bool) {
+	if edge, ok := spdx3ScopedRelationshipTypes[scopedRelationship{t, scope}]; ok {
+		return edge, true
+	}
+	return edgeFromSPDX3(t)
 }

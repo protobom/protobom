@@ -764,3 +764,20 @@ func TestSPDX3FileTypes(t *testing.T) {
 		})
 	}
 }
+
+// TestPurposeToSPDX3 pins the purposes whose SPDX 3 name is not simply their
+// own: the ones SPDX 3 folds together, and the ones it has no name for.
+func TestPurposeToSPDX3(t *testing.T) {
+	t.Parallel()
+	for purpose, expected := range map[sbom.Purpose]software.SoftwarePurpose{
+		sbom.Purpose_DEVICE:                 software.SoftwarePurposeDevice,
+		sbom.Purpose_DEVICE_DRIVER:          software.SoftwarePurposeDeviceDriver,
+		sbom.Purpose_PLATFORM:               software.SoftwarePurposePlatform,
+		sbom.Purpose_OTHER:                  software.SoftwarePurposeOther,
+		sbom.Purpose_MODEL:                  software.SoftwarePurposeModel,
+		sbom.Purpose_MACHINE_LEARNING_MODEL: software.SoftwarePurposeModel,
+		sbom.Purpose_UNKNOWN_PURPOSE:        "",
+	} {
+		require.Equal(t, expected, purposeToSPDX3(purpose), purpose)
+	}
+}

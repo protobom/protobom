@@ -551,28 +551,70 @@ func TestSPDX3DescribesFromACollection(t *testing.T) {
 	}}, doc.NodeList.Edges)
 }
 
-// TestSPDX3LifecycleScopeIsDropped covers the decision that protobom holds
-// no lifecycle scope: a scoped relationship is read as the relationship it
-// is, without the period it holds during.
-func TestSPDX3LifecycleScopeIsDropped(t *testing.T) {
+// TestSPDX3LifecycleScopeIsRead covers the pairs SPDX 3 states with a
+// lifecycle scoped relationship: protobom names the period with the edge
+// type itself, so "a depends on b during build" is "b is a build dependency
+// of a". A period protobom has no edge type for leaves a plain dependency,
+// or no edge at all for a tool, since protobom cannot say a tool is used
+// without saying when.
+func TestSPDX3LifecycleScopeIsRead(t *testing.T) {
 	t.Parallel()
 
-	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3TwoPackages(`{
-		"type": "LifecycleScopedRelationship",
-		"spdxId": "https://example.com/doc#r",
-		"creationInfo": "_:creationinfo",
-		"from": "https://example.com/doc#a",
-		"relationshipType": "dependsOn",
-		"scope": "build",
-		"to": ["https://example.com/doc#b"]
-	}`)), nil, nil)
-	require.NoError(t, err)
+	for name, tc := range map[string]struct {
+		relType, scope string
+		expected       []*sbom.Edge
+	}{
+		"build dependency": {"dependsOn", "build", []*sbom.Edge{{
+			Type: sbom.Edge_buildDependency, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"dev dependency": {"dependsOn", "development", []*sbom.Edge{{
+			Type: sbom.Edge_devDependency, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"runtime dependency": {"dependsOn", "runtime", []*sbom.Edge{{
+			Type: sbom.Edge_runtimeDependency, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"test dependency": {"dependsOn", "test", []*sbom.Edge{{
+			Type: sbom.Edge_testDependency, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"build tool": {"usesTool", "build", []*sbom.Edge{{
+			Type: sbom.Edge_buildTool, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"dev tool": {"usesTool", "development", []*sbom.Edge{{
+			Type: sbom.Edge_devTool, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"test tool": {"usesTool", "test", []*sbom.Edge{{
+			Type: sbom.Edge_testTool, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"dependency during design is a plain dependency": {"dependsOn", "design", []*sbom.Edge{{
+			Type: sbom.Edge_dependsOn, From: "https://example.com/doc#a", To: []string{"https://example.com/doc#b"},
+		}}},
+		"tool during design is dropped": {"usesTool", "design", []*sbom.Edge{}},
+		"scoped containment is containment": {"contains", "runtime", []*sbom.Edge{{
+			Type: sbom.Edge_contains, From: "https://example.com/doc#a", To: []string{"https://example.com/doc#b"},
+		}}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3TwoPackages(`{
+				"type": "LifecycleScopedRelationship",
+				"spdxId": "https://example.com/doc#r",
+				"creationInfo": "_:creationinfo",
+				"from": "https://example.com/doc#a",
+				"relationshipType": "`+tc.relType+`",
+				"scope": "`+tc.scope+`",
+				"to": ["https://example.com/doc#b"]
+			}`)), nil, nil)
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, doc.NodeList.Edges)
+		})
+	}
 
-	require.Equal(t, []*sbom.Edge{{
-		Type: sbom.Edge_dependsOn,
-		From: "https://example.com/doc#a",
-		To:   []string{"https://example.com/doc#b"},
-	}}, doc.NodeList.Edges)
+	// A tool with no period at all cannot be read either.
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3TwoPackages(
+		spdx3Relationship("https://example.com/doc#r", "https://example.com/doc#a", "usesTool", "https://example.com/doc#b"),
+	)), nil, nil)
+	require.NoError(t, err)
+	require.Empty(t, doc.NodeList.Edges)
 }
 
 func TestSPDX3UnserializeCreators(t *testing.T) {

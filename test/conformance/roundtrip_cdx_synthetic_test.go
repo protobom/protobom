@@ -450,6 +450,9 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 	// them to "other", so they cannot come back as themselves. The list is
 	// here so that a type leaving the unnamed set is a test failure rather
 	// than a silent change.
+	//
+	// A security policy is only named when its URL is a security.txt file,
+	// which the walk's URL is not; the named case has its own subtest.
 	unnamedRefs := map[sbom.ExternalReference_ExternalReferenceType]bool{
 		sbom.ExternalReference_UNKNOWN:                         true,
 		sbom.ExternalReference_BINARY:                          true,
@@ -471,9 +474,21 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 		sbom.ExternalReference_SECURITY_OTHER:                  true,
 		sbom.ExternalReference_SECURITY_POLICY:                 true,
 		sbom.ExternalReference_SECURITY_SWID:                   true,
-		sbom.ExternalReference_SOURCE_ARTIFACT:                 true,
 		sbom.ExternalReference_VULNERABILITY_DISCLOSURE_REPORT: true,
 	}
+
+	t.Run("security policy pointing at a security.txt survives", func(t *testing.T) {
+		got := cdxRoundTrip(t, cdxOneNodeDoc(&sbom.Node{
+			Id: "root", Type: sbom.Node_PACKAGE, Name: "n",
+			ExternalReferences: []*sbom.ExternalReference{
+				{Url: "https://example.com/.well-known/security.txt", Type: sbom.ExternalReference_SECURITY_POLICY},
+			},
+		}))
+		node := got.NodeList.GetNodeByID("root")
+		require.NotNil(t, node)
+		require.Len(t, node.ExternalReferences, 1)
+		require.Equal(t, sbom.ExternalReference_SECURITY_POLICY, node.ExternalReferences[0].Type)
+	})
 
 	// A plain website or distribution reference is read back into the
 	// node's home and download URL fields rather than as a reference.

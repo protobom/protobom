@@ -765,6 +765,12 @@ func (u *CDX) cdxExtRefTypeToProtobomType(cdxExtRefType cdx.ExternalReferenceTyp
 		return sbom.ExternalReference_SECURITY_THREAT_MODEL
 	case cdx.ERTypeSocial:
 		return sbom.ExternalReference_SOCIAL
+	case cdx.ERTypeSourceDistribution:
+		return sbom.ExternalReference_SOURCE_ARTIFACT
+	case cdx.ERTypeRFC9116:
+		// A security.txt file is the instructions for reporting
+		// vulnerabilities, which is what a security policy reference is.
+		return sbom.ExternalReference_SECURITY_POLICY
 	case cdx.ERTypeStaticAnalysisReport:
 		return sbom.ExternalReference_STATIC_ANALYSIS_REPORT
 	case cdx.ERTypeSupport:

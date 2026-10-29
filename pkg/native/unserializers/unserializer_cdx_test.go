@@ -88,6 +88,8 @@ func TestCdxExtRefTypeToProtobomType(t *testing.T) {
 		cdx.ERTypeCodifiedInfrastructure:           sbom.ExternalReference_CODIFIED_INFRASTRUCTURE,
 		cdx.ERTypeComponentAnalysisReport:          sbom.ExternalReference_COMPONENT_ANALYSIS_REPORT,
 		cdx.ExternalReferenceType("configuration"): sbom.ExternalReference_CONFIGURATION,
+		cdx.ERTypeSourceDistribution:               sbom.ExternalReference_SOURCE_ARTIFACT,
+		cdx.ERTypeRFC9116:                          sbom.ExternalReference_SECURITY_POLICY,
 		cdx.ERTypeDistributionIntake:               sbom.ExternalReference_DISTRIBUTION_INTAKE,
 		cdx.ERTypeDistribution:                     sbom.ExternalReference_DOWNLOAD,
 		cdx.ERTypeDocumentation:                    sbom.ExternalReference_DOCUMENTATION,

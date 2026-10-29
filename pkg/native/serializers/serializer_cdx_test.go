@@ -249,6 +249,7 @@ func TestProtobomExtRefTypeToCdxType(t *testing.T) {
 		sbom.ExternalReference_SECURITY_PENTEST_REPORT:                 cdx.ERTypePentestReport,
 		sbom.ExternalReference_SECURITY_THREAT_MODEL:                   cdx.ERTypeThreatModel,
 		sbom.ExternalReference_SOCIAL:                                  cdx.ERTypeSocial,
+		sbom.ExternalReference_SOURCE_ARTIFACT:                         cdx.ERTypeSourceDistribution,
 		sbom.ExternalReference_STATIC_ANALYSIS_REPORT:                  cdx.ERTypeStaticAnalysisReport,
 		sbom.ExternalReference_SUPPORT:                                 cdx.ERTypeSupport,
 		sbom.ExternalReference_VCS:                                     cdx.ERTypeVCS,
@@ -610,6 +611,33 @@ func TestNodeContentTypeToComponent(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			comp := sut.nodeToComponent(&sbom.Node{ContentType: tc.contentType})
 			require.Equal(t, tc.expected, comp.MIMEType)
+		})
+	}
+}
+
+// A security policy reference is written as the RFC 9116 type only when its
+// URL points at a security.txt file, the one thing that type means.
+func TestSecurityPolicyToComponent(t *testing.T) {
+	sut := CDX{}
+	for name, tc := range map[string]struct {
+		url      string
+		expected cdx.ExternalReferenceType
+	}{
+		"well known location":  {"https://example.com/.well-known/security.txt", cdx.ERTypeRFC9116},
+		"legacy location":      {"https://example.com/security.txt", cdx.ERTypeRFC9116},
+		"upper case file name": {"https://example.com/.well-known/SECURITY.TXT", cdx.ERTypeRFC9116},
+		"with query":           {"https://example.com/.well-known/security.txt?v=2", cdx.ERTypeRFC9116},
+		"policy page":          {"https://example.com/security", cdx.ERTypeOther},
+		"markdown policy":      {"https://github.com/org/repo/blob/main/SECURITY.md", cdx.ERTypeOther},
+		"file name elsewhere":  {"https://example.com/security.txt.bak", cdx.ERTypeOther},
+		"not a url":            {"::not a url", cdx.ERTypeOther},
+	} {
+		t.Run(name, func(t *testing.T) {
+			comp := sut.nodeToComponent(&sbom.Node{ExternalReferences: []*sbom.ExternalReference{
+				{Url: tc.url, Type: sbom.ExternalReference_SECURITY_POLICY},
+			}})
+			require.Len(t, *comp.ExternalReferences, 1)
+			require.Equal(t, tc.expected, (*comp.ExternalReferences)[0].Type)
 		})
 	}
 }

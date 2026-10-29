@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"maps"
+	"net/url"
 	"regexp"
 	"slices"
 	"strconv"
@@ -533,7 +534,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 			cdxRef := cdx.ExternalReference{
 				URL:     er.Url,
 				Comment: er.Comment,
-				Type:    s.protobomExtRefTypeToCdxType(er.Type),
+				Type:    s.cdxExtRefType(er),
 			}
 			hashList := []cdx.Hash{}
 			for _, protoAlgo := range slices.Sorted(maps.Keys(er.Hashes)) {
@@ -652,18 +653,18 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 // addURLReference appends an external reference of the given type pointing to
 // url, unless url is empty or the component already references it with the
 // same type.
-func (s *CDX) addURLReference(c *cdx.Component, url string, t sbom.ExternalReference_ExternalReferenceType) {
-	if url == "" {
+func (s *CDX) addURLReference(c *cdx.Component, location string, t sbom.ExternalReference_ExternalReferenceType) {
+	if location == "" {
 		return
 	}
 	cdxType := s.protobomExtRefTypeToCdxType(t)
 	for _, er := range *c.ExternalReferences {
-		if er.Type == cdxType && er.URL == url {
+		if er.Type == cdxType && er.URL == location {
 			return
 		}
 	}
 	*c.ExternalReferences = append(*c.ExternalReferences, cdx.ExternalReference{
-		URL:  url,
+		URL:  location,
 		Type: cdxType,
 	})
 }
@@ -699,8 +700,35 @@ func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, _ i
 	return nil
 }
 
+// cdxExtRefType returns the CycloneDX type of a protobom external reference.
+// It is protobomExtRefTypeToCdxType, except for the one type whose CycloneDX
+// name depends on the reference's URL: a security policy is written as the
+// RFC 9116 reference type only when it points at a security.txt file, which
+// is what that type means. Any other security policy has no CycloneDX name.
+func (s *CDX) cdxExtRefType(er *sbom.ExternalReference) cdx.ExternalReferenceType {
+	if er.Type == sbom.ExternalReference_SECURITY_POLICY && isSecurityTxtURL(er.Url) {
+		return cdx.ERTypeRFC9116
+	}
+	return s.protobomExtRefTypeToCdxType(er.Type)
+}
+
+// isSecurityTxtURL reports whether a URL points at a security.txt file as
+// RFC 9116 locates it: at /.well-known/security.txt, or at /security.txt
+// for the legacy location the RFC still admits.
+func isSecurityTxtURL(rawURL string) bool {
+	u, err := url.Parse(strings.TrimSpace(rawURL))
+	if err != nil {
+		return false
+	}
+	return strings.HasSuffix(strings.ToLower(u.Path), "/security.txt")
+}
+
 // protobomExtRefTypeToCdxType translates between the protobom external reference
 // identifiers and the CycloneDX equivalent types.
+//
+// A SECURITY_POLICY has no CycloneDX name of its own: the RFC 9116 type
+// names a security.txt file specifically, so it is only written when the
+// reference URL points at one (see cdxExtRefType).
 func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference_ExternalReferenceType) cdx.ExternalReferenceType {
 	switch protoExtRefType {
 	case sbom.ExternalReference_ATTESTATION:
@@ -769,6 +797,8 @@ func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference
 		return cdx.ERTypeThreatModel
 	case sbom.ExternalReference_SOCIAL:
 		return cdx.ERTypeSocial
+	case sbom.ExternalReference_SOURCE_ARTIFACT:
+		return cdx.ERTypeSourceDistribution
 	case sbom.ExternalReference_STATIC_ANALYSIS_REPORT:
 		return cdx.ERTypeStaticAnalysisReport
 	case sbom.ExternalReference_SUPPORT:

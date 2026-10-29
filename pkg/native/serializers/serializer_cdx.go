@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -135,6 +137,10 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 		components[node.Id] = s.nodeToComponent(node)
 	}
 
+	// Index the direct targets of every node once, in the order the edges
+	// state them, so the component tree is built in document order.
+	children := indexChildren(bom.NodeList)
+
 	// Apply the scope relationships to the components.
 	applyScopeEdges(bom.NodeList, components)
 
@@ -157,7 +163,7 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 			if !ok {
 				return nil, fmt.Errorf("integrity error: root component %q not found", rootID)
 			}
-			subtree, err := recurseComponentComponents(rootID, bom.NodeList, components, &seen)
+			subtree, err := recurseComponentComponents(rootID, children, components, &seen)
 			if err != nil {
 				return nil, fmt.Errorf("building component tree for root %q: %w", rootID, err)
 			}
@@ -175,7 +181,7 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 
 		// Extract the component tree
 		componentTree, err := recurseComponentComponents(
-			rootNode.Id, bom.NodeList, components, &map[string]struct{}{rootNode.Id: {}},
+			rootNode.Id, children, components, &map[string]struct{}{rootNode.Id: {}},
 		)
 		if err != nil {
 			return nil, fmt.Errorf("building component tree: %w", err)
@@ -286,42 +292,57 @@ func isValidCycloneDXSerialNumberFormat(serial string) bool {
 	return serialNumberRegex.MatchString(serial)
 }
 
-func recurseComponentComponents(
-	start string, nl *sbom.NodeList, components map[string]*cdx.Component, seen *map[string]struct{}, //nolint:gocritic
-) (*[]cdx.Component, error) {
-	// FIrst, well add the first level ones and then recurse
-	ret := []cdx.Component{}
-	descendants := nl.NodeDescendants(start, 1)
-	if len(descendants.Edges) == 0 {
-		return &ret, nil
+// indexChildren returns the direct targets of every node across all edge
+// types, in the order the edges state them. A target is listed once, where
+// it first appears.
+func indexChildren(nl *sbom.NodeList) map[string][]string {
+	children := map[string][]string{}
+	listed := map[string]map[string]struct{}{}
+	for _, e := range nl.Edges {
+		if listed[e.From] == nil {
+			listed[e.From] = map[string]struct{}{}
+		}
+		for _, id := range e.To {
+			if _, ok := listed[e.From][id]; ok {
+				continue
+			}
+			listed[e.From][id] = struct{}{}
+			children[e.From] = append(children[e.From], id)
+		}
 	}
+	return children
+}
 
-	protoIDToComp := map[string]*cdx.Component{}
+// recurseComponentComponents builds the component subtree under start: its
+// direct targets, each with their own subtree, in the order the edges state
+// them so the output is the same every time the document is written. A node
+// already placed in the tree is not placed again.
+func recurseComponentComponents(
+	start string, children map[string][]string, components map[string]*cdx.Component, seen *map[string]struct{}, //nolint:gocritic
+) (*[]cdx.Component, error) {
+	ret := []cdx.Component{}
 
-	// First add the nodes to the top
-	for _, id := range descendants.Edges[0].To {
+	// Claim this level's nodes before recursing, so a node reachable from
+	// two siblings lands under the first one.
+	level := []string{}
+	for _, id := range children[start] {
 		if _, ok := (*seen)[id]; ok {
 			continue
 		}
 		if _, ok := components[id]; !ok {
 			return nil, fmt.Errorf("unable to find component for node %q", id)
 		}
-		protoIDToComp[id] = components[id]
+		level = append(level, id)
 		(*seen)[id] = struct{}{}
 	}
 
-	// Now cycle them again and recurse
-	for id := range protoIDToComp {
-		comps, err := recurseComponentComponents(id, nl, components, seen)
+	for _, id := range level {
+		comps, err := recurseComponentComponents(id, children, components, seen)
 		if err != nil {
 			return nil, err
 		}
-		protoIDToComp[id].Components = comps
-	}
-
-	// Assemble the return slice
-	for _, comp := range protoIDToComp {
-		ret = append(ret, *comp)
+		components[id].Components = comps
+		ret = append(ret, *components[id])
 	}
 	return &ret, nil
 }
@@ -489,18 +510,18 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		c.Licenses = &licenses
 	}
 
-	if len(n.Hashes) > 0 {
-		for algo, hash := range n.Hashes {
-			cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(algo))
-			if err != nil {
-				// TODO(degradation): Algorithm not supported in CDX
-				continue
-			}
-			*c.Hashes = append(*c.Hashes, cdx.Hash{
-				Algorithm: cdxAlgo,
-				Value:     hash,
-			})
+	// Hashes and identifiers are maps. They are written in the order of
+	// their algorithm and type values so the output is stable.
+	for _, algo := range slices.Sorted(maps.Keys(n.Hashes)) {
+		cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(algo))
+		if err != nil {
+			// TODO(degradation): Algorithm not supported in CDX
+			continue
 		}
+		*c.Hashes = append(*c.Hashes, cdx.Hash{
+			Algorithm: cdxAlgo,
+			Value:     n.Hashes[algo],
+		})
 	}
 
 	if n.ExternalReferences != nil {
@@ -511,7 +532,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				Type:    s.protobomExtRefTypeToCdxType(er.Type),
 			}
 			hashList := []cdx.Hash{}
-			for protoAlgo, val := range er.Hashes {
+			for _, protoAlgo := range slices.Sorted(maps.Keys(er.Hashes)) {
 				cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(protoAlgo))
 				if err != nil {
 					// TODO(degradation): Hash not supported
@@ -519,7 +540,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				}
 				hashList = append(hashList, cdx.Hash{
 					Algorithm: cdxAlgo,
-					Value:     val,
+					Value:     er.Hashes[protoAlgo],
 				})
 			}
 			if len(hashList) > 0 {
@@ -538,7 +559,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	s.addURLReference(c, n.UrlDownload, sbom.ExternalReference_DOWNLOAD)
 
 	if n.Identifiers != nil {
-		for idType := range n.Identifiers {
+		for _, idType := range slices.Sorted(maps.Keys(n.Identifiers)) {
 			switch idType {
 			case int32(sbom.SoftwareIdentifierType_PURL):
 				c.PackageURL = n.Identifiers[idType]

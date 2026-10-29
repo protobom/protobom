@@ -1,11 +1,13 @@
 package serializers
 
 import (
+	"bytes"
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/stretchr/testify/require"
 
+	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -504,4 +506,88 @@ func TestNodeConcludedLicenseToComponent(t *testing.T) {
 			require.Equal(t, tc.expected, *comp.Licenses)
 		})
 	}
+}
+
+// TestSerializeIsDeterministic pins the output order of everything the
+// serializer reads from a map or a graph walk: hashes, identifiers, external
+// reference hashes and the component tree. Writing the same document twice
+// must give the same bytes, and the order must be the one documented.
+func TestSerializeIsDeterministic(t *testing.T) {
+	doc := &sbom.Document{
+		Metadata: &sbom.Metadata{Id: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79", Version: "1"},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{
+				{
+					Id: "root", Name: "root",
+					Hashes: map[int32]string{
+						int32(sbom.HashAlgorithm_SHA512): "c",
+						int32(sbom.HashAlgorithm_MD5):    "a",
+						int32(sbom.HashAlgorithm_SHA256): "b",
+					},
+					Identifiers: map[int32]string{
+						int32(sbom.SoftwareIdentifierType_CPE22): "cpe:/a:v:p:1",
+						int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*",
+						int32(sbom.SoftwareIdentifierType_PURL):  "pkg:generic/p@1",
+					},
+					ExternalReferences: []*sbom.ExternalReference{{
+						Url: "https://example.com/p.tgz", Type: sbom.ExternalReference_DOWNLOAD,
+						Hashes: map[int32]string{
+							int32(sbom.HashAlgorithm_SHA384): "y",
+							int32(sbom.HashAlgorithm_SHA1):   "x",
+						},
+					}},
+				},
+				{Id: "c", Name: "c"},
+				{Id: "a", Name: "a"},
+				{Id: "b", Name: "b"},
+				{Id: "b1", Name: "b1"},
+				{Id: "b2", Name: "b2"},
+			},
+			Edges: []*sbom.Edge{
+				{Type: sbom.Edge_contains, From: "root", To: []string{"c", "a", "b"}},
+				{Type: sbom.Edge_contains, From: "b", To: []string{"b2", "b1"}},
+			},
+			RootElements: []string{"root"},
+		},
+	}
+
+	sut := NewCDX("1.6", "json")
+	render := func() (*cdx.BOM, []byte) {
+		out, err := sut.Serialize(doc, &native.SerializeOptions{}, nil)
+		require.NoError(t, err)
+		bom, ok := out.(*cdx.BOM)
+		require.True(t, ok)
+		var buf bytes.Buffer
+		require.NoError(t, sut.Render(bom, &buf, nil, nil))
+		return bom, buf.Bytes()
+	}
+
+	bom, first := render()
+	for range 20 {
+		_, again := render()
+		require.Equal(t, string(first), string(again))
+	}
+
+	root := bom.Metadata.Component
+	require.Equal(t, []cdx.Hash{
+		{Algorithm: cdx.HashAlgoMD5, Value: "a"},
+		{Algorithm: cdx.HashAlgoSHA256, Value: "b"},
+		{Algorithm: cdx.HashAlgoSHA512, Value: "c"},
+	}, *root.Hashes)
+	require.Equal(t, "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*", root.CPE, "CPE 2.3 wins over 2.2 whatever the order")
+	require.Equal(t, []cdx.Hash{
+		{Algorithm: cdx.HashAlgoSHA1, Value: "x"},
+		{Algorithm: cdx.HashAlgoSHA384, Value: "y"},
+	}, *(*root.ExternalReferences)[0].Hashes)
+
+	// The component tree follows the order the containing edges state.
+	names := func(comps *[]cdx.Component) []string {
+		out := make([]string, 0, len(*comps))
+		for _, c := range *comps {
+			out = append(out, c.Name)
+		}
+		return out
+	}
+	require.Equal(t, []string{"c", "a", "b"}, names(bom.Components))
+	require.Equal(t, []string{"b2", "b1"}, names((*bom.Components)[2].Components))
 }

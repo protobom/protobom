@@ -603,7 +603,11 @@ func TestSPDX3UnserializeCreators(t *testing.T) {
 		},
 		{
 			"type": "SoftwareAgent", "spdxId": "https://example.com/doc#scanner",
-			"creationInfo": "_:creationinfo", "name": "a scanner"
+			"creationInfo": "_:creationinfo", "name": "a scanner",
+			"externalIdentifier": [
+				{"type": "ExternalIdentifier", "externalIdentifierType": "email", "identifier": "scanner@example.com"},
+				{"type": "ExternalIdentifier", "externalIdentifierType": "urlScheme", "identifier": "https://scanner.example.com"}
+			]
 		},
 		{
 			"type": "SoftwareAgent", "spdxId": "https://example.com/doc#protobom",
@@ -631,7 +635,7 @@ func TestSPDX3UnserializeCreators(t *testing.T) {
 	require.Equal(t, []*sbom.Person{
 		{Name: "Jane", Email: "jane@example.com", Url: "https://jane.example.com"},
 		{Name: "Acme", IsOrg: true},
-		{Name: "a scanner", IsSoftwareAgent: true},
+		{Name: "a scanner", IsSoftwareAgent: true, Email: "scanner@example.com", Url: "https://scanner.example.com"},
 	}, doc.Metadata.Authors)
 
 	require.Equal(t, []*sbom.Tool{

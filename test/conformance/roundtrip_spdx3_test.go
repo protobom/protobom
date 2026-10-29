@@ -489,7 +489,7 @@ func TestRoundTripSPDX3Agents(t *testing.T) {
 			Authors: []*sbom.Person{
 				{Name: "Jane", Email: "jane@example.com", Url: "https://jane.example.com"},
 				{Name: "Acme", IsOrg: true, Email: "acme@example.com"},
-				{Name: "a scanner", IsSoftwareAgent: true},
+				{Name: "a scanner", IsSoftwareAgent: true, Email: "scanner@example.com", Url: "https://scanner.example.com"},
 			},
 			Tools: []*sbom.Tool{
 				{Name: "a-tool", Version: "v1.2.3"},

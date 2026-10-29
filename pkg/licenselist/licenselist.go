@@ -46,6 +46,18 @@ func index() {
 	})
 }
 
+// ShortVersion returns the version of the SPDX License List in the
+// major.minor form the List is published under and SPDX 2 states it in,
+// so "3.29.0" is "3.29".
+func ShortVersion() string {
+	major, rest, ok := strings.Cut(Version, ".")
+	if !ok {
+		return Version
+	}
+	minor, _, _ := strings.Cut(rest, ".")
+	return major + "." + minor
+}
+
 // License looks up a license identifier. It returns the canonical spelling,
 // whether the list deprecates the identifier, and whether it is listed at all.
 func License(id string) (canonical string, deprecated, ok bool) {

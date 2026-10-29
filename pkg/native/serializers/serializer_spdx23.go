@@ -190,7 +190,9 @@ func (s *SPDX23) Serialize(bom *sbom.Document, serializeopts *native.SerializeOp
 		DocumentComment:   bom.Metadata.Comment,
 
 		CreationInfo: &spdx.CreationInfo{
-			LicenseListVersion: "3.20", // https://spdx.org/licenses/
+			// The version of the License List the embedded data comes
+			// from, in the major.minor form SPDX 2 states it in.
+			LicenseListVersion: licenselist.ShortVersion(),
 			Creators: []spdx.Creator{
 				// Register protobom as one of the document creation tools,
 				// with the version of the protobom module rather than that

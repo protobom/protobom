@@ -801,3 +801,16 @@ func TestSPDX23SerializeIsDeterministic(t *testing.T) {
 	}
 	require.Equal(t, []string{"pkg:generic/p@1", "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*", "gitoid:blob:sha1:abc"}, locators)
 }
+
+// The document states the version of the License List protobom embeds.
+func TestSPDX23LicenseListVersion(t *testing.T) {
+	doc, err := NewSPDX23().Serialize(&sbom.Document{
+		Metadata: &sbom.Metadata{Id: "https://example.com/doc"},
+		NodeList: &sbom.NodeList{},
+	}, &native.SerializeOptions{}, nil)
+	require.NoError(t, err)
+	spdxDoc, ok := doc.(*spdx.Document)
+	require.True(t, ok)
+	require.Equal(t, licenselist.ShortVersion(), spdxDoc.CreationInfo.LicenseListVersion)
+	require.Regexp(t, `^\d+\.\d+$`, spdxDoc.CreationInfo.LicenseListVersion)
+}

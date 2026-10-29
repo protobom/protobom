@@ -4,6 +4,7 @@
 package licenselist
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -77,4 +78,9 @@ func TestNoCaseCollisions(t *testing.T) {
 	index()
 	require.Len(t, licenseIndex, len(licenses))
 	require.Len(t, exceptionIndex, len(exceptions))
+}
+
+func TestShortVersion(t *testing.T) {
+	require.Regexp(t, `^\d+\.\d+$`, ShortVersion())
+	require.True(t, strings.HasPrefix(Version, ShortVersion()+"."))
 }

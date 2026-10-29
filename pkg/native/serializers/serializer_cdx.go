@@ -349,21 +349,8 @@ func buildMetadata(doc *sbom.Document) (*cdx.Metadata, error) {
 
 	if len(doc.Metadata.DocumentTypes) > 0 {
 		lifecycles := []cdx.Lifecycle{}
-
 		for _, dt := range doc.Metadata.DocumentTypes {
-			var lfc cdx.Lifecycle
-			var err error
-			if dt.Type == nil {
-				lfc.Name = dt.GetName()
-				lfc.Description = dt.GetDescription()
-			} else {
-				lfc.Phase, err = sbomTypeToPhase(dt)
-				if err != nil {
-					return nil, err
-				}
-			}
-
-			lifecycles = append(lifecycles, lfc)
+			lifecycles = append(lifecycles, documentTypeToLifecycle(dt))
 		}
 		metadata.Lifecycles = &lifecycles
 	}
@@ -390,28 +377,54 @@ func buildMetadata(doc *sbom.Document) (*cdx.Metadata, error) {
 	return &metadata, nil
 }
 
-// sbomTypeToPhase converts a SBOM document type to a CDX lifecycle phase
-func sbomTypeToPhase(dt *sbom.DocumentType) (cdx.LifecyclePhase, error) {
-	switch *dt.Type {
-	case sbom.DocumentType_BUILD:
-		return cdx.LifecyclePhaseBuild, nil
-	case sbom.DocumentType_DESIGN:
-		return cdx.LifecyclePhaseDesign, nil
-	case sbom.DocumentType_ANALYZED:
-		return cdx.LifecyclePhasePostBuild, nil
-	case sbom.DocumentType_SOURCE:
-		return cdx.LifecyclePhasePreBuild, nil
-	case sbom.DocumentType_DECOMISSION:
-		return cdx.LifecyclePhaseDecommission, nil
-	case sbom.DocumentType_DEPLOYED:
-		return cdx.LifecyclePhaseOperations, nil
-	case sbom.DocumentType_DISCOVERY:
-		return cdx.LifecyclePhaseDiscovery, nil
-	case sbom.DocumentType_OTHER:
-		return cdx.LifecyclePhase(strings.ToLower(*dt.Name)), nil
+// documentTypeToLifecycle converts a protobom document type to a CycloneDX
+// lifecycle entry. A lifecycle is either one of the predefined phases or a
+// named entry with an optional description, never both. The types with a
+// phase equivalent are written as that phase; the rest (OTHER, RUNTIME and
+// an unset type) are written as a named lifecycle. When the type carries no
+// name, the lowercased type name is used so the entry stays valid.
+// TODO(degradation): the name and description of a type written as a phase
+// are not written, the schema does not admit them next to a phase.
+func documentTypeToLifecycle(dt *sbom.DocumentType) cdx.Lifecycle {
+	if dt.Type != nil {
+		if phase, ok := sbomTypeToPhase(*dt.Type); ok {
+			return cdx.Lifecycle{Phase: phase}
+		}
 	}
-	// TODO(option): Dont err but assign to type OTHER
-	return "", fmt.Errorf("unknown document type %s", dt.GetName())
+
+	name := dt.GetName()
+	if name == "" && dt.Type != nil {
+		name = strings.ToLower(dt.Type.String())
+	}
+
+	return cdx.Lifecycle{
+		Name:        name,
+		Description: dt.GetDescription(),
+	}
+}
+
+// sbomTypeToPhase returns the CycloneDX lifecycle phase equivalent to a
+// protobom document type. The second return value is false when the type has
+// no predefined phase (OTHER and RUNTIME).
+func sbomTypeToPhase(t sbom.DocumentType_SBOMType) (cdx.LifecyclePhase, bool) {
+	switch t {
+	case sbom.DocumentType_BUILD:
+		return cdx.LifecyclePhaseBuild, true
+	case sbom.DocumentType_DESIGN:
+		return cdx.LifecyclePhaseDesign, true
+	case sbom.DocumentType_ANALYZED:
+		return cdx.LifecyclePhasePostBuild, true
+	case sbom.DocumentType_SOURCE:
+		return cdx.LifecyclePhasePreBuild, true
+	case sbom.DocumentType_DECOMISSION:
+		return cdx.LifecyclePhaseDecommission, true
+	case sbom.DocumentType_DEPLOYED:
+		return cdx.LifecyclePhaseOperations, true
+	case sbom.DocumentType_DISCOVERY:
+		return cdx.LifecyclePhaseDiscovery, true
+	default:
+		return "", false
+	}
 }
 
 // clearAutoRefs

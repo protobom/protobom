@@ -70,6 +70,12 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 				if name == "" {
 					name = string(lc.Phase)
 				}
+				// A lifecycle without a phase is a named entry. The serializer
+				// writes the protobom types that have no CycloneDX phase this
+				// way, so read those names back into the equivalent type.
+				if lc.Phase == "" {
+					t = namedLifecycleToSBOMType(lc.Name)
+				}
 
 				md.DocumentTypes = append(md.DocumentTypes, &sbom.DocumentType{
 					Name:        &name,
@@ -576,6 +582,19 @@ func (u *CDX) phaseToSBOMType(ph *cdx.LifecyclePhase) *sbom.DocumentType_SBOMTyp
 		return sbom.DocumentType_SOURCE.Enum()
 	case cdx.LifecyclePhasePostBuild:
 		return sbom.DocumentType_ANALYZED.Enum()
+	default:
+		return nil
+	}
+}
+
+// namedLifecycleToSBOMType returns the document type a named CycloneDX
+// lifecycle stands for. Only the types the serializer writes as named
+// lifecycles, because they have no predefined phase, are recognized. Any
+// other name is a custom lifecycle and yields no type.
+func namedLifecycleToSBOMType(name string) *sbom.DocumentType_SBOMType {
+	switch strings.ToLower(name) {
+	case "runtime":
+		return sbom.DocumentType_RUNTIME.Enum()
 	default:
 		return nil
 	}

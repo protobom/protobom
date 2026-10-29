@@ -1,6 +1,7 @@
 package serializers
 
 import (
+	"bytes"
 	"encoding/json"
 	"strings"
 	"testing"
@@ -707,4 +708,109 @@ func TestSPDX23CreatorTools(t *testing.T) {
 		}
 	}
 	require.Equal(t, []string{protobomToolName(), "scanner-1.0", "protobom-storage-1.0"}, tools)
+}
+
+// The document is dated when the protobom says it was created, in UTC as
+// SPDX requires, and only dated now when the protobom says nothing.
+func TestSPDX23Created(t *testing.T) {
+	serialize := func(date *timestamppb.Timestamp) string {
+		doc, err := NewSPDX23().Serialize(&sbom.Document{
+			Metadata: &sbom.Metadata{Id: "https://example.com/doc", Date: date},
+			NodeList: &sbom.NodeList{},
+		}, &native.SerializeOptions{}, nil)
+		require.NoError(t, err)
+		spdxDoc, ok := doc.(*spdx.Document)
+		require.True(t, ok)
+		return spdxDoc.CreationInfo.Created
+	}
+
+	stated := time.Date(2020, 1, 2, 3, 4, 5, 0, time.FixedZone("CST", -6*3600))
+	require.Equal(t, "2020-01-02T09:04:05Z", serialize(timestamppb.New(stated)))
+
+	before := time.Now().UTC().Truncate(time.Second)
+	now, err := time.Parse(time.RFC3339, serialize(nil))
+	require.NoError(t, err)
+	require.False(t, now.Before(before), "an undated protobom is dated now")
+}
+
+// TestSPDX23SerializeIsDeterministic pins the output order of what the
+// serializer reads from maps: package and file hashes, and identifiers.
+// Writing the same document twice must give the same bytes, in the order
+// of the enum values.
+func TestSPDX23SerializeIsDeterministic(t *testing.T) {
+	doc := &sbom.Document{
+		Metadata: &sbom.Metadata{Id: "https://example.com/doc", Date: timestamppb.New(time.Unix(0, 0))},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{
+				{
+					Id: "pkg", Type: sbom.Node_PACKAGE, Name: "pkg",
+					Hashes: map[int32]string{
+						int32(sbom.HashAlgorithm_SHA512): "c",
+						int32(sbom.HashAlgorithm_MD5):    "a",
+						int32(sbom.HashAlgorithm_SHA256): "b",
+					},
+					Identifiers: map[int32]string{
+						int32(sbom.SoftwareIdentifierType_GITOID): "gitoid:blob:sha1:abc",
+						int32(sbom.SoftwareIdentifierType_CPE23):  "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*",
+						int32(sbom.SoftwareIdentifierType_PURL):   "pkg:generic/p@1",
+					},
+				},
+				{
+					Id: "file", Type: sbom.Node_FILE, Name: "a/file",
+					Hashes: map[int32]string{
+						int32(sbom.HashAlgorithm_SHA384): "y",
+						int32(sbom.HashAlgorithm_SHA1):   "x",
+					},
+				},
+			},
+			Edges:        []*sbom.Edge{{Type: sbom.Edge_contains, From: "pkg", To: []string{"file"}}},
+			RootElements: []string{"pkg"},
+		},
+	}
+
+	sut := NewSPDX23()
+	render := func() (*spdx.Document, string) {
+		out, err := sut.Serialize(doc, &native.SerializeOptions{}, nil)
+		require.NoError(t, err)
+		spdxDoc, ok := out.(*spdx.Document)
+		require.True(t, ok)
+		var buf bytes.Buffer
+		require.NoError(t, sut.Render(spdxDoc, &buf, &native.RenderOptions{Indent: 2}, nil))
+		return spdxDoc, buf.String()
+	}
+
+	spdxDoc, first := render()
+	for range 20 {
+		_, again := render()
+		require.Equal(t, first, again)
+	}
+
+	require.Equal(t, []common.Checksum{
+		{Algorithm: common.MD5, Value: "a"},
+		{Algorithm: common.SHA256, Value: "b"},
+		{Algorithm: common.SHA512, Value: "c"},
+	}, spdxDoc.Packages[0].PackageChecksums)
+	require.Equal(t, []common.Checksum{
+		{Algorithm: common.SHA1, Value: "x"},
+		{Algorithm: common.SHA384, Value: "y"},
+	}, spdxDoc.Files[0].Checksums)
+
+	locators := make([]string, 0, len(spdxDoc.Packages[0].PackageExternalReferences))
+	for _, ref := range spdxDoc.Packages[0].PackageExternalReferences {
+		locators = append(locators, ref.Locator)
+	}
+	require.Equal(t, []string{"pkg:generic/p@1", "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*", "gitoid:blob:sha1:abc"}, locators)
+}
+
+// The document states the version of the License List protobom embeds.
+func TestSPDX23LicenseListVersion(t *testing.T) {
+	doc, err := NewSPDX23().Serialize(&sbom.Document{
+		Metadata: &sbom.Metadata{Id: "https://example.com/doc"},
+		NodeList: &sbom.NodeList{},
+	}, &native.SerializeOptions{}, nil)
+	require.NoError(t, err)
+	spdxDoc, ok := doc.(*spdx.Document)
+	require.True(t, ok)
+	require.Equal(t, licenselist.ShortVersion(), spdxDoc.CreationInfo.LicenseListVersion)
+	require.Regexp(t, `^\d+\.\d+$`, spdxDoc.CreationInfo.LicenseListVersion)
 }

@@ -75,27 +75,34 @@ func withIdentifiers(person *sbom.Person, identifiers []core.ExternalIdentifier)
 }
 
 // toolFromSPDX3 reads a tool element, and says whether the element was one.
+// SPDX 3's Tool has a name and nothing else, so the name is taken apart as
+// splitToolName does.
 //
-// SPDX 3's Tool has a name and nothing else, so protobom's writer joins the
-// name and version with a dash and the reader has to decide where to take
-// them apart again. It splits only when what follows the last dash looks
-// like a version, which leaves alone the tools that are named with dashes —
-// spdx-maven-plugin keeps its name, Microsoft.SBOMTool-0.2.7 gets its
-// version back, and protobom-v1.2.3 comes back as it went out.
-//
-// TODO(degradation): a tool whose version does not start with a digit is
-// read as part of its name, and a tool's vendor has nowhere to come from.
+// TODO(degradation): a tool's vendor has nowhere to come from.
 func toolFromSPDX3(node spdx3types.Node) (*sbom.Tool, bool) {
 	tool, ok := node.(*core.Tool)
 	if !ok {
 		return nil, false
 	}
-
-	name, version := tool.Name, ""
-	if dash := strings.LastIndex(name, "-"); dash > 0 && looksLikeVersion(name[dash+1:]) {
-		name, version = name[:dash], name[dash+1:]
-	}
+	name, version := splitToolName(tool.Name)
 	return &sbom.Tool{Name: name, Version: version}, true
+}
+
+// splitToolName takes a tool's version off its name. SPDX 2 states a tool
+// as "name-version" and SPDX 3 has a name and nothing else, so protobom's
+// writers join the two with a dash and the readers have to decide where to
+// take them apart again. The name is split only when what follows the last
+// dash looks like a version, which leaves alone the tools that are named
+// with dashes: spdx-maven-plugin keeps its name, Microsoft.SBOMTool-0.2.7
+// gets its version back, and protobom-v1.2.3 comes back as it went out.
+//
+// TODO(degradation): a tool whose version does not start with a digit is
+// read as part of its name.
+func splitToolName(tool string) (name, version string) {
+	if dash := strings.LastIndex(tool, "-"); dash > 0 && looksLikeVersion(tool[dash+1:]) {
+		return tool[:dash], tool[dash+1:]
+	}
+	return tool, ""
 }
 
 // looksLikeVersion says whether a string is one a tool would be versioned

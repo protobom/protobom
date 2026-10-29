@@ -3,6 +3,7 @@ package unserializers
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/spdx/tools-golang/spdx"
@@ -301,4 +302,121 @@ func TestPackageToNodeURLs(t *testing.T) {
 			require.Equal(t, tc.wantDownload, n.UrlDownload)
 		})
 	}
+}
+
+// The document's own fields are read into the metadata.
+func TestSPDX23UnserializeDocumentFields(t *testing.T) {
+	doc, err := NewSPDX23().unserializeDocument(&spdx23.Document{
+		SPDXIdentifier:    "DOCUMENT",
+		DocumentName:      "a name",
+		DocumentNamespace: "https://example.com/doc",
+		DocumentComment:   "a document comment",
+		CreationInfo:      &spdx23.CreationInfo{Created: "2020-01-02T03:04:05Z"},
+	}, &native.UnserializeOptions{})
+	require.NoError(t, err)
+	require.Equal(t, "https://example.com/doc#DOCUMENT", doc.Metadata.Id)
+	require.Equal(t, "a name", doc.Metadata.Name)
+	require.Equal(t, "a document comment", doc.Metadata.Comment)
+	require.Equal(t, "2020-01-02T03:04:05Z", doc.Metadata.Date.AsTime().Format("2006-01-02T15:04:05Z"))
+}
+
+// A file's fields are read into the node, attribution texts included.
+func TestSPDX23FileToNode(t *testing.T) {
+	n := NewSPDX23().fileToNode(&spdx23.File{
+		FileSPDXIdentifier:   "File-1",
+		FileName:             "a/file.txt",
+		FileComment:          "a comment",
+		FileCopyrightText:    "Copyright someone",
+		LicenseComments:      "license comments",
+		FileTypes:            []string{"TEXT"},
+		FileAttributionTexts: []string{"attributed to someone", "and someone else"},
+	})
+	require.Equal(t, "File-1", n.Id)
+	require.Equal(t, sbom.Node_FILE, n.Type)
+	require.Equal(t, "a/file.txt", n.Name)
+	require.Equal(t, "a comment", n.Comment)
+	require.Equal(t, "Copyright someone", n.Copyright)
+	require.Equal(t, "license comments", n.LicenseComments)
+	require.Equal(t, []string{"TEXT"}, n.FileTypes)
+	require.Equal(t, []string{"attributed to someone", "and someone else"}, n.Attribution)
+
+	// A file without attribution texts has an empty list, not a nil one.
+	require.Equal(t, []string{}, NewSPDX23().fileToNode(&spdx23.File{FileName: "x"}).Attribution)
+}
+
+// A relationship ending in NOASSERTION or NONE names no element, so it
+// leaves no edge and no root behind; every other relationship is read.
+func TestSPDX23SpecialRelationshipTargets(t *testing.T) {
+	doc, err := NewSPDX23().Unserialize(strings.NewReader(`{
+		"spdxVersion": "SPDX-2.3", "dataLicense": "CC0-1.0", "SPDXID": "SPDXRef-DOCUMENT",
+		"name": "x", "documentNamespace": "https://example.com/x",
+		"creationInfo": {"created": "2020-01-01T00:00:00Z", "creators": ["Tool: test"]},
+		"packages": [
+			{"name": "a", "SPDXID": "SPDXRef-a", "downloadLocation": "NOASSERTION"},
+			{"name": "b", "SPDXID": "SPDXRef-b", "downloadLocation": "NOASSERTION"}
+		],
+		"relationships": [
+			{"spdxElementId": "SPDXRef-DOCUMENT", "relatedSpdxElement": "SPDXRef-a", "relationshipType": "DESCRIBES"},
+			{"spdxElementId": "SPDXRef-DOCUMENT", "relatedSpdxElement": "NOASSERTION", "relationshipType": "DESCRIBES"},
+			{"spdxElementId": "SPDXRef-a", "relatedSpdxElement": "SPDXRef-b", "relationshipType": "DEPENDS_ON"},
+			{"spdxElementId": "SPDXRef-a", "relatedSpdxElement": "NOASSERTION", "relationshipType": "DEPENDS_ON"},
+			{"spdxElementId": "SPDXRef-b", "relatedSpdxElement": "NONE", "relationshipType": "DEPENDS_ON"}
+		]
+	}`), &native.UnserializeOptions{}, nil)
+	require.NoError(t, err)
+	require.Equal(t, []string{"a"}, doc.NodeList.RootElements)
+	require.Equal(t, []*sbom.Edge{{Type: sbom.Edge_dependsOn, From: "a", To: []string{"b"}}}, doc.NodeList.Edges)
+}
+
+// Authors, suppliers and originators come back with their email split off
+// the "name (email)" string SPDX 2 states them with.
+func TestSPDX23ActorsWithEmails(t *testing.T) {
+	doc, err := NewSPDX23().Unserialize(strings.NewReader(`{
+		"spdxVersion": "SPDX-2.3", "dataLicense": "CC0-1.0", "SPDXID": "SPDXRef-DOCUMENT",
+		"name": "x", "documentNamespace": "https://example.com/x",
+		"creationInfo": {"created": "2020-01-01T00:00:00Z", "creators": [
+			"Person: Jane Doe (jane@example.com)", "Organization: Acme ()", "Organization: Example (Europe)", "Tool: test"
+		]},
+		"packages": [{
+			"name": "a", "SPDXID": "SPDXRef-a", "downloadLocation": "NOASSERTION",
+			"supplier": "Organization: Acme, Inc. (sales@acme.example)",
+			"originator": "Person: Bob Builder (bob@example.com)"
+		}, {
+			"name": "b", "SPDXID": "SPDXRef-b", "downloadLocation": "NOASSERTION",
+			"supplier": "NOASSERTION"
+		}]
+	}`), &native.UnserializeOptions{}, nil)
+	require.NoError(t, err)
+
+	require.Equal(t, []*sbom.Person{
+		{Name: "Jane Doe", Email: "jane@example.com"},
+		{Name: "Acme", IsOrg: true},
+		{Name: "Example (Europe)", IsOrg: true},
+	}, doc.Metadata.Authors)
+
+	a := doc.NodeList.GetNodeByID("a")
+	require.Equal(t, []*sbom.Person{{Name: "Acme, Inc.", Email: "sales@acme.example", IsOrg: true}}, a.Suppliers)
+	require.Equal(t, []*sbom.Person{{Name: "Bob Builder", Email: "bob@example.com"}}, a.Originators)
+	require.Empty(t, doc.NodeList.GetNodeByID("b").Suppliers)
+}
+
+// A tool creator's version is split off its name when it looks like one,
+// the way the SPDX 3 reader does it, and the rest of the name is kept.
+func TestSPDX23ToolCreators(t *testing.T) {
+	doc, err := NewSPDX23().Unserialize(strings.NewReader(`{
+		"spdxVersion": "SPDX-2.3", "dataLicense": "CC0-1.0", "SPDXID": "SPDXRef-DOCUMENT",
+		"name": "x", "documentNamespace": "https://example.com/x",
+		"creationInfo": {"created": "2020-01-01T00:00:00Z", "creators": [
+			"Tool: trivy-0.42.1", "Tool: protobom-v1.2.3", "Tool: apko (v0.8.0-53-gfaa1b37)",
+			"Tool: GitHub.com-Dependency-Graph", "Tool: sigs.k8s.io/bom/pkg/spdx"
+		]}
+	}`), &native.UnserializeOptions{}, nil)
+	require.NoError(t, err)
+	require.Equal(t, []*sbom.Tool{
+		{Name: "trivy", Version: "0.42.1"},
+		{Name: "protobom", Version: "v1.2.3"},
+		{Name: "apko (v0.8.0-53-gfaa1b37)"},
+		{Name: "GitHub.com-Dependency-Graph"},
+		{Name: "sigs.k8s.io/bom/pkg/spdx"},
+	}, doc.Metadata.Tools)
 }

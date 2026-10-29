@@ -67,6 +67,7 @@ func (u *SPDX23) unserializeDocument(spdxDoc *spdx23.Document, opts *native.Unse
 	bom := sbom.NewDocument()
 	bom.Metadata.Id = buildDocumentIdentifier(spdxDoc)
 	bom.Metadata.Name = spdxDoc.DocumentName
+	bom.Metadata.Comment = spdxDoc.DocumentComment
 
 	// TODO(degradation): External document references
 
@@ -79,13 +80,18 @@ func (u *SPDX23) unserializeDocument(spdxDoc *spdx23.Document, opts *native.Unse
 			for _, c := range spdxDoc.CreationInfo.Creators {
 				// TODO: We need to create a parser library in formats/spdx
 				if c.CreatorType == protospdx.Tool {
-					// TODO: Split the version from the Tool string here.
-					bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: c.Creator})
+					// SPDX 2 states a tool as "name-version".
+					name, version := splitToolName(c.Creator)
+					bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: name, Version: version})
 					continue
 				}
-				a := &sbom.Person{Name: c.Creator}
-				a.IsOrg = (c.CreatorType == protospdx.Organization)
-				bom.Metadata.Authors = append(bom.Metadata.Authors, a)
+				// SPDX 2 states an author as "name (email)".
+				name, email := protospdx.SplitActor(c.Creator)
+				bom.Metadata.Authors = append(bom.Metadata.Authors, &sbom.Person{
+					Name:  name,
+					Email: email,
+					IsOrg: c.CreatorType == protospdx.Organization,
+				})
 			}
 		}
 	}
@@ -101,6 +107,12 @@ func (u *SPDX23) unserializeDocument(spdxDoc *spdx23.Document, opts *native.Unse
 	}
 
 	for _, r := range spdxDoc.Relationships {
+		// A relationship ending in NOASSERTION or NONE says the document
+		// declines to name, or has no, related element: there is no node
+		// for an edge to reach, so it is not read.
+		if r.RefA.SpecialID != "" || r.RefB.SpecialID != "" {
+			continue
+		}
 		// The SPDX go library surfaces the JSON top-level elements as relationships:
 		if r.RefA.ElementRefID == protospdx.DOCUMENT && strings.EqualFold(r.Relationship, "DESCRIBES") {
 			bom.NodeList.RootElements = append(bom.NodeList.RootElements, string(r.RefB.ElementRefID))
@@ -234,21 +246,25 @@ func (u *SPDX23) packageToNode(opts *native.UnserializeOptions, p *spdx23.Packag
 		n.BuildDate = timestamppb.New(*t)
 	}
 
-	// Mmh there is a limitation here on the SPDX libraries. They will not
-	// return the supplier and originator emails as a separate field. Perhaps
-	// we should upstream a fix for that.
-	if p.PackageSupplier != nil && p.PackageSupplier.Supplier != protospdx.NOASSERTION {
-		n.Suppliers = []*sbom.Person{{Name: p.PackageSupplier.Supplier}}
-		if p.PackageSupplier.SupplierType == protospdx.Organization {
-			n.Suppliers[0].IsOrg = true
-		}
+	// The SPDX library hands the supplier and originator over as the
+	// "name (email)" string SPDX 2 states them with, so the email is split
+	// off here.
+	if p.PackageSupplier != nil && p.PackageSupplier.Supplier != protospdx.NOASSERTION && p.PackageSupplier.Supplier != "" {
+		name, email := protospdx.SplitActor(p.PackageSupplier.Supplier)
+		n.Suppliers = []*sbom.Person{{
+			Name:  name,
+			Email: email,
+			IsOrg: p.PackageSupplier.SupplierType == protospdx.Organization,
+		}}
 	}
 
 	if p.PackageOriginator != nil && p.PackageOriginator.Originator != protospdx.NOASSERTION && p.PackageOriginator.Originator != "" {
-		n.Originators = []*sbom.Person{{Name: p.PackageOriginator.Originator}}
-		if p.PackageOriginator.OriginatorType == protospdx.Organization {
-			n.Originators[0].IsOrg = true
-		}
+		name, email := protospdx.SplitActor(p.PackageOriginator.Originator)
+		n.Originators = []*sbom.Person{{
+			Name:  name,
+			Email: email,
+			IsOrg: p.PackageOriginator.OriginatorType == protospdx.Organization,
+		}}
 	}
 
 	// If the hack to read properties is enabled, unmarshall any properties
@@ -293,7 +309,7 @@ func (u *SPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 		LicenseComments: f.LicenseComments,
 		Copyright:       f.FileCopyrightText,
 		Comment:         f.FileComment,
-		Attribution:     []string{},
+		Attribution:     append([]string{}, f.FileAttributionTexts...),
 		Suppliers:       []*sbom.Person{},
 		Originators:     []*sbom.Person{},
 		FileTypes:       f.FileTypes,

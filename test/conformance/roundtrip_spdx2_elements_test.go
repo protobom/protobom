@@ -130,3 +130,25 @@ func TestRoundTripSPDX2Actors(t *testing.T) {
 		})
 	}
 }
+
+// TestRoundTripSPDX2Tools pins that the tools a document credits keep their
+// versions through every SPDX 2 encoding, which states a tool as
+// "name-version".
+func TestRoundTripSPDX2Tools(t *testing.T) {
+	tools := []*sbom.Tool{
+		{Name: "scanner", Version: "1.2.3"},
+		{Name: "spdx-maven-plugin"},
+	}
+	original := &sbom.Document{
+		Metadata: &sbom.Metadata{Id: "https://example.com/spdxdocs/tools#DOCUMENT", Tools: tools},
+		NodeList: &sbom.NodeList{Nodes: []*sbom.Node{}, Edges: []*sbom.Edge{}},
+	}
+	for _, format := range spdx2Formats {
+		t.Run(string(format), func(t *testing.T) {
+			got := spdx2RoundTrip(t, original, format)
+			// The writer credits protobom itself first.
+			require.Len(t, got.Metadata.Tools, len(tools)+1)
+			require.Equal(t, tools, got.Metadata.Tools[1:])
+		})
+	}
+}

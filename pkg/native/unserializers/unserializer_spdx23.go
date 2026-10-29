@@ -80,8 +80,9 @@ func (u *SPDX23) unserializeDocument(spdxDoc *spdx23.Document, opts *native.Unse
 			for _, c := range spdxDoc.CreationInfo.Creators {
 				// TODO: We need to create a parser library in formats/spdx
 				if c.CreatorType == protospdx.Tool {
-					// TODO: Split the version from the Tool string here.
-					bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: c.Creator})
+					// SPDX 2 states a tool as "name-version".
+					name, version := splitToolName(c.Creator)
+					bom.Metadata.Tools = append(bom.Metadata.Tools, &sbom.Tool{Name: name, Version: version})
 					continue
 				}
 				// SPDX 2 states an author as "name (email)".

@@ -399,3 +399,24 @@ func TestSPDX23ActorsWithEmails(t *testing.T) {
 	require.Equal(t, []*sbom.Person{{Name: "Bob Builder", Email: "bob@example.com"}}, a.Originators)
 	require.Empty(t, doc.NodeList.GetNodeByID("b").Suppliers)
 }
+
+// A tool creator's version is split off its name when it looks like one,
+// the way the SPDX 3 reader does it, and the rest of the name is kept.
+func TestSPDX23ToolCreators(t *testing.T) {
+	doc, err := NewSPDX23().Unserialize(strings.NewReader(`{
+		"spdxVersion": "SPDX-2.3", "dataLicense": "CC0-1.0", "SPDXID": "SPDXRef-DOCUMENT",
+		"name": "x", "documentNamespace": "https://example.com/x",
+		"creationInfo": {"created": "2020-01-01T00:00:00Z", "creators": [
+			"Tool: trivy-0.42.1", "Tool: protobom-v1.2.3", "Tool: apko (v0.8.0-53-gfaa1b37)",
+			"Tool: GitHub.com-Dependency-Graph", "Tool: sigs.k8s.io/bom/pkg/spdx"
+		]}
+	}`), &native.UnserializeOptions{}, nil)
+	require.NoError(t, err)
+	require.Equal(t, []*sbom.Tool{
+		{Name: "trivy", Version: "0.42.1"},
+		{Name: "protobom", Version: "v1.2.3"},
+		{Name: "apko (v0.8.0-53-gfaa1b37)"},
+		{Name: "GitHub.com-Dependency-Graph"},
+		{Name: "sigs.k8s.io/bom/pkg/spdx"},
+	}, doc.Metadata.Tools)
+}

@@ -357,6 +357,12 @@ func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.N
 		node.Identifiers[int32(sbom.SoftwareIdentifierType_GITOID)] = (*c.OmniborID)[0]
 	}
 
+	if c.SWHID != nil && len(*c.SWHID) > 0 {
+		// TODO(degradation): protobom holds one SWHID per node, any
+		// additional ones are dropped.
+		node.Identifiers[int32(sbom.SoftwareIdentifierType_SWHID)] = (*c.SWHID)[0]
+	}
+
 	if c.Authors != nil {
 		for _, author := range *c.Authors {
 			node.Originators = append(node.Originators, &sbom.Person{

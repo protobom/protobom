@@ -115,6 +115,7 @@ func TestExtRefTypeToIdentifierType(t *testing.T) {
 		{spdx.SecurityCPE23Type, sbom.SoftwareIdentifierType_CPE23},
 		{spdx.SecurityCPE22Type, sbom.SoftwareIdentifierType_CPE22},
 		{spdx.TypePersistentIdGitoid, sbom.SoftwareIdentifierType_GITOID},
+		{spdx.TypePersistentIdSwh, sbom.SoftwareIdentifierType_SWHID},
 		{"", sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE},
 	} {
 		identifier := s23.extRefTypeToIdentifierType(tc.sut)

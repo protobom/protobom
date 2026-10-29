@@ -714,6 +714,8 @@ func identifierTypeToSPDX3(t sbom.SoftwareIdentifierType) core.ExternalIdentifie
 		return core.ExternalIdentifierTypeCpe23
 	case sbom.SoftwareIdentifierType_GITOID:
 		return core.ExternalIdentifierTypeGitoid
+	case sbom.SoftwareIdentifierType_SWHID:
+		return core.ExternalIdentifierTypeSwhid
 	default:
 		return ""
 	}

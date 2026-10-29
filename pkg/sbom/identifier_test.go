@@ -17,6 +17,7 @@ func TestIToSPDX2Category(t *testing.T) {
 		{SoftwareIdentifierType_CPE23, spdx.CategorySecurity},
 		{SoftwareIdentifierType_CPE22, spdx.CategorySecurity},
 		{SoftwareIdentifierType_GITOID, spdx.CategoryPersistentID},
+		{SoftwareIdentifierType_SWHID, spdx.CategoryPersistentID},
 		{SoftwareIdentifierType(328742873), spdx.CategoryOther},
 	} {
 		require.Equal(t, tc.expected, tc.sut.ToSPDX2Category())
@@ -32,6 +33,7 @@ func TestIToSPDX2Type(t *testing.T) {
 		{SoftwareIdentifierType_CPE23, spdx.ExtRefTypeCPE23},
 		{SoftwareIdentifierType_CPE22, spdx.ExtRefTypeCPE22},
 		{SoftwareIdentifierType_GITOID, spdx.ExtRefTypeGitoid},
+		{SoftwareIdentifierType_SWHID, spdx.ExtRefTypeSwh},
 		{SoftwareIdentifierType(1234123415), ""},
 	} {
 		require.Equal(t, tc.expected, tc.sut.ToSPDX2Type())

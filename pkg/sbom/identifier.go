@@ -38,6 +38,8 @@ func SoftwareIdentifierTypeFromSPDXExtRefType(spdxType string) SoftwareIdentifie
 		return SoftwareIdentifierType_CPE23
 	case spdx.ExtRefTypeGitoid:
 		return SoftwareIdentifierType_GITOID
+	case spdx.ExtRefTypeSwh:
+		return SoftwareIdentifierType_SWHID
 	default:
 		return SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE
 	}
@@ -50,7 +52,7 @@ func (i SoftwareIdentifierType) ToSPDX2Category() string {
 		return spdx.CategorySecurity
 	case "maven-central", "npm", "nuget", "bower", spdx.ExtRefTypePurl:
 		return spdx.CategoryPackageManager
-	case "swh", spdx.ExtRefTypeGitoid:
+	case spdx.ExtRefTypeSwh, spdx.ExtRefTypeGitoid:
 		return spdx.CategoryPersistentID
 	default:
 		return spdx.CategoryOther
@@ -68,6 +70,8 @@ func (i SoftwareIdentifierType) ToSPDX2Type() string {
 		return spdx.ExtRefTypeCPE23
 	case SoftwareIdentifierType_GITOID:
 		return spdx.ExtRefTypeGitoid
+	case SoftwareIdentifierType_SWHID:
+		return spdx.ExtRefTypeSwh
 	default:
 		return ""
 	}

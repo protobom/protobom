@@ -80,8 +80,8 @@ func externalRefTypeFromSPDX3(t core.ExternalRefType) sbom.ExternalReference_Ext
 // identifierTypeFromSPDX3 returns the protobom identifier type an SPDX 3
 // external identifier names.
 //
-// TODO(degradation): SPDX 3 has eleven identifier types and protobom four,
-// so a cpe22 in an email or a swid has nowhere to go.
+// TODO(degradation): SPDX 3 has eleven identifier types and protobom five,
+// so a cve, a swid or an email has nowhere to go.
 func identifierTypeFromSPDX3(t core.ExternalIdentifierType) sbom.SoftwareIdentifierType {
 	switch t {
 	case core.ExternalIdentifierTypePackageUrl:
@@ -92,6 +92,8 @@ func identifierTypeFromSPDX3(t core.ExternalIdentifierType) sbom.SoftwareIdentif
 		return sbom.SoftwareIdentifierType_CPE23
 	case core.ExternalIdentifierTypeGitoid:
 		return sbom.SoftwareIdentifierType_GITOID
+	case core.ExternalIdentifierTypeSwhid:
+		return sbom.SoftwareIdentifierType_SWHID
 	default:
 		return sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE
 	}

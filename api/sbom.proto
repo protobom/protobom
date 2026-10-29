@@ -682,4 +682,6 @@ enum SoftwareIdentifierType {
   CPE23 = 3;
   // Git Object Identifier (OID) identifier type.
   GITOID = 4;
+  // Software Heritage persistent identifier (SWHID).
+  SWHID = 5;
 }

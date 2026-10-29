@@ -585,3 +585,24 @@ func TestUnserializeNamedLicenses(t *testing.T) {
 		t, "MIT OR LicenseRef-x-protobom-GPL OR LicenseRef-x-protobom-Perl-like-licence", root.LicenseConcluded,
 	)
 }
+
+func TestUnserializeMimeType(t *testing.T) {
+	data := `{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"component": {"bom-ref": "root", "type": "application", "name": "root", "mime-type": "application/zip"}
+		},
+		"components": [
+			{"bom-ref": "f", "type": "file", "name": "logo.png", "mime-type": "image/png"},
+			{"bom-ref": "n", "type": "library", "name": "no-type"}
+		]
+	}`
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(data), nil, nil)
+	require.NoError(t, err)
+	require.Equal(t, "application/zip", doc.NodeList.GetNodeByID("root").ContentType)
+	require.Equal(t, "image/png", doc.NodeList.GetNodeByID("f").ContentType)
+	require.Empty(t, doc.NodeList.GetNodeByID("n").ContentType)
+}

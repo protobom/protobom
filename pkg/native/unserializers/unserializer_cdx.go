@@ -279,6 +279,7 @@ func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.N
 		Licenses:           u.licenseChoicesToLicenseList(c.Licenses),
 		LicenseConcluded:   u.licenseChoicesToLicenseString(c.Licenses),
 		Copyright:          c.Copyright,
+		ContentType:        c.MIMEType,
 		Hashes:             map[int32]string{},
 		Description:        c.Description,
 		Attribution:        []string{},

@@ -591,3 +591,25 @@ func TestSerializeIsDeterministic(t *testing.T) {
 	require.Equal(t, []string{"c", "a", "b"}, names(bom.Components))
 	require.Equal(t, []string{"b2", "b1"}, names((*bom.Components)[2].Components))
 }
+
+func TestNodeContentTypeToComponent(t *testing.T) {
+	sut := CDX{}
+	for name, tc := range map[string]struct {
+		contentType string
+		expected    string
+	}{
+		"media type":               {"application/json", "application/json"},
+		"with suffix and plus":     {"application/vnd.cyclonedx+json", "application/vnd.cyclonedx+json"},
+		"upper case is normalized": {"Application/JSON", "application/json"},
+		"surrounding whitespace":   {" image/png ", "image/png"},
+		"empty":                    {"", ""},
+		"not a media type":         {"json", ""},
+		"with parameters":          {"text/plain; charset=utf-8", ""},
+		"too many parts":           {"a/b/c", ""},
+	} {
+		t.Run(name, func(t *testing.T) {
+			comp := sut.nodeToComponent(&sbom.Node{ContentType: tc.contentType})
+			require.Equal(t, tc.expected, comp.MIMEType)
+		})
+	}
+}

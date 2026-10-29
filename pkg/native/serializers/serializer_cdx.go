@@ -30,6 +30,10 @@ const serialNumberPattern = `^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a
 var (
 	serialNumberRegex     *regexp.Regexp
 	serialNumberRegexInit sync.Once
+
+	// cdxMimeTypePattern is the shape the CycloneDX schema requires of a
+	// component mime-type.
+	cdxMimeTypePattern = regexp.MustCompile(`^[-+a-z0-9.]+/[-+a-z0-9.]+$`)
 )
 
 type (
@@ -623,6 +627,15 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	}
 
 	c.Copyright = n.GetCopyright()
+
+	// The content type is the component's mime-type. CycloneDX requires it
+	// in lower case and shaped as type/subtype; media types are not case
+	// sensitive, so the case is normalized rather than dropping the value.
+	// TODO(degradation): a content type that is not shaped as a media type
+	// cannot be written.
+	if mimeType := strings.ToLower(strings.TrimSpace(n.ContentType)); cdxMimeTypePattern.MatchString(mimeType) {
+		c.MIMEType = mimeType
+	}
 
 	properties := []cdx.Property{}
 	for _, p := range n.Properties {

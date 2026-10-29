@@ -694,6 +694,10 @@ func (u *CDX) cdxHashAlgoToProtobomAlgo(cdxAlgo cdx.HashAlgorithm) sbom.HashAlgo
 		return sbom.HashAlgorithm_BLAKE2B_512
 	case cdx.HashAlgoBlake3:
 		return sbom.HashAlgorithm_BLAKE3
+	case cdx.HashAlgoStreebog256:
+		return sbom.HashAlgorithm_STREEBOG_256
+	case cdx.HashAlgoStreebog512:
+		return sbom.HashAlgorithm_STREEBOG_512
 	default:
 		return sbom.HashAlgorithm_UNKNOWN
 	}

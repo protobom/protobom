@@ -432,14 +432,31 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 	})
 
 	// Hash algorithms CycloneDX has no name for are dropped on write.
+	// Streebog has a name from 1.7 on, so the 1.6 walk drops it too; it
+	// has its own round trip below.
 	droppedAlgos := map[sbom.HashAlgorithm]bool{
-		sbom.HashAlgorithm_UNKNOWN: true,
-		sbom.HashAlgorithm_ADLER32: true,
-		sbom.HashAlgorithm_MD2:     true,
-		sbom.HashAlgorithm_MD4:     true,
-		sbom.HashAlgorithm_MD6:     true,
-		sbom.HashAlgorithm_SHA224:  true,
+		sbom.HashAlgorithm_UNKNOWN:      true,
+		sbom.HashAlgorithm_ADLER32:      true,
+		sbom.HashAlgorithm_MD2:          true,
+		sbom.HashAlgorithm_MD4:          true,
+		sbom.HashAlgorithm_MD6:          true,
+		sbom.HashAlgorithm_SHA224:       true,
+		sbom.HashAlgorithm_STREEBOG_256: true,
+		sbom.HashAlgorithm_STREEBOG_512: true,
 	}
+
+	t.Run("streebog hashes survive from 1.7", func(t *testing.T) {
+		hashes := map[int32]string{
+			int32(sbom.HashAlgorithm_STREEBOG_256): "abc123",
+			int32(sbom.HashAlgorithm_STREEBOG_512): "def456",
+		}
+		got := cdxRoundTripIn(t, cdxOneNodeDoc(&sbom.Node{
+			Id: "root", Type: sbom.Node_PACKAGE, Name: "n", Hashes: hashes,
+		}), formats.CDX17JSON)
+		node := got.NodeList.GetNodeByID("root")
+		require.NotNil(t, node)
+		require.Equal(t, hashes, node.Hashes)
+	})
 
 	t.Run("hash algorithms", func(t *testing.T) {
 		for value, name := range sbom.HashAlgorithm_name {

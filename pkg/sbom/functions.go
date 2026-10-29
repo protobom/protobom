@@ -100,6 +100,10 @@ func HashAlgorithmFromCDX(cdxAlgorithm cdx.HashAlgorithm) HashAlgorithm {
 		return HashAlgorithm_BLAKE2B_512
 	case cdx.HashAlgoBlake3:
 		return HashAlgorithm_BLAKE3
+	case cdx.HashAlgoStreebog256:
+		return HashAlgorithm_STREEBOG_256
+	case cdx.HashAlgoStreebog512:
+		return HashAlgorithm_STREEBOG_512
 	default:
 		return HashAlgorithm_UNKNOWN
 	}

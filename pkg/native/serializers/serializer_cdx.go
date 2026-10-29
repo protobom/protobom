@@ -933,6 +933,12 @@ func (s *CDX) protoHashAlgoToCdxAlgo(protoAlgo sbom.HashAlgorithm) (cdx.HashAlgo
 		return cdx.HashAlgoBlake2b_512, nil
 	case sbom.HashAlgorithm_BLAKE3:
 		return cdx.HashAlgoBlake3, nil
+	case sbom.HashAlgorithm_STREEBOG_256:
+		// Streebog is a 1.7 addition, the encoder drops it for older
+		// versions.
+		return cdx.HashAlgoStreebog256, nil
+	case sbom.HashAlgorithm_STREEBOG_512:
+		return cdx.HashAlgoStreebog512, nil
 	}
 
 	// TODO(degradation): Unknow algorithms err here. We could silently not.

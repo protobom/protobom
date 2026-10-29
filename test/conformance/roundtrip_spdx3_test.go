@@ -84,7 +84,13 @@ func TestRoundTripSPDX3Elements(t *testing.T) {
 	}
 
 	original := &sbom.Document{
-		Metadata: &sbom.Metadata{Id: ns, Name: "a round trip", Version: "1"},
+		Metadata: &sbom.Metadata{
+			Id: ns, Name: "a round trip", Version: "1",
+			DocumentTypes: []*sbom.DocumentType{
+				{Type: sbom.DocumentType_BUILD.Enum()},
+				{Type: sbom.DocumentType_ANALYZED.Enum()},
+			},
+		},
 		NodeList: &sbom.NodeList{
 			Nodes:        []*sbom.Node{pkg, file},
 			Edges:        []*sbom.Edge{},
@@ -108,6 +114,10 @@ func TestRoundTripSPDX3Elements(t *testing.T) {
 
 	require.Equal(t, ns, got.Metadata.Id)
 	require.Equal(t, "a round trip", got.Metadata.Name)
+
+	// The kinds of bill of materials travel on the Sbom element and come
+	// back in the order written.
+	require.Equal(t, original.Metadata.DocumentTypes, got.Metadata.DocumentTypes)
 
 	// The document says it is about the package, through the bill of
 	// materials the writer wraps it in.
@@ -175,13 +185,45 @@ const vocabularyNS = "https://example.com/spdxdocs/vocabularies"
 // rather than in a document that quietly lost a field.
 func TestRoundTripSPDX3EveryVocabulary(t *testing.T) {
 	// Purposes protobom writes as an SPDX 3 purpose that names something
-	// else: SPDX 3 has deviceDriver and platform, but the writer sends them
-	// to device and other, and a machine learning model to model.
+	// else: SPDX 3 has one model purpose, so a machine learning model is
+	// written as model and comes back as the other model purpose.
 	lossy := map[sbom.Purpose]bool{
-		sbom.Purpose_DEVICE_DRIVER:          true,
-		sbom.Purpose_PLATFORM:               true,
 		sbom.Purpose_MACHINE_LEARNING_MODEL: true,
 	}
+
+	// Document types SPDX 3 has no kind for: OTHER, and the two that come
+	// from CycloneDX. The writer leaves them out, so they cannot come back.
+	unnamedTypes := map[sbom.DocumentType_SBOMType]bool{
+		sbom.DocumentType_OTHER:       true,
+		sbom.DocumentType_DISCOVERY:   true,
+		sbom.DocumentType_DECOMISSION: true,
+	}
+
+	t.Run("document types", func(t *testing.T) {
+		for value, name := range sbom.DocumentType_SBOMType_name {
+			docType := sbom.DocumentType_SBOMType(value)
+			t.Run(name, func(t *testing.T) {
+				original := &sbom.Document{
+					Metadata: &sbom.Metadata{
+						Id:            vocabularyNS,
+						DocumentTypes: []*sbom.DocumentType{{Type: docType.Enum()}},
+					},
+					NodeList: &sbom.NodeList{Nodes: []*sbom.Node{}, Edges: []*sbom.Edge{}},
+				}
+				var out bytes.Buffer
+				require.NoError(t, writer.New().WriteStreamWithOptions(
+					original, &out, &writer.Options{Format: formats.SPDX3JSON},
+				))
+				got, err := reader.New().ParseStream(bytes.NewReader(out.Bytes()))
+				require.NoError(t, err)
+				if unnamedTypes[docType] {
+					require.Empty(t, got.Metadata.DocumentTypes)
+					return
+				}
+				require.Equal(t, original.Metadata.DocumentTypes, got.Metadata.DocumentTypes)
+			})
+		}
+	})
 
 	t.Run("purposes", func(t *testing.T) {
 		for value, name := range sbom.Purpose_name {
@@ -344,20 +386,9 @@ func TestRoundTripSPDX3EveryEdgeType(t *testing.T) {
 		sbom.Edge_prerequisiteFor: sbom.Edge_prerequisite,
 	}
 
-	// The relationship types protobom states with a lifecycle scope. SPDX 3
-	// writes the scope on the relationship, the reader drops it, and what is
-	// left is the type that names no period — or, for the tool ones,
-	// nothing at all, since protobom has no way to say a tool is used
-	// without saying when.
-	scoped := map[sbom.Edge_Type]sbom.Edge_Type{
-		sbom.Edge_buildDependency:   sbom.Edge_dependsOn,
-		sbom.Edge_devDependency:     sbom.Edge_dependsOn,
-		sbom.Edge_runtimeDependency: sbom.Edge_dependsOn,
-		sbom.Edge_testDependency:    sbom.Edge_dependsOn,
-		sbom.Edge_buildTool:         sbom.Edge_UNKNOWN,
-		sbom.Edge_devTool:           sbom.Edge_UNKNOWN,
-		sbom.Edge_testTool:          sbom.Edge_UNKNOWN,
-	}
+	// The seven types protobom states with the period in the type itself
+	// are written as a scoped dependsOn or usesTool and read back through
+	// the scope, so they survive like every other type.
 
 	for value, name := range sbom.Edge_Type_name {
 		edgeType := sbom.Edge_Type(value)
@@ -397,9 +428,6 @@ func TestRoundTripSPDX3EveryEdgeType(t *testing.T) {
 			want, wantFrom, wantTo := edgeType, from, to
 			if collapsed, ok := collapses[edgeType]; ok {
 				want, wantFrom, wantTo = collapsed, to, from
-			}
-			if unscoped, ok := scoped[edgeType]; ok {
-				want, wantFrom, wantTo = unscoped, to, from
 			}
 
 			if want == sbom.Edge_UNKNOWN {
@@ -445,7 +473,7 @@ func TestRoundTripSPDX3Agents(t *testing.T) {
 			Authors: []*sbom.Person{
 				{Name: "Jane", Email: "jane@example.com", Url: "https://jane.example.com"},
 				{Name: "Acme", IsOrg: true, Email: "acme@example.com"},
-				{Name: "a scanner", IsSoftwareAgent: true},
+				{Name: "a scanner", IsSoftwareAgent: true, Email: "scanner@example.com", Url: "https://scanner.example.com"},
 			},
 			Tools: []*sbom.Tool{
 				{Name: "a-tool", Version: "v1.2.3"},

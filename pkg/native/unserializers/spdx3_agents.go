@@ -35,7 +35,9 @@ func agentFromSPDX3(node spdx3types.Node) (*sbom.Person, bool) {
 	case *core.Organization:
 		return withIdentifiers(&sbom.Person{Name: agent.Name, IsOrg: true}, agent.ExternalIdentifier), true
 	case *core.SoftwareAgent:
-		return &sbom.Person{Name: agent.Name, IsSoftwareAgent: true}, true
+		// A software agent can be reached the same ways a person can, and
+		// the writer states its email and URL the same way.
+		return withIdentifiers(&sbom.Person{Name: agent.Name, IsSoftwareAgent: true}, agent.ExternalIdentifier), true
 	default:
 		return nil, false
 	}

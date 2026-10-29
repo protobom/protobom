@@ -132,6 +132,10 @@ func HashAlgorithmFromSPDX(spdxAlgo common.ChecksumAlgorithm) HashAlgorithm {
 // https://github.com/spdx/spdx-3-model/blob/main/model/Core/Vocabularies/HashAlgorithm.md
 func (ha HashAlgorithm) ToSPDX3() string {
 	switch ha {
+	case HashAlgorithm_ADLER32:
+		return "adler32"
+	case HashAlgorithm_MD2:
+		return "md2"
 	case HashAlgorithm_MD4:
 		return "md4"
 	case HashAlgorithm_MD5:
@@ -171,6 +175,10 @@ func (ha HashAlgorithm) ToSPDX3() string {
 // name states. It is the inverse of [HashAlgorithm.ToSPDX3].
 func HashAlgorithmFromSPDX3(spdxAlgo string) HashAlgorithm {
 	switch spdxAlgo {
+	case "adler32":
+		return HashAlgorithm_ADLER32
+	case "md2":
+		return HashAlgorithm_MD2
 	case "md4":
 		return HashAlgorithm_MD4
 	case "md5":

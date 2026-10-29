@@ -11,6 +11,7 @@ import (
 
 	"github.com/carabiner-dev/spdx3/profiles/core"
 	"github.com/carabiner-dev/spdx3/profiles/expandedlicensing"
+	"github.com/carabiner-dev/spdx3/profiles/software"
 	"github.com/stretchr/testify/require"
 
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
@@ -152,7 +153,8 @@ func TestSPDX3UnserializeElements(t *testing.T) {
 			"validUntilTime": "2026-08-03T00:00:00Z",
 			"verifiedUsing": [
 				{"type": "Hash", "algorithm": "sha256", "hashValue": "abc123"},
-				{"type": "Hash", "algorithm": "adler32", "hashValue": "nope"}
+				{"type": "Hash", "algorithm": "adler32", "hashValue": "0bad"},
+				{"type": "Hash", "algorithm": "crystalsKyber", "hashValue": "nope"}
 			],
 			"externalIdentifier": [
 				{"type": "ExternalIdentifier", "externalIdentifierType": "cpe23", "identifier": "cpe:2.3:a:x"},
@@ -202,7 +204,11 @@ func TestSPDX3UnserializeElements(t *testing.T) {
 
 	// An algorithm or identifier type protobom has no name for is dropped,
 	// and does not displace the ones it does.
-	require.Equal(t, map[int32]string{int32(sbom.HashAlgorithm_SHA256): "abc123"}, pkg.Hashes)
+	// An algorithm protobom has no value for is dropped; every other is read.
+	require.Equal(t, map[int32]string{
+		int32(sbom.HashAlgorithm_SHA256):  "abc123",
+		int32(sbom.HashAlgorithm_ADLER32): "0bad",
+	}, pkg.Hashes)
 	require.Equal(t, map[int32]string{
 		int32(sbom.SoftwareIdentifierType_PURL):  "pkg:generic/a-package@1.2.3",
 		int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:x",
@@ -545,28 +551,70 @@ func TestSPDX3DescribesFromACollection(t *testing.T) {
 	}}, doc.NodeList.Edges)
 }
 
-// TestSPDX3LifecycleScopeIsDropped covers the decision that protobom holds
-// no lifecycle scope: a scoped relationship is read as the relationship it
-// is, without the period it holds during.
-func TestSPDX3LifecycleScopeIsDropped(t *testing.T) {
+// TestSPDX3LifecycleScopeIsRead covers the pairs SPDX 3 states with a
+// lifecycle scoped relationship: protobom names the period with the edge
+// type itself, so "a depends on b during build" is "b is a build dependency
+// of a". A period protobom has no edge type for leaves a plain dependency,
+// or no edge at all for a tool, since protobom cannot say a tool is used
+// without saying when.
+func TestSPDX3LifecycleScopeIsRead(t *testing.T) {
 	t.Parallel()
 
-	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3TwoPackages(`{
-		"type": "LifecycleScopedRelationship",
-		"spdxId": "https://example.com/doc#r",
-		"creationInfo": "_:creationinfo",
-		"from": "https://example.com/doc#a",
-		"relationshipType": "dependsOn",
-		"scope": "build",
-		"to": ["https://example.com/doc#b"]
-	}`)), nil, nil)
-	require.NoError(t, err)
+	for name, tc := range map[string]struct {
+		relType, scope string
+		expected       []*sbom.Edge
+	}{
+		"build dependency": {"dependsOn", "build", []*sbom.Edge{{
+			Type: sbom.Edge_buildDependency, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"dev dependency": {"dependsOn", "development", []*sbom.Edge{{
+			Type: sbom.Edge_devDependency, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"runtime dependency": {"dependsOn", "runtime", []*sbom.Edge{{
+			Type: sbom.Edge_runtimeDependency, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"test dependency": {"dependsOn", "test", []*sbom.Edge{{
+			Type: sbom.Edge_testDependency, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"build tool": {"usesTool", "build", []*sbom.Edge{{
+			Type: sbom.Edge_buildTool, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"dev tool": {"usesTool", "development", []*sbom.Edge{{
+			Type: sbom.Edge_devTool, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"test tool": {"usesTool", "test", []*sbom.Edge{{
+			Type: sbom.Edge_testTool, From: "https://example.com/doc#b", To: []string{"https://example.com/doc#a"},
+		}}},
+		"dependency during design is a plain dependency": {"dependsOn", "design", []*sbom.Edge{{
+			Type: sbom.Edge_dependsOn, From: "https://example.com/doc#a", To: []string{"https://example.com/doc#b"},
+		}}},
+		"tool during design is dropped": {"usesTool", "design", []*sbom.Edge{}},
+		"scoped containment is containment": {"contains", "runtime", []*sbom.Edge{{
+			Type: sbom.Edge_contains, From: "https://example.com/doc#a", To: []string{"https://example.com/doc#b"},
+		}}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3TwoPackages(`{
+				"type": "LifecycleScopedRelationship",
+				"spdxId": "https://example.com/doc#r",
+				"creationInfo": "_:creationinfo",
+				"from": "https://example.com/doc#a",
+				"relationshipType": "`+tc.relType+`",
+				"scope": "`+tc.scope+`",
+				"to": ["https://example.com/doc#b"]
+			}`)), nil, nil)
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, doc.NodeList.Edges)
+		})
+	}
 
-	require.Equal(t, []*sbom.Edge{{
-		Type: sbom.Edge_dependsOn,
-		From: "https://example.com/doc#a",
-		To:   []string{"https://example.com/doc#b"},
-	}}, doc.NodeList.Edges)
+	// A tool with no period at all cannot be read either.
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3TwoPackages(
+		spdx3Relationship("https://example.com/doc#r", "https://example.com/doc#a", "usesTool", "https://example.com/doc#b"),
+	)), nil, nil)
+	require.NoError(t, err)
+	require.Empty(t, doc.NodeList.Edges)
 }
 
 func TestSPDX3UnserializeCreators(t *testing.T) {
@@ -602,7 +650,11 @@ func TestSPDX3UnserializeCreators(t *testing.T) {
 		},
 		{
 			"type": "SoftwareAgent", "spdxId": "https://example.com/doc#scanner",
-			"creationInfo": "_:creationinfo", "name": "a scanner"
+			"creationInfo": "_:creationinfo", "name": "a scanner",
+			"externalIdentifier": [
+				{"type": "ExternalIdentifier", "externalIdentifierType": "email", "identifier": "scanner@example.com"},
+				{"type": "ExternalIdentifier", "externalIdentifierType": "urlScheme", "identifier": "https://scanner.example.com"}
+			]
 		},
 		{
 			"type": "SoftwareAgent", "spdxId": "https://example.com/doc#protobom",
@@ -630,7 +682,7 @@ func TestSPDX3UnserializeCreators(t *testing.T) {
 	require.Equal(t, []*sbom.Person{
 		{Name: "Jane", Email: "jane@example.com", Url: "https://jane.example.com"},
 		{Name: "Acme", IsOrg: true},
-		{Name: "a scanner", IsSoftwareAgent: true},
+		{Name: "a scanner", IsSoftwareAgent: true, Email: "scanner@example.com", Url: "https://scanner.example.com"},
 	}, doc.Metadata.Authors)
 
 	require.Equal(t, []*sbom.Tool{
@@ -918,4 +970,49 @@ func TestSPDX3LicensesOfElementsNotRead(t *testing.T) {
 	require.Len(t, doc.NodeList.Nodes, 1)
 	require.Empty(t, doc.NodeList.Nodes[0].Licenses)
 	require.Empty(t, doc.NodeList.Edges)
+}
+
+func TestSPDX3UnserializeDocumentTypes(t *testing.T) {
+	t.Parallel()
+
+	doc, err := NewSPDX3().Unserialize(strings.NewReader(spdx3Doc(spdx3CreationInfo+`,
+		{
+			"type": "SpdxDocument",
+			"spdxId": "https://spdx.org/spdxdocs/protobom/test",
+			"creationInfo": "_:creationinfo",
+			"rootElement": ["https://spdx.org/spdxdocs/protobom/test#sbom"]
+		},
+		{
+			"type": "software_Sbom",
+			"spdxId": "https://spdx.org/spdxdocs/protobom/test#sbom",
+			"creationInfo": "_:creationinfo",
+			"software_sbomType": ["build", "runtime", "build", "not-a-kind"]
+		}`)), nil, nil)
+	require.NoError(t, err)
+
+	// The kinds are read in the order stated, once each, and a kind SPDX 3
+	// does not name is skipped rather than failing the document.
+	require.Len(t, doc.Metadata.DocumentTypes, 2)
+	require.Equal(t, sbom.DocumentType_BUILD, doc.Metadata.DocumentTypes[0].GetType())
+	require.Equal(t, sbom.DocumentType_RUNTIME, doc.Metadata.DocumentTypes[1].GetType())
+	require.Nil(t, doc.Metadata.DocumentTypes[0].Name)
+	require.Nil(t, doc.Metadata.DocumentTypes[0].Description)
+}
+
+func TestSPDX3DocumentTypeFromSPDX3(t *testing.T) {
+	t.Parallel()
+	for kind, expected := range map[software.SbomType]sbom.DocumentType_SBOMType{
+		software.SbomTypeAnalyzed: sbom.DocumentType_ANALYZED,
+		software.SbomTypeBuild:    sbom.DocumentType_BUILD,
+		software.SbomTypeDeployed: sbom.DocumentType_DEPLOYED,
+		software.SbomTypeDesign:   sbom.DocumentType_DESIGN,
+		software.SbomTypeRuntime:  sbom.DocumentType_RUNTIME,
+		software.SbomTypeSource:   sbom.DocumentType_SOURCE,
+	} {
+		got, ok := documentTypeFromSPDX3(kind)
+		require.True(t, ok, kind)
+		require.Equal(t, expected, got, kind)
+	}
+	_, ok := documentTypeFromSPDX3(software.SbomType("other"))
+	require.False(t, ok)
 }

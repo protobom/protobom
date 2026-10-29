@@ -600,6 +600,10 @@ enum HashAlgorithm {
   MD6 = 16;
   // SHA-224 hash algorithm, not supported by SPDX formats..
   SHA224 = 17;
+  // Streebog-256 (GOST R 34.11-2012) hash algorithm, not supported by SPDX formats.
+  STREEBOG_256 = 18;
+  // Streebog-512 (GOST R 34.11-2012) hash algorithm, not supported by SPDX formats.
+  STREEBOG_512 = 19;
 }
 
 // Purpose represents different purposes or roles assigned to software entities within the Software Bill of Materials (SBOM).

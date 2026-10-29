@@ -58,6 +58,8 @@ func TestCdxHashAlgoToProtobomAlgo(t *testing.T) {
 	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
 	for c, p := range map[cdx.HashAlgorithm]sbom.HashAlgorithm{
 		cdx.HashAlgoMD5:                      sbom.HashAlgorithm_MD5,
+		cdx.HashAlgoStreebog256:              sbom.HashAlgorithm_STREEBOG_256,
+		cdx.HashAlgoStreebog512:              sbom.HashAlgorithm_STREEBOG_512,
 		cdx.HashAlgoSHA1:                     sbom.HashAlgorithm_SHA1,
 		cdx.HashAlgoSHA256:                   sbom.HashAlgorithm_SHA256,
 		cdx.HashAlgoSHA384:                   sbom.HashAlgorithm_SHA384,

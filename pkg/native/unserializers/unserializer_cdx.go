@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
-	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/licenselist"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -521,10 +521,10 @@ func licenseChoiceString(lc *cdx.LicenseChoice) string {
 	if lc.License.ID != "" {
 		return lc.License.ID
 	}
-	if expression, ok := protospdx.ListedExpression(lc.License.Name); ok {
+	if expression, ok := licenselist.ListedExpression(lc.License.Name); ok {
 		return expression
 	}
-	if id, ok := protospdx.ListedExpression(cdxformats.LicenseRefName(lc.License.Name)); ok {
+	if id, ok := licenselist.ListedExpression(cdxformats.LicenseRefName(lc.License.Name)); ok {
 		return id
 	}
 	return cdxformats.NamedLicenseRef(lc.License.Name)

@@ -12,6 +12,7 @@ import (
 	spdx3types "github.com/carabiner-dev/spdx3/types"
 
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/licenselist"
 )
 
 // licenses folds the licensing back into the elements it belongs to.
@@ -48,7 +49,7 @@ func (rd *spdx3Reader) licenses() {
 				continue
 			}
 			if declared {
-				node.Licenses = append(node.Licenses, protospdx.SplitLicenses(expression, protospdx.OperatorAND)...)
+				node.Licenses = append(node.Licenses, licenselist.SplitLicenses(expression, licenselist.OperatorAND)...)
 				continue
 			}
 			// TODO(degradation): protobom concludes a single licence, so an

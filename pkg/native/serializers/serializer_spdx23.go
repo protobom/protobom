@@ -16,6 +16,7 @@ import (
 	"github.com/spdx/tools-golang/spdx/v2/v2_3"
 
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/licenselist"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -58,8 +59,8 @@ type SPDX23Options struct {
 
 // Validate returns an error if the SPDX options are invalid
 func (o *SPDX23Options) Validate() error {
-	if o.LicenseExpressionOperator != protospdx.OperatorOR && o.LicenseExpressionOperator != protospdx.OperatorAND {
-		return fmt.Errorf("invalid LicenseExpressionOperator, must be '%s' or '%s'", protospdx.OperatorOR, protospdx.OperatorAND)
+	if o.LicenseExpressionOperator != licenselist.OperatorOR && o.LicenseExpressionOperator != licenselist.OperatorAND {
+		return fmt.Errorf("invalid LicenseExpressionOperator, must be '%s' or '%s'", licenselist.OperatorOR, licenselist.OperatorAND)
 	}
 	return nil
 }
@@ -68,7 +69,7 @@ var DefaultSPDX23Options = SPDX23Options{
 	FailOnInvalidDocIdFragment: false,
 	FailOnMultipleLicenses:     false,
 	GenerateDocumentID:         true,
-	LicenseExpressionOperator:  protospdx.OperatorOR,
+	LicenseExpressionOperator:  licenselist.OperatorOR,
 }
 
 const spdxOther = "OTHER"
@@ -357,7 +358,7 @@ func (s *SPDX23) buildPackages(
 
 		// Licenses that are compound expressions themselves are bracketed
 		// so the joined expression keeps the meaning of each.
-		declared, err := protospdx.JoinLicenses(node.Licenses, spdxopts.LicenseExpressionOperator)
+		declared, err := licenselist.JoinLicenses(node.Licenses, spdxopts.LicenseExpressionOperator)
 		if err != nil {
 			return nil, fmt.Errorf("node %q: joining declared licenses: %w", node.Id, err)
 		}

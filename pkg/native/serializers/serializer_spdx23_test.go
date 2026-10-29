@@ -13,6 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/licenselist"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -645,20 +646,20 @@ func TestSPDX23DeclaredLicenses(t *testing.T) {
 		operator string
 		expected string
 	}{
-		{"none", nil, protospdx.OperatorOR, ""},
-		{"one", []string{"MIT"}, protospdx.OperatorOR, "MIT"},
-		{"a single compound entry is kept", []string{"MIT OR Apache-2.0"}, protospdx.OperatorAND, "MIT OR Apache-2.0"},
-		{"simple entries", []string{"MIT", "Apache-2.0"}, protospdx.OperatorOR, "MIT OR Apache-2.0"},
+		{"none", nil, licenselist.OperatorOR, ""},
+		{"one", []string{"MIT"}, licenselist.OperatorOR, "MIT"},
+		{"a single compound entry is kept", []string{"MIT OR Apache-2.0"}, licenselist.OperatorAND, "MIT OR Apache-2.0"},
+		{"simple entries", []string{"MIT", "Apache-2.0"}, licenselist.OperatorOR, "MIT OR Apache-2.0"},
 		{
 			"a compound entry is bracketed",
 			[]string{"MIT OR Apache-2.0", "BSD-3-Clause"},
-			protospdx.OperatorAND,
+			licenselist.OperatorAND,
 			"(MIT OR Apache-2.0) AND BSD-3-Clause",
 		},
 		{
 			"a compound entry is bracketed with the default operator",
 			[]string{"MIT AND Apache-2.0", "BSD-3-Clause"},
-			protospdx.OperatorOR,
+			licenselist.OperatorOR,
 			"(MIT AND Apache-2.0) OR BSD-3-Clause",
 		},
 	} {

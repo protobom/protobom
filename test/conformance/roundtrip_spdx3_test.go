@@ -14,7 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/protobom/protobom/pkg/formats"
-	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/licenselist"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/native/serializers"
 	"github.com/protobom/protobom/pkg/reader"
@@ -747,7 +747,7 @@ func TestConvertSPDX3ToSPDX23Licenses(t *testing.T) {
 	}{
 		// Joined with AND, as SPDX 3 reads a list of licenses, the
 		// expression is the one the SPDX 3 document declared.
-		"AND": {protospdx.OperatorAND, expression},
+		"AND": {licenselist.OperatorAND, expression},
 		// TODO: the SPDX 2.3 writer joins with OR by default, which reads
 		// the list differently than SPDX 3 does. The bracket still keeps
 		// the choice together.

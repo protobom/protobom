@@ -22,6 +22,7 @@ import (
 	spdx3types "github.com/carabiner-dev/spdx3/types"
 
 	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
+	"github.com/protobom/protobom/pkg/licenselist"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -510,7 +511,7 @@ func (t *spdx3Translator) nodeLicenses(n *sbom.Node, element core.ElementDescend
 	// one expression. The list is read as licenses that all apply, so they
 	// are joined with AND, and compound entries are bracketed to keep their
 	// meaning.
-	declared, err := protospdx.JoinLicenses(n.Licenses, protospdx.OperatorAND)
+	declared, err := licenselist.JoinLicenses(n.Licenses, licenselist.OperatorAND)
 	if err != nil {
 		return fmt.Errorf("joining declared licenses: %w", err)
 	}

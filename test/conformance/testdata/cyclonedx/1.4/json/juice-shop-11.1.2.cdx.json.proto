@@ -2,7 +2,7 @@
 ã
 -urn:uuid:1f860713-54b9-4253-ba5a-9554851904af1"•…žùÀÒï*"
 Node.js module2.0.0	CycloneDXJü
-*application/vnd.cyclonedx+json;version=1.4…€366c6f121289a7a37f3d34e4ff533bc0eb62670a30b240b5f09b10e4f414b4c29235cfdc40fdeb26a392b8d8ce83128e4fdd4bf3cbda819b17915c1fc4046078,(1ed400d53c4977e4f6721f58cef55dc91b2a3ee4D@3d5e265e2ca8493098b93d7dd899a1cbd172aff0df97ae7b3f904748827c30d0ª«-"Nfile://test/conformance/testdata/cyclonedx/1.4/json/juice-shop-11.1.2.cdx.json÷¸
+*application/vnd.cyclonedx+json;version=1.4D@3d5e265e2ca8493098b93d7dd899a1cbd172aff0df97ae7b3f904748827c30d0…€366c6f121289a7a37f3d34e4ff533bc0eb62670a30b240b5f09b10e4f414b4c29235cfdc40fdeb26a392b8d8ce83128e4fdd4bf3cbda819b17915c1fc4046078,(1ed400d53c4977e4f6721f58cef55dc91b2a3ee4ª«-"Nfile://test/conformance/testdata/cyclonedx/1.4/json/juice-shop-11.1.2.cdx.jsonÿ»
 ª
 pkg:npm/juice-shop@11.1.2
 juice-shop"11.1.22https://owasp-juice.shopBMITJMITŠCProbably the most modern and sophisticated insecure web applicationÂ3
@@ -433,8 +433,8 @@ source-map"0.5.72%https://github.com/mozilla/source-mapBBSD-3-ClauseJBSD-3-Cl
  pkg:npm/source-map-resolve@0.5.3source-map-resolve"0.5.323https://github.com/lydell/source-map-resolve#readmeBMITJMITŠ;Resolve the source map and/or sources for a generated file.Â7
 3https://github.com/lydell/source-map-resolve/issues8Â8
 4git+https://github.com/lydell/source-map-resolve.git88â$ pkg:npm/source-map-resolve@0.5.3ê,(190866bece7553e1f8f267a2ee82c606b5509a1aò
-’
-pkg:npm/atob@2.1.2atob"2.1.22-https://git.coolaj86.com/coolaj86/atob.js.gitŠAatob for Node.JS and Linux / Mac / Windows CLI (it's a one-liner)Â/
+¸
+pkg:npm/atob@2.1.2atob"2.1.22-https://git.coolaj86.com/coolaj86/atob.js.gitBMIT OR Apache-2.0JMIT OR Apache-2.0ŠAatob for Node.JS and Linux / Mac / Windows CLI (it's a one-liner)Â/
 +git://git.coolaj86.com/coolaj86/atob.js.git88âpkg:npm/atob@2.1.2ê,(6d9517eb9e030d2436666651e86bd9f6f13533c9ò
 
 "pkg:npm/decode-uri-component@0.2.0decode-uri-component"0.2.02=https://github.com/SamVerschueren/decode-uri-component#readmeBMITJMITŠA better decodeURIComponentÂA
@@ -1959,8 +1959,8 @@ strip-ansi"4.0.02*https://github.com/chalk/strip-ansi#readmeBMITJMITŠStrip 
 ansi-regex"3.0.02*https://github.com/chalk/ansi-regex#readmeBMITJMITŠ1Regular expression for matching ANSI escape codesÂ.
 *https://github.com/chalk/ansi-regex/issues8Â/
 +git+https://github.com/chalk/ansi-regex.git88âpkg:npm/ansi-regex@3.0.0ê,(ed0317c322064f79466c02966bddb605ab37d998ò
-‘
-pkg:npm/rc@1.2.8rc"1.2.82(https://github.com/dominictarr/rc#readmeŠhardwired configuration loaderÂ,
+×
+pkg:npm/rc@1.2.8rc"1.2.82(https://github.com/dominictarr/rc#readmeB!BSD-2-Clause OR MIT OR Apache-2.0J!BSD-2-Clause OR MIT OR Apache-2.0Šhardwired configuration loaderÂ,
 (https://github.com/dominictarr/rc/issues8Â-
 )git+https://github.com/dominictarr/rc.git88âpkg:npm/rc@1.2.8ê,(cd924bf5200a075b83c188cd6b9e211b7fc0d3edò
 Æ
@@ -2369,8 +2369,8 @@ estraverse"1.5.12+https://github.com/Constellation/estraverseŠ%ECMAScript JS A
 source-map"0.1.432%https://github.com/mozilla/source-mapŠ"Generates and consumes source mapsÂ0
 ,https://github.com/mozilla/source-map/issues8Â3
 /git+ssh://git@github.com/mozilla/source-map.git88âpkg:npm/source-map@0.1.43ê,(c24bc146ca517c1471f5dacbe2571b2b7f9e3346ò
-Å
-pkg:npm/amdefine@1.0.1amdefine"1.0.12"http://github.com/jrburke/amdefineŠBProvide AMD's define() API for declaring modules in the AMD formatÂ.
+ï
+pkg:npm/amdefine@1.0.1amdefine"1.0.12"http://github.com/jrburke/amdefineBBSD-3-Clause OR MITJBSD-3-Clause OR MITŠBProvide AMD's define() API for declaring modules in the AMD formatÂ.
 *https://github.com/jrburke/amdefine/issues8Â/
 +git+https://github.com/jrburke/amdefine.git88âpkg:npm/amdefine@1.0.1ê,(4a5282ac164729e93619bcfd3ad151f817ce91f5ò
 Ë
@@ -2655,8 +2655,8 @@ lazy-cache"1.0.42+https://github.com/jonschlinkert/lazy-cacheBMITJMITŠ-Cache
 pkg:npm/right-align@0.1.3right-align"0.1.32,https://github.com/jonschlinkert/right-alignBMITJMITŠ!Right-align the text in a string.Â7
 3https://github.com/jonschlinkert/right-align/issues8Â2
 .git://github.com/jonschlinkert/right-align.git88âpkg:npm/right-align@0.1.3ê,(61339b722fe6a3515689210d24e14c96148613efò
-Õ
-pkg:npm/wordwrap@0.0.2wordwrap"0.0.220https://github.com/substack/node-wordwrap#readmeŠ>Wrap those words. Show them at what columns to start and stop.Â4
+“
+pkg:npm/wordwrap@0.0.2wordwrap"0.0.220https://github.com/substack/node-wordwrap#readmeBLicenseRef-x-protobom-MIT-X11JLicenseRef-x-protobom-MIT-X11Š>Wrap those words. Show them at what columns to start and stop.Â4
 0https://github.com/substack/node-wordwrap/issues8Â/
 +git://github.com/substack/node-wordwrap.git88âpkg:npm/wordwrap@0.0.2ê,(b79669bb42ecb409f83d583cad52ca17eaa1643fò
 …
@@ -2941,8 +2941,8 @@ $git+https://github.com/ljharb/qs.git88âpkg:npm/qs@6.5.2ê,(cb3ae806e87
 pkg:npm/uuid@3.4.0uuid"3.4.02%https://github.com/uuidjs/uuid#readmeBMITJMITŠRFC4122 (v1, v4, and v5) UUIDsÂ)
 %https://github.com/uuidjs/uuid/issues8Â*
 &git+https://github.com/uuidjs/uuid.git88âpkg:npm/uuid@3.4.0ê,(b23e4358afa8a202fe7a100af1f5f883f02007eeò
-ù
-pkg:npm/sanitize-filename@1.6.3sanitize-filename"1.6.328https://github.com/parshap/node-sanitize-filename#readmeŠ'Sanitize a string for use as a filenameÂ<
+•
+pkg:npm/sanitize-filename@1.6.3sanitize-filename"1.6.328https://github.com/parshap/node-sanitize-filename#readmeBWTFPL OR ISCJWTFPL OR ISCŠ'Sanitize a string for use as a filenameÂ<
 8https://github.com/parshap/node-sanitize-filename/issues8Â?
 ;git+ssh://git@github.com/parshap/node-sanitize-filename.git88â#pkg:npm/sanitize-filename@1.6.3ê,(755ebd752045931977e30b2025d340d7c9090378ò
 ƒ
@@ -3236,12 +3236,12 @@ Apache-2.0Šg[![NPM version](https://badge.fury.io/js/swagger-ui-dist.svg)](http
 pkg:npm/buffers@0.1.1buffers"0.1.12/https://github.com/substack/node-buffers#readmeŠNTreat a collection of Buffers as a single contiguous partially mutable Buffer.Â3
 /https://github.com/substack/node-buffers/issues8Â6
 2git+ssh://git@github.com/substack/node-buffers.git88âpkg:npm/buffers@0.1.1ê,(b24579c3bed4d6d396aeee6d9a8ae7f5482ab7bbò
-ê
-pkg:npm/chainsaw@0.1.0chainsaw"0.1.020https://github.com/substack/node-chainsaw#readmeŠKBuild chainable fluent interfaces the easy way... with a freakin' chainsaw!Â4
+¨
+pkg:npm/chainsaw@0.1.0chainsaw"0.1.020https://github.com/substack/node-chainsaw#readmeBLicenseRef-x-protobom-MIT-X11JLicenseRef-x-protobom-MIT-X11ŠKBuild chainable fluent interfaces the easy way... with a freakin' chainsaw!Â4
 0https://github.com/substack/node-chainsaw/issues8Â7
 3git+ssh://git@github.com/substack/node-chainsaw.git88âpkg:npm/chainsaw@0.1.0ê,(5eab50b28afe58074d0d58291388828b5e5fbc98ò
-â
-pkg:npm/traverse@0.3.9traverse"0.3.92.https://github.com/substack/js-traverse#readmeŠITraverse and transform objects by visiting every node on a recursive walkÂ2
+ 
+pkg:npm/traverse@0.3.9traverse"0.3.92.https://github.com/substack/js-traverse#readmeBLicenseRef-x-protobom-MIT-X11JLicenseRef-x-protobom-MIT-X11ŠITraverse and transform objects by visiting every node on a recursive walkÂ2
 .https://github.com/substack/js-traverse/issues8Â5
 1git+ssh://git@github.com/substack/js-traverse.git88âpkg:npm/traverse@0.3.9ê,(717b8f220cc0bb7b44e40514c22b2e8bbc70d8b9ò
 â
@@ -3377,8 +3377,8 @@ $https://github.com/Qix-/color/issues8Â)
 pkg:npm/z85@0.0.2z85"0.0.22$https://github.com/msealand/z85.nodeBMITJMITŠZeroMQ Base-85 EncodingÂ/
 +https://github.com/msealand/z85.node/issues8Â0
 ,git+https://github.com/msealand/z85.node.git88âpkg:npm/z85@0.0.2ê,(45d353b13e4ee3d376c3fbd37dcda85feed8b0d3ò
-è
-pkg:npm/expand-template@2.0.3expand-template"2.0.320https://github.com/ralphtheninja/expand-templateŠ(Expand placeholders in a template stringÂ;
+„
+pkg:npm/expand-template@2.0.3expand-template"2.0.320https://github.com/ralphtheninja/expand-templateBMIT OR WTFPLJMIT OR WTFPLŠ(Expand placeholders in a template stringÂ;
 7https://github.com/ralphtheninja/expand-template/issues8Â<
 8git+https://github.com/ralphtheninja/expand-template.git88â!pkg:npm/expand-template@2.0.3ê,(6e14b3fcee0f3a6340ecb57d2e8918692052a47cò
 û

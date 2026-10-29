@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
+	"github.com/protobom/protobom/pkg/licenselist"
 	"github.com/protobom/protobom/pkg/mod"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
@@ -475,9 +476,12 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		licenseChoices = append(licenseChoices, protobomLicenseToCdx(l))
 	}
 	// From 1.6 on, CycloneDX can state the concluded license apart from the
-	// declared ones through the license acknowledgement.
+	// declared ones through the license acknowledgement. A concluded license
+	// that only restates the declared list is not written: the reader derives
+	// it again from the declared entries, so writing it would add an entry
+	// the source never had on every pass through CycloneDX.
 	// TODO(degradation): below 1.6 the concluded license is not written.
-	if n.LicenseConcluded != "" && s.supportsLicenseAcknowledgment() {
+	if s.statesConcludedLicense(n) {
 		licenseChoices = append(licenseChoices, protobomConcludedLicenseToCdx(n.LicenseConcluded))
 	}
 	if len(licenseChoices) > 0 {
@@ -749,17 +753,35 @@ func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference
 }
 
 // protobomLicenseToCdx renders a single protobom license string as a CycloneDX
-// license choice. A compound SPDX expression is emitted through the Expression
-// field; a bare license keeps using License.ID. CycloneDX only accepts a single
-// SPDX identifier in License.ID, so placing an expression there (e.g.
-// "Apache-2.0 OR MIT") produces an invalid document and defeats the round-trip:
-// the unserializer already reads an expression back into the same license slice
-// (see licenseChoicesToLicenseList).
+// license choice. CycloneDX only accepts a listed SPDX identifier in
+// License.ID, so the string is placed by what it is:
+//
+//   - A license reference protobom minted from a CycloneDX license name
+//     (see cdxformats.NamedLicenseRefPrefix) goes back to License.Name.
+//   - Any other license reference came from an SPDX document and is emitted
+//     through the Expression field, which takes any SPDX expression and so
+//     preserves the reference as is.
+//   - A compound SPDX expression is emitted through the Expression field too.
+//   - A license in the SPDX License List goes to License.ID in its canonical
+//     spelling, since the field is case sensitive.
+//   - Any other bare license is not an identifier CycloneDX accepts and is
+//     written as a license name.
+//     TODO(degradation): the unserializer reads such a name back as a
+//     marked license reference rather than the original string.
+//
+// The unserializer reads each form back into the same license slice (see
+// licenseChoicesToLicenseList), which keeps the round trip.
 func protobomLicenseToCdx(license string) cdx.LicenseChoice {
-	if isSPDXLicenseExpression(license) {
+	if name, ok := cdxformats.LicenseNameFromRef(license); ok {
+		return cdx.LicenseChoice{License: &cdx.License{Name: name}}
+	}
+	if cdxformats.IsLicenseRef(license) || isSPDXLicenseExpression(license) {
 		return cdx.LicenseChoice{Expression: license}
 	}
-	return cdx.LicenseChoice{License: &cdx.License{ID: license}}
+	if canonical, _, ok := licenselist.License(license); ok {
+		return cdx.LicenseChoice{License: &cdx.License{ID: canonical}}
+	}
+	return cdx.LicenseChoice{License: &cdx.License{Name: license}}
 }
 
 // protobomConcludedLicenseToCdx renders the concluded license as a CycloneDX
@@ -775,6 +797,17 @@ func protobomConcludedLicenseToCdx(license string) cdx.LicenseChoice {
 		choice.Acknowledgement = &ack
 	}
 	return choice
+}
+
+// statesConcludedLicense reports whether the node's concluded license has to
+// be written as an acknowledged entry: the target version supports the
+// acknowledgement and the concluded license says more than the declared list,
+// that is, it differs from what the reader derives from the declared entries.
+func (s *CDX) statesConcludedLicense(n *sbom.Node) bool {
+	if n.LicenseConcluded == "" || !s.supportsLicenseAcknowledgment() {
+		return false
+	}
+	return n.LicenseConcluded != cdxformats.DerivedConcludedLicense(n.Licenses)
 }
 
 // supportsLicenseAcknowledgment reports whether the CycloneDX version being

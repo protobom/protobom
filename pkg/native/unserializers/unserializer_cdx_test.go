@@ -500,3 +500,88 @@ func TestCDXLifecyclesToDocumentTypes(t *testing.T) {
 	require.Nil(t, res.Metadata.DocumentTypes[2].Type)
 	require.Equal(t, "audit", res.Metadata.DocumentTypes[2].GetName())
 }
+
+func TestLicenseChoiceString(t *testing.T) {
+	for name, tc := range map[string]struct {
+		choice   cdx.LicenseChoice
+		expected string
+	}{
+		"expression": {cdx.LicenseChoice{Expression: "MIT OR Apache-2.0"}, "MIT OR Apache-2.0"},
+		"identifier": {cdx.LicenseChoice{License: &cdx.License{ID: "MIT"}}, "MIT"},
+		"identifier wins over name": {
+			cdx.LicenseChoice{License: &cdx.License{ID: "MIT", Name: "The MIT License"}}, "MIT",
+		},
+		"name only": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "GPL"}}, "LicenseRef-x-protobom-GPL",
+		},
+		"name with url and text": {
+			cdx.LicenseChoice{License: &cdx.License{
+				Name: "Custom Corp License", URL: "https://example.com/license",
+				Text: &cdx.AttachedText{Content: "You may..."},
+			}},
+			"LicenseRef-x-protobom-Custom-Corp-License",
+		},
+		"name of nothing but invalid characters": {cdx.LicenseChoice{License: &cdx.License{Name: "++"}}, ""},
+		// Older producers wrote expressions and ids in the name field.
+		"name spelling a listed id": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "MIT"}}, "MIT",
+		},
+		"name spelling a listed id in another case": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "mit"}}, "MIT",
+		},
+		"name spelling an expression": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "(MIT OR Apache-2.0)"}}, "MIT OR Apache-2.0",
+		},
+		"name spelling an expression with an exception": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "GPL-2.0-only WITH Classpath-exception-2.0"}},
+			"GPL-2.0-only WITH Classpath-exception-2.0",
+		},
+		"name spelling a listed id with other punctuation": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "ZPL 2.1"}}, "ZPL-2.1",
+		},
+		"name spelling a listed id with other punctuation and case": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "bsd 3 clause"}}, "BSD-3-Clause",
+		},
+		"name with an unlisted token is a reference": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "MIT OR Foo"}}, "LicenseRef-x-protobom-MIT-OR-Foo",
+		},
+		"name with a slash is a reference": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "MIT/X11"}}, "LicenseRef-x-protobom-MIT-X11",
+		},
+		"empty license": {cdx.LicenseChoice{License: &cdx.License{}}, ""},
+		"nil license":   {cdx.LicenseChoice{}, ""},
+	} {
+		t.Run(name, func(t *testing.T) {
+			require.Equal(t, tc.expected, licenseChoiceString(&tc.choice))
+		})
+	}
+}
+
+func TestUnserializeNamedLicenses(t *testing.T) {
+	data := `{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"component": {
+				"bom-ref": "root", "type": "application", "name": "root",
+				"licenses": [
+					{"license": {"id": "MIT"}},
+					{"license": {"name": "GPL"}},
+					{"license": {"name": "Perl like licence"}}
+				]
+			}
+		}
+	}`
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(data), nil, nil)
+	require.NoError(t, err)
+	root := doc.NodeList.GetNodeByID("root")
+	require.NotNil(t, root)
+	require.Equal(t, []string{
+		"MIT", "LicenseRef-x-protobom-GPL", "LicenseRef-x-protobom-Perl-like-licence",
+	}, root.Licenses)
+	require.Equal(
+		t, "MIT OR LicenseRef-x-protobom-GPL OR LicenseRef-x-protobom-Perl-like-licence", root.LicenseConcluded,
+	)
+}

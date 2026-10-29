@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
+	"github.com/protobom/protobom/pkg/licenselist"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -492,18 +493,41 @@ func isConcludedLicense(lc *cdx.LicenseChoice) bool {
 }
 
 // licenseChoiceString returns the string form of a license choice, or an
-// empty string when the choice states no license.
+// empty string when the choice states no license. An expression and a
+// listed identifier are read as they are. A license that only has a name
+// is read, in this order, as:
+//
+//   - The SPDX expression the name spells when it is one naming only
+//     listed licenses, which older producers wrote in the name field.
+//   - The listed identifier the name spells once restricted to the
+//     characters a license reference admits, so "ZPL 2.1" is ZPL-2.1 and
+//     "BSD-3-clause-SUN" is BSD-3-Clause-Sun. Only case and punctuation
+//     may differ, the name is never mapped to a different identifier.
+//   - A license reference minted from the name, marked so the serializer
+//     can write it back as a name (see cdxformats.NamedLicenseRef).
+//
+// The second rule keeps the round trip stable: the serializer writes a
+// minted reference back as the restricted name, which would otherwise be
+// read as the identifier it spells the second time around.
+// TODO(degradation): the license text and URL have no place in protobom
+// and are dropped.
 func licenseChoiceString(lc *cdx.LicenseChoice) string {
-	// TODO(license): This should handle licenses without an ID and
-	// create custom licenses or another solution that captures the
-	// full custom license text.
 	if lc.Expression != "" {
 		return lc.Expression
 	}
-	if lc.License != nil {
+	if lc.License == nil {
+		return ""
+	}
+	if lc.License.ID != "" {
 		return lc.License.ID
 	}
-	return ""
+	if expression, ok := licenselist.ListedExpression(lc.License.Name); ok {
+		return expression
+	}
+	if id, ok := licenselist.ListedExpression(cdxformats.LicenseRefName(lc.License.Name)); ok {
+		return id
+	}
+	return cdxformats.NamedLicenseRef(lc.License.Name)
 }
 
 // licenseChoicesToLicenseList returns a flat list of the declared license
@@ -530,7 +554,8 @@ func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 
 // licenseChoicesToLicenseString takes the component license data and computes
 // the concluded license expression: the licenses marked with the concluded
-// acknowledgement or, when there are none, the joined declared entries. It
+// acknowledgement or, when there are none, the concluded license derived
+// from the declared entries (see cdxformats.DerivedConcludedLicense). It
 // will return the license or expression verbatim if its just a single entry.
 // This function is temporary and probably should be part of a more complete
 // license package.
@@ -538,7 +563,7 @@ func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 	if lcs == nil {
 		return ""
 	}
-	var parts, concluded []string
+	var declared, concluded []string
 	for i := range *lcs {
 		lc := &(*lcs)[i]
 		s := licenseChoiceString(lc)
@@ -548,17 +573,14 @@ func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 		if isConcludedLicense(lc) {
 			concluded = append(concluded, s)
 		} else {
-			parts = append(parts, s)
+			declared = append(declared, s)
 		}
 	}
 
 	if len(concluded) > 0 {
-		parts = concluded
+		return cdxformats.DerivedConcludedLicense(concluded)
 	}
-	if len(parts) == 1 {
-		return parts[0]
-	}
-	return strings.Join(parts, " OR ")
+	return cdxformats.DerivedConcludedLicense(declared)
 }
 
 // phaseToSBOMType converts a CycloneDX lifecycle phase to an SBOM document type

@@ -18,13 +18,24 @@ const (
 )
 
 // NamedLicenseRef mints the license reference protobom carries a CycloneDX
-// license that only has a name as. The name is restricted to the characters
-// an SPDX license reference admits (letters, digits, dot and dash): any
-// other run of characters becomes a single dash and dashes at either end
-// are dropped. It returns an empty string when nothing of the name survives.
+// license that only has a name as: the marker prefix followed by the name
+// as LicenseRefName spells it. It returns an empty string when nothing of
+// the name survives.
 // TODO(degradation): the original spelling of a name that needed changes
 // is lost.
 func NamedLicenseRef(name string) string {
+	name = LicenseRefName(name)
+	if name == "" {
+		return ""
+	}
+	return NamedLicenseRefPrefix + name
+}
+
+// LicenseRefName restricts a license name to the characters an SPDX license
+// reference admits (letters, digits, dot and dash): any other run of
+// characters, dashes included, becomes a single dash and dashes at either
+// end are dropped. The result is stable: spelling it again changes nothing.
+func LicenseRefName(name string) string {
 	var b strings.Builder
 	dash := false
 	for _, r := range name {
@@ -39,10 +50,7 @@ func NamedLicenseRef(name string) string {
 			dash = true
 		}
 	}
-	if b.Len() == 0 {
-		return ""
-	}
-	return NamedLicenseRefPrefix + b.String()
+	return b.String()
 }
 
 // LicenseNameFromRef returns the name carried by a license reference protobom

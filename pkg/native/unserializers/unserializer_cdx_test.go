@@ -522,8 +522,34 @@ func TestLicenseChoiceString(t *testing.T) {
 			"LicenseRef-x-protobom-Custom-Corp-License",
 		},
 		"name of nothing but invalid characters": {cdx.LicenseChoice{License: &cdx.License{Name: "++"}}, ""},
-		"empty license":                          {cdx.LicenseChoice{License: &cdx.License{}}, ""},
-		"nil license":                            {cdx.LicenseChoice{}, ""},
+		// Older producers wrote expressions and ids in the name field.
+		"name spelling a listed id": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "MIT"}}, "MIT",
+		},
+		"name spelling a listed id in another case": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "mit"}}, "MIT",
+		},
+		"name spelling an expression": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "(MIT OR Apache-2.0)"}}, "MIT OR Apache-2.0",
+		},
+		"name spelling an expression with an exception": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "GPL-2.0-only WITH Classpath-exception-2.0"}},
+			"GPL-2.0-only WITH Classpath-exception-2.0",
+		},
+		"name spelling a listed id with other punctuation": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "ZPL 2.1"}}, "ZPL-2.1",
+		},
+		"name spelling a listed id with other punctuation and case": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "bsd 3 clause"}}, "BSD-3-Clause",
+		},
+		"name with an unlisted token is a reference": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "MIT OR Foo"}}, "LicenseRef-x-protobom-MIT-OR-Foo",
+		},
+		"name with a slash is a reference": {
+			cdx.LicenseChoice{License: &cdx.License{Name: "MIT/X11"}}, "LicenseRef-x-protobom-MIT-X11",
+		},
+		"empty license": {cdx.LicenseChoice{License: &cdx.License{}}, ""},
+		"nil license":   {cdx.LicenseChoice{}, ""},
 	} {
 		t.Run(name, func(t *testing.T) {
 			require.Equal(t, tc.expected, licenseChoiceString(&tc.choice))

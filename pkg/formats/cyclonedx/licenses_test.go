@@ -76,3 +76,10 @@ func TestNamedLicenseRef(t *testing.T) {
 		})
 	}
 }
+
+func TestLicenseRefNameIsStable(t *testing.T) {
+	for _, name := range []string{"GPL", "ZPL 2.1", "Magick++", "  BSD (3 clause)  ", "a--b", "-a-", "++", ""} {
+		once := LicenseRefName(name)
+		require.Equal(t, once, LicenseRefName(once), "%q", name)
+	}
+}

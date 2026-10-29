@@ -304,6 +304,34 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 		}, *bom.Metadata.Component.Licenses)
 	})
 
+	// Older producers wrote expressions in the license name. One naming
+	// only listed licenses is read as the expression and written back
+	// through the expression field, which is where it belongs. A name that
+	// is not an expression stays a name, in the spelling a reference admits.
+	t.Run("a license name spelling an expression is written as the expression", func(t *testing.T) {
+		source := `{"bomFormat":"CycloneDX","specVersion":"1.4","version":1,
+			"serialNumber":"urn:uuid:11111111-2222-3333-4444-555555555555",
+			"metadata":{"component":{"bom-ref":"root","type":"library","name":"n",
+				"licenses":[{"license":{"name":"(MIT OR Apache-2.0)"}},{"license":{"name":"MIT/X11"}}]}}}`
+
+		doc, err := reader.New().ParseStream(bytes.NewReader([]byte(source)))
+		require.NoError(t, err)
+		node := doc.NodeList.GetNodeByID("root")
+		require.NotNil(t, node)
+		require.Equal(t, []string{"MIT OR Apache-2.0", "LicenseRef-x-protobom-MIT-X11"}, node.Licenses)
+
+		var buf bytes.Buffer
+		require.NoError(t, writer.New().WriteStreamWithOptions(
+			doc, &buf, &writer.Options{Format: formats.CDX14JSON},
+		))
+		bom := new(cdx.BOM)
+		require.NoError(t, cdx.NewBOMDecoder(bytes.NewReader(buf.Bytes()), cdx.BOMFileFormatJSON).Decode(bom))
+		require.NotNil(t, bom.Metadata.Component.Licenses)
+		require.Equal(t, cdx.Licenses{
+			{Expression: "MIT OR Apache-2.0"}, {License: &cdx.License{Name: "MIT-X11"}},
+		}, *bom.Metadata.Component.Licenses)
+	})
+
 	// TODO(degradation): CycloneDX below 1.6 has no license acknowledgement,
 	// so a concluded license that the declared list cannot reproduce is
 	// lost there.

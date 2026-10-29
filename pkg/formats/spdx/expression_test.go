@@ -177,3 +177,49 @@ func TestJoinSplitLicensesSingleCompoundEntry(t *testing.T) {
 	require.Equal(t, "MIT AND BSD-3-Clause", joined)
 	require.Equal(t, []string{"MIT", "BSD-3-Clause"}, SplitLicenses(joined, OperatorAND))
 }
+
+func TestListedExpression(t *testing.T) {
+	for name, tc := range map[string]struct {
+		in       string
+		expected string
+		ok       bool
+	}{
+		"listed id":                     {"MIT", "MIT", true},
+		"listed id in another case":     {"mit", "MIT", true},
+		"deprecated id":                 {"GPL-2.0", "GPL-2.0", true},
+		"plus suffix":                   {"GPL-2.0-or-later+", "GPL-2.0-or-later+", true},
+		"or":                            {"MIT OR Apache-2.0", "MIT OR Apache-2.0", true},
+		"lower case operator":           {"MIT or Apache-2.0", "MIT OR Apache-2.0", true},
+		"and with grouping":             {"(MIT OR Apache-2.0) AND BSD-3-Clause", "(MIT OR Apache-2.0) AND BSD-3-Clause", true},
+		"enclosing parentheses removed": {"(MIT OR Apache-2.0)", "MIT OR Apache-2.0", true},
+		"with exception":                {"GPL-2.0-only WITH Classpath-exception-2.0", "GPL-2.0-only WITH Classpath-exception-2.0", true},
+		"with in another case":          {"GPL-2.0-only with classpath-exception-2.0", "GPL-2.0-only WITH Classpath-exception-2.0", true},
+		"license reference":             {"LicenseRef-GPL", "LicenseRef-GPL", true},
+		"reference in an expression":    {"MIT OR LicenseRef-x-protobom-GPL", "MIT OR LicenseRef-x-protobom-GPL", true},
+		"document reference":            {"DocumentRef-spdx-tool-1.2:LicenseRef-MIT-Style-2", "DocumentRef-spdx-tool-1.2:LicenseRef-MIT-Style-2", true},
+		"extra spaces":                  {"  MIT   OR\tApache-2.0 ", "MIT OR Apache-2.0", true},
+		"nested groups":                 {"((MIT OR Apache-2.0) AND (BSD-3-Clause OR ISC))", "(MIT OR Apache-2.0) AND (BSD-3-Clause OR ISC)", true},
+
+		"free form name":           {"GPL", "", false},
+		"slash is not an operator": {"MIT/X11", "", false},
+		"unlisted token in or":     {"MIT OR Foo", "", false},
+		"unlisted exception":       {"GPL-2.0-only WITH Foo-exception", "", false},
+		"exception as a license":   {"Classpath-exception-2.0", "", false},
+		"with without exception":   {"GPL-2.0-only WITH", "", false},
+		"dangling operator":        {"MIT OR", "", false},
+		"leading operator":         {"OR MIT", "", false},
+		"two operands":             {"MIT Apache-2.0", "", false},
+		"unbalanced open":          {"(MIT OR Apache-2.0", "", false},
+		"unbalanced close":         {"MIT OR Apache-2.0)", "", false},
+		"empty group":              {"MIT OR ()", "", false},
+		"empty":                    {"", "", false},
+		"only parentheses":         {"()", "", false},
+		"document reference alone": {"DocumentRef-foo", "", false},
+	} {
+		t.Run(name, func(t *testing.T) {
+			got, ok := ListedExpression(tc.in)
+			require.Equal(t, tc.ok, ok)
+			require.Equal(t, tc.expected, got)
+		})
+	}
+}

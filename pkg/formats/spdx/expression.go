@@ -6,6 +6,8 @@ package spdx
 import (
 	"fmt"
 	"strings"
+
+	"github.com/protobom/protobom/pkg/licenselist"
 )
 
 // The license expression operators that combine licenses.
@@ -168,4 +170,150 @@ func unwrap(expression string) string {
 
 func isExpressionSpace(c byte) bool {
 	return c == ' ' || c == '\t' || c == '\n' || c == '\r'
+}
+
+// The license expression keywords and prefixes besides AND and OR.
+const (
+	operatorWITH     = "WITH"
+	licenseRefPrefix = "LicenseRef-"
+	documentRefTag   = "DocumentRef-"
+)
+
+// ListedExpression reports whether a string is a well formed SPDX license
+// expression that names only licenses and exceptions in the SPDX License
+// List, or license references, and returns it in canonical form: the listed
+// identifiers in their canonical spelling and the operators in upper case,
+// with one pair of parentheses enclosing the whole expression removed.
+//
+// It is how a converter tells an expression from a free-form license name
+// when a format does not say which one it holds. A single listed identifier
+// is an expression too, so a name that merely spells a listed license in
+// another case comes back as that license.
+func ListedExpression(expression string) (string, bool) {
+	expression = unwrap(strings.TrimSpace(expression))
+	if expression == "" {
+		return "", false
+	}
+
+	var out []string
+	depth := 0
+	wantOperand := true
+	i := 0
+	for i < len(expression) {
+		c := expression[i]
+		switch {
+		case isExpressionSpace(c):
+			i++
+			continue
+		case c == '(':
+			if !wantOperand {
+				return "", false
+			}
+			depth++
+			out = append(out, "(")
+			i++
+			continue
+		case c == ')':
+			if wantOperand || depth == 0 {
+				return "", false
+			}
+			depth--
+			out[len(out)-1] += ")"
+			i++
+			continue
+		}
+
+		j := i
+		for j < len(expression) && !isExpressionSpace(expression[j]) &&
+			expression[j] != '(' && expression[j] != ')' {
+			j++
+		}
+		word := expression[i:j]
+		i = j
+
+		switch {
+		case strings.EqualFold(word, OperatorAND), strings.EqualFold(word, OperatorOR):
+			if wantOperand {
+				return "", false
+			}
+			out = append(out, strings.ToUpper(word))
+			wantOperand = true
+		case strings.EqualFold(word, operatorWITH):
+			// WITH binds an exception to the license just read.
+			if wantOperand {
+				return "", false
+			}
+			exception, ok := nextWord(expression, &i)
+			if !ok {
+				return "", false
+			}
+			canonical, _, listed := licenselist.Exception(exception)
+			if !listed {
+				return "", false
+			}
+			out = append(out, operatorWITH, canonical)
+		default:
+			if !wantOperand {
+				return "", false
+			}
+			license, ok := listedLicense(word)
+			if !ok {
+				return "", false
+			}
+			out = append(out, license)
+			wantOperand = false
+		}
+	}
+	if wantOperand || depth != 0 {
+		return "", false
+	}
+	return joinTokens(out), true
+}
+
+// listedLicense returns the canonical form of a license token: a listed
+// identifier, with the "+" suffix kept when present, or a license reference,
+// which is returned as it is.
+func listedLicense(token string) (string, bool) {
+	if strings.HasPrefix(token, licenseRefPrefix) ||
+		(strings.HasPrefix(token, documentRefTag) && strings.Contains(token, ":"+licenseRefPrefix)) {
+		return token, true
+	}
+	plus := strings.HasSuffix(token, "+")
+	if canonical, _, ok := licenselist.License(strings.TrimSuffix(token, "+")); ok {
+		if plus {
+			return canonical + "+", true
+		}
+		return canonical, true
+	}
+	return "", false
+}
+
+// nextWord reads the next word of the expression starting at *i, skipping
+// spaces, and advances *i past it. Parentheses end a word.
+func nextWord(expression string, i *int) (string, bool) {
+	for *i < len(expression) && isExpressionSpace(expression[*i]) {
+		*i++
+	}
+	j := *i
+	for j < len(expression) && !isExpressionSpace(expression[j]) &&
+		expression[j] != '(' && expression[j] != ')' {
+		j++
+	}
+	word := expression[*i:j]
+	*i = j
+	return word, word != ""
+}
+
+// joinTokens writes the tokens with single spaces, keeping an opening
+// parenthesis attached to what follows it and a closing one to what
+// precedes it.
+func joinTokens(tokens []string) string {
+	var b strings.Builder
+	for i, t := range tokens {
+		if i > 0 && tokens[i-1] != "(" {
+			b.WriteByte(' ')
+		}
+		b.WriteString(t)
+	}
+	return b.String()
 }

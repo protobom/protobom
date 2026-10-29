@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	cdxformats "github.com/protobom/protobom/pkg/formats/cyclonedx"
+	protospdx "github.com/protobom/protobom/pkg/formats/spdx"
 	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
@@ -494,8 +495,20 @@ func isConcludedLicense(lc *cdx.LicenseChoice) bool {
 // licenseChoiceString returns the string form of a license choice, or an
 // empty string when the choice states no license. An expression and a
 // listed identifier are read as they are. A license that only has a name
-// is read as a license reference minted from that name, marked so the
-// serializer can write it back as a name (see cdxformats.NamedLicenseRef).
+// is read, in this order, as:
+//
+//   - The SPDX expression the name spells when it is one naming only
+//     listed licenses, which older producers wrote in the name field.
+//   - The listed identifier the name spells once restricted to the
+//     characters a license reference admits, so "ZPL 2.1" is ZPL-2.1 and
+//     "BSD-3-clause-SUN" is BSD-3-Clause-Sun. Only case and punctuation
+//     may differ, the name is never mapped to a different identifier.
+//   - A license reference minted from the name, marked so the serializer
+//     can write it back as a name (see cdxformats.NamedLicenseRef).
+//
+// The second rule keeps the round trip stable: the serializer writes a
+// minted reference back as the restricted name, which would otherwise be
+// read as the identifier it spells the second time around.
 // TODO(degradation): the license text and URL have no place in protobom
 // and are dropped.
 func licenseChoiceString(lc *cdx.LicenseChoice) string {
@@ -507,6 +520,12 @@ func licenseChoiceString(lc *cdx.LicenseChoice) string {
 	}
 	if lc.License.ID != "" {
 		return lc.License.ID
+	}
+	if expression, ok := protospdx.ListedExpression(lc.License.Name); ok {
+		return expression
+	}
+	if id, ok := protospdx.ListedExpression(cdxformats.LicenseRefName(lc.License.Name)); ok {
+		return id
 	}
 	return cdxformats.NamedLicenseRef(lc.License.Name)
 }

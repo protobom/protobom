@@ -302,3 +302,19 @@ func TestPackageToNodeURLs(t *testing.T) {
 		})
 	}
 }
+
+// The document's own fields are read into the metadata.
+func TestSPDX23UnserializeDocumentFields(t *testing.T) {
+	doc, err := NewSPDX23().unserializeDocument(&spdx23.Document{
+		SPDXIdentifier:    "DOCUMENT",
+		DocumentName:      "a name",
+		DocumentNamespace: "https://example.com/doc",
+		DocumentComment:   "a document comment",
+		CreationInfo:      &spdx23.CreationInfo{Created: "2020-01-02T03:04:05Z"},
+	}, &native.UnserializeOptions{})
+	require.NoError(t, err)
+	require.Equal(t, "https://example.com/doc#DOCUMENT", doc.Metadata.Id)
+	require.Equal(t, "a name", doc.Metadata.Name)
+	require.Equal(t, "a document comment", doc.Metadata.Comment)
+	require.Equal(t, "2020-01-02T03:04:05Z", doc.Metadata.Date.AsTime().Format("2006-01-02T15:04:05Z"))
+}

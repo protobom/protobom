@@ -67,6 +67,7 @@ func (u *SPDX23) unserializeDocument(spdxDoc *spdx23.Document, opts *native.Unse
 	bom := sbom.NewDocument()
 	bom.Metadata.Id = buildDocumentIdentifier(spdxDoc)
 	bom.Metadata.Name = spdxDoc.DocumentName
+	bom.Metadata.Comment = spdxDoc.DocumentComment
 
 	// TODO(degradation): External document references
 

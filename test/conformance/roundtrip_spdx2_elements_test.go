@@ -44,9 +44,10 @@ func TestRoundTripSPDX2Metadata(t *testing.T) {
 	date := timestamppb.New(time.Date(2020, 1, 2, 3, 4, 5, 0, time.UTC))
 	original := &sbom.Document{
 		Metadata: &sbom.Metadata{
-			Id:   "https://example.com/spdxdocs/metadata#DOCUMENT",
-			Name: "a round trip",
-			Date: date,
+			Id:      "https://example.com/spdxdocs/metadata#DOCUMENT",
+			Name:    "a round trip",
+			Comment: "a document comment",
+			Date:    date,
 		},
 		NodeList: &sbom.NodeList{
 			Nodes:        []*sbom.Node{{Id: "pkg", Type: sbom.Node_PACKAGE, Name: "pkg"}},
@@ -58,6 +59,7 @@ func TestRoundTripSPDX2Metadata(t *testing.T) {
 		t.Run(string(format), func(t *testing.T) {
 			got := spdx2RoundTrip(t, original, format)
 			require.Equal(t, "a round trip", got.Metadata.Name)
+			require.Equal(t, "a document comment", got.Metadata.Comment)
 			require.Equal(t, date.AsTime(), got.Metadata.Date.AsTime())
 		})
 	}

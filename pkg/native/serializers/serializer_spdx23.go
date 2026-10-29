@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/url"
 	"slices"
 	"strings"
@@ -327,18 +328,19 @@ func buildFiles(bom *sbom.Document) ([]*spdx.File, error) { //nolint:unparam
 			f.FileCopyrightText = protospdx.NONE
 		}
 
-		for algo, hash := range node.Hashes {
-			if _, ok := sbom.HashAlgorithm_name[algo]; ok {
-				spdxAlgo := sbom.HashAlgorithm(algo).ToSPDX()
-				if spdxAlgo == "" {
-					// TODO(degradation): Data loss. How do we handle more algos?
-					continue
-				}
-				f.Checksums = append(f.Checksums, common.Checksum{
-					Algorithm: spdxAlgo,
-					Value:     hash,
-				})
+		// The hashes are a map, so they are written in the order of their
+		// algorithm values to keep the output the same from one run to the
+		// next.
+		for _, algo := range slices.Sorted(maps.Keys(node.Hashes)) {
+			spdxAlgo := sbom.HashAlgorithm(algo).ToSPDX()
+			if spdxAlgo == "" {
+				// TODO(degradation): Data loss. How do we handle more algos?
+				continue
 			}
+			f.Checksums = append(f.Checksums, common.Checksum{
+				Algorithm: spdxAlgo,
+				Value:     node.Hashes[algo],
+			})
 		}
 		files = append(files, &f)
 	}
@@ -465,19 +467,19 @@ func (s *SPDX23) buildPackages(
 			p.PackageDownloadLocation = protospdx.NOASSERTION
 		}
 
-		for algo, hash := range node.Hashes {
-			if _, ok := sbom.HashAlgorithm_name[algo]; ok {
-				spdxAlgo := sbom.HashAlgorithm(algo).ToSPDX()
-				if spdxAlgo == "" {
-					// Data loss here.
-					// TODO how do we handle when data loss occurs?
-					continue
-				}
-				p.PackageChecksums = append(p.PackageChecksums, common.Checksum{
-					Algorithm: spdxAlgo,
-					Value:     hash,
-				})
+		// The hashes and identifiers are maps, so they are written in the
+		// order of their keys to keep the output the same from one run to
+		// the next.
+		for _, algo := range slices.Sorted(maps.Keys(node.Hashes)) {
+			spdxAlgo := sbom.HashAlgorithm(algo).ToSPDX()
+			if spdxAlgo == "" {
+				// TODO(degradation): the algorithm has no SPDX 2 name.
+				continue
 			}
+			p.PackageChecksums = append(p.PackageChecksums, common.Checksum{
+				Algorithm: spdxAlgo,
+				Value:     node.Hashes[algo],
+			})
 		}
 
 		for _, e := range node.ExternalReferences {
@@ -495,7 +497,7 @@ func (s *SPDX23) buildPackages(
 			})
 		}
 
-		for i := range node.Identifiers {
+		for _, i := range slices.Sorted(maps.Keys(node.Identifiers)) {
 			p.PackageExternalReferences = append(p.PackageExternalReferences, &v2_3.PackageExternalReference{
 				Category: sbom.SoftwareIdentifierType(i).ToSPDX2Category(),
 				RefType:  sbom.SoftwareIdentifierType(i).ToSPDX2Type(),

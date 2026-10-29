@@ -1,6 +1,7 @@
 package serializers
 
 import (
+	"bytes"
 	"encoding/json"
 	"strings"
 	"testing"
@@ -730,4 +731,73 @@ func TestSPDX23Created(t *testing.T) {
 	now, err := time.Parse(time.RFC3339, serialize(nil))
 	require.NoError(t, err)
 	require.False(t, now.Before(before), "an undated protobom is dated now")
+}
+
+// TestSPDX23SerializeIsDeterministic pins the output order of what the
+// serializer reads from maps: package and file hashes, and identifiers.
+// Writing the same document twice must give the same bytes, in the order
+// of the enum values.
+func TestSPDX23SerializeIsDeterministic(t *testing.T) {
+	doc := &sbom.Document{
+		Metadata: &sbom.Metadata{Id: "https://example.com/doc", Date: timestamppb.New(time.Unix(0, 0))},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{
+				{
+					Id: "pkg", Type: sbom.Node_PACKAGE, Name: "pkg",
+					Hashes: map[int32]string{
+						int32(sbom.HashAlgorithm_SHA512): "c",
+						int32(sbom.HashAlgorithm_MD5):    "a",
+						int32(sbom.HashAlgorithm_SHA256): "b",
+					},
+					Identifiers: map[int32]string{
+						int32(sbom.SoftwareIdentifierType_GITOID): "gitoid:blob:sha1:abc",
+						int32(sbom.SoftwareIdentifierType_CPE23):  "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*",
+						int32(sbom.SoftwareIdentifierType_PURL):   "pkg:generic/p@1",
+					},
+				},
+				{
+					Id: "file", Type: sbom.Node_FILE, Name: "a/file",
+					Hashes: map[int32]string{
+						int32(sbom.HashAlgorithm_SHA384): "y",
+						int32(sbom.HashAlgorithm_SHA1):   "x",
+					},
+				},
+			},
+			Edges:        []*sbom.Edge{{Type: sbom.Edge_contains, From: "pkg", To: []string{"file"}}},
+			RootElements: []string{"pkg"},
+		},
+	}
+
+	sut := NewSPDX23()
+	render := func() (*spdx.Document, string) {
+		out, err := sut.Serialize(doc, &native.SerializeOptions{}, nil)
+		require.NoError(t, err)
+		spdxDoc, ok := out.(*spdx.Document)
+		require.True(t, ok)
+		var buf bytes.Buffer
+		require.NoError(t, sut.Render(spdxDoc, &buf, &native.RenderOptions{Indent: 2}, nil))
+		return spdxDoc, buf.String()
+	}
+
+	spdxDoc, first := render()
+	for range 20 {
+		_, again := render()
+		require.Equal(t, first, again)
+	}
+
+	require.Equal(t, []common.Checksum{
+		{Algorithm: common.MD5, Value: "a"},
+		{Algorithm: common.SHA256, Value: "b"},
+		{Algorithm: common.SHA512, Value: "c"},
+	}, spdxDoc.Packages[0].PackageChecksums)
+	require.Equal(t, []common.Checksum{
+		{Algorithm: common.SHA1, Value: "x"},
+		{Algorithm: common.SHA384, Value: "y"},
+	}, spdxDoc.Files[0].Checksums)
+
+	locators := make([]string, 0, len(spdxDoc.Packages[0].PackageExternalReferences))
+	for _, ref := range spdxDoc.Packages[0].PackageExternalReferences {
+		locators = append(locators, ref.Locator)
+	}
+	require.Equal(t, []string{"pkg:generic/p@1", "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*", "gitoid:blob:sha1:abc"}, locators)
 }

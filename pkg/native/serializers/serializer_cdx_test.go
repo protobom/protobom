@@ -1,11 +1,13 @@
 package serializers
 
 import (
+	"bytes"
 	"testing"
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/stretchr/testify/require"
 
+	"github.com/protobom/protobom/pkg/native"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -247,6 +249,7 @@ func TestProtobomExtRefTypeToCdxType(t *testing.T) {
 		sbom.ExternalReference_SECURITY_PENTEST_REPORT:                 cdx.ERTypePentestReport,
 		sbom.ExternalReference_SECURITY_THREAT_MODEL:                   cdx.ERTypeThreatModel,
 		sbom.ExternalReference_SOCIAL:                                  cdx.ERTypeSocial,
+		sbom.ExternalReference_SOURCE_ARTIFACT:                         cdx.ERTypeSourceDistribution,
 		sbom.ExternalReference_STATIC_ANALYSIS_REPORT:                  cdx.ERTypeStaticAnalysisReport,
 		sbom.ExternalReference_SUPPORT:                                 cdx.ERTypeSupport,
 		sbom.ExternalReference_VCS:                                     cdx.ERTypeVCS,
@@ -502,6 +505,159 @@ func TestNodeConcludedLicenseToComponent(t *testing.T) {
 			comp := sut.nodeToComponent(&sbom.Node{Licenses: tc.declared, LicenseConcluded: tc.concluded})
 			require.NotNil(t, comp.Licenses)
 			require.Equal(t, tc.expected, *comp.Licenses)
+		})
+	}
+}
+
+// TestSerializeIsDeterministic pins the output order of everything the
+// serializer reads from a map or a graph walk: hashes, identifiers, external
+// reference hashes and the component tree. Writing the same document twice
+// must give the same bytes, and the order must be the one documented.
+func TestSerializeIsDeterministic(t *testing.T) {
+	doc := &sbom.Document{
+		Metadata: &sbom.Metadata{Id: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79", Version: "1"},
+		NodeList: &sbom.NodeList{
+			Nodes: []*sbom.Node{
+				{
+					Id: "root", Name: "root",
+					Hashes: map[int32]string{
+						int32(sbom.HashAlgorithm_SHA512): "c",
+						int32(sbom.HashAlgorithm_MD5):    "a",
+						int32(sbom.HashAlgorithm_SHA256): "b",
+					},
+					Identifiers: map[int32]string{
+						int32(sbom.SoftwareIdentifierType_CPE22): "cpe:/a:v:p:1",
+						int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*",
+						int32(sbom.SoftwareIdentifierType_PURL):  "pkg:generic/p@1",
+					},
+					ExternalReferences: []*sbom.ExternalReference{{
+						Url: "https://example.com/p.tgz", Type: sbom.ExternalReference_DOWNLOAD,
+						Hashes: map[int32]string{
+							int32(sbom.HashAlgorithm_SHA384): "y",
+							int32(sbom.HashAlgorithm_SHA1):   "x",
+						},
+					}},
+				},
+				{Id: "c", Name: "c"},
+				{Id: "a", Name: "a"},
+				{Id: "b", Name: "b"},
+				{Id: "b1", Name: "b1"},
+				{Id: "b2", Name: "b2"},
+			},
+			Edges: []*sbom.Edge{
+				{Type: sbom.Edge_contains, From: "root", To: []string{"c", "a", "b"}},
+				{Type: sbom.Edge_contains, From: "b", To: []string{"b2", "b1"}},
+			},
+			RootElements: []string{"root"},
+		},
+	}
+
+	sut := NewCDX("1.6", "json")
+	render := func() (*cdx.BOM, []byte) {
+		out, err := sut.Serialize(doc, &native.SerializeOptions{}, nil)
+		require.NoError(t, err)
+		bom, ok := out.(*cdx.BOM)
+		require.True(t, ok)
+		var buf bytes.Buffer
+		require.NoError(t, sut.Render(bom, &buf, nil, nil))
+		return bom, buf.Bytes()
+	}
+
+	bom, first := render()
+	for range 20 {
+		_, again := render()
+		require.Equal(t, string(first), string(again))
+	}
+
+	root := bom.Metadata.Component
+	require.Equal(t, []cdx.Hash{
+		{Algorithm: cdx.HashAlgoMD5, Value: "a"},
+		{Algorithm: cdx.HashAlgoSHA256, Value: "b"},
+		{Algorithm: cdx.HashAlgoSHA512, Value: "c"},
+	}, *root.Hashes)
+	require.Equal(t, "cpe:2.3:a:v:p:1:*:*:*:*:*:*:*", root.CPE, "CPE 2.3 wins over 2.2 whatever the order")
+	require.Equal(t, []cdx.Hash{
+		{Algorithm: cdx.HashAlgoSHA1, Value: "x"},
+		{Algorithm: cdx.HashAlgoSHA384, Value: "y"},
+	}, *(*root.ExternalReferences)[0].Hashes)
+
+	// The component tree follows the order the containing edges state.
+	names := func(comps *[]cdx.Component) []string {
+		out := make([]string, 0, len(*comps))
+		for _, c := range *comps {
+			out = append(out, c.Name)
+		}
+		return out
+	}
+	require.Equal(t, []string{"c", "a", "b"}, names(bom.Components))
+	require.Equal(t, []string{"b2", "b1"}, names((*bom.Components)[2].Components))
+}
+
+func TestNodeContentTypeToComponent(t *testing.T) {
+	sut := CDX{}
+	for name, tc := range map[string]struct {
+		contentType string
+		expected    string
+	}{
+		"media type":               {"application/json", "application/json"},
+		"with suffix and plus":     {"application/vnd.cyclonedx+json", "application/vnd.cyclonedx+json"},
+		"upper case is normalized": {"Application/JSON", "application/json"},
+		"surrounding whitespace":   {" image/png ", "image/png"},
+		"empty":                    {"", ""},
+		"not a media type":         {"json", ""},
+		"with parameters":          {"text/plain; charset=utf-8", ""},
+		"too many parts":           {"a/b/c", ""},
+	} {
+		t.Run(name, func(t *testing.T) {
+			comp := sut.nodeToComponent(&sbom.Node{ContentType: tc.contentType})
+			require.Equal(t, tc.expected, comp.MIMEType)
+		})
+	}
+}
+
+// A security policy reference is written as the RFC 9116 type only when its
+// URL points at a security.txt file, the one thing that type means.
+func TestSecurityPolicyToComponent(t *testing.T) {
+	sut := CDX{}
+	for name, tc := range map[string]struct {
+		url      string
+		expected cdx.ExternalReferenceType
+	}{
+		"well known location":  {"https://example.com/.well-known/security.txt", cdx.ERTypeRFC9116},
+		"legacy location":      {"https://example.com/security.txt", cdx.ERTypeRFC9116},
+		"upper case file name": {"https://example.com/.well-known/SECURITY.TXT", cdx.ERTypeRFC9116},
+		"with query":           {"https://example.com/.well-known/security.txt?v=2", cdx.ERTypeRFC9116},
+		"policy page":          {"https://example.com/security", cdx.ERTypeOther},
+		"markdown policy":      {"https://github.com/org/repo/blob/main/SECURITY.md", cdx.ERTypeOther},
+		"file name elsewhere":  {"https://example.com/security.txt.bak", cdx.ERTypeOther},
+		"not a url":            {"::not a url", cdx.ERTypeOther},
+	} {
+		t.Run(name, func(t *testing.T) {
+			comp := sut.nodeToComponent(&sbom.Node{ExternalReferences: []*sbom.ExternalReference{
+				{Url: tc.url, Type: sbom.ExternalReference_SECURITY_POLICY},
+			}})
+			require.Len(t, *comp.ExternalReferences, 1)
+			require.Equal(t, tc.expected, (*comp.ExternalReferences)[0].Type)
+		})
+	}
+}
+
+func TestCDXDocumentVersion(t *testing.T) {
+	for name, tc := range map[string]struct {
+		version  string
+		expected int
+	}{
+		"one":              {"1", 1},
+		"revision":         {"7", 7},
+		"with whitespace":  {" 3 ", 3},
+		"empty is default": {"", 1},
+		"zero":             {"0", 1},
+		"negative":         {"-2", 1},
+		"not an integer":   {"1.0", 1},
+		"semantic version": {"v2", 1},
+	} {
+		t.Run(name, func(t *testing.T) {
+			require.Equal(t, tc.expected, cdxDocumentVersion(tc.version))
 		})
 	}
 }

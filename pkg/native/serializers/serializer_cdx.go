@@ -4,7 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
+	"net/url"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -28,6 +31,10 @@ const serialNumberPattern = `^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a
 var (
 	serialNumberRegex     *regexp.Regexp
 	serialNumberRegexInit sync.Once
+
+	// cdxMimeTypePattern is the shape the CycloneDX schema requires of a
+	// component mime-type.
+	cdxMimeTypePattern = regexp.MustCompile(`^[-+a-z0-9.]+/[-+a-z0-9.]+$`)
 )
 
 type (
@@ -96,11 +103,7 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 		}
 	}
 
-	ver, err := strconv.Atoi(bom.Metadata.Version)
-	// TODO(deprecation): If version does not parse to int, there's data loss here.
-	if err == nil {
-		doc.Version = ver
-	}
+	doc.Version = cdxDocumentVersion(bom.Metadata.Version)
 
 	// Add the document metadata
 	md, err := buildMetadata(bom)
@@ -135,6 +138,10 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 		components[node.Id] = s.nodeToComponent(node)
 	}
 
+	// Index the direct targets of every node once, in the order the edges
+	// state them, so the component tree is built in document order.
+	children := indexChildren(bom.NodeList)
+
 	// Apply the scope relationships to the components.
 	applyScopeEdges(bom.NodeList, components)
 
@@ -157,7 +164,7 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 			if !ok {
 				return nil, fmt.Errorf("integrity error: root component %q not found", rootID)
 			}
-			subtree, err := recurseComponentComponents(rootID, bom.NodeList, components, &seen)
+			subtree, err := recurseComponentComponents(rootID, children, components, &seen)
 			if err != nil {
 				return nil, fmt.Errorf("building component tree for root %q: %w", rootID, err)
 			}
@@ -175,7 +182,7 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 
 		// Extract the component tree
 		componentTree, err := recurseComponentComponents(
-			rootNode.Id, bom.NodeList, components, &map[string]struct{}{rootNode.Id: {}},
+			rootNode.Id, children, components, &map[string]struct{}{rootNode.Id: {}},
 		)
 		if err != nil {
 			return nil, fmt.Errorf("building component tree: %w", err)
@@ -196,6 +203,20 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 	// root component's name, which names the software, not the document.
 
 	return doc, nil
+}
+
+// cdxDocumentVersion returns the CycloneDX document version a protobom
+// version string states. CycloneDX counts revisions of a document with an
+// integer of 1 or more, 1 being the default. A protobom version that is not
+// such an integer cannot be written and yields the default: an empty one is
+// the usual case, since formats without a revision counter leave it unset.
+// TODO(degradation): a version that is not a positive integer is dropped.
+func cdxDocumentVersion(version string) int {
+	v, err := strconv.Atoi(strings.TrimSpace(version))
+	if err != nil || v < 1 {
+		return 1
+	}
+	return v
 }
 
 // applyScopeEdges projects the relationships carrying CycloneDX scope
@@ -286,42 +307,57 @@ func isValidCycloneDXSerialNumberFormat(serial string) bool {
 	return serialNumberRegex.MatchString(serial)
 }
 
-func recurseComponentComponents(
-	start string, nl *sbom.NodeList, components map[string]*cdx.Component, seen *map[string]struct{}, //nolint:gocritic
-) (*[]cdx.Component, error) {
-	// FIrst, well add the first level ones and then recurse
-	ret := []cdx.Component{}
-	descendants := nl.NodeDescendants(start, 1)
-	if len(descendants.Edges) == 0 {
-		return &ret, nil
+// indexChildren returns the direct targets of every node across all edge
+// types, in the order the edges state them. A target is listed once, where
+// it first appears.
+func indexChildren(nl *sbom.NodeList) map[string][]string {
+	children := map[string][]string{}
+	listed := map[string]map[string]struct{}{}
+	for _, e := range nl.Edges {
+		if listed[e.From] == nil {
+			listed[e.From] = map[string]struct{}{}
+		}
+		for _, id := range e.To {
+			if _, ok := listed[e.From][id]; ok {
+				continue
+			}
+			listed[e.From][id] = struct{}{}
+			children[e.From] = append(children[e.From], id)
+		}
 	}
+	return children
+}
 
-	protoIDToComp := map[string]*cdx.Component{}
+// recurseComponentComponents builds the component subtree under start: its
+// direct targets, each with their own subtree, in the order the edges state
+// them so the output is the same every time the document is written. A node
+// already placed in the tree is not placed again.
+func recurseComponentComponents(
+	start string, children map[string][]string, components map[string]*cdx.Component, seen *map[string]struct{}, //nolint:gocritic
+) (*[]cdx.Component, error) {
+	ret := []cdx.Component{}
 
-	// First add the nodes to the top
-	for _, id := range descendants.Edges[0].To {
+	// Claim this level's nodes before recursing, so a node reachable from
+	// two siblings lands under the first one.
+	level := []string{}
+	for _, id := range children[start] {
 		if _, ok := (*seen)[id]; ok {
 			continue
 		}
 		if _, ok := components[id]; !ok {
 			return nil, fmt.Errorf("unable to find component for node %q", id)
 		}
-		protoIDToComp[id] = components[id]
+		level = append(level, id)
 		(*seen)[id] = struct{}{}
 	}
 
-	// Now cycle them again and recurse
-	for id := range protoIDToComp {
-		comps, err := recurseComponentComponents(id, nl, components, seen)
+	for _, id := range level {
+		comps, err := recurseComponentComponents(id, children, components, seen)
 		if err != nil {
 			return nil, err
 		}
-		protoIDToComp[id].Components = comps
-	}
-
-	// Assemble the return slice
-	for _, comp := range protoIDToComp {
-		ret = append(ret, *comp)
+		components[id].Components = comps
+		ret = append(ret, *components[id])
 	}
 	return &ret, nil
 }
@@ -489,18 +525,18 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		c.Licenses = &licenses
 	}
 
-	if len(n.Hashes) > 0 {
-		for algo, hash := range n.Hashes {
-			cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(algo))
-			if err != nil {
-				// TODO(degradation): Algorithm not supported in CDX
-				continue
-			}
-			*c.Hashes = append(*c.Hashes, cdx.Hash{
-				Algorithm: cdxAlgo,
-				Value:     hash,
-			})
+	// Hashes and identifiers are maps. They are written in the order of
+	// their algorithm and type values so the output is stable.
+	for _, algo := range slices.Sorted(maps.Keys(n.Hashes)) {
+		cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(algo))
+		if err != nil {
+			// TODO(degradation): Algorithm not supported in CDX
+			continue
 		}
+		*c.Hashes = append(*c.Hashes, cdx.Hash{
+			Algorithm: cdxAlgo,
+			Value:     n.Hashes[algo],
+		})
 	}
 
 	if n.ExternalReferences != nil {
@@ -508,10 +544,10 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 			cdxRef := cdx.ExternalReference{
 				URL:     er.Url,
 				Comment: er.Comment,
-				Type:    s.protobomExtRefTypeToCdxType(er.Type),
+				Type:    s.cdxExtRefType(er),
 			}
 			hashList := []cdx.Hash{}
-			for protoAlgo, val := range er.Hashes {
+			for _, protoAlgo := range slices.Sorted(maps.Keys(er.Hashes)) {
 				cdxAlgo, err := s.protoHashAlgoToCdxAlgo(sbom.HashAlgorithm(protoAlgo))
 				if err != nil {
 					// TODO(degradation): Hash not supported
@@ -519,7 +555,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				}
 				hashList = append(hashList, cdx.Hash{
 					Algorithm: cdxAlgo,
-					Value:     val,
+					Value:     er.Hashes[protoAlgo],
 				})
 			}
 			if len(hashList) > 0 {
@@ -538,7 +574,7 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 	s.addURLReference(c, n.UrlDownload, sbom.ExternalReference_DOWNLOAD)
 
 	if n.Identifiers != nil {
-		for idType := range n.Identifiers {
+		for _, idType := range slices.Sorted(maps.Keys(n.Identifiers)) {
 			switch idType {
 			case int32(sbom.SoftwareIdentifierType_PURL):
 				c.PackageURL = n.Identifiers[idType]
@@ -603,6 +639,15 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 
 	c.Copyright = n.GetCopyright()
 
+	// The content type is the component's mime-type. CycloneDX requires it
+	// in lower case and shaped as type/subtype; media types are not case
+	// sensitive, so the case is normalized rather than dropping the value.
+	// TODO(degradation): a content type that is not shaped as a media type
+	// cannot be written.
+	if mimeType := strings.ToLower(strings.TrimSpace(n.ContentType)); cdxMimeTypePattern.MatchString(mimeType) {
+		c.MIMEType = mimeType
+	}
+
 	properties := []cdx.Property{}
 	for _, p := range n.Properties {
 		properties = append(properties, cdx.Property{
@@ -618,18 +663,18 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 // addURLReference appends an external reference of the given type pointing to
 // url, unless url is empty or the component already references it with the
 // same type.
-func (s *CDX) addURLReference(c *cdx.Component, url string, t sbom.ExternalReference_ExternalReferenceType) {
-	if url == "" {
+func (s *CDX) addURLReference(c *cdx.Component, location string, t sbom.ExternalReference_ExternalReferenceType) {
+	if location == "" {
 		return
 	}
 	cdxType := s.protobomExtRefTypeToCdxType(t)
 	for _, er := range *c.ExternalReferences {
-		if er.Type == cdxType && er.URL == url {
+		if er.Type == cdxType && er.URL == location {
 			return
 		}
 	}
 	*c.ExternalReferences = append(*c.ExternalReferences, cdx.ExternalReference{
-		URL:  url,
+		URL:  location,
 		Type: cdxType,
 	})
 }
@@ -665,8 +710,35 @@ func (s *CDX) Render(doc interface{}, wr io.Writer, o *native.RenderOptions, _ i
 	return nil
 }
 
+// cdxExtRefType returns the CycloneDX type of a protobom external reference.
+// It is protobomExtRefTypeToCdxType, except for the one type whose CycloneDX
+// name depends on the reference's URL: a security policy is written as the
+// RFC 9116 reference type only when it points at a security.txt file, which
+// is what that type means. Any other security policy has no CycloneDX name.
+func (s *CDX) cdxExtRefType(er *sbom.ExternalReference) cdx.ExternalReferenceType {
+	if er.Type == sbom.ExternalReference_SECURITY_POLICY && isSecurityTxtURL(er.Url) {
+		return cdx.ERTypeRFC9116
+	}
+	return s.protobomExtRefTypeToCdxType(er.Type)
+}
+
+// isSecurityTxtURL reports whether a URL points at a security.txt file as
+// RFC 9116 locates it: at /.well-known/security.txt, or at /security.txt
+// for the legacy location the RFC still admits.
+func isSecurityTxtURL(rawURL string) bool {
+	u, err := url.Parse(strings.TrimSpace(rawURL))
+	if err != nil {
+		return false
+	}
+	return strings.HasSuffix(strings.ToLower(u.Path), "/security.txt")
+}
+
 // protobomExtRefTypeToCdxType translates between the protobom external reference
 // identifiers and the CycloneDX equivalent types.
+//
+// A SECURITY_POLICY has no CycloneDX name of its own: the RFC 9116 type
+// names a security.txt file specifically, so it is only written when the
+// reference URL points at one (see cdxExtRefType).
 func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference_ExternalReferenceType) cdx.ExternalReferenceType {
 	switch protoExtRefType {
 	case sbom.ExternalReference_ATTESTATION:
@@ -735,6 +807,8 @@ func (s *CDX) protobomExtRefTypeToCdxType(protoExtRefType sbom.ExternalReference
 		return cdx.ERTypeThreatModel
 	case sbom.ExternalReference_SOCIAL:
 		return cdx.ERTypeSocial
+	case sbom.ExternalReference_SOURCE_ARTIFACT:
+		return cdx.ERTypeSourceDistribution
 	case sbom.ExternalReference_STATIC_ANALYSIS_REPORT:
 		return cdx.ERTypeStaticAnalysisReport
 	case sbom.ExternalReference_SUPPORT:

@@ -88,6 +88,8 @@ func TestCdxExtRefTypeToProtobomType(t *testing.T) {
 		cdx.ERTypeCodifiedInfrastructure:           sbom.ExternalReference_CODIFIED_INFRASTRUCTURE,
 		cdx.ERTypeComponentAnalysisReport:          sbom.ExternalReference_COMPONENT_ANALYSIS_REPORT,
 		cdx.ExternalReferenceType("configuration"): sbom.ExternalReference_CONFIGURATION,
+		cdx.ERTypeSourceDistribution:               sbom.ExternalReference_SOURCE_ARTIFACT,
+		cdx.ERTypeRFC9116:                          sbom.ExternalReference_SECURITY_POLICY,
 		cdx.ERTypeDistributionIntake:               sbom.ExternalReference_DISTRIBUTION_INTAKE,
 		cdx.ERTypeDistribution:                     sbom.ExternalReference_DOWNLOAD,
 		cdx.ERTypeDocumentation:                    sbom.ExternalReference_DOCUMENTATION,
@@ -584,4 +586,46 @@ func TestUnserializeNamedLicenses(t *testing.T) {
 	require.Equal(
 		t, "MIT OR LicenseRef-x-protobom-GPL OR LicenseRef-x-protobom-Perl-like-licence", root.LicenseConcluded,
 	)
+}
+
+func TestUnserializeMimeType(t *testing.T) {
+	data := `{
+		"bomFormat": "CycloneDX",
+		"specVersion": "1.5",
+		"version": 1,
+		"metadata": {
+			"component": {"bom-ref": "root", "type": "application", "name": "root", "mime-type": "application/zip"}
+		},
+		"components": [
+			{"bom-ref": "f", "type": "file", "name": "logo.png", "mime-type": "image/png"},
+			{"bom-ref": "n", "type": "library", "name": "no-type"}
+		]
+	}`
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	doc, err := cdxu.Unserialize(strings.NewReader(data), nil, nil)
+	require.NoError(t, err)
+	require.Equal(t, "application/zip", doc.NodeList.GetNodeByID("root").ContentType)
+	require.Equal(t, "image/png", doc.NodeList.GetNodeByID("f").ContentType)
+	require.Empty(t, doc.NodeList.GetNodeByID("n").ContentType)
+}
+
+func TestUnserializeDocumentVersion(t *testing.T) {
+	for name, tc := range map[string]struct {
+		version  string // the JSON version member, empty for none
+		expected string
+	}{
+		"stated":  {`"version": 4,`, "4"},
+		"one":     {`"version": 1,`, "1"},
+		"missing": {``, "1"},
+		"zero":    {`"version": 0,`, "1"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			data := `{"bomFormat": "CycloneDX", "specVersion": "1.5", ` + tc.version + `
+				"metadata": {"component": {"bom-ref": "root", "type": "application", "name": "root"}}}`
+			cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+			doc, err := cdxu.Unserialize(strings.NewReader(data), nil, nil)
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, doc.Metadata.Version)
+		})
+	}
 }

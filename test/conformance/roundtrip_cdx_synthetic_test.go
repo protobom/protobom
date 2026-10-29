@@ -80,6 +80,7 @@ func TestRoundTripCDXElements(t *testing.T) {
 		Version:          "1.2.3",
 		Description:      "a description",
 		Copyright:        "Copyright someone",
+		ContentType:      "application/zip",
 		Licenses:         []string{"Apache-2.0"},
 		LicenseConcluded: "Apache-2.0",
 		PrimaryPurpose:   []sbom.Purpose{sbom.Purpose_LIBRARY},
@@ -154,6 +155,7 @@ func TestRoundTripCDXElements(t *testing.T) {
 		{"version", pkg.Version, gotPkg.Version},
 		{"description", pkg.Description, gotPkg.Description},
 		{"copyright", pkg.Copyright, gotPkg.Copyright},
+		{"content type", pkg.ContentType, gotPkg.ContentType},
 		{"licenses", pkg.Licenses, gotPkg.Licenses},
 		{"license concluded", pkg.LicenseConcluded, gotPkg.LicenseConcluded},
 		{"purposes", pkg.PrimaryPurpose, gotPkg.PrimaryPurpose},
@@ -251,6 +253,21 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 			require.Equal(t, tc.expectedDeclared, node.Licenses)
 		})
 	}
+
+	// The document version is a revision counter CycloneDX defaults to 1.
+	t.Run("document version", func(t *testing.T) {
+		for name, tc := range map[string]struct{ in, out string }{
+			"stated":         {"3", "3"},
+			"unset is one":   {"", "1"},
+			"not an integer": {"1.0", "1"},
+		} {
+			t.Run(name, func(t *testing.T) {
+				doc := cdxOneNodeDoc(&sbom.Node{Id: "root", Type: sbom.Node_PACKAGE, Name: "n"})
+				doc.Metadata.Version = tc.in
+				require.Equal(t, tc.out, cdxRoundTrip(t, doc).Metadata.Version)
+			})
+		}
+	})
 
 	// The concluded license the reader derives from the declared entries
 	// must not be written back as an acknowledged entry, or every pass
@@ -448,6 +465,9 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 	// them to "other", so they cannot come back as themselves. The list is
 	// here so that a type leaving the unnamed set is a test failure rather
 	// than a silent change.
+	//
+	// A security policy is only named when its URL is a security.txt file,
+	// which the walk's URL is not; the named case has its own subtest.
 	unnamedRefs := map[sbom.ExternalReference_ExternalReferenceType]bool{
 		sbom.ExternalReference_UNKNOWN:                         true,
 		sbom.ExternalReference_BINARY:                          true,
@@ -469,9 +489,21 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 		sbom.ExternalReference_SECURITY_OTHER:                  true,
 		sbom.ExternalReference_SECURITY_POLICY:                 true,
 		sbom.ExternalReference_SECURITY_SWID:                   true,
-		sbom.ExternalReference_SOURCE_ARTIFACT:                 true,
 		sbom.ExternalReference_VULNERABILITY_DISCLOSURE_REPORT: true,
 	}
+
+	t.Run("security policy pointing at a security.txt survives", func(t *testing.T) {
+		got := cdxRoundTrip(t, cdxOneNodeDoc(&sbom.Node{
+			Id: "root", Type: sbom.Node_PACKAGE, Name: "n",
+			ExternalReferences: []*sbom.ExternalReference{
+				{Url: "https://example.com/.well-known/security.txt", Type: sbom.ExternalReference_SECURITY_POLICY},
+			},
+		}))
+		node := got.NodeList.GetNodeByID("root")
+		require.NotNil(t, node)
+		require.Len(t, node.ExternalReferences, 1)
+		require.Equal(t, sbom.ExternalReference_SECURITY_POLICY, node.ExternalReferences[0].Type)
+	})
 
 	// A plain website or distribution reference is read back into the
 	// node's home and download URL fields rather than as a reference.

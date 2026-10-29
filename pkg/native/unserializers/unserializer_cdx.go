@@ -45,9 +45,16 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		return nil, fmt.Errorf("decoding cyclonedx: %w", err)
 	}
 
+	// A document that states no version has version 1, the CycloneDX
+	// default, which the decoder leaves as zero.
+	version := bom.Version
+	if version < 1 {
+		version = 1
+	}
+
 	md := &sbom.Metadata{
 		Id:      bom.SerialNumber,
-		Version: fmt.Sprintf("%d", bom.Version),
+		Version: fmt.Sprintf("%d", version),
 		Date:    &timestamppb.Timestamp{},
 		Tools:   []*sbom.Tool{},
 		Authors: []*sbom.Person{},
@@ -279,6 +286,7 @@ func (u *CDX) componentToNode(c *cdx.Component, autoIDs map[string]int) (*sbom.N
 		Licenses:           u.licenseChoicesToLicenseList(c.Licenses),
 		LicenseConcluded:   u.licenseChoicesToLicenseString(c.Licenses),
 		Copyright:          c.Copyright,
+		ContentType:        c.MIMEType,
 		Hashes:             map[int32]string{},
 		Description:        c.Description,
 		Attribution:        []string{},
@@ -764,6 +772,12 @@ func (u *CDX) cdxExtRefTypeToProtobomType(cdxExtRefType cdx.ExternalReferenceTyp
 		return sbom.ExternalReference_SECURITY_THREAT_MODEL
 	case cdx.ERTypeSocial:
 		return sbom.ExternalReference_SOCIAL
+	case cdx.ERTypeSourceDistribution:
+		return sbom.ExternalReference_SOURCE_ARTIFACT
+	case cdx.ERTypeRFC9116:
+		// A security.txt file is the instructions for reporting
+		// vulnerabilities, which is what a security policy reference is.
+		return sbom.ExternalReference_SECURITY_POLICY
 	case cdx.ERTypeStaticAnalysisReport:
 		return sbom.ExternalReference_STATIC_ANALYSIS_REPORT
 	case cdx.ERTypeSupport:

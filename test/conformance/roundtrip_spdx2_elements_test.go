@@ -64,3 +64,37 @@ func TestRoundTripSPDX2Metadata(t *testing.T) {
 		})
 	}
 }
+
+// TestRoundTripSPDX2File pins the file fields that survive a trip through
+// every SPDX 2 encoding.
+func TestRoundTripSPDX2File(t *testing.T) {
+	file := &sbom.Node{
+		Id:          "file-1",
+		Type:        sbom.Node_FILE,
+		Name:        "a/file.txt",
+		Comment:     "a comment",
+		Copyright:   "Copyright someone",
+		Attribution: []string{"attributed to someone", "and someone else"},
+		Hashes:      map[int32]string{int32(sbom.HashAlgorithm_SHA256): "0123456789abcdef"},
+	}
+	original := &sbom.Document{
+		Metadata: &sbom.Metadata{Id: "https://example.com/spdxdocs/file#DOCUMENT"},
+		NodeList: &sbom.NodeList{
+			Nodes:        []*sbom.Node{{Id: "pkg", Type: sbom.Node_PACKAGE, Name: "pkg"}, file},
+			Edges:        []*sbom.Edge{{Type: sbom.Edge_contains, From: "pkg", To: []string{"file-1"}}},
+			RootElements: []string{"pkg"},
+		},
+	}
+	for _, format := range spdx2Formats {
+		t.Run(string(format), func(t *testing.T) {
+			got := spdx2RoundTrip(t, original, format).NodeList.GetNodeByID(file.Id)
+			require.NotNil(t, got)
+			require.Equal(t, sbom.Node_FILE, got.Type)
+			require.Equal(t, file.Name, got.Name)
+			require.Equal(t, file.Comment, got.Comment)
+			require.Equal(t, file.Copyright, got.Copyright)
+			require.Equal(t, file.Attribution, got.Attribution)
+			require.Equal(t, file.Hashes, got.Hashes)
+		})
+	}
+}

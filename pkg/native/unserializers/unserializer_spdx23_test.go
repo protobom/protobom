@@ -318,3 +318,27 @@ func TestSPDX23UnserializeDocumentFields(t *testing.T) {
 	require.Equal(t, "a document comment", doc.Metadata.Comment)
 	require.Equal(t, "2020-01-02T03:04:05Z", doc.Metadata.Date.AsTime().Format("2006-01-02T15:04:05Z"))
 }
+
+// A file's fields are read into the node, attribution texts included.
+func TestSPDX23FileToNode(t *testing.T) {
+	n := NewSPDX23().fileToNode(&spdx23.File{
+		FileSPDXIdentifier:   "File-1",
+		FileName:             "a/file.txt",
+		FileComment:          "a comment",
+		FileCopyrightText:    "Copyright someone",
+		LicenseComments:      "license comments",
+		FileTypes:            []string{"TEXT"},
+		FileAttributionTexts: []string{"attributed to someone", "and someone else"},
+	})
+	require.Equal(t, "File-1", n.Id)
+	require.Equal(t, sbom.Node_FILE, n.Type)
+	require.Equal(t, "a/file.txt", n.Name)
+	require.Equal(t, "a comment", n.Comment)
+	require.Equal(t, "Copyright someone", n.Copyright)
+	require.Equal(t, "license comments", n.LicenseComments)
+	require.Equal(t, []string{"TEXT"}, n.FileTypes)
+	require.Equal(t, []string{"attributed to someone", "and someone else"}, n.Attribution)
+
+	// A file without attribution texts has an empty list, not a nil one.
+	require.Equal(t, []string{}, NewSPDX23().fileToNode(&spdx23.File{FileName: "x"}).Attribution)
+}

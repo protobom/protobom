@@ -294,7 +294,7 @@ func (u *SPDX23) fileToNode(f *spdx23.File) *sbom.Node {
 		LicenseComments: f.LicenseComments,
 		Copyright:       f.FileCopyrightText,
 		Comment:         f.FileComment,
-		Attribution:     []string{},
+		Attribution:     append([]string{}, f.FileAttributionTexts...),
 		Suppliers:       []*sbom.Person{},
 		Originators:     []*sbom.Person{},
 		FileTypes:       f.FileTypes,

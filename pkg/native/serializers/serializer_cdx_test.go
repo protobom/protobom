@@ -402,3 +402,60 @@ func TestDocumentTypeToLifecycle(t *testing.T) {
 }
 
 func ptr[T any](v T) *T { return &v }
+
+func TestNodeConcludedLicenseToComponent(t *testing.T) {
+	concluded := func(id string) cdx.LicenseChoice {
+		return cdx.LicenseChoice{License: &cdx.License{ID: id, Acknowledgement: cdx.LicenseAcknowledgementConcluded}}
+	}
+	for name, tc := range map[string]struct {
+		version   string
+		declared  []string
+		concluded string
+		expected  cdx.Licenses
+	}{
+		"concluded equal to the single declared license is not written": {
+			"1.6",
+			[]string{"MIT"},
+			"MIT",
+			cdx.Licenses{{License: &cdx.License{ID: "MIT"}}},
+		},
+		"concluded equal to the derived join is not written": {
+			"1.6",
+			[]string{"MIT", "Apache-2.0"},
+			"MIT OR Apache-2.0",
+			cdx.Licenses{{License: &cdx.License{ID: "MIT"}}, {License: &cdx.License{ID: "Apache-2.0"}}},
+		},
+		"concluded differing from declared is written": {
+			"1.6",
+			[]string{"MIT"},
+			"Apache-2.0",
+			cdx.Licenses{{License: &cdx.License{ID: "MIT"}}, concluded("Apache-2.0")},
+		},
+		"concluded alone is written": {
+			"1.6", nil, "GPL-3.0-or-later",
+			cdx.Licenses{concluded("GPL-3.0-or-later")},
+		},
+		"concluded expression is written on the choice": {
+			"1.6",
+			[]string{"BSD-3-Clause"},
+			"MIT OR GPL-2.0-only",
+			cdx.Licenses{
+				{License: &cdx.License{ID: "BSD-3-Clause"}},
+				{Expression: "MIT OR GPL-2.0-only", Acknowledgement: ptr(cdx.LicenseAcknowledgementConcluded)},
+			},
+		},
+		"concluded is not written below 1.6": {
+			"1.5",
+			[]string{"MIT"},
+			"Apache-2.0",
+			cdx.Licenses{{License: &cdx.License{ID: "MIT"}}},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			sut := NewCDX(tc.version, "json")
+			comp := sut.nodeToComponent(&sbom.Node{Licenses: tc.declared, LicenseConcluded: tc.concluded})
+			require.NotNil(t, comp.Licenses)
+			require.Equal(t, tc.expected, *comp.Licenses)
+		})
+	}
+}

@@ -530,7 +530,8 @@ func (u *CDX) licenseChoicesToLicenseList(lcs *cdx.Licenses) []string {
 
 // licenseChoicesToLicenseString takes the component license data and computes
 // the concluded license expression: the licenses marked with the concluded
-// acknowledgement or, when there are none, the joined declared entries. It
+// acknowledgement or, when there are none, the concluded license derived
+// from the declared entries (see cdxformats.DerivedConcludedLicense). It
 // will return the license or expression verbatim if its just a single entry.
 // This function is temporary and probably should be part of a more complete
 // license package.
@@ -538,7 +539,7 @@ func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 	if lcs == nil {
 		return ""
 	}
-	var parts, concluded []string
+	var declared, concluded []string
 	for i := range *lcs {
 		lc := &(*lcs)[i]
 		s := licenseChoiceString(lc)
@@ -548,17 +549,14 @@ func (u *CDX) licenseChoicesToLicenseString(lcs *cdx.Licenses) string {
 		if isConcludedLicense(lc) {
 			concluded = append(concluded, s)
 		} else {
-			parts = append(parts, s)
+			declared = append(declared, s)
 		}
 	}
 
 	if len(concluded) > 0 {
-		parts = concluded
+		return cdxformats.DerivedConcludedLicense(concluded)
 	}
-	if len(parts) == 1 {
-		return parts[0]
-	}
-	return strings.Join(parts, " OR ")
+	return cdxformats.DerivedConcludedLicense(declared)
 }
 
 // phaseToSBOMType converts a CycloneDX lifecycle phase to an SBOM document type

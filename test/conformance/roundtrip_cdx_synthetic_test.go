@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -230,6 +231,39 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 			require.Equal(t, tc.expectedDeclared, node.Licenses)
 		})
 	}
+
+	// The concluded license the reader derives from the declared entries
+	// must not be written back as an acknowledged entry, or every pass
+	// through CycloneDX would grow the license list by one.
+	t.Run("derived concluded license is not written back", func(t *testing.T) {
+		source := `{"bomFormat":"CycloneDX","specVersion":"1.6","version":1,
+			"serialNumber":"urn:uuid:11111111-2222-3333-4444-555555555555",
+			"metadata":{"component":{"bom-ref":"root","type":"library","name":"n",
+				"licenses":[{"license":{"id":"MIT"}},{"license":{"id":"Apache-2.0"}}]}}}`
+
+		doc, err := reader.New().ParseStream(bytes.NewReader([]byte(source)))
+		require.NoError(t, err)
+		for pass := 1; pass <= 2; pass++ {
+			var buf bytes.Buffer
+			require.NoError(t, writer.New().WriteStreamWithOptions(
+				doc, &buf, &writer.Options{Format: formats.CDX16JSON},
+			))
+			out := buf.Bytes()
+			bom := new(cdx.BOM)
+			require.NoError(t, cdx.NewBOMDecoder(bytes.NewReader(out), cdx.BOMFileFormatJSON).Decode(bom))
+			require.NotNil(t, bom.Metadata.Component.Licenses)
+			require.Equal(t, cdx.Licenses{
+				{License: &cdx.License{ID: "MIT"}}, {License: &cdx.License{ID: "Apache-2.0"}},
+			}, *bom.Metadata.Component.Licenses, "pass %d", pass)
+
+			doc, err = reader.New().ParseStream(bytes.NewReader(out))
+			require.NoError(t, err)
+			node := doc.NodeList.GetNodeByID("root")
+			require.NotNil(t, node)
+			require.Equal(t, []string{"MIT", "Apache-2.0"}, node.Licenses)
+			require.Equal(t, "MIT OR Apache-2.0", node.LicenseConcluded)
+		}
+	})
 
 	// TODO(degradation): CycloneDX below 1.6 has no license acknowledgement,
 	// so a concluded license that the declared list cannot reproduce is

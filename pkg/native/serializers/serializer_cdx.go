@@ -475,9 +475,12 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 		licenseChoices = append(licenseChoices, protobomLicenseToCdx(l))
 	}
 	// From 1.6 on, CycloneDX can state the concluded license apart from the
-	// declared ones through the license acknowledgement.
+	// declared ones through the license acknowledgement. A concluded license
+	// that only restates the declared list is not written: the reader derives
+	// it again from the declared entries, so writing it would add an entry
+	// the source never had on every pass through CycloneDX.
 	// TODO(degradation): below 1.6 the concluded license is not written.
-	if n.LicenseConcluded != "" && s.supportsLicenseAcknowledgment() {
+	if s.statesConcludedLicense(n) {
 		licenseChoices = append(licenseChoices, protobomConcludedLicenseToCdx(n.LicenseConcluded))
 	}
 	if len(licenseChoices) > 0 {
@@ -775,6 +778,17 @@ func protobomConcludedLicenseToCdx(license string) cdx.LicenseChoice {
 		choice.Acknowledgement = &ack
 	}
 	return choice
+}
+
+// statesConcludedLicense reports whether the node's concluded license has to
+// be written as an acknowledged entry: the target version supports the
+// acknowledgement and the concluded license says more than the declared list,
+// that is, it differs from what the reader derives from the declared entries.
+func (s *CDX) statesConcludedLicense(n *sbom.Node) bool {
+	if n.LicenseConcluded == "" || !s.supportsLicenseAcknowledgment() {
+		return false
+	}
+	return n.LicenseConcluded != cdxformats.DerivedConcludedLicense(n.Licenses)
 }
 
 // supportsLicenseAcknowledgment reports whether the CycloneDX version being

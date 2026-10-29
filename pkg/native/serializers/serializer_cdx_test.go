@@ -331,3 +331,74 @@ func TestNodeURLsToComponent(t *testing.T) {
 		require.Empty(t, *c.ExternalReferences)
 	})
 }
+
+func TestDocumentTypeToLifecycle(t *testing.T) {
+	for name, tc := range map[string]struct {
+		dt       *sbom.DocumentType
+		expected cdx.Lifecycle
+	}{
+		"build": {
+			&sbom.DocumentType{Type: sbom.DocumentType_BUILD.Enum()},
+			cdx.Lifecycle{Phase: cdx.LifecyclePhaseBuild},
+		},
+		"design": {
+			&sbom.DocumentType{Type: sbom.DocumentType_DESIGN.Enum()},
+			cdx.Lifecycle{Phase: cdx.LifecyclePhaseDesign},
+		},
+		"analyzed": {
+			&sbom.DocumentType{Type: sbom.DocumentType_ANALYZED.Enum()},
+			cdx.Lifecycle{Phase: cdx.LifecyclePhasePostBuild},
+		},
+		"source": {
+			&sbom.DocumentType{Type: sbom.DocumentType_SOURCE.Enum()},
+			cdx.Lifecycle{Phase: cdx.LifecyclePhasePreBuild},
+		},
+		"decommission": {
+			&sbom.DocumentType{Type: sbom.DocumentType_DECOMISSION.Enum()},
+			cdx.Lifecycle{Phase: cdx.LifecyclePhaseDecommission},
+		},
+		"deployed": {
+			&sbom.DocumentType{Type: sbom.DocumentType_DEPLOYED.Enum()},
+			cdx.Lifecycle{Phase: cdx.LifecyclePhaseOperations},
+		},
+		"discovery": {
+			&sbom.DocumentType{Type: sbom.DocumentType_DISCOVERY.Enum()},
+			cdx.Lifecycle{Phase: cdx.LifecyclePhaseDiscovery},
+		},
+		"phase drops name and description": {
+			&sbom.DocumentType{
+				Type: sbom.DocumentType_BUILD.Enum(), Name: ptr("CI build"), Description: ptr("built on CI"),
+			},
+			cdx.Lifecycle{Phase: cdx.LifecyclePhaseBuild},
+		},
+		// RUNTIME and OTHER have no CycloneDX phase, they are named lifecycles.
+		"runtime without name": {
+			&sbom.DocumentType{Type: sbom.DocumentType_RUNTIME.Enum()},
+			cdx.Lifecycle{Name: "runtime"},
+		},
+		"runtime with name and description": {
+			&sbom.DocumentType{
+				Type: sbom.DocumentType_RUNTIME.Enum(), Name: ptr("Runtime capture"), Description: ptr("eBPF probe"),
+			},
+			cdx.Lifecycle{Name: "Runtime capture", Description: "eBPF probe"},
+		},
+		"other without name": {
+			&sbom.DocumentType{Type: sbom.DocumentType_OTHER.Enum()},
+			cdx.Lifecycle{Name: "other"},
+		},
+		"other with name": {
+			&sbom.DocumentType{Type: sbom.DocumentType_OTHER.Enum(), Name: ptr("Audit"), Description: ptr("yearly")},
+			cdx.Lifecycle{Name: "Audit", Description: "yearly"},
+		},
+		"no type": {
+			&sbom.DocumentType{Name: ptr("custom"), Description: ptr("custom stage")},
+			cdx.Lifecycle{Name: "custom", Description: "custom stage"},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			require.Equal(t, tc.expected, documentTypeToLifecycle(tc.dt))
+		})
+	}
+}
+
+func ptr[T any](v T) *T { return &v }

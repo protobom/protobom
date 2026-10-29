@@ -465,3 +465,38 @@ func TestUnserializeURLReferences(t *testing.T) {
 	require.Equal(t, "https://mirror.example.com/pkg.tgz", root.ExternalReferences[1].Url)
 	require.Equal(t, sbom.ExternalReference_VCS, root.ExternalReferences[2].Type)
 }
+
+func TestCDXNamedLifecycleToSBOMType(t *testing.T) {
+	for name, expected := range map[string]*sbom.DocumentType_SBOMType{
+		"runtime": sbom.DocumentType_RUNTIME.Enum(),
+		"Runtime": sbom.DocumentType_RUNTIME.Enum(),
+		"audit":   nil,
+		"":        nil,
+	} {
+		t.Run(name, func(t *testing.T) {
+			require.Equal(t, expected, namedLifecycleToSBOMType(name))
+		})
+	}
+}
+
+func TestCDXLifecyclesToDocumentTypes(t *testing.T) {
+	doc := `{"bomFormat":"CycloneDX","specVersion":"1.5","version":1,"metadata":{"lifecycles":[
+		{"phase":"build"},
+		{"name":"runtime","description":"captured on a live host"},
+		{"name":"audit"}
+	]}}`
+	cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+	res, err := cdxu.Unserialize(strings.NewReader(doc), nil, nil)
+	require.NoError(t, err)
+	require.Len(t, res.Metadata.DocumentTypes, 3)
+
+	require.Equal(t, sbom.DocumentType_BUILD, res.Metadata.DocumentTypes[0].GetType())
+	require.Equal(t, "build", res.Metadata.DocumentTypes[0].GetName())
+
+	require.Equal(t, sbom.DocumentType_RUNTIME, res.Metadata.DocumentTypes[1].GetType())
+	require.Equal(t, "runtime", res.Metadata.DocumentTypes[1].GetName())
+	require.Equal(t, "captured on a live host", res.Metadata.DocumentTypes[1].GetDescription())
+
+	require.Nil(t, res.Metadata.DocumentTypes[2].Type)
+	require.Equal(t, "audit", res.Metadata.DocumentTypes[2].GetName())
+}

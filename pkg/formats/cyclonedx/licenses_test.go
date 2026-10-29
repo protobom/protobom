@@ -52,3 +52,27 @@ func TestIsLicenseRef(t *testing.T) {
 	require.False(t, IsLicenseRef("MIT"))
 	require.False(t, IsLicenseRef("MIT OR LicenseRef-GPL"))
 }
+
+func TestNamedLicenseRef(t *testing.T) {
+	for name, expected := range map[string]string{
+		"GPL":                      "LicenseRef-x-protobom-GPL",
+		"public-domain":            "LicenseRef-x-protobom-public-domain",
+		"Perl like licence":        "LicenseRef-x-protobom-Perl-like-licence",
+		"Magick++":                 "LicenseRef-x-protobom-Magick",
+		"  BSD (3 clause)  ":       "LicenseRef-x-protobom-BSD-3-clause",
+		"v1.2":                     "LicenseRef-x-protobom-v1.2",
+		"Custom Corp License, 2.0": "LicenseRef-x-protobom-Custom-Corp-License-2.0",
+		"++":                       "",
+		"":                         "",
+	} {
+		t.Run(name, func(t *testing.T) {
+			ref := NamedLicenseRef(name)
+			require.Equal(t, expected, ref)
+			if expected != "" {
+				// What was minted must be recognized as a named reference.
+				_, ok := LicenseNameFromRef(ref)
+				require.True(t, ok)
+			}
+		})
+	}
+}

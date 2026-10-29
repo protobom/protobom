@@ -492,18 +492,23 @@ func isConcludedLicense(lc *cdx.LicenseChoice) bool {
 }
 
 // licenseChoiceString returns the string form of a license choice, or an
-// empty string when the choice states no license.
+// empty string when the choice states no license. An expression and a
+// listed identifier are read as they are. A license that only has a name
+// is read as a license reference minted from that name, marked so the
+// serializer can write it back as a name (see cdxformats.NamedLicenseRef).
+// TODO(degradation): the license text and URL have no place in protobom
+// and are dropped.
 func licenseChoiceString(lc *cdx.LicenseChoice) string {
-	// TODO(license): This should handle licenses without an ID and
-	// create custom licenses or another solution that captures the
-	// full custom license text.
 	if lc.Expression != "" {
 		return lc.Expression
 	}
-	if lc.License != nil {
+	if lc.License == nil {
+		return ""
+	}
+	if lc.License.ID != "" {
 		return lc.License.ID
 	}
-	return ""
+	return cdxformats.NamedLicenseRef(lc.License.Name)
 }
 
 // licenseChoicesToLicenseList returns a flat list of the declared license

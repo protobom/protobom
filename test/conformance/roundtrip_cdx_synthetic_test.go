@@ -218,6 +218,19 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 		"a concluded expression survives": {
 			"(MIT OR GPL-2.0-only)", []string{"BSD-3-Clause"}, "(MIT OR GPL-2.0-only)", []string{"BSD-3-Clause"},
 		},
+		// A license reference from an SPDX document is written as an
+		// expression and read back as it is.
+		"a license reference survives": {
+			"", []string{"LicenseRef-GPL"}, "LicenseRef-GPL", []string{"LicenseRef-GPL"},
+		},
+		// A reference minted from a CycloneDX license name is written back
+		// as the name and minted again on read.
+		"a reference minted from a name survives": {
+			"",
+			[]string{"MIT", "LicenseRef-x-protobom-GPL"},
+			"MIT OR LicenseRef-x-protobom-GPL",
+			[]string{"MIT", "LicenseRef-x-protobom-GPL"},
+		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			got := cdxRoundTrip(t, cdxOneNodeDoc(&sbom.Node{
@@ -263,6 +276,32 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 			require.Equal(t, []string{"MIT", "Apache-2.0"}, node.Licenses)
 			require.Equal(t, "MIT OR Apache-2.0", node.LicenseConcluded)
 		}
+	})
+
+	// A CycloneDX license that only has a name is read as a marked license
+	// reference and written back as the same name.
+	t.Run("a license name is read as a reference and written back as the name", func(t *testing.T) {
+		source := `{"bomFormat":"CycloneDX","specVersion":"1.6","version":1,
+			"serialNumber":"urn:uuid:11111111-2222-3333-4444-555555555555",
+			"metadata":{"component":{"bom-ref":"root","type":"library","name":"n",
+				"licenses":[{"license":{"id":"MIT"}},{"license":{"name":"GPL"}}]}}}`
+
+		doc, err := reader.New().ParseStream(bytes.NewReader([]byte(source)))
+		require.NoError(t, err)
+		node := doc.NodeList.GetNodeByID("root")
+		require.NotNil(t, node)
+		require.Equal(t, []string{"MIT", "LicenseRef-x-protobom-GPL"}, node.Licenses)
+
+		var buf bytes.Buffer
+		require.NoError(t, writer.New().WriteStreamWithOptions(
+			doc, &buf, &writer.Options{Format: formats.CDX16JSON},
+		))
+		bom := new(cdx.BOM)
+		require.NoError(t, cdx.NewBOMDecoder(bytes.NewReader(buf.Bytes()), cdx.BOMFileFormatJSON).Decode(bom))
+		require.NotNil(t, bom.Metadata.Component.Licenses)
+		require.Equal(t, cdx.Licenses{
+			{License: &cdx.License{ID: "MIT"}}, {License: &cdx.License{Name: "GPL"}},
+		}, *bom.Metadata.Component.Licenses)
 	})
 
 	// TODO(degradation): CycloneDX below 1.6 has no license acknowledgement,

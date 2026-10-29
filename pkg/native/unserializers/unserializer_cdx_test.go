@@ -608,3 +608,24 @@ func TestUnserializeMimeType(t *testing.T) {
 	require.Equal(t, "image/png", doc.NodeList.GetNodeByID("f").ContentType)
 	require.Empty(t, doc.NodeList.GetNodeByID("n").ContentType)
 }
+
+func TestUnserializeDocumentVersion(t *testing.T) {
+	for name, tc := range map[string]struct {
+		version  string // the JSON version member, empty for none
+		expected string
+	}{
+		"stated":  {`"version": 4,`, "4"},
+		"one":     {`"version": 1,`, "1"},
+		"missing": {``, "1"},
+		"zero":    {`"version": 0,`, "1"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			data := `{"bomFormat": "CycloneDX", "specVersion": "1.5", ` + tc.version + `
+				"metadata": {"component": {"bom-ref": "root", "type": "application", "name": "root"}}}`
+			cdxu := NewCDX(cdxUnserializerTestVersion, cdxUnserializerTestEncoding)
+			doc, err := cdxu.Unserialize(strings.NewReader(data), nil, nil)
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, doc.Metadata.Version)
+		})
+	}
+}

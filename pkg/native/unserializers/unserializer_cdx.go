@@ -45,9 +45,16 @@ func (u *CDX) Unserialize(r io.Reader, _ *native.UnserializeOptions, _ interface
 		return nil, fmt.Errorf("decoding cyclonedx: %w", err)
 	}
 
+	// A document that states no version has version 1, the CycloneDX
+	// default, which the decoder leaves as zero.
+	version := bom.Version
+	if version < 1 {
+		version = 1
+	}
+
 	md := &sbom.Metadata{
 		Id:      bom.SerialNumber,
-		Version: fmt.Sprintf("%d", bom.Version),
+		Version: fmt.Sprintf("%d", version),
 		Date:    &timestamppb.Timestamp{},
 		Tools:   []*sbom.Tool{},
 		Authors: []*sbom.Person{},

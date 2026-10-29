@@ -103,11 +103,7 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 		}
 	}
 
-	ver, err := strconv.Atoi(bom.Metadata.Version)
-	// TODO(deprecation): If version does not parse to int, there's data loss here.
-	if err == nil {
-		doc.Version = ver
-	}
+	doc.Version = cdxDocumentVersion(bom.Metadata.Version)
 
 	// Add the document metadata
 	md, err := buildMetadata(bom)
@@ -207,6 +203,20 @@ func (s *CDX) Serialize(bom *sbom.Document, serializeopts *native.SerializeOptio
 	// root component's name, which names the software, not the document.
 
 	return doc, nil
+}
+
+// cdxDocumentVersion returns the CycloneDX document version a protobom
+// version string states. CycloneDX counts revisions of a document with an
+// integer of 1 or more, 1 being the default. A protobom version that is not
+// such an integer cannot be written and yields the default: an empty one is
+// the usual case, since formats without a revision counter leave it unset.
+// TODO(degradation): a version that is not a positive integer is dropped.
+func cdxDocumentVersion(version string) int {
+	v, err := strconv.Atoi(strings.TrimSpace(version))
+	if err != nil || v < 1 {
+		return 1
+	}
+	return v
 }
 
 // applyScopeEdges projects the relationships carrying CycloneDX scope

@@ -254,6 +254,21 @@ func TestRoundTripCDXLicenses(t *testing.T) {
 		})
 	}
 
+	// The document version is a revision counter CycloneDX defaults to 1.
+	t.Run("document version", func(t *testing.T) {
+		for name, tc := range map[string]struct{ in, out string }{
+			"stated":         {"3", "3"},
+			"unset is one":   {"", "1"},
+			"not an integer": {"1.0", "1"},
+		} {
+			t.Run(name, func(t *testing.T) {
+				doc := cdxOneNodeDoc(&sbom.Node{Id: "root", Type: sbom.Node_PACKAGE, Name: "n"})
+				doc.Metadata.Version = tc.in
+				require.Equal(t, tc.out, cdxRoundTrip(t, doc).Metadata.Version)
+			})
+		}
+	})
+
 	// The concluded license the reader derives from the declared entries
 	// must not be written back as an acknowledged entry, or every pass
 	// through CycloneDX would grow the license list by one.

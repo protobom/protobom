@@ -641,3 +641,23 @@ func TestSecurityPolicyToComponent(t *testing.T) {
 		})
 	}
 }
+
+func TestCDXDocumentVersion(t *testing.T) {
+	for name, tc := range map[string]struct {
+		version  string
+		expected int
+	}{
+		"one":              {"1", 1},
+		"revision":         {"7", 7},
+		"with whitespace":  {" 3 ", 3},
+		"empty is default": {"", 1},
+		"zero":             {"0", 1},
+		"negative":         {"-2", 1},
+		"not an integer":   {"1.0", 1},
+		"semantic version": {"v2", 1},
+	} {
+		t.Run(name, func(t *testing.T) {
+			require.Equal(t, tc.expected, cdxDocumentVersion(tc.version))
+		})
+	}
+}

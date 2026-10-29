@@ -589,6 +589,9 @@ func (s *CDX) nodeToComponent(n *sbom.Node) *cdx.Component {
 				// OmniBOR identifiers are gitoids. The field is a 1.6
 				// addition, the encoder drops it for older versions.
 				c.OmniborID = &[]string{n.Identifiers[idType]}
+			case int32(sbom.SoftwareIdentifierType_SWHID):
+				// Also a 1.6 addition the encoder drops for older versions.
+				c.SWHID = &[]string{n.Identifiers[idType]}
 			}
 		}
 	}

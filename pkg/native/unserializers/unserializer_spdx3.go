@@ -211,11 +211,14 @@ func (rd *spdx3Reader) softwareArtifact(a *software.SoftwareArtifact) *sbom.Node
 	node.Attribution = a.AttributionText
 	node.PrimaryPurpose = purposesFromSPDX3(a.PrimaryPurpose, a.AdditionalPurpose)
 
+	// A content identifier is one of the two kinds protobom knows, both
+	// of which SPDX 3 also admits as external identifiers.
 	for _, id := range a.ContentIdentifier {
-		// TODO(degradation): protobom has no identifier type for a swhid,
-		// so only gitoids survive.
-		if id.ContentIdentifierType == software.ContentIdentifierTypeGitoid {
+		switch id.ContentIdentifierType {
+		case software.ContentIdentifierTypeGitoid:
 			node.Identifiers[int32(sbom.SoftwareIdentifierType_GITOID)] = id.ContentIdentifierValue
+		case software.ContentIdentifierTypeSwhid:
+			node.Identifiers[int32(sbom.SoftwareIdentifierType_SWHID)] = id.ContentIdentifierValue
 		}
 	}
 

@@ -173,6 +173,10 @@ func TestSPDX3UnserializeElements(t *testing.T) {
 			"software_fileKind": "file",
 			"software_contentIdentifier": [{
 				"type": "software_ContentIdentifier",
+				"software_contentIdentifierType": "swhid",
+				"software_contentIdentifierValue": "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"
+			}, {
+				"type": "software_ContentIdentifier",
 				"software_contentIdentifierType": "gitoid",
 				"software_contentIdentifierValue": "gitoid:blob:sha1:abc"
 			}]
@@ -225,8 +229,11 @@ func TestSPDX3UnserializeElements(t *testing.T) {
 	require.Equal(t, "a/file.txt", file.Name)
 	require.Equal(t, "text/plain", file.ContentType)
 	require.Equal(t, sbom.Node_FILE_KIND_FILE, file.FileKind)
-	require.Equal(t, "gitoid:blob:sha1:abc",
-		file.Identifiers[int32(sbom.SoftwareIdentifierType_GITOID)])
+	// Both content identifier kinds are read.
+	require.Equal(t, map[int32]string{
+		int32(sbom.SoftwareIdentifierType_GITOID): "gitoid:blob:sha1:abc",
+		int32(sbom.SoftwareIdentifierType_SWHID):  "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2",
+	}, file.Identifiers)
 }
 
 // TestSPDX3ElementsAreSelectedByClass is the test for the rule that keeps

@@ -64,6 +64,7 @@ func TestRoundTripSPDX3Elements(t *testing.T) {
 		Identifiers: map[int32]string{
 			int32(sbom.SoftwareIdentifierType_PURL):  "pkg:generic/a-package@1.2.3",
 			int32(sbom.SoftwareIdentifierType_CPE23): "cpe:2.3:a:example:a-package:1.2.3:*:*:*:*:*:*:*",
+			int32(sbom.SoftwareIdentifierType_SWHID): "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2",
 		},
 		ExternalReferences: []*sbom.ExternalReference{
 			{Url: "https://example.com/web", Type: sbom.ExternalReference_WEBSITE, Comment: "the site"},

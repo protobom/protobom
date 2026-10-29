@@ -92,6 +92,7 @@ func TestRoundTripCDXElements(t *testing.T) {
 			int32(sbom.SoftwareIdentifierType_PURL):   "pkg:generic/a-package@1.2.3",
 			int32(sbom.SoftwareIdentifierType_CPE23):  "cpe:2.3:a:example:a-package:1.2.3:*:*:*:*:*:*:*",
 			int32(sbom.SoftwareIdentifierType_GITOID): "gitoid:blob:sha256:261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+			int32(sbom.SoftwareIdentifierType_SWHID):  "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2",
 		},
 		Originators: []*sbom.Person{
 			{Name: "An Author", Email: "author@example.com"},
@@ -587,6 +588,8 @@ func TestRoundTripCDXEveryVocabulary(t *testing.T) {
 					identifier = "cpe:2.3:a:example:x:1.0.0:*:*:*:*:*:*:*"
 				case sbom.SoftwareIdentifierType_GITOID:
 					identifier = "gitoid:blob:sha256:261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+				case sbom.SoftwareIdentifierType_SWHID:
+					identifier = "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"
 				}
 				got := cdxRoundTrip(t, cdxOneNodeDoc(&sbom.Node{
 					Id: "root", Type: sbom.Node_PACKAGE, Name: "n",

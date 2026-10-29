@@ -323,6 +323,8 @@ const (
 	SoftwareIdentifierType_CPE23 SoftwareIdentifierType = 3
 	// Git Object Identifier (OID) identifier type.
 	SoftwareIdentifierType_GITOID SoftwareIdentifierType = 4
+	// Software Heritage persistent identifier (SWHID).
+	SoftwareIdentifierType_SWHID SoftwareIdentifierType = 5
 )
 
 // Enum value maps for SoftwareIdentifierType.
@@ -333,6 +335,7 @@ var (
 		2: "CPE22",
 		3: "CPE23",
 		4: "GITOID",
+		5: "SWHID",
 	}
 	SoftwareIdentifierType_value = map[string]int32{
 		"UNKNOWN_IDENTIFIER_TYPE": 0,
@@ -340,6 +343,7 @@ var (
 		"CPE22":                   2,
 		"CPE23":                   3,
 		"GITOID":                  4,
+		"SWHID":                   5,
 	}
 )
 
@@ -2424,14 +2428,15 @@ const file_sbom_proto_rawDesc = "" +
 	"\n" +
 	"\x06SOURCE\x10\x1a\x12\x11\n" +
 	"\rSPECIFICATION\x10\x1b\x12\b\n" +
-	"\x04TEST\x10\x1c*a\n" +
+	"\x04TEST\x10\x1c*l\n" +
 	"\x16SoftwareIdentifierType\x12\x1b\n" +
 	"\x17UNKNOWN_IDENTIFIER_TYPE\x10\x00\x12\b\n" +
 	"\x04PURL\x10\x01\x12\t\n" +
 	"\x05CPE22\x10\x02\x12\t\n" +
 	"\x05CPE23\x10\x03\x12\n" +
 	"\n" +
-	"\x06GITOID\x10\x04B\xae\x01\n" +
+	"\x06GITOID\x10\x04\x12\t\n" +
+	"\x05SWHID\x10\x05B\xae\x01\n" +
 	"\x15com.protobom.protobomB\tSbomProtoP\x01Z%github.com/protobom/protobom/pkg/sbom\xa2\x02\x03PPX\xaa\x02\x11Protobom.Protobom\xca\x02\x11Protobom\\Protobom\xe2\x02\x1dProtobom\\Protobom\\GPBMetadata\xea\x02\x12Protobom::Protobomb\x06proto3"
 
 var (

@@ -406,6 +406,8 @@ func (*SPDX23) extRefTypeToIdentifierType(spdxType string) sbom.SoftwareIdentifi
 		return sbom.SoftwareIdentifierType_CPE23
 	case spdx.TypePersistentIdGitoid:
 		return sbom.SoftwareIdentifierType_GITOID
+	case spdx.TypePersistentIdSwh:
+		return sbom.SoftwareIdentifierType_SWHID
 	default:
 		return sbom.SoftwareIdentifierType_UNKNOWN_IDENTIFIER_TYPE
 	}

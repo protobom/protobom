@@ -23,6 +23,7 @@ const (
 	ExtRefTypeCPE22  = "cpe22Type"
 	ExtRefTypeCPE23  = "cpe23Type"
 	ExtRefTypeGitoid = "gitoid"
+	ExtRefTypeSwh    = "swh"
 
 	// ProtobomName is how protobom names itself, as a tool and as an agent,
 	// in the SPDX documents it writes and recognizes itself by when reading

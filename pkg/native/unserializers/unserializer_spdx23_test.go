@@ -3,6 +3,7 @@ package unserializers
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/spdx/tools-golang/spdx"
@@ -341,4 +342,28 @@ func TestSPDX23FileToNode(t *testing.T) {
 
 	// A file without attribution texts has an empty list, not a nil one.
 	require.Equal(t, []string{}, NewSPDX23().fileToNode(&spdx23.File{FileName: "x"}).Attribution)
+}
+
+// A relationship ending in NOASSERTION or NONE names no element, so it
+// leaves no edge and no root behind; every other relationship is read.
+func TestSPDX23SpecialRelationshipTargets(t *testing.T) {
+	doc, err := NewSPDX23().Unserialize(strings.NewReader(`{
+		"spdxVersion": "SPDX-2.3", "dataLicense": "CC0-1.0", "SPDXID": "SPDXRef-DOCUMENT",
+		"name": "x", "documentNamespace": "https://example.com/x",
+		"creationInfo": {"created": "2020-01-01T00:00:00Z", "creators": ["Tool: test"]},
+		"packages": [
+			{"name": "a", "SPDXID": "SPDXRef-a", "downloadLocation": "NOASSERTION"},
+			{"name": "b", "SPDXID": "SPDXRef-b", "downloadLocation": "NOASSERTION"}
+		],
+		"relationships": [
+			{"spdxElementId": "SPDXRef-DOCUMENT", "relatedSpdxElement": "SPDXRef-a", "relationshipType": "DESCRIBES"},
+			{"spdxElementId": "SPDXRef-DOCUMENT", "relatedSpdxElement": "NOASSERTION", "relationshipType": "DESCRIBES"},
+			{"spdxElementId": "SPDXRef-a", "relatedSpdxElement": "SPDXRef-b", "relationshipType": "DEPENDS_ON"},
+			{"spdxElementId": "SPDXRef-a", "relatedSpdxElement": "NOASSERTION", "relationshipType": "DEPENDS_ON"},
+			{"spdxElementId": "SPDXRef-b", "relatedSpdxElement": "NONE", "relationshipType": "DEPENDS_ON"}
+		]
+	}`), &native.UnserializeOptions{}, nil)
+	require.NoError(t, err)
+	require.Equal(t, []string{"a"}, doc.NodeList.RootElements)
+	require.Equal(t, []*sbom.Edge{{Type: sbom.Edge_dependsOn, From: "a", To: []string{"b"}}}, doc.NodeList.Edges)
 }

@@ -102,6 +102,12 @@ func (u *SPDX23) unserializeDocument(spdxDoc *spdx23.Document, opts *native.Unse
 	}
 
 	for _, r := range spdxDoc.Relationships {
+		// A relationship ending in NOASSERTION or NONE says the document
+		// declines to name, or has no, related element: there is no node
+		// for an edge to reach, so it is not read.
+		if r.RefA.SpecialID != "" || r.RefB.SpecialID != "" {
+			continue
+		}
 		// The SPDX go library surfaces the JSON top-level elements as relationships:
 		if r.RefA.ElementRefID == protospdx.DOCUMENT && strings.EqualFold(r.Relationship, "DESCRIBES") {
 			bom.NodeList.RootElements = append(bom.NodeList.RootElements, string(r.RefB.ElementRefID))

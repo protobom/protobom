@@ -69,3 +69,55 @@ func (e *Edge) indexDestinations() map[string]struct{} {
 	}
 	return dests
 }
+
+// inverseEdgeTypes are the edge types that state their relationship from the
+// owned node: the edge's source is the dependency, the part or the tool, and
+// its destinations are what it belongs to.
+var inverseEdgeTypes = map[Edge_Type]struct{}{
+	Edge_amends:              {},
+	Edge_buildDependency:     {},
+	Edge_buildTool:           {},
+	Edge_contained_by:        {},
+	Edge_copy:                {},
+	Edge_dataFile:            {},
+	Edge_dependencyManifest:  {},
+	Edge_dependencyOf:        {},
+	Edge_describedBy:         {},
+	Edge_devDependency:       {},
+	Edge_devTool:             {},
+	Edge_documentation:       {},
+	Edge_example:             {},
+	Edge_expandedFromArchive: {},
+	Edge_fileAdded:           {},
+	Edge_fileDeleted:         {},
+	Edge_generatedFrom:       {},
+	Edge_metafile:            {},
+	Edge_optionalComponent:   {},
+	Edge_optionalDependency:  {},
+	Edge_packages:            {},
+	Edge_patch:               {},
+	Edge_prerequisiteFor:     {},
+	Edge_providedDependency:  {},
+	Edge_requirementFor:      {},
+	Edge_runtimeDependency:   {},
+	Edge_specificationFor:    {},
+	Edge_test:                {},
+	Edge_testCase:            {},
+	Edge_testDependency:      {},
+	Edge_testTool:            {},
+	Edge_variant:             {},
+}
+
+// Inverse reports whether edges of the type run from the owned node to its
+// owner. protobom keeps the relationship names and directions of SPDX 2,
+// which states many of them that way round: "A DEPENDENCY_OF B", "A
+// CONTAINED_BY B" and "A BUILD_TOOL_OF B" all name the owner last. Reading
+// the graph as a tree, an inverse edge is followed backwards: its
+// destinations are the parents and its source the child.
+//
+// These are the types the SPDX 3 serializer turns around, SPDX 3 having
+// dropped the inverse relationships.
+func (t Edge_Type) Inverse() bool {
+	_, ok := inverseEdgeTypes[t]
+	return ok
+}

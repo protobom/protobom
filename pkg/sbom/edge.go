@@ -69,3 +69,123 @@ func (e *Edge) indexDestinations() map[string]struct{} {
 	}
 	return dests
 }
+
+// inverseEdgeTypes are the edge types that state their relationship from the
+// owned node: the edge's source is the dependency, the part or the tool, and
+// its destinations are what it belongs to.
+var inverseEdgeTypes = map[Edge_Type]struct{}{
+	Edge_amends:              {},
+	Edge_buildDependency:     {},
+	Edge_buildTool:           {},
+	Edge_contained_by:        {},
+	Edge_copy:                {},
+	Edge_dataFile:            {},
+	Edge_dependencyManifest:  {},
+	Edge_dependencyOf:        {},
+	Edge_describedBy:         {},
+	Edge_devDependency:       {},
+	Edge_devTool:             {},
+	Edge_documentation:       {},
+	Edge_example:             {},
+	Edge_expandedFromArchive: {},
+	Edge_fileAdded:           {},
+	Edge_fileDeleted:         {},
+	Edge_generatedFrom:       {},
+	Edge_metafile:            {},
+	Edge_optionalComponent:   {},
+	Edge_optionalDependency:  {},
+	Edge_packages:            {},
+	Edge_patch:               {},
+	Edge_prerequisiteFor:     {},
+	Edge_providedDependency:  {},
+	Edge_requirementFor:      {},
+	Edge_runtimeDependency:   {},
+	Edge_specificationFor:    {},
+	Edge_test:                {},
+	Edge_testCase:            {},
+	Edge_testDependency:      {},
+	Edge_testTool:            {},
+	Edge_variant:             {},
+}
+
+// Inverse reports whether edges of the type run from the owned node to its
+// owner. protobom keeps the relationship names and directions of SPDX 2,
+// which states many of them that way round: "A DEPENDENCY_OF B", "A
+// CONTAINED_BY B" and "A BUILD_TOOL_OF B" all name the owner last. Reading
+// the graph as a tree, an inverse edge is followed backwards: its
+// destinations are the parents and its source the child.
+//
+// These are the types the SPDX 3 serializer turns around, SPDX 3 having
+// dropped the inverse relationships.
+func (t Edge_Type) Inverse() bool {
+	_, ok := inverseEdgeTypes[t]
+	return ok
+}
+
+// EdgeGroup names a set of edge types that say the same kind of thing about
+// a relationship, so they can be told apart or left out of a graph together
+// (see WithoutEdgeGroups).
+type EdgeGroup string
+
+const (
+	// EdgeGroupDevelopment are the dependencies and tools used to develop
+	// the software.
+	EdgeGroupDevelopment EdgeGroup = "development"
+	// EdgeGroupTest are the dependencies, tools, tests and test cases used
+	// to test the software.
+	EdgeGroupTest EdgeGroup = "test"
+	// EdgeGroupBuild are the dependencies and tools used to build the
+	// software.
+	EdgeGroupBuild EdgeGroup = "build"
+	// EdgeGroupOptional are the components and dependencies the software
+	// works without, and those it expects its environment to provide.
+	EdgeGroupOptional EdgeGroup = "optional"
+	// EdgeGroupDocumentation are the documentation and the examples of the
+	// software.
+	EdgeGroupDocumentation EdgeGroup = "documentation"
+)
+
+// edgeGroups lists the groups in the order EdgeGroups answers them, each
+// with its edge types.
+var edgeGroups = []struct {
+	group EdgeGroup
+	types []Edge_Type
+}{
+	{EdgeGroupDevelopment, []Edge_Type{Edge_devDependency, Edge_devTool}},
+	{EdgeGroupTest, []Edge_Type{Edge_testDependency, Edge_testTool, Edge_test, Edge_testCase}},
+	{EdgeGroupBuild, []Edge_Type{Edge_buildDependency, Edge_buildTool}},
+	{EdgeGroupOptional, []Edge_Type{Edge_optionalDependency, Edge_optionalComponent, Edge_providedDependency}},
+	{EdgeGroupDocumentation, []Edge_Type{Edge_documentation, Edge_example}},
+}
+
+// EdgeGroups returns every edge group, in a fixed order.
+func EdgeGroups() []EdgeGroup {
+	groups := make([]EdgeGroup, 0, len(edgeGroups))
+	for _, g := range edgeGroups {
+		groups = append(groups, g.group)
+	}
+	return groups
+}
+
+// EdgeTypes returns the edge types of the group. A group this package does
+// not define has none.
+func (g EdgeGroup) EdgeTypes() []Edge_Type {
+	for _, eg := range edgeGroups {
+		if eg.group == g {
+			return slices.Clone(eg.types)
+		}
+	}
+	return nil
+}
+
+// Group returns the group the edge type belongs to, or an empty group when
+// it belongs to none: most types, a plain dependsOn or contains among them,
+// say nothing a group captures.
+func (t Edge_Type) Group() EdgeGroup {
+	for _, eg := range edgeGroups {
+		if slices.Contains(eg.types, t) {
+			return eg.group
+		}
+	}
+	return ""
+}

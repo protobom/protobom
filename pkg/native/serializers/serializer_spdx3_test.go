@@ -358,6 +358,10 @@ func TestSPDX3EdgeMappingIsExhaustive(t *testing.T) {
 			"edge type %q maps to %q, which is not a member of the SPDX 3 "+
 				"relationship vocabulary", name, mapping.relType)
 
+		require.Equal(t, edge.Inverse(), mapping.invert,
+			"edge type %q is turned around here but sbom.Edge_Type.Inverse "+
+				"says otherwise: the two have to agree on which way it runs", name)
+
 		if mapping.scope != "" {
 			require.True(t, mapping.scope.IsValid(),
 				"edge type %q maps to lifecycle scope %q, which is not a member "+

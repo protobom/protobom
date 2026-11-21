@@ -432,6 +432,22 @@ func (n *Node) Checksum() string {
 // PackageURL represents a Package URL (PURL) for identifying and locating software packages.
 type PackageURL string
 
+// Type returns the type of the package URL in lower case ("npm", "golang"),
+// or an empty string when it has none to read.
+func (p PackageURL) Type() string {
+	const scheme = "pkg:"
+	s := string(p)
+	if len(s) < len(scheme) || !strings.EqualFold(s[:len(scheme)], scheme) {
+		return ""
+	}
+	// The scheme may be followed by slashes, which are not significant.
+	t, _, found := strings.Cut(strings.TrimLeft(s[len(scheme):], "/"), "/")
+	if !found {
+		return ""
+	}
+	return strings.ToLower(t)
+}
+
 // Purl returns the node's Package URL (PURL) as a string.
 // If the node is of type FILE empty PURL is returned.
 func (n *Node) Purl() PackageURL {

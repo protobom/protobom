@@ -319,6 +319,56 @@ func TestFilter(t *testing.T) {
 	})
 }
 
+func TestFilterWithoutEdgeGroups(t *testing.T) {
+	t.Parallel()
+	sut := filterList([]*Edge{
+		{Type: Edge_dependsOn, From: "root", To: []string{"prod"}},
+		{Type: Edge_devTool, From: "linter", To: []string{"root"}},
+		{Type: Edge_testCase, From: "case", To: []string{"root"}},
+		{Type: Edge_buildDependency, From: "compiler", To: []string{"root"}},
+	}, "root", "prod", "linter", "case", "compiler")
+
+	got := sut.Filter(WithoutEdgeGroups(EdgeGroupDevelopment, EdgeGroupTest))
+	require.Equal(t, []string{"root", "prod", "compiler"}, filterNodeIDs(got))
+
+	got = sut.Filter(WithoutEdgeGroups(EdgeGroups()...))
+	require.Equal(t, []string{"root", "prod"}, filterNodeIDs(got))
+
+	got = sut.Filter(WithoutEdgeGroups(), WithoutEdgeGroups("nonesuch"))
+	require.True(t, sut.Equal(got))
+}
+
+func TestEdgeGroups(t *testing.T) {
+	t.Parallel()
+	require.Equal(t, []EdgeGroup{
+		EdgeGroupDevelopment, EdgeGroupTest, EdgeGroupBuild,
+		EdgeGroupOptional, EdgeGroupDocumentation,
+	}, EdgeGroups())
+
+	// Every type is in the group that lists it, and in that one only.
+	seen := map[Edge_Type]EdgeGroup{}
+	for _, g := range EdgeGroups() {
+		require.NotEmpty(t, g.EdgeTypes(), g)
+		for _, et := range g.EdgeTypes() {
+			require.Equal(t, g, et.Group(), et.String())
+			require.NotContains(t, seen, et, "%s is in two groups", et)
+			seen[et] = g
+		}
+	}
+
+	for _, et := range []Edge_Type{
+		Edge_UNKNOWN, Edge_dependsOn, Edge_dependencyOf, Edge_contains, Edge_runtimeDependency,
+	} {
+		require.Empty(t, et.Group(), et.String())
+	}
+	require.Empty(t, EdgeGroup("nonesuch").EdgeTypes())
+
+	// The types of a group are the caller's to change.
+	types := EdgeGroupBuild.EdgeTypes()
+	types[0] = Edge_UNKNOWN
+	require.Equal(t, Edge_buildDependency, EdgeGroupBuild.EdgeTypes()[0])
+}
+
 func TestEdgeTypeInverse(t *testing.T) {
 	t.Parallel()
 	for _, et := range []Edge_Type{

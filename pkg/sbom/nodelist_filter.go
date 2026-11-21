@@ -28,6 +28,18 @@ func WithoutEdgeTypes(types ...Edge_Type) FilterOption {
 	}
 }
 
+// WithoutEdgeGroups leaves out the relationships of every edge type of the
+// given groups, as WithoutEdgeTypes does for the types it is handed:
+// WithoutEdgeGroups(EdgeGroupDevelopment, EdgeGroupTest) leaves a graph
+// without its development and test dependencies.
+func WithoutEdgeGroups(groups ...EdgeGroup) FilterOption {
+	types := []Edge_Type{}
+	for _, g := range groups {
+		types = append(types, g.EdgeTypes()...)
+	}
+	return WithoutEdgeTypes(types...)
+}
+
 // WithoutNodes leaves out the nodes match answers true for.
 func WithoutNodes(match func(*Node) bool) FilterOption {
 	return func(f *nodeListFilter) {

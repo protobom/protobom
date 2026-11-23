@@ -22,9 +22,9 @@ jobs:
 
       - name: Resolve Go versions
         id: go-versions
-        uses: carabiner-dev/actions/go/versions@63d43b57262e65927864c8f7ca0a6a8efe06acc0 # v1.3.1
+        uses: carabiner-dev/actions/go/versions@2f56fd66c5ef961f72bca3dbacbbfbd9acc717ee # v1.3.2
 
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version: ${{ steps.go-versions.outputs.GO_VERSION_STABLE }}
           check-latest: true
